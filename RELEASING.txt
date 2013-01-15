@@ -1,0 +1,44 @@
+Releasing clld
+==============
+
+- Do any necessary branch merges (e.g. master to branch, branch to master).
+
+- On release branch:
+
+  $ git pull
+
+- Do platform test via tox:
+
+  $ tox -r
+
+  Make sure statement coverage is at 100%::
+
+- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2, 3.3):
+
+  $ python clld/scaffolds/tests.py
+
+- Make sure javascript tests pass with coverage at 100%::
+
+  $ java -jar tools/jsTestDriver/JsTestDriver.jar --tests all --browser /usr/bin/google-chrome --port 9876
+
+- Make sure docs render OK::
+
+  $ cd docs
+  $ make clean html
+
+- Update translations (using a py3 env with babel patched for py3 compatibility).
+
+- Change setup.py version to the new version number.
+
+- Change docs/conf.py version to the new version number.
+
+- Change CHANGES.txt heading to reflect the new version number.
+
+- Create a release tag.
+
+- Make sure your system Python has ``setuptools-git`` installed and release to
+  PyPI::
+
+  $ python setup.py sdist register upload
+
+- Publish new version of docs.

@@ -1,0 +1,64 @@
+# Translations template for clld.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the clld project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: clld 0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-01-15 13:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: clld/web/templates/contribution/index_html.mako:5
+msgid "Contributions"
+msgstr ""
+
+#: clld/web/templates/example/index_html.mako:5
+msgid "Examples"
+msgstr ""
+
+#: clld/web/templates/example/index_html.mako:7
+msgid "Examples for this project"
+msgstr ""
+
+#: clld/web/templates/language/detail_html.mako:5
+msgid "Language"
+msgstr ""
+
+#: clld/web/templates/language/index_html.mako:15
+#: clld/web/templates/language/kml.mako:6
+msgid "Languages"
+msgstr ""
+
+#: clld/web/templates/language/index_html.mako:17
+msgid "Languages under analysis for this project"
+msgstr ""
+
+#: clld/web/templates/parameter/detail_html.mako:8
+msgid "Parameter"
+msgstr ""
+
+#: clld/web/templates/parameter/index_html.mako:5
+msgid "Parameters"
+msgstr ""
+
+#: clld/web/templates/parameter/index_html.mako:7
+msgid "Parameters under analysis for this project"
+msgstr ""
+
+#: clld/web/templates/source/index_html.mako:5
+msgid "Sources"
+msgstr ""
+
+#: clld/web/templates/source/index_html.mako:7
+msgid "Sources cited in this project"
+msgstr ""
+
