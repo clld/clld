@@ -10,7 +10,12 @@
         <meta name="author" content="">
         <!-- Le styles -->
         <link href="${request.static_url('clld:web/static/css/clld.css')}" rel="stylesheet">
+
+        ##
+        ## TODO: include project-specific bootstrap.css!
+        ##
         <link href="${request.static_url('clld:web/static/css/bootstrap.css')}" rel="stylesheet">
+        <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
 
         <script type="text/javascript"
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBKZ6iuwHMVqtwkAegSmtCVIboFHk94AA&sensor=false">

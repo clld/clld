@@ -13,7 +13,7 @@ class ILanguage(Interface):
     longitude = Attribute('')
 
 
-class IExample(Interface):
+class ISentence(Interface):
     """marker interface
     """
 
@@ -54,6 +54,16 @@ class IUnitParameter(Interface):
 
 
 class IUnit(Interface):
+    """marker interface
+    """
+
+
+class IUnitValue(Interface):
+    """marker interface
+    """
+
+
+class IUnitDomainElement(Interface):
     """marker interface
     """
 

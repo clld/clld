@@ -41,12 +41,59 @@ chf: make sure backgroud is transparent (the 00 added to the color spec)
 """
 
 
+#-----------------------------------------------------------------------------
+# We augment mapper classes for basic objects using mixins to add the ability
+# to store arbitrary key-value pairs and files associated with an object.
+#-----------------------------------------------------------------------------
 class File(Base):
     """Model for storage of files in the database.
     """
     name = Column(Unicode)
     mime_type = Column(String)
     content = Column(LargeBinary)
+
+
+class FilesMixin(object):
+    """This mixin provides a way to associate files with another model class.
+    """
+    @classmethod
+    def owner_class(cls):
+        return cls.__name__.split('_')[0]
+
+    name = Column(Unicode)
+    ord = Column(Integer, default=1)
+
+    @declared_attr
+    def file_pk(cls):
+        return Column(Integer, ForeignKey('file.pk'))
+
+    @declared_attr
+    def file(cls):
+        return relationship(File)
+
+    @declared_attr
+    def object_pk(cls):
+        return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
+
+    #@declared_attr
+    #def object(cls):
+    #    return relationship(cls.owner_class(), backref=backref('files', order_by=cls.ord))
+
+
+class HasFilesMixin(object):
+    """Adds a convenience method to retrieve a dict of associated files.
+
+    .. note::
+
+        It is the responsibility of the programmer to make sure conversion to a dict makes
+        sense, i.e. the names of associated files are actually unique.
+    """
+    def filesdict(self):
+        return dict((f.name, f.file) for f in self.files)
+
+    @declared_attr
+    def data(cls):
+        return relationship(cls.__name__ + '_files')
 
 
 class DataMixin(object):
@@ -65,9 +112,9 @@ class DataMixin(object):
     def object_pk(cls):
         return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
 
-    @declared_attr
-    def object(cls):
-        return relationship(cls.owner_class(), backref=backref('data', order_by=cls.ord))
+    #@declared_attr
+    #def object(cls):
+    #    return relationship(cls.owner_class(), backref=backref('data', order_by=cls.ord))
 
 
 class HasDataMixin(object):
@@ -81,6 +128,10 @@ class HasDataMixin(object):
     def datadict(self):
         return dict((d.key, d.value) for d in self.data)
 
+    @declared_attr
+    def data(cls):
+        return relationship(cls.__name__ + '_data')
+
 
 class IdNameDescriptionMixin(object):
     """id is to be used as string identifier which can be used for sorting and as
@@ -91,7 +142,15 @@ class IdNameDescriptionMixin(object):
     description = Column(Unicode)
 
 
+#-----------------------------------------------------------------------------
+# The mapper classes for basic objects of the clld db model are marked as
+# implementers of the related interface.
+#-----------------------------------------------------------------------------
 class Language_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Language_files(Base, Versioned, FilesMixin):
     pass
 
 
@@ -100,7 +159,8 @@ class Language(Base,
                PolymorphicBaseMixin,
                Versioned,
                IdNameDescriptionMixin,
-               HasDataMixin):
+               HasDataMixin,
+               HasFilesMixin):
     """Languages are the main objects of discourse. We attach a geo-coordinate
     to them to be able to put them on maps.
     """
@@ -110,12 +170,293 @@ class Language(Base,
     identifiers = association_proxy('languageidentifier', 'identifier')
 
 
+class DomainElement_data(Base, Versioned, DataMixin):
+    pass
+
+
+class DomainElement_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IDomainElement)
+class DomainElement(Base,
+                    PolymorphicBaseMixin,
+                    Versioned,
+                    IdNameDescriptionMixin,
+                    HasDataMixin,
+                    HasFilesMixin):
+    __table_args__ = (UniqueConstraint('name', 'parameter_pk'),)
+
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+
+    # do we need a numeric value for these?
+
+
+class Parameter_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Parameter_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IParameter)
+class Parameter(Base,
+                PolymorphicBaseMixin,
+                Versioned,
+                IdNameDescriptionMixin,
+                HasDataMixin,
+                HasFilesMixin):
+    __table_args__ = (UniqueConstraint('name'),)
+    domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
+
+
+class Source_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Source_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.ISource)
+class Source(Base,
+             PolymorphicBaseMixin,
+             Versioned,
+             IdNameDescriptionMixin,
+             HasDataMixin,
+             HasFilesMixin):
+    glottolog_id = Column(String)
+    google_book_search_id = Column(String)
+
+
+class Contribution_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Contribution_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IContribution)
+class Contribution(Base,
+                   PolymorphicBaseMixin,
+                   Versioned,
+                   IdNameDescriptionMixin,
+                   HasDataMixin,
+                   HasFilesMixin):
+    __table_args__ = (UniqueConstraint('name'),)
+    date = Column(Date)
+
+    @property
+    def primary_contributors(self):
+        return [assoc.contributor for assoc in
+                sorted(self.contributor_assocs, key=lambda a: a.ord) if assoc.primary]
+
+    @property
+    def secondary_contributors(self):
+        return [assoc.contributor for assoc in
+                sorted(self.contributor_assocs, key=lambda a: a.ord) if not assoc.primary]
+
+
+class Value_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Value_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IValue)
+class Value(Base,
+            PolymorphicBaseMixin,
+            Versioned,
+            IdNameDescriptionMixin,
+            HasDataMixin,
+            HasFilesMixin):
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
+
+    # Values may be taken from a domain.
+    domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
+
+    # Languages may have multiple values for the same parameter. Their relative
+    # frequency can be stored here.
+    frequency = Column(Float)
+
+    parameter = relationship('Parameter', backref='values')
+    domainelement = relationship('DomainElement', backref='values')
+    contribution = relationship('Contribution', backref='values')
+
+    @declared_attr
+    def language(cls):
+        return relationship('Language', backref=backref('values', order_by=cls.language_pk))
+
+    @validates('parameter_pk')
+    def validate_parameter_pk(self, key, parameter_pk):
+        """We have to make sure, the parameter a value is tied to and the parameter a
+        possible domainelement is tied to stay in sync.
+        """
+        if self.domainelement:
+            assert self.domainelement.parameter_pk == parameter_pk
+        return parameter_pk
+
+
+class Contributor_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Contributor_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IContributor)
+class Contributor(Base,
+                  PolymorphicBaseMixin,
+                  Versioned,
+                  IdNameDescriptionMixin,
+                  HasDataMixin,
+                  HasFilesMixin):
+    __table_args__ = (UniqueConstraint('name'),)
+    url = Column(Unicode())
+    email = Column(String)
+    address = Column(Unicode)
+
+
+class Sentence_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Sentence_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.ISentence)
+class Sentence(Base,
+               PolymorphicBaseMixin,
+               Versioned,
+               HasDataMixin,
+               HasFilesMixin):
+    pass
+
+
+class Unit_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Unit_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IUnit)
+class Unit(Base,
+           PolymorphicBaseMixin,
+           Versioned,
+           IdNameDescriptionMixin,
+           HasDataMixin,
+           HasFilesMixin):
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    language = relationship(Language)
+
+
+class UnitDomainElement_data(Base, Versioned, DataMixin):
+    pass
+
+
+class UnitDomainElement_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IUnitDomainElement)
+class UnitDomainElement(Base,
+                        PolymorphicBaseMixin,
+                        Versioned,
+                        IdNameDescriptionMixin,
+                        HasDataMixin,
+                        HasFilesMixin):
+    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
+    ord = Column(Integer)
+
+    # do we need a numeric value for these?
+
+
+class UnitParameter_data(Base, Versioned, DataMixin):
+    pass
+
+
+class UnitParameter_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IUnitParameter)
+class UnitParameter(Base,
+                    PolymorphicBaseMixin,
+                    Versioned,
+                    IdNameDescriptionMixin,
+                    HasDataMixin,
+                    HasFilesMixin):
+    domain = relationship('UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
+
+
+class UnitValue_data(Base, Versioned, DataMixin):
+    pass
+
+
+class UnitValue_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IUnitValue)
+class UnitValue(Base,
+                PolymorphicBaseMixin,
+                Versioned,
+                IdNameDescriptionMixin,
+                HasDataMixin,
+                HasFilesMixin):
+    unit_pk = Column(Integer, ForeignKey('unit.pk'))
+    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
+
+    # Values may be taken from a domain.
+    unitdomainelement_pk = Column(Integer, ForeignKey('unitdomainelement.pk'))
+
+    # Languages may have multiple values for the same parameter. Their relative
+    # frequency can be stored here.
+    frequency = Column(Float)
+
+    unitparameter = relationship('UnitParameter', backref='unitvalues')
+    unitdomainelement = relationship('UnitDomainElement', backref='unitvalues')
+    contribution = relationship('Contribution', backref='unitvalues')
+
+    @declared_attr
+    def unit(cls):
+        return relationship('Unit', backref=backref('unitvalues', order_by=cls.unit_pk))
+
+    @validates('parameter_pk')
+    def validate_parameter_pk(self, key, unitparameter_pk):
+        """We have to make sure, the parameter a value is tied to and the parameter a
+        possible domainelement is tied to stay in sync.
+        """
+        if self.unitdomainelement:
+            assert self.unitdomainelement.unitparameter_pk == unitparameter_pk
+        return unitparameter_pk
+
+
+#-----------------------------------------------------------------------------
+# Non-core mappers and association tables
+#-----------------------------------------------------------------------------
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
     """We want to be able to link languages to languages in other systems. Thus,
-    we store identifiers of various types like 'wals', 'iso_639_3', 'glottolog'.
+    we store identifiers of various types like 'wals', 'iso639-3', 'glottolog'.
     """
     __table_args__ = (UniqueConstraint('name', 'type'), UniqueConstraint('id'))
     type = Column(String)
+
+    @validates('type')
+    def validate_type(self, key, type):
+        assert type in ['wals', 'iso639-3', 'glottolog']
+        return type
 
     def url(self):
         """
@@ -142,152 +483,66 @@ class LanguageIdentifier(Base, Versioned):
         backref=backref("languageidentifier", cascade="all, delete-orphan"))
 
 
-@implementer(interfaces.IDomainElement)
-class DomainElement(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
-    __table_args__ = (UniqueConstraint('name', 'parameter_pk'),)
-
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
-
-    # do we need a numeric value for these?
-
-
-@implementer(interfaces.IParameter)
-class Parameter(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
-    __table_args__ = (UniqueConstraint('name'),)
-    domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
-
-
-class Source_data(Base, DataMixin, Versioned):
-    pass
-
-
-@implementer(interfaces.ISource)
-class Source(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin, HasDataMixin):
-    glottolog_id = Column(String)
-    google_book_search_id = Column(String)
-
-
-@implementer(interfaces.IContribution)
-class Contribution(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):  # TODO: hasData, hasFiles
-    __table_args__ = (UniqueConstraint('name'),)
-    date = Column(Date)
-
-    @property
-    def primary_contributors(self):
-        return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: a.ord) if assoc.primary]
-
-    @property
-    def secondary_contributors(self):
-        return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: a.ord) if not assoc.primary]
-
-
-@implementer(interfaces.IValue)
-class Value(Base, PolymorphicBaseMixin, Versioned):
-    id = Column(Integer, unique=True)
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
-    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
-    description = Column(Unicode())
-
-    # Values may be taken from a domain.
-    domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
-
-    # Languages may have multiple values for the same parameter. Their relative
-    # frequency can be stored here.
-    frequency = Column(Float)
-
-    parameter = relationship('Parameter', backref='values')
-    domainelement = relationship('DomainElement', backref='values')
-    contribution = relationship('Contribution', backref='values')
+#
+# Several objects can be linked to sources, i.e. they can have references.
+#
+class HasSourceMixin(object):
+    key = Column(Unicode)  # the citation key, specific (and unique) within a contribution
+    description = Column(Unicode)  # e.g. page numbers.
 
     @declared_attr
-    def language(cls):
-        return relationship('Language', backref=backref('values', order_by=cls.language_pk))
+    def source_pk(cls):
+        return Column(Integer, ForeignKey('source.pk'))
 
-    #
-    # TODO: examples
-    #
-
-    @validates('parameter_pk')
-    def validate_parameter_pk(self, key, parameter_pk):
-        """We have to make sure, the parameter a value is tied to and the parameter a
-        possible domainelement is tied to stay in sync.
-        """
-        if self.domainelement:
-            assert self.domainelement.parameter_pk == parameter_pk
-        return parameter_pk
+    @declared_attr
+    def source(cls):
+        return relationship(Source, backref=cls.__name__.lower() + 's')
 
 
-class Reference(Base, Versioned):
-    """Values (or Examples?) are linked to Sources with an optional description of this
+class ValueReference(Base, Versioned, HasSourceMixin):
+    """Values are linked to Sources with an optional description of this
     linkage, e.g. 'pp. 30-34'.
     """
-    key = Column(Unicode)  # the citation key, specific (and unique) within a contribution
     value_pk = Column(Integer, ForeignKey('value.pk'))
-    source_pk = Column(Integer, ForeignKey('source.pk'))
-
-    # since examples are linked to values, isn't it sufficient to store the references for
-    # examples as references of the value? Not if value-example is many-to-many!
-    #example_pk = Column(Integer, ForeignKey('example.pk'))
-
-    description = Column(Unicode)
-
-    source = relationship(Source, backref='references')
 
     @declared_attr
     def value(cls):
         return relationship(Value, backref=backref("references", order_by=cls.key))
 
 
-@implementer(interfaces.IContributor)
-class Contributor(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
-    __table_args__ = (UniqueConstraint('name'),)
-    url = Column(Unicode())
-    email = Column(String)
-    address = Column(Unicode)
+class SentenceReference(Base, Versioned, HasSourceMixin):
+    """
+    """
+    sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
 
-
-@implementer(interfaces.IExample)
-class Example(Base, PolymorphicBaseMixin, Versioned):
-    pass
+    @declared_attr
+    def sentence(cls):
+        return relationship(Sentence, backref=backref("references", order_by=cls.key))
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
+    """Many-to-many association between contributors and contributions
+    """
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
+
+    # contributors are ordered.
     ord = Column(Integer, default=1)
+
+    # we distinguish between primary and secondary (a.k.a. 'with ...') contributors.
     primary = Column(Boolean, default=True)
+
     contribution = relationship(Contribution, backref='contributor_assocs')
     contributor = relationship(Contributor, backref='contribution_assocs')
 
 
-class ValueExample(Base, PolymorphicBaseMixin, Versioned):
+class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
+    """Many-to-many association between values and sentences given as explanation of a
+    value.
+    """
     value_pk = Column(Integer, ForeignKey('value.pk'))
-    example_pk = Column(Integer, ForeignKey('example.pk'))
+    sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
     description = Column(Unicode())
-
-
-class ExampleReference(Base, PolymorphicBaseMixin, Versioned):
-    example_pk = Column(Integer, ForeignKey('example.pk'))
-    reference_pk = Column(Integer, ForeignKey('reference.pk'))
-    description = Column(Unicode())  # pages, accessed on, ...
-
-
-class Unit_data(Base, DataMixin, Versioned):
-    pass
-
-
-@implementer(interfaces.IUnit)
-class Unit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin, HasDataMixin):
-    pass
-    # link to language
-
-
-@implementer(interfaces.IUnitParameter)
-class UnitParameter(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
-    pass
 
 
 class UnitParameterUnit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):

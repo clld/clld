@@ -32,7 +32,7 @@ class Renderable(object):
 
     def __init__(self, obj):
         self.obj = obj
-    
+
     @property
     def charset(self):
         return 'utf-8' if \
@@ -68,7 +68,7 @@ class GeoJson(object):
 
     def render(self, ctx, req):
         features = []
-        
+
         for language, values in groupby(ctx.values, lambda v: v.language):
             properties = self.feature_properties(req, language, list(values))
             if properties:
@@ -77,7 +77,7 @@ class GeoJson(object):
                     "geometry": {"type": "Point", "coordinates": [language.longitude, language.latitude]},
                     "properties": properties,
                 })
-        
+
         return dumps({
             'type': 'FeatureCollection',
             'properties': {'name': ctx.name},
@@ -100,8 +100,10 @@ def includeme(config):
         ('contribution', interfaces.IContribution),
         ('contributor', interfaces.IContributor),
         ('parameter', interfaces.IParameter),
-        ('example', interfaces.IExample),
+        ('sentence', interfaces.ISentence),
         ('source', interfaces.ISource),
+        ('unit', interfaces.IUnit),
+        ('unitparameter', interfaces.IUnitParameter),
     ]:
         specs.append((interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
         specs.append((interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
@@ -114,7 +116,7 @@ def includeme(config):
         (interfaces.ILanguage, Representation, 'application/vnd.google-earth.kml+xml', 'kml', 'clld:web/templates/language/kml.pt', {'send_mimetype': 'application/xml'}),
         (interfaces.IContribution, Index, 'text/html', 'html', 'contribution/index_html.mako', {}),
     ])
-        
+
     for i, spec in enumerate(specs):
         interface, base, mimetype, extension, template, extra = spec
         extra.update(mimetype=mimetype, extension=extension, template=template)

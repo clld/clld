@@ -19,7 +19,7 @@ class Col(object):
         self.name = name
         self.js_args = {
             'sName': name,
-            'sTitle': name.capitalize(),
+            'sTitle': self.dt.req.translate('dt-' + name),
             'bSortable': True,
             'bSearchable': True,
             'bVisible': True,
@@ -67,7 +67,7 @@ class Col(object):
                     pass
 
     def format(self, item):
-        return getattr(item, self.name, None)
+        return getattr(item, self.name, None) or ''
 
     #
     # TODO: how to pass function as mRender attribute? JsSymbol class?
@@ -76,7 +76,10 @@ class Col(object):
 
 
 class LinkCol(Col):
-    def __init__(self, dt, name, route_name=None, get_label=None, get_attrs=None, **kw):
+    def __init__(self, dt, name, route_name=None,
+                 get_label=None,
+                 get_attrs=None,
+                 **kw):
         self._get_label = get_label
         self._get_attrs = get_attrs
         kw.setdefault('sType', 'html')
@@ -89,13 +92,18 @@ class LinkCol(Col):
         return getattr(item, self.name, item.id)
 
     def get_attrs(self, item):
-        res = {'href': self.dt.req.route_url(self.route_name, id=item.id)}
+        id_ = getattr(item, self.name, None)
+        if id_:
+            id_ = getattr(id_, 'id', None)
+        if not id_:
+            id_ = item.id
+        res = {'href': self.dt.req.route_url(self.route_name, id=id_)}
         if self._get_attrs:
             res.update(self._get_attrs(item))
         return res
 
     def format(self, item):
-        return tag('a', self.get_label(item), **self.get_attrs(item))
+        return tag('a', self.get_label(item) or '--', **self.get_attrs(item))
 
 
 class DetailsRowLinkCol(Col):
@@ -169,7 +177,6 @@ class DataTable(object):
             'clld:web/templates/datatable.mako',
             {'datatable': self, 'options': Markup(dumps(self.options))},
             request=self.req))
-
 
     def get_query(self, limit=200, offset=0):
         query = self.base_query(DBSession.query(self.model))
