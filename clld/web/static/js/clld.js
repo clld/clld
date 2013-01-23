@@ -184,16 +184,19 @@ CLLD.Map = (function(){
         layers: [],
         init: _init,
         url: function() {
-            var l = CLLD.Map.layers[0];
-            l.getFeatureBy()
         },
-        getLayerByName: function(name) {
+        getLayer: function(spec) {
             var i, layer;
-            for (i=0; i<CLLD.Map.layers.length; i++) {
-                layer = CLLD.Map.layers[i];
-                if (layer.name == name) {
-                    return layer;
+            spec = spec === undefined ? 0 : spec;
+
+            if (typeof spec == 'string') {
+                for (i=0; i<CLLD.Map.layers.length; i++) {
+                    if (CLLD.Map.layers[i].name == spec) {
+                        return CLLD.Map.layers[i];
+                    }
                 }
+            } else {
+                return CLLD.Map.layers[spec];
             }
             return undefined;
         },
@@ -201,19 +204,17 @@ CLLD.Map = (function(){
             if (selectedFeature) {
                 selectCtrl.unselect(selectedFeature);
             }
-
             var features;
-            layer = layer === undefined ? 0 : layer;
-
-            if (typeof layer == 'string') {
-                layer = CLLD.Map.getLayerByName(layer);
-            } else {
-                layer = CLLD.Map.layers[layer];
-            }
+            layer = CLLD.Map.getLayer(layer);
             features = layer.getFeaturesByAttribute(property, value)
             if (features) {
                 selectCtrl.select(features[0]);
             }
+        },
+        toggleLayer: function(layer, ctrl) {
+            layer = CLLD.Map.getLayer(layer);
+            layer.display(!$(ctrl).prop('checked'));
+            $(ctrl).prop('checked', !$(ctrl).prop('checked'));
         },
         style_maps: {'default': styles}
     }

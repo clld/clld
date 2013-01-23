@@ -63,3 +63,11 @@ div.olMap img {
 #map-container .accordion-inner {
     padding: 0;
 }
+
+#map-inner .nav-pills {
+    margin-bottom: 0;
+}
+
+#map-inner ul, #map-inner ol {
+    margin-bottom: 0;
+}

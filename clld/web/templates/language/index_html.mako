@@ -18,20 +18,7 @@
 ## TODO: lookup whether any map is registered for this view, and if so, render it!
 ##
 % if request.map:
-<div class="accordion" id="map-container">
-    <div class="accordion-group">
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map-container" href="#map-inner">
-                show/hide map
-            </a>
-        </div>
-        <div id="map-inner" class="accordion-body collapse in">
-            <div class="accordion-inner">
-                ${request.map.render()}
-            </div>
-        </div>
-    </div>
-</div>
+${request.map.render()}
 % endif
 
 ${ctx.render()}

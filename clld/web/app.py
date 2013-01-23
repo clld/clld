@@ -17,7 +17,7 @@ from clld.web.views import index_view, resource_view, robots, sitemapindex
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
-from clld.web.maps import Map
+from clld.web.maps import Map, ParameterMap
 
 
 def menu_item(resource, ctx, req):
@@ -98,6 +98,7 @@ def includeme(config):
     # TODO: register maps!
     #
     config.register_map('languages', Map)
+    config.register_map('parameter', ParameterMap)
 
     config.registry.registerUtility(menuitems, IMenuItems)
     config.include('clld.web.adapters')
