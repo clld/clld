@@ -5,9 +5,11 @@ from sqlalchemy import asc, desc, or_
 from sqlalchemy.types import String, Unicode, Float, Integer
 from pyramid.renderers import render
 from markupsafe import Markup
+from zope.interface import implementer
 
 from clld.db.meta import DBSession
 from clld.web.util.htmllib import tag
+from clld.interfaces import IDataTable
 
 
 class Col(object):
@@ -106,6 +108,19 @@ class LinkCol(Col):
         return tag('a', self.get_label(item) or '--', **self.get_attrs(item))
 
 
+class LinkToMapCol(LinkCol):
+    def __init__(self, dt, name=None, **kw):
+        kw.setdefault('bSearchable', False)
+        kw.setdefault('bSortable', False)
+        LinkCol.__init__(self, dt, name or '', **kw)
+
+    def get_label(self, item):
+        return tag('i', **{'class': 'icon-globe'})
+
+    def get_attrs(self, item):
+        return {'title': 'show %s on map' % getattr(item, 'name', ''), 'onclick': 'CLLD.Map.showInfoWindow("id", "%s")' % item.id}
+
+
 class DetailsRowLinkCol(Col):
     def __init__(self, dt, name=None, route_name=None, **kw):
         kw.setdefault('bSortable', False)
@@ -132,6 +147,7 @@ class IdCol(Col):
         Col.__init__(self, dt, name, **kw)
 
 
+@implementer(IDataTable)
 class DataTable(object):
     show_details = False
     search = 'col'  # col|global|global_col

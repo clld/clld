@@ -66,26 +66,68 @@ class GeoJson(object):
     def render_to_response(self, ctx, req):
         return Response(self.render(ctx, req), content_type='application/json')
 
+    def featurecollection_properties(self, ctx, req):
+        return {}
+
+    def feature_iterator(self, ctx, req):
+        return iter([])
+
+    def feature_properties(self, ctx, req, feature):
+        return {}
+
+    def feature_coordinates(self, ctx, req, feature):
+        """
+        :return: lonlat
+        """
+        return [0.0, 0.0]
+
     def render(self, ctx, req):
         features = []
 
-        for language, values in groupby(ctx.values, lambda v: v.language):
-            properties = self.feature_properties(req, language, list(values))
+        for feature in self.feature_iterator(ctx, req):
+            properties = self.feature_properties(ctx, req, feature)
             if properties:
                 features.append({
                     "type": "Feature",
-                    "geometry": {"type": "Point", "coordinates": [language.longitude, language.latitude]},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": self.feature_coordinates(ctx, req, feature)},
                     "properties": properties,
                 })
 
         return dumps({
             'type': 'FeatureCollection',
-            'properties': {'name': ctx.name},
+            'properties': self.featurecollection_properties(ctx, req),
             'features': features,
         })
 
-    def feature_properties(self, req, language, values):
+
+class GeoJsonParameter(GeoJson):
+    def featurecollection_properties(self, ctx, req):
+        return {'name': ctx.name}
+
+    def feature_iterator(self, ctx, req):
+        return groupby(ctx.values, lambda v: v.language)
+
+    def feature_coordinates(self, ctx, req, feature):
+        language, values = feature
+        return [language.longitude, language.latitude]
+
+    def feature_properties(self, ctx, req, feature):
+        language, values = feature
         return {'name': language.name, 'id': language.id}
+
+
+@implementer(interfaces.IIndex)
+class GeoJsonLanguages(GeoJson):
+    def feature_iterator(self, ctx, req):
+        return ctx.get_query(limit=5000)
+
+    def feature_coordinates(self, ctx, req, feature):
+        return [feature.longitude, feature.latitude]
+
+    def feature_properties(self, ctx, req, feature):
+        return {'name': feature.name, 'id': feature.id}
 
 
 @implementer(interfaces.IIndex)
@@ -123,4 +165,9 @@ def includeme(config):
         cls = type('Renderer%s' % i, (base,), extra)
         config.registry.registerAdapter(cls, (interface,), list(implementedBy(base))[0], name=mimetype)
 
-    config.registry.registerAdapter(GeoJson, (interfaces.IParameter,), interfaces.IRepresentation, name=GeoJson.mimetype)
+    #
+    # TODO: Register maps, which in turn should register appropriate GeoJson data adapters!
+    #
+    config.registry.registerAdapter(GeoJsonLanguages, (interfaces.ILanguage,), interfaces.IIndex, name=GeoJson.mimetype)
+
+    config.registry.registerAdapter(GeoJsonParameter, (interfaces.IParameter,), interfaces.IRepresentation, name=GeoJson.mimetype)

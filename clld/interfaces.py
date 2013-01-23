@@ -108,6 +108,11 @@ class IDataTable(Interface):
     """
 
 
+class IMap(Interface):
+    """marker
+    """
+
+
 class IMenuItems(Interface):
     """marker interface
     """

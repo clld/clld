@@ -59,3 +59,7 @@ tfoot {
 div.olMap img {
   max-width: none !important;
 }
+
+#map-container .accordion-inner {
+    padding: 0;
+}

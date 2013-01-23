@@ -61,16 +61,50 @@ CLLD.Map = (function(){
         }
     });
 
-    var _init = function (data_layers, options) {
-        var i, route, layer, layers = [], styles = CLLD.Map.style_maps['default'];
 
-        options = options == undefined ? {} : options;
+    var selectedFeature;
+    var selectCtrl;
 
-        if (options.style_map) {
-            styles = CLLD.Map.style_maps[options.style_map];
+
+    function onFeatureSelectCallback(data) {
+        popup = new OpenLayers.Popup.FramedCloud("chicken",
+                selectedFeature.geometry.getBounds().getCenterLonLat(),
+                null,
+                data,
+                null, false, null);
+        selectedFeature.popup = popup;
+        CLLD.Map.map.addPopup(popup);
+    }
+
+    function onFeatureSelect(feature) {
+        var route = CLLD.Map.options.info_route == undefined ? 'language_alt' : CLLD.Map.options.info_route;
+
+        selectedFeature = feature;
+        $.get(
+            CLLD.route_url(route, {'id': feature.data.id, 'ext': 'snippet.html'}, CLLD.Map.options.info_query),
+            CLLD.Map.options.info_query == undefined ? {} : CLLD.Map.options.info_query,
+            function(data, textStatus, jqXHR) {
+                onFeatureSelectCallback(data);
+            },
+            'html'
+        );
+    }
+
+    function onFeatureUnselect(feature) {
+        CLLD.Map.map.removePopup(feature.popup);
+        feature.popup.destroy();
+        feature.popup = null;
+    }
+
+
+    var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
+        var i, layer, styles = CLLD.Map.style_maps['default'];
+
+        CLLD.Map.options = options == undefined ? {} : options;
+
+        if (CLLD.Map.options.style_map) {
+            styles = CLLD.Map.style_maps[CLLD.Map.options.style_map];
         }
-
-        route = options.info_route == undefined ? 'language_alt' : options.info_route;
 
         CLLD.Map.map = new OpenLayers.Map('map', {
             projection: 'EPSG:3857',
@@ -115,13 +149,12 @@ CLLD.Map = (function(){
                     format: new OpenLayers.Format.GeoJSON()
                 })
             });
-            layers.push(layer);
-            CLLD.Map.layers[data_layers[i][0]] = layer;
+            CLLD.Map.layers.push(layer);
             CLLD.Map.map.addLayer(layer);
         }
 
         var highlightCtrl = new OpenLayers.Control.SelectFeature(
-            layers,
+            CLLD.Map.layers,
             {
                 hover: true,
                 highlightOnly: true,
@@ -129,39 +162,11 @@ CLLD.Map = (function(){
             }
         );
 
-        var selectedFeature;
-
-        function onFeatureSelect(data) {
-            popup = new OpenLayers.Popup.FramedCloud("chicken",
-                    selectedFeature.geometry.getBounds().getCenterLonLat(),
-                    null,
-                    data,
-                    null, false, null);
-            selectedFeature.popup = popup;
-            CLLD.Map.map.addPopup(popup);
-        }
-
-        function onFeatureUnselect(feature) {
-            CLLD.Map.map.removePopup(feature.popup);
-            feature.popup.destroy();
-            feature.popup = null;
-        }
-
-        var selectCtrl = new OpenLayers.Control.SelectFeature(
-            layers,
+        selectCtrl = new OpenLayers.Control.SelectFeature(
+            CLLD.Map.layers,
             {
                 onUnselect: onFeatureUnselect,
-                onSelect: function(feature){
-                    selectedFeature = feature;
-                    $.get(
-                        CLLD.route_url(route, {'id': feature.data.id, 'ext': 'snippet.html'}, options.info_query),
-                        options.info_query == undefined ? {} : options.info_query,
-                        function(data, textStatus, jqXHR) {
-                            onFeatureSelect(data);
-                        },
-                        'html'
-                    );
-                }
+                onSelect: onFeatureSelect,
             }
         );
 
@@ -176,9 +181,40 @@ CLLD.Map = (function(){
 
     return {
         map: undefined,
-        layers: {},
+        layers: [],
         init: _init,
-        url: function() {},
+        url: function() {
+            var l = CLLD.Map.layers[0];
+            l.getFeatureBy()
+        },
+        getLayerByName: function(name) {
+            var i, layer;
+            for (i=0; i<CLLD.Map.layers.length; i++) {
+                layer = CLLD.Map.layers[i];
+                if (layer.name == name) {
+                    return layer;
+                }
+            }
+            return undefined;
+        },
+        showInfoWindow: function(property, value, layer) {
+            if (selectedFeature) {
+                selectCtrl.unselect(selectedFeature);
+            }
+
+            var features;
+            layer = layer === undefined ? 0 : layer;
+
+            if (typeof layer == 'string') {
+                layer = CLLD.Map.getLayerByName(layer);
+            } else {
+                layer = CLLD.Map.layers[layer];
+            }
+            features = layer.getFeaturesByAttribute(property, value)
+            if (features) {
+                selectCtrl.select(features[0]);
+            }
+        },
         style_maps: {'default': styles}
     }
 })();

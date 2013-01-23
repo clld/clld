@@ -12,11 +12,12 @@ from clld.db.meta import (
     Base,
 )
 from clld.db.models import MODELS
-from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation
+from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
 from clld.web.views import index_view, resource_view, robots, sitemapindex
-from clld.web.subscribers import add_renderer_globals, add_localizer
+from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
+from clld.web.maps import Map
 
 
 def menu_item(resource, ctx, req):
@@ -38,6 +39,10 @@ def ctx_factory(model, type_, req):
         raise HTTPNotFound()
 
 
+def register_cls(interface, config, route, cls):
+    config.registry.registerUtility(cls, provided=interface, name=route)
+
+
 def includeme(config):
     engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
@@ -46,19 +51,13 @@ def includeme(config):
     config.add_settings({'pyramid.default_locale_name':'en'})
     config.add_subscriber(add_renderer_globals, events.BeforeRender)
     config.add_subscriber(add_localizer, events.NewRequest)
+    config.add_subscriber(init_map, events.ContextFound)
     config.add_translation_dirs('clld:locale')
 
     config.add_static_view(name='clld-static', path='clld:web/static')
 
-    #
-    # TODO: add config directive to register maps! which implicitely registers the
-    # appropiate geojson adapter!
-    #
-
-    def register_datatable(config, cls, route):
-        config.registry.registerUtility(cls, provided=IDataTable, name=route)
-
-    config.add_directive('register_datatable', register_datatable)
+    config.add_directive('register_datatable', partial(register_cls, IDataTable))
+    config.add_directive('register_map', partial(register_cls, IMap))
 
     def add_route_and_view(config, route_name, route_pattern, view, **kw):
         route_kw = {}
@@ -85,7 +84,7 @@ def includeme(config):
         ]:
             config.add_route_and_view(route_name, pattern, index_view, factory=factory)
             config.register_datatable(
-                getattr(datatables, plural.capitalize(), DataTable), route_name)
+                route_name, getattr(datatables, plural.capitalize(), DataTable))
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % name, resource_view, **kw)
@@ -94,6 +93,11 @@ def includeme(config):
         if plural in config.registry.settings.get(
             'clld.menuitems', 'contributions parameters languages').split():
             menuitems[plural] = partial(menu_item, plural)
+
+    #
+    # TODO: register maps!
+    #
+    config.register_map('languages', Map)
 
     config.registry.registerUtility(menuitems, IMenuItems)
     config.include('clld.web.adapters')
