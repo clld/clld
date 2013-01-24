@@ -49,7 +49,7 @@ $(document).ready( function() {
         "bServerSide": true,
         "bStateSave": true,
         //"sDom": '<"H"l<"dt-toolbar">fr>t<"F"ip>',
-	"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+	"sDom": "<'row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
         "fnServerParams": function (aoData) {
 	        % if datatable.search == 'global_col':
             aoData.push({"name": "searchCol", "value": $('#searchCol').val()});
@@ -76,6 +76,7 @@ $(document).ready( function() {
 	"bAutoWidth": false,
 	"sPaginationType": "bootstrap"
     });
+
 
 $.extend( $.fn.dataTableExt.oStdClasses, {
     "sWrapper": "dataTables_wrapper form-inline"
@@ -175,9 +176,6 @@ $.extend( $.fn.dataTableExt.oPagination, {
 		}
 	}
 } );
-
-
-
 
 
 

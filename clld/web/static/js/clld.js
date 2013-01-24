@@ -98,7 +98,7 @@ CLLD.Map = (function(){
 
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, styles = CLLD.Map.style_maps['default'];
+        var i, layer, spec, styles = CLLD.Map.style_maps['default'];
 
         CLLD.Map.options = options == undefined ? {} : options;
 
@@ -130,7 +130,7 @@ CLLD.Map = (function(){
                 // Google.v3 uses web mercator as projection, so we have to
                 // transform our coordinates
                 .transform('EPSG:4326', 'EPSG:3857'),
-            zoom: 3
+            zoom: 1
         });
         CLLD.Map.map.addControl(new OpenLayers.Control.LayerSwitcher());
 
@@ -138,14 +138,15 @@ CLLD.Map = (function(){
         // or use pie charts from google via externalGraphic!
 
         for (i=0; i<data_layers.length; i++) {
-            layer = new OpenLayers.Layer.Vector(data_layers[i][0], {
-                styleMap: styles,
+            spec = data_layers[i];
+            layer = new OpenLayers.Layer.Vector(spec.name, {
+                styleMap: spec.style_map === undefined ? styles : spec.style_map,
                 displayInLayerSwitcher: false,
                 rendererOptions: {zIndexing: true},
                 projection: new OpenLayers.Projection('EPSG:4326'),
                 strategies: [new OpenLayers.Strategy.Fixed()],
                 protocol: new OpenLayers.Protocol.HTTP({
-                    url: data_layers[i][1],
+                    url: spec.url,
                     format: new OpenLayers.Format.GeoJSON()
                 })
             });
@@ -176,7 +177,7 @@ CLLD.Map = (function(){
         highlightCtrl.activate();
         selectCtrl.activate();
 
-        CLLD.Map.map.zoomToMaxExtent();
+        //CLLD.Map.map.zoomToMaxExtent();
     };
 
     return {

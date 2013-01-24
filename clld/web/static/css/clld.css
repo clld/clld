@@ -71,3 +71,15 @@ div.olMap img {
 #map-inner ul, #map-inner ol {
     margin-bottom: 0;
 }
+
+.dt-full-cell {
+    width: 100%;
+    margin-top: -4px !important;
+    padding-top: 4px;
+    margin-bottom: -4px !important;
+    padding-bottom: 4px;
+    margin-left: -5px !important;
+    padding-left: 5px;
+    margin-right: -5px !important;
+    padding-right: 5px;
+}

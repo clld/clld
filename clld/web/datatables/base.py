@@ -242,6 +242,18 @@ class DataTable(object):
         return query
 
     def toolbar(self):
+        return Markup("""<button type="button" data-toggle="modal" data-target="#myModal">Column Descriptions</button>
+    <div id="myModal" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Modal header</h3>
+    </div>
+    <div class="modal-body">
+    <p>One fine body</p>
+    </div>
+    </div>
+""".replace('\n', ''))
+
         if self.search == 'global_col':
             return Markup(
                 tag('select',

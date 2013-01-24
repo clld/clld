@@ -18,31 +18,47 @@ class Map(object):
         self.req = req
         self.ctx = ctx
         self.eid = eid or 'map'
+        self._layers = None
 
+    @property
     def layers(self):
+        if self._layers is None:
+            self._layers = self.get_layers()
+        return self._layers
+
+    def get_layers(self):
         route_params = {'ext': 'geojson'}
         if not IDataTable.providedBy(self.ctx):
             route_params['id'] = self.ctx.id
         route_name = self.req.matched_route.name
         if not route_name.endswith('_alt'):
             route_name += '_alt'
-        return [[getattr(self.ctx, 'name', 'GeoJSON layer'), self.req.route_url(route_name, **route_params)]]
+        return [{
+            'name': getattr(self.ctx, 'name', 'GeoJSON layer'),
+            'url': self.req.route_url(route_name, **route_params)}]
+
+    def options(self):
+        return {}
 
     def render(self):
         return Markup(render(
-            'clld:web/templates/map.mako',
-            {'map': self,
-             #'options': Markup(dumps(self.options))
-             },
-            request=self.req))
+            'clld:web/templates/map.mako', {'map': self}, request=self.req))
 
 
 class ParameterMap(Map):
-    def layers(self):
+    def get_layers(self):
         if self.ctx.domain:
-            return [[de.name, self.req.route_url('parameter_alt', id=self.ctx.id, ext='geojson', _query=dict(domainelement=str(de.id)))] for de in self.ctx.domain]
-        return [[self.ctx.name, self.req.route_url('parameter_alt', id=self.ctx.id, ext='geojson')]]
-
+            return [{
+                'name': de.name,
+                'url': self.req.route_url(
+                    'parameter_alt',
+                    id=self.ctx.id, ext='geojson',
+                    _query=dict(domainelement=str(de.id))),
+            } for de in self.ctx.domain]
+        return [{
+            'name': self.ctx.name,
+            'url': self.req.route_url('parameter_alt', id=self.ctx.id, ext='geojson'),
+        }]
 
 
 """

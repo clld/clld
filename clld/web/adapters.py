@@ -115,7 +115,7 @@ class GeoJsonParameter(GeoJson):
 
     def feature_properties(self, ctx, req, feature):
         language, values = feature
-        return {'name': language.name, 'id': language.id}
+        return {'name': language.name, 'id': language.id, 'values': ', '.join(v.name for v in values)}
 
 
 @implementer(interfaces.IIndex)
