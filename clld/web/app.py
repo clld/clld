@@ -6,6 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
+from pyramid.request import Request, reify
+from purl import URL
 
 from clld.db.meta import (
     DBSession,
@@ -18,6 +20,12 @@ from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
 from clld.web.maps import Map, ParameterMap
+
+
+class ClldRequest(Request):
+    @reify
+    def purl(self):
+        return URL(self.url)
 
 
 def menu_item(resource, ctx, req):
@@ -44,6 +52,8 @@ def register_cls(interface, config, route, cls):
 
 
 def includeme(config):
+    config.set_request_factory(ClldRequest)
+
     engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine

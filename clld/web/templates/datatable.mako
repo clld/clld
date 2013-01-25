@@ -19,32 +19,37 @@
     </tbody>
     % if datatable.search == 'col':
     <tfoot>
-		<tr>
+	<tr>
             % for col in datatable.cols:
-			<th style="text-align: left;">
+	    <th style="text-align: left;">
                 % if col.js_args['bSearchable']:
 		    % if hasattr(col, 'choices'):
-			    <select class="control" name="${col.name}">
-				    <option value="">--any--</option>
-				    % for val in getattr(col, 'choices'):
-				    <option value="${val}">${val}</option>
-				    % endfor
-			    </select>
+		    <select class="control" name="${col.name}">
+			<option value="">--any--</option>
+			% for val in getattr(col, 'choices'):
+			<option value="${val}">${val}</option>
+			% endfor
+		    </select>
 		    % else:
-			    <input type="text" name="${col.name}" value="" placeholder="Search ${col.js_args['sTitle']}" class="input-small control" />
+		    <input type="text" name="${col.name}" value="" placeholder="Search ${col.js_args['sTitle']}" class="input-small control" />
 		    % endif
                 % else:
                     <input type="text" name="${col.name}" value="" class="search_init control" style="display: none;"/>
                 % endif
             </th>
             % endfor
-		</tr>
+	</tr>
 
-	</tfoot>
+    </tfoot>
     % endif
 </table>
 <script>
 $(document).ready( function() {
+    /*
+     * TODO: replace with
+     * CLLD.DataTable.init("${datatable.eid}", h.dumps(datatable.options))
+     */
+
     $.extend($.fn.dataTable.defaults, {
         "bServerSide": true,
         "bStateSave": true,

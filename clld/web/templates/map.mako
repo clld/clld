@@ -7,6 +7,7 @@
         </div>
         <div id="map-inner" class="accordion-body collapse in">
             <div class="accordion-inner">
+		% if len(map.layers) > 1:
 	        <ul class="nav nav-pills">
 		    <li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -30,6 +31,7 @@
 			</ul>
 		    </li>
 		</ul>
+		% endif
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
 		<script>
 $(window).load(function() {
