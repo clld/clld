@@ -21,10 +21,10 @@ def view(interface, ctx, req):
     else:
         # content negotiation using the accept header
         adapter = adapters.get(req.accept.best_match(adapters.keys()))
-    
+
     if not adapter:
         raise HTTPNotAcceptable()
-    
+
     adapter = adapter[0] if isinstance(adapter, list) else adapter
     return adapter.render_to_response(ctx, req)
 
@@ -60,7 +60,7 @@ def datatable_xhr_view(ctx, req):
         echo = int(req.params['sEcho'])
     except ValueError:
         echo = 1
-    
+
     res = {
         "aaData": data,
         "sEcho": str(echo),
@@ -68,6 +68,14 @@ def datatable_xhr_view(ctx, req):
         "iTotalDisplayRecords": ctx.count_filtered,
     }
     return Response(dumps(res), content_type='application/json')
+
+
+def _raise(req):
+    raise ValueError('test')
+
+
+def _ping(req):
+    return {'status': 'ok'}
 
 
 def robots(req):

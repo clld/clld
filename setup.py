@@ -28,6 +28,8 @@ install_requires = [
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
     'purl',
+    'path.py',
+    'pyramid-exclog',
     ]
 
 if not PY3:

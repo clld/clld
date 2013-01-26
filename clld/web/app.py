@@ -15,7 +15,7 @@ from clld.db.meta import (
 )
 from clld.db.models import MODELS
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
-from clld.web.views import index_view, resource_view, robots, sitemapindex
+from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -79,6 +79,9 @@ def includeme(config):
 
     config.add_directive('add_route_and_view', add_route_and_view)
 
+    config.add_route_and_view('_raise', '/_raise', _raise)
+    config.add_route_and_view('_ping', '/_ping', _ping, renderer='json')
+
     config.add_route('home', '/')
     menuitems = OrderedDict(home=partial(menu_item, 'home'))
 
@@ -104,9 +107,6 @@ def includeme(config):
             'clld.menuitems', 'contributions parameters languages').split():
             menuitems[plural] = partial(menu_item, plural)
 
-    #
-    # TODO: register maps!
-    #
     config.register_map('languages', Map)
     config.register_map('parameter', ParameterMap)
 
