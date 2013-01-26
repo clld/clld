@@ -1,15 +1,16 @@
 """
 Deployment utilities for clld apps
 """
-from fabric.api import sudo, local, put, env
+import time
+import json
+
+from fabric.api import sudo, run, local, put, env
 from fabtools import require
 from fabtools.python import virtualenv
 from fabtools import service
 
 from clld.deploy import config
 
-
-VENV = '/usr/local/venvs/wold2'
 
 LOCATION_TEMPLATE = """\
 location /{app.name} {{
@@ -24,18 +25,13 @@ location /{app.name} {{
 }}
 """
 
-UPSTART_TEMPLATE = """\
-description "{app.name}"
-
-start on runlevel [2345]
-stop on runlevel [!2345]
-
-respawn
-expect fork
-
-exec {gunicorn} -u {app.name} -g {app.name} {app.config}
+SUPERVISOR_TEMPLATE = """\
+[program:{app.name}]
+command={gunicorn} -u {app.name} -g {app.name} --error-logfile {app.error_log} {app.config}
+autostart=true
+autorestart=true
+redirect_stderr=True
 """
-
 
 _CONFIG_TEMPLATE = """\
 [app:{app.name}]
@@ -154,24 +150,37 @@ def deploy(app, environment):
     require.files.file(
         str(app.config),
         contents=CONFIG_TEMPLATES[environment].format(**template_variables),
+        owner='root',
+        group='root',
         use_sudo=True)
 
     require.files.file(
-        str(app.upstart),
-        contents=UPSTART_TEMPLATE.format(**template_variables),
+        str(app.supervisor),
+        contents=SUPERVISOR_TEMPLATE.format(**template_variables),
+        mode='644',
+        owner='root',
+        group='root',
         use_sudo=True)
 
-    require.service.started(app.name)
+    sudo('/etc/init.d/supervisor stop')
+    sudo('/etc/init.d/supervisor start')
+    time.sleep(2)
+    res = run('curl http://localhost:%s/_ping' % app.port)
+    assert json.loads(res)['status'] == 'ok'
 
     if environment == 'test':
         require.files.file(
             str(app.nginx_location),
             contents=LOCATION_TEMPLATE.format(**template_variables),
+            owner='root',
+            group='root',
             use_sudo=True)
     elif environment == 'production':
         require.files.file(
             str(app.nginx_site),
             contents=SITE_TEMPLATE.format(**template_variables),
+            owner='root',
+            group='root',
             use_sudo=True)
 
     service.reload('nginx')

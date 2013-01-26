@@ -29,6 +29,10 @@ class App(object):
     def logs(self):
         return path('/var/log').joinpath(self.name)
 
+    @property
+    def error_log(self):
+        return self.logs.joinpath('error.log')
+
     def bin(self, command):
         return self.venv.joinpath('bin', command)
 
@@ -37,8 +41,8 @@ class App(object):
         return repos(self.name)
 
     @property
-    def upstart(self):
-        return path('/etc/init').joinpath('%s.conf' % self.name)
+    def supervisor(self):
+        return path('/etc/supervisor/conf.d').joinpath('%s.conf' % self.name)
 
     @property
     def nginx_location(self):
