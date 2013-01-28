@@ -1,4 +1,4 @@
 from json import dumps
 
 from clld import interfaces
-from clld.web.util.htmllib import tag
+from clld.web.util.htmllib import HTML

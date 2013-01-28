@@ -24,6 +24,9 @@
 				    ##
 
 				    ##<img src="${request.static_url('wals3:static/icons/'+de.icon_id+'.png')}">
+				    % if 'marker' in layer:
+				    ${layer['marker']}
+				    % endif
 				    ${layer["name"]}
 				</label>
 			    </li>

@@ -223,5 +223,18 @@ $.extend( $.fn.dataTableExt.oPagination, {
         /* Filter on the column (the index) of this element */
         datatable.fnFilter($(this).val(), $("tfoot .control").index(this));
     } );
+
+    var dl = '';
+    % for i, col in enumerate(datatable.cols):
+	% if hasattr(col, 'description'):
+	    dl += '<dt>${col.js_args['sTitle']}</dt><dd>${col.description|n}</dd>';
+	% endif
+    % endfor
+
+    if (dl) {
+    	$('#cdOpener').popover({html: true, content: '<dl>'+dl+'</dl>', title: 'Column Descriptions', trigger: 'click', placement: 'left'});
+    } else {
+	$('#cdOpener').hide();
+    }
 } );
 </script>

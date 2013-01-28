@@ -92,6 +92,6 @@ setup(name='clld',
             ('web/static/**', 'ignore', None)]},
       entry_points = """\
         [pyramid.scaffold]
-        crossgram=clld.scaffolds:CrossGramProjectTemplate
+        clld_app=clld.scaffolds:ClldAppTemplate
       """
       )

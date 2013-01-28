@@ -1,6 +1,9 @@
 """
 Deployment utilities for clld apps
 """
+#
+# TODO: logrotate!
+#
 import time
 import json
 
@@ -126,6 +129,11 @@ def install_repos(name):
     sudo('pip install -e git+%s#egg=%s' % (config.repos(name), name))
 
 
+def create_file_as_root(path, content, **kw):
+    require.files.file(
+        str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
+
+
 def deploy(app, environment):
     template_variables = dict(
         app=app, env=env, config=config, gunicorn=app.bin('gunicorn_paster'))
@@ -142,25 +150,19 @@ def deploy(app, environment):
         install_repos('clld')
         install_repos(app.name)
 
+    #
+    # TODO: replace with initialization of db from wold-data repos!
+    #
     if False:  # recreate the db only if necessary!
         local('pg_dump -f /tmp/wold2.sql wold2')
         require.files.file('/tmp/wold2.sql', source="/tmp/wold2.sql")
         sudo('sudo -u wold2 psql -f /tmp/wold2.sql -d wold2')
 
-    require.files.file(
-        str(app.config),
-        contents=CONFIG_TEMPLATES[environment].format(**template_variables),
-        owner='root',
-        group='root',
-        use_sudo=True)
+    create_file_as_root(
+        app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
 
-    require.files.file(
-        str(app.supervisor),
-        contents=SUPERVISOR_TEMPLATE.format(**template_variables),
-        mode='644',
-        owner='root',
-        group='root',
-        use_sudo=True)
+    create_file_as_root(
+        app.supervisor, SUPERVISOR_TEMPLATE.format(**template_variables), mode='644')
 
     sudo('/etc/init.d/supervisor stop')
     sudo('/etc/init.d/supervisor start')
@@ -169,18 +171,9 @@ def deploy(app, environment):
     assert json.loads(res)['status'] == 'ok'
 
     if environment == 'test':
-        require.files.file(
-            str(app.nginx_location),
-            contents=LOCATION_TEMPLATE.format(**template_variables),
-            owner='root',
-            group='root',
-            use_sudo=True)
+        create_file_as_root(
+            app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
     elif environment == 'production':
-        require.files.file(
-            str(app.nginx_site),
-            contents=SITE_TEMPLATE.format(**template_variables),
-            owner='root',
-            group='root',
-            use_sudo=True)
+        create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
 
     service.reload('nginx')

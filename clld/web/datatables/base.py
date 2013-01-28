@@ -8,7 +8,7 @@ from markupsafe import Markup
 from zope.interface import implementer
 
 from clld.db.meta import DBSession
-from clld.web.util.htmllib import tag
+from clld.web.util.htmllib import HTML
 from clld.interfaces import IDataTable
 
 
@@ -105,7 +105,7 @@ class LinkCol(Col):
         return res
 
     def format(self, item):
-        return tag('a', self.get_label(item) or '--', **self.get_attrs(item))
+        return HTML.a(self.get_label(item) or '--', **self.get_attrs(item))
 
 
 class LinkToMapCol(LinkCol):
@@ -115,7 +115,7 @@ class LinkToMapCol(LinkCol):
         LinkCol.__init__(self, dt, name or '', **kw)
 
     def get_label(self, item):
-        return tag('i', **{'class': 'icon-globe'})
+        return HTML.i(**{'class': 'icon-globe'})
 
     def get_attrs(self, item):
         return {'title': 'show %s on map' % getattr(item, 'name', ''), 'onclick': 'CLLD.Map.showInfoWindow("id", "%s")' % item.id}
@@ -134,8 +134,11 @@ class DetailsRowLinkCol(Col):
         Col.__init__(self, dt, name, **kw)
 
     def format(self, item):
-        return tag(
-            'span', ' ',
+        return HTML.span(
+            ' ',
+            #
+            # TODO: replace with bootstrap icons! or with bootstrap button?
+            #
             class_='ui-icon ui-icon-circle-plus',
             href=self.dt.req.route_url(self.route_name, ext='snippet.html', id=item.id))
 
@@ -242,26 +245,7 @@ class DataTable(object):
         return query
 
     def toolbar(self):
-        return Markup("""<button type="button" data-toggle="modal" data-target="#myModal">Column Descriptions</button>
-    <div id="myModal" class="modal hide fade">
-    <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>Modal header</h3>
-    </div>
-    <div class="modal-body">
-    <p>One fine body</p>
-    </div>
-    </div>
-""".replace('\n', ''))
-
-        if self.search == 'global_col':
-            return Markup(
-                tag('select',
-                    *[tag('option', col.js_args['sTitle'], value=str(i))
-                      for i, col in enumerate(self.cols) if col.js_args['bSearchable']],
-                    id='searchCol'))
-        else:
-            return ''
+        return Markup('<button type="button" class="btn btn-info" id="cdOpener"><i class="icon-info-sign icon-white"></i></button>')
 
     def get_options(self):
         return {

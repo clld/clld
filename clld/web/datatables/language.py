@@ -10,6 +10,6 @@ class Languages(DataTable):
             LinkCol(self, 'id', route_name='language', get_label=lambda item: item.id),
             LinkCol(self, 'name', route_name='language'),
             LinkToMapCol(self),
-            Col(self, 'latitude'),
+            Col(self, 'latitude', description='<h2>Hallo</h2>'),
             Col(self, 'longitude'),
         ]
