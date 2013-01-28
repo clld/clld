@@ -1,3 +1,8 @@
+"""
+This module provides base classes to compose DataTables, i.e. objects which have a double
+nature: On the client they provide the information to instantiate a jquery DataTables
+object. Server side they know how to provide the data to the client-side table.
+"""
 from json import dumps
 import re
 
@@ -9,10 +14,13 @@ from zope.interface import implementer
 
 from clld.db.meta import DBSession
 from clld.web.util.htmllib import HTML
+from clld.web.util.helpers import link, button, icon
 from clld.interfaces import IDataTable
 
 
 class Col(object):
+    """DataTables are basically a list of column specifications.
+    """
     dt_name_pattern = re.compile('[a-z]+[A-Z]+[a-z]+')
     operator_pattern = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
@@ -71,27 +79,15 @@ class Col(object):
     def format(self, item):
         return getattr(item, self.name, None) or ''
 
-    #
-    # TODO: how to pass function as mRender attribute? JsSymbol class?
-    # 'mRender': clld.renderers["name"]?
-    #
-
 
 class LinkCol(Col):
-    def __init__(self, dt, name, route_name=None,
-                 get_label=None,
-                 get_attrs=None,
-                 **kw):
-        self._get_label = get_label
+    """Column which renders a link.
+    """
+    def __init__(self, dt, name, route_name=None, get_attrs=None, **kw):
         self._get_attrs = get_attrs
         kw.setdefault('sType', 'html')
         self.route_name = route_name or name
         Col.__init__(self, dt, name, **kw)
-
-    def get_label(self, item):
-        if self._get_label:
-            return self._get_label(item)
-        return getattr(item, self.name, item.id)
 
     def get_attrs(self, item):
         id_ = getattr(item, self.name, None)
@@ -105,7 +101,7 @@ class LinkCol(Col):
         return res
 
     def format(self, item):
-        return HTML.a(self.get_label(item) or '--', **self.get_attrs(item))
+        return link(self.dt.req, item, **self.get_attrs(item))
 
 
 class LinkToMapCol(LinkCol):
@@ -114,11 +110,12 @@ class LinkToMapCol(LinkCol):
         kw.setdefault('bSortable', False)
         LinkCol.__init__(self, dt, name or '', **kw)
 
-    def get_label(self, item):
-        return HTML.i(**{'class': 'icon-globe'})
-
-    def get_attrs(self, item):
-        return {'title': 'show %s on map' % getattr(item, 'name', ''), 'onclick': 'CLLD.Map.showInfoWindow("id", "%s")' % item.id}
+    def format(self, item):
+        return button(
+            icon('icon-globe'),
+            title='show %s on map' % getattr(item, 'name', ''),
+            onclick='CLLD.Map.showInfoWindow("id", "%s")' % item.id,
+        )
 
 
 class DetailsRowLinkCol(Col):
@@ -134,13 +131,11 @@ class DetailsRowLinkCol(Col):
         Col.__init__(self, dt, name, **kw)
 
     def format(self, item):
-        return HTML.span(
-            ' ',
-            #
-            # TODO: replace with bootstrap icons! or with bootstrap button?
-            #
-            class_='ui-icon ui-icon-circle-plus',
-            href=self.dt.req.route_url(self.route_name, ext='snippet.html', id=item.id))
+        return button(
+            icon('info-sign', inverted=True),
+            href=self.dt.req.route_url(self.route_name, ext='snippet.html', id=item.id),
+            title="show details",
+            class_="btn-info details")
 
 
 class IdCol(Col):
@@ -152,8 +147,7 @@ class IdCol(Col):
 
 @implementer(IDataTable)
 class DataTable(object):
-    show_details = False
-    search = 'col'  # col|global|global_col
+    search = True
 
     def __init__(self, req, model, eid=None):
         self.model = model
@@ -201,25 +195,7 @@ class DataTable(object):
         query = self.base_query(DBSession.query(self.model))
         self.count_all = query.count()
 
-        # single search box:
-        if self.search.startswith('global'):
-            qs = self.req.params.get('sSearch')
-            if qs:
-                if self.search == 'global_col':
-                    try:
-                        clause = self.cols[int(self.req.params.get('searchCol'))].search(qs)
-                    except ValueError:
-                        clause = None
-                    if clause is not None:
-                        query = query.filter(clause)
-                else:
-                    clauses = []
-                    for col in self.cols:
-                        if col.js_args['bSearchable']:
-                            clauses.append(col.search(qs))
-                    query = query.filter(or_(*[c for c in clauses if c is not None]))
-        # search box per column:
-        else:
+        if self.search:
             for name, val in self.req.params.items():
                 if val and name.startswith('sSearch_'):
                     try:
@@ -245,81 +221,16 @@ class DataTable(object):
         return query
 
     def toolbar(self):
-        return Markup('<button type="button" class="btn btn-info" id="cdOpener"><i class="icon-info-sign icon-white"></i></button>')
+        return button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener')
 
     def get_options(self):
         return {
+            "bStateSave": True,
+            "sDom": "<'row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "bAutoWidth": False,
+            "sPaginationType": "bootstrap",
             "bServerSide": True,
             "aoColumns": [col.js_args for col in self.cols],
             "iDisplayLength": 25,
             "aLengthMenu": [[25, 50, 100], [25, 50, 100]],
-            #"sPaginationType": "bootstrap",
         }
-#            "bProcessing": False,
-#            "bServerSide": False,
-#            "sAjaxSource": "${request.url}",
-#            "bPaginate": True,
-#            "sPaginationType": "full_numbers"
-#            "bLengthChange": True,
-#            "bFilter": True,
-#            "bSort": True,
-#            "bInfo": True,
-#            "bAutoWidth": True,
-#
-#            "bStateSave": True,
-#
-#
-#"aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
-#
-#            "aoColumnDefs": [
-#            {
-#                // `data` refers to the data for the cell (defined by `mData`, which
-#                // defaults to the column being worked with, in this case is the first
-#                // Using `row[0]` is equivalent.
-#                "mRender": function ( data, type, row ) {
-#                    return data +' '+ row[3];
-#                },
-#                "aTargets": [ 0 ]
-#            },
-#            { "bVisible": false,  "aTargets": [ 3 ] },
-#            { "sClass": "center", "aTargets": [ 4 ] }
-#        ]
-#
-#
-#
-#"aoColumns": [
-#      { "aDataSort": [ 0, 1 ] , "asSorting": ["asc", "desc" ], "bSearchable": true, "bSortable": true, "bVisible": true, sName, sClass, sTitle
-#        sType: string|numeric|date|html, sWidth},
-#      { "aDataSort": [ 1, 0 ] },
-#      { "aDataSort": [ 2, 3, 4 ] },
-#      null,
-#      null
-#    ]
-#
-#
-#        }
-#
-#
-#$('#example tbody tr').live('click', function () {
-#        var sTitle;
-#        var nTds = $('td', this);
-#        var sBrowser = $(nTds[1]).text();
-#        var sGrade = $(nTds[4]).text();
-#
-#        if ( sGrade == "A" )
-#            sTitle =  sBrowser+' will provide a first class (A) level of CSS support.';
-#        else if ( sGrade == "C" )
-#            sTitle = sBrowser+' will provide a core (C) level of CSS support.';
-#        else if ( sGrade == "X" )
-#            sTitle = sBrowser+' does not provide CSS support or has a broken implementation. Block CSS.';
-#        else
-#            sTitle = sBrowser+' will provide an undefined level of CSS support.';
-#
-#        alert( sTitle )
-#    } );
-#
-#
-#
-##
-## js: http://jqueryui.com/autocomplete/#categories
-##

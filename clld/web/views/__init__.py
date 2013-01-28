@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPNotAcceptable
 
 from clld.interfaces import IRepresentation, IIndex
 from clld.db.meta import DBSession
-from clld.db.models import MODELS
+from clld import RESOURCES
 
 
 def view(interface, ctx, req):
@@ -83,4 +83,4 @@ def robots(req):
 
 
 def sitemapindex(req):
-    return {'sitemaps': [req.route_url(r + 's_alt', ext='sitemap.xml') for r in MODELS]}
+    return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml') for r in RESOURCES]}

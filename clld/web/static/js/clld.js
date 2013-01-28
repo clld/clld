@@ -29,38 +29,32 @@ CLLD.route_url = function(route, data, query) {
 
 CLLD.DataTable = (function(){
 
-    var _init = function(eid, options) {
+    var _init = function(eid, toolbar, options) {
+        var col;
+
         options = options === undefined ? {} : options;
 
         $.extend($.fn.dataTable.defaults, {
-            "bServerSide": true,
-            "bStateSave": true,
-            //"sDom": '<"H"l<"dt-toolbar">fr>t<"F"ip>',
-            "sDom": "<'row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
             "fnServerParams": function (aoData) {
-            	aoData.push({"name": "__eid__", "value": eid});
+		aoData.push({"name": "__eid__", "value": "${datatable.eid}"});
             },
             "fnInitComplete": function(oSettings) {
                 var i, ctrl;
-
-                for (i=0 ; i < oSettings.aoPreSearchCols.length ; i++){
-                    if (oSettings.aoPreSearchCols[i].sSearch.length > 0){
-            		ctrl = $("tfoot .control")[i];
-            		ctrl = $(ctrl);
-        		if (ctrl.length) {
-            		    ctrl.val(oSettings.aoPreSearchCols[i].sSearch);
-            		}
+                for (i=0 ; i<oSettings.aoPreSearchCols.length ; i++) {
+                    if(oSettings.aoPreSearchCols[i].sSearch.length > 0) {
+			ctrl = $("tfoot .control")[i];
+			ctrl = $(ctrl);
+			if (ctrl.length) {
+			    ctrl.val(oSettings.aoPreSearchCols[i].sSearch);
+			}
                     }
                 }
-            },
-            "bJQueryUI": false,
-            "bAutoWidth": false,
-            "sPaginationType": "bootstrap"
+            }
         });
 
-        $.extend( $.fn.dataTableExt.oStdClasses, {
+        $.extend($.fn.dataTableExt.oStdClasses, {
             "sWrapper": "dataTables_wrapper form-inline"
-        });
+        } );
 
         /* API method to get paging information */
         $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings) {
@@ -80,26 +74,28 @@ CLLD.DataTable = (function(){
             "bootstrap": {
 		"fnInit": function(oSettings, nPaging, fnDraw) {
 		    var oLang = oSettings.oLanguage.oPaginate;
-                    var fnClickHandler = function (e) {
+                    var fnClickHandler = function ( e ) {
 			e.preventDefault();
-			if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
-			    fnDraw(oSettings);
+			if ( oSettings.oApi._fnPageChange(oSettings, e.data.action) ) {
+			    fnDraw( oSettings );
 			}
-                    };
+		    };
 
-		    $(nPaging).addClass('pagination').append('<ul>'+
-			'<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
-			'<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
-			'</ul>');
+		    $(nPaging).addClass('pagination').append(
+			'<ul>'+
+			    '<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
+			    '<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
+			'</ul>'
+		    );
 		    var els = $('a', nPaging);
-                    $(els[0]).bind('click.DT', { action: "previous" }, fnClickHandler);
-                    $(els[1]).bind('click.DT', { action: "next" }, fnClickHandler);
+		    $(els[0]).bind( 'click.DT', { action: "previous" }, fnClickHandler );
+		    $(els[1]).bind( 'click.DT', { action: "next" }, fnClickHandler );
 		},
-		"fnUpdate": function (oSettings, fnDraw) {
+		"fnUpdate": function ( oSettings, fnDraw ) {
 		    var iListLength = 5;
 		    var oPaging = oSettings.oInstance.fnPagingInfo();
 		    var an = oSettings.aanFeatures.p;
-                    var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
+		    var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
 
 		    if ( oPaging.iTotalPages < iListLength) {
 			iStart = 1;
@@ -109,7 +105,7 @@ CLLD.DataTable = (function(){
 			iEnd = iListLength;
 		    } else if ( oPaging.iPage >= (oPaging.iTotalPages-iHalf) ) {
 			iStart = oPaging.iTotalPages - iListLength + 1;
-			iEnd = oPaging.iTotalPages;
+                        iEnd = oPaging.iTotalPages;
 		    } else {
 			iStart = oPaging.iPage - iHalf + 1;
 			iEnd = iStart + iListLength - 1;
@@ -123,12 +119,12 @@ CLLD.DataTable = (function(){
 			for ( j=iStart ; j<=iEnd ; j++ ) {
 			    sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
 			    $('<li '+sClass+'><a href="#">'+j+'</a></li>')
-				.insertBefore( $('li:last', an[i])[0] )
-				.bind('click', function (e) {
-				    e.preventDefault();
-				    oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
-				    fnDraw( oSettings );
-				} );
+			    .insertBefore( $('li:last', an[i])[0] )
+			    .bind('click', function (e) {
+				e.preventDefault();
+				oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
+				fnDraw( oSettings );
+			    } );
 			}
 
 			// Add / remove disabled classes from the static elements
@@ -136,7 +132,7 @@ CLLD.DataTable = (function(){
 			    $('li:first', an[i]).addClass('disabled');
 			} else {
 			    $('li:first', an[i]).removeClass('disabled');
-			}
+		    	}
 
 			if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
 			    $('li:last', an[i]).addClass('disabled');
@@ -146,47 +142,52 @@ CLLD.DataTable = (function(){
 		    }
 		}
             }
-        });
+        } );
 
-        var datatable = $('#'+eid).dataTable(options);
-
+        CLLD.DataTable.dt = $('#'+eid).dataTable(options);
         $('.dataTables_filter').hide();
-
-        if (options.toolbar) {
+        if (toolbar) {
             $("div.dt-toolbar").html(toolbar);
         }
-
-        $('#searchCol').change(function(){datatable.fnFilter($('.dataTables_filter input').val())});
-
-        if (options.show_details) {
-            $('#'+eid+' tbody td span').live( 'click', function () {
-                var nTr = $(this).parents('tr')[0];
-                if (datatable.fnIsOpen(nTr)) {
-                    /* This row is already open - close it */
-                    $(this).attr('class', 'ui-icon ui-icon-circle-plus');
-                    datatable.fnClose( nTr );
-                } else {
-                    $(this).attr('class', 'ui-icon ui-icon-circle-minus');
-                    $.get($(this).attr('href'), {}, function(data, textStatus, jqXHR) {
-                        datatable.fnOpen( nTr, data, 'details' );
-                    }, 'html');
-                    /* Open this row */
-                }
-            });
-        }
+        $('#searchCol').change(function(){CLLD.DataTable.dt.fnFilter($('.dataTables_filter input').val())});
+        $('#'+eid+' tbody td button.details').live('click', function () {
+            var nTr = $(this).parents('tr')[0];
+            if (CLLD.DataTable.dt.fnIsOpen(nTr)) {
+                CLLD.DataTable.dt.fnClose( nTr );
+            } else {
+                $.get($(this).attr('href'), {}, function(data, textStatus, jqXHR) {
+                    CLLD.DataTable.dt.fnOpen( nTr, data, 'details' );
+                }, 'html');
+            }
+        });
 
         $("tfoot input").keyup( function () {
             /* Filter on the column (the index) of this element */
-            datatable.fnFilter(this.value, $("tfoot .control").index(this));
-        } );
+            CLLD.DataTable.dt.fnFilter(this.value, $("tfoot .control").index(this));
+        });
 
 	$("tfoot select").change( function () {
             /* Filter on the column (the index) of this element */
-            datatable.fnFilter($(this).val(), $("tfoot .control").index(this));
-        } );
+            CLLD.DataTable.dt.fnFilter($(this).val(), $("tfoot .control").index(this));
+        });
+
+        var dl = '';
+        for (i=0; i < options.aoColumns.length; i++) {
+            col = options.aoColumns[i];
+            if (col.sDescription) {
+                dl += '<dt>'+col.sTitle+'</dt><dd>'+col.sDescription+'</dd>';
+            }
+        }
+
+        if (dl) {
+        	$('#cdOpener').popover({html: true, content: '<dl>'+dl+'</dl>', title: 'Column Descriptions', trigger: 'click', placement: 'left'});
+        } else {
+            $('#cdOpener').hide();
+        }
     };
 
     return {
+        dt: undefined,
         init: _init
     }
 })();

@@ -19,11 +19,6 @@
 			    <li onclick="CLLD.Map.toggleLayer('${layer["name"]}', this.firstElementChild.firstElementChild);">
 			        <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
 				    <input type="checkbox" checked="checked">
-				    ##
-				    ## TODO: creation of legend must be pluggable!
-				    ##
-
-				    ##<img src="${request.static_url('wals3:static/icons/'+de.icon_id+'.png')}">
 				    % if 'marker' in layer:
 				    ${layer['marker']}
 				    % endif

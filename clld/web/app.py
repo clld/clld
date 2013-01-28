@@ -16,7 +16,7 @@ from clld.db.meta import (
     DBSession,
     Base,
 )
-from clld.db.models import MODELS
+from clld import RESOURCES
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
 from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
@@ -114,7 +114,8 @@ def includeme(config):
     config.add_route_and_view('robots', '/robots.txt', robots)
     config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
 
-    for name, model in MODELS.items():
+    for rsc in RESOURCES:
+        name, model = rsc.name, rsc.model
         plural = name + 's'
         factory = partial(ctx_factory, model, 'index')
 
