@@ -1,3 +1,5 @@
+from itertools import groupby
+
 from sqlalchemy import (
     Column,
     Float,
@@ -209,6 +211,11 @@ class Parameter(Base,
                 HasFilesMixin):
     __table_args__ = (UniqueConstraint('name'),)
     domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
+
+    @property
+    def languages(self):
+        for language, values in groupby(self.values, lambda v: v.language):
+            yield language
 
 
 class Source_data(Base, Versioned, DataMixin):

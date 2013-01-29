@@ -7,11 +7,6 @@ from clld.db.models.common import Contributor
 
 
 class ContributionsCol(Col):
-    def __init__(self, dt, **kw):
-        kw.setdefault('bSortable', False)
-        kw.setdefault('bSearchable', False)
-        Col.__init__(self, dt, 'Contributions', **kw)
-
     def format(self, item):
         return HTML.ul(
             *[HTML.li(HTML.a(c.contribution.name, href=self.dt.req.route_url('contribution', id=c.contribution.id)))
@@ -20,13 +15,11 @@ class ContributionsCol(Col):
 
 
 class NameCol(Col):
-
-    def order(self, direction):
-        return desc(Contributor.id) if direction == 'desc' else asc(Contributor.id)
+    def order(self):
+        return Contributor.id
 
 
 class UrlCol(Col):
-
     def format(self, item):
         if item.url:
             return external_link(item.url, 'homepage')
@@ -34,10 +27,9 @@ class UrlCol(Col):
 
 
 class Contributors(DataTable):
-
     def col_defs(self):
         return [
             NameCol(self, 'name'),
-            ContributionsCol(self),
-            UrlCol(self, 'url'),
+            ContributionsCol(self, 'Contributions', bSortable=False, bSearchable=False),
+            UrlCol(self, 'Homepage', bSortable=False, bSearchable=False),
         ]

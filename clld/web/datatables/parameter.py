@@ -4,8 +4,7 @@ from clld.web.datatables.value import Values
 
 
 class Parameters(DataTable):
-
     def col_defs(self):
         return [
-            LinkCol(self, 'id', route_name='parameter', get_label=lambda item: item.name),
+            LinkCol(self, 'name'),
         ]

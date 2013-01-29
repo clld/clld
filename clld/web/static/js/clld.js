@@ -27,6 +27,20 @@ CLLD.route_url = function(route, data, query) {
     return url;
 }
 
+
+CLLD.Modal = (function(){
+    var _show = function(title, url) {
+        $('#ModalLabel').html(title);
+        $('#ModalBody').load(url);
+        $('#Modal').modal('show');
+    }
+
+    return {
+        show: _show
+    }
+})();
+
+
 CLLD.DataTable = (function(){
 
     var _init = function(eid, toolbar, options) {

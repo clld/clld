@@ -22,7 +22,7 @@
 	<tr>
             % for col in datatable.cols:
 	    <th style="text-align: left;">
-                % if col.js_args['bSearchable']:
+                % if col.js_args.get('bSearchable', True):
 		    % if hasattr(col, 'choices'):
 		    <select class="control" name="${col.name}">
 			<option value="">--any--</option>

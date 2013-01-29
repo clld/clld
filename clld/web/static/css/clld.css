@@ -7,6 +7,25 @@ body {
 
 .dt-toolbar {float: right; text-align: right;}
 
+#sidebar {margin-top: 10px;}
+
+#sidebar .well {
+    padding-top: 0px;
+    padding-bottom: 5px;
+}
+
+td.right{
+    text-align: right !important;
+}
+
+td.left{
+    text-align: left !important;
+}
+
+td.center{
+    text-align: center !important;
+}
+
 div.dataTables_length label {
     float: left;
     text-align: left;
@@ -82,4 +101,9 @@ div.olMap img {
     padding-left: 5px;
     margin-right: -5px !important;
     padding-right: 5px;
+}
+
+.right .dropdown-menu {
+    text-align: left !important;
+    min-width: 100px !important;
 }

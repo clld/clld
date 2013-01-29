@@ -6,26 +6,16 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPNotAcceptable
 from clld.interfaces import IRepresentation, IIndex
 from clld.db.meta import DBSession
 from clld import RESOURCES
+from clld.web.adapters import get_adapter
 
 
 def view(interface, ctx, req):
     """renders a resource as pyramid response using the most appropriate adapter
     for the accept header sent.
     """
-    resource = ctx.model() if hasattr(ctx, 'model') else ctx
-    adapters = dict(req.registry.getAdapters([resource], interface))
-
-    if 'ext' in req.matchdict:
-        # find adapter by requested file extension
-        adapter = [r for r in adapters.values() if r.extension == req.matchdict['ext']]
-    else:
-        # content negotiation using the accept header
-        adapter = adapters.get(req.accept.best_match(adapters.keys()))
-
+    adapter = get_adapter(interface, ctx, req, ext=req.matchdict.get('ext'))
     if not adapter:
         raise HTTPNotAcceptable()
-
-    adapter = adapter[0] if isinstance(adapter, list) else adapter
     return adapter.render_to_response(ctx, req)
 
 

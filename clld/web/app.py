@@ -35,6 +35,24 @@ class ClldRequest(Request):
         """
         return URL(self.url)
 
+    def resource_url(self, obj, rsc=None, **kw):
+        if rsc is None:
+            for _rsc in RESOURCES:
+                if _rsc.interface.providedBy(obj):
+                    rsc = _rsc
+                    break
+
+            assert rsc
+
+        route = rsc.name
+        if 'ext' in kw:
+            route += '_alt'
+
+        # if rsc is passed explicitely, we allow the object id to be passed in as obj,
+        # to make it possible to create resource URLs without having the "real" object.
+        kw.setdefault('id', getattr(obj, 'id', obj))
+        return self.route_url(route, **kw)
+
 
 def menu_item(resource, ctx, req):
     """

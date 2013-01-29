@@ -82,10 +82,10 @@
 
             <div class="row-fluid">
             % if hasattr(self, 'sidebar'):
-                <div class="span9">
+                <div class="span8">
                 ${next.body()}
                 </div>
-                <div class="span3">
+                <div id="sidebar" class="span4">
                     ${self.sidebar()}
                 </div>
             % else:
@@ -94,10 +94,30 @@
                 </div>
             % endif
             </div>
+            % if hasattr(self, 'below_sidebar'):
+            <div class="row-fluid">
+                <div class="span12">
+                ${self.below_sidebar()}
+                </div>
+            </div>
+            % endif
             <footer>
                 <%block name="footer">clld</%block>
             </footer>
         </div>
+
+        <div id="Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="ModalLabel"></h3>
+            </div>
+            <div id="ModalBody" class="modal-body">
+            </div>
+            ##<div class="modal-footer">
+            ##    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            ##</div>
+        </div>
+
         <script>
             <%block name="javascript"> </%block>
         </script>

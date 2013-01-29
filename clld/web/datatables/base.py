@@ -5,9 +5,11 @@ object. Server side they know how to provide the data to the client-side table.
 """
 from json import dumps
 import re
+from copy import copy
 
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.types import String, Unicode, Float, Integer
+from sqlalchemy.sql.expression import operator
 from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
@@ -18,22 +20,45 @@ from clld.web.util.helpers import link, button, icon
 from clld.interfaces import IDataTable
 
 
+OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
+
+
+def filter_number(col, qs, type_=None):
+    op = col.__eq__
+    match = OPERATOR_PATTERN.match(qs)
+    if match:
+        op = {
+            '>': col.__gt__,
+            '>=': col.__ge__,
+            '=': col.__eq__,
+            '==': col.__eq__,
+            '<': col.__lt__,
+            '<=': col.__le__,
+        }.get(match.group('op'), col.__eq__)
+        qs = qs[match.end():]
+    try:
+        if type_:
+            qs = type_(qs.strip())
+        else:
+            if isinstance(col.property.columns[0].type, Float):
+                qs = float(qs.strip())
+            if isinstance(col.property.columns[0].type, Integer):
+                qs = int(qs.strip())
+        return op(qs)
+    except ValueError:
+        pass
+
+
 class Col(object):
     """DataTables are basically a list of column specifications.
     """
     dt_name_pattern = re.compile('[a-z]+[A-Z]+[a-z]+')
-    operator_pattern = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
     def __init__(self, dt, name, **kw):
         self.dt = dt
         self.name = name
-        self.js_args = {
-            'sName': name,
-            'sTitle': self.dt.req.translate('dt-' + name),
-            'bSortable': True,
-            'bSearchable': True,
-            'bVisible': True,
-        }
+        self.js_args = {'sName': name, 'sTitle': self.dt.req.translate('dt-' + name)}
+
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):
                 self.js_args[key] = val
@@ -46,35 +71,15 @@ class Col(object):
             if model_col and hasattr(model_col.property, 'columns'):
                 self.model_col = model_col
 
-    def order(self, direction):
-        if self.model_col:
-            return desc(self.model_col) if direction == 'desc' else asc(self.model_col)
+    def order(self):
+        return self.model_col
 
     def search(self, qs):
         if self.model_col:
             if isinstance(self.model_col.property.columns[0].type, (String, Unicode)):
                 return self.model_col.contains(qs)
             if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
-                op = self.model_col.__eq__
-                match = self.operator_pattern.match(qs)
-                if match:
-                    op = {
-                        '>': self.model_col.__gt__,
-                        '>=': self.model_col.__ge__,
-                        '=': self.model_col.__eq__,
-                        '==': self.model_col.__eq__,
-                        '<': self.model_col.__lt__,
-                        '<=': self.model_col.__le__,
-                    }.get(match.group('op'), self.model_col.__eq__)
-                    qs = qs[match.end():]
-                try:
-                    if isinstance(self.model_col.property.columns[0].type, Float):
-                        qs = float(qs.strip())
-                    if isinstance(self.model_col.property.columns[0].type, Integer):
-                        qs = int(qs.strip())
-                    return op(qs)
-                except ValueError:
-                    pass
+                return filter_number(self.model_col, qs)
 
     def format(self, item):
         return getattr(item, self.name, None) or ''
@@ -83,32 +88,21 @@ class Col(object):
 class LinkCol(Col):
     """Column which renders a link.
     """
-    def __init__(self, dt, name, route_name=None, get_attrs=None, **kw):
-        self._get_attrs = get_attrs
-        kw.setdefault('sType', 'html')
-        self.route_name = route_name or name
-        Col.__init__(self, dt, name, **kw)
-
     def get_attrs(self, item):
-        id_ = getattr(item, self.name, None)
-        if id_:
-            id_ = getattr(id_, 'id', None)
-        if not id_:
-            id_ = item.id
-        res = {'href': self.dt.req.route_url(self.route_name, id=id_)}
-        if self._get_attrs:
-            res.update(self._get_attrs(item))
-        return res
+        return {}
+
+    def get_obj(self, item):
+        return item
 
     def format(self, item):
-        return link(self.dt.req, item, **self.get_attrs(item))
+        return link(self.dt.req, self.get_obj(item), **self.get_attrs(item))
 
 
-class LinkToMapCol(LinkCol):
+class LinkToMapCol(Col):
     def __init__(self, dt, name=None, **kw):
         kw.setdefault('bSearchable', False)
         kw.setdefault('bSortable', False)
-        LinkCol.__init__(self, dt, name or '', **kw)
+        Col.__init__(self, dt, name or '', **kw)
 
     def format(self, item):
         return button(
@@ -138,13 +132,6 @@ class DetailsRowLinkCol(Col):
             class_="btn-info details")
 
 
-class IdCol(Col):
-    def __init__(self, dt, name='id', **kw):
-        kw.setdefault('bVisible', False)
-        kw.setdefault('bSearchable', False)
-        Col.__init__(self, dt, name, **kw)
-
-
 @implementer(IDataTable)
 class DataTable(object):
     search = True
@@ -160,10 +147,7 @@ class DataTable(object):
         self.server_side = False
 
     def col_defs(self):
-        return [
-            IdCol(self),
-            Col(self, 'name'),
-        ]
+        return [LinkCol(self, 'name')]
 
     @property
     def cols(self):
@@ -209,10 +193,15 @@ class DataTable(object):
 
         for index in range(int(self.req.params.get('iSortingCols', 0))):
             col = self.cols[int(self.req.params['iSortCol_%s' % index])]
-            if col.js_args['bSortable']:
-                order = col.order(self.req.params['sSortDir_%s' % index])
-                if order is not None:
-                    query = query.order_by(order)
+            if col.js_args.get('bSortable', True):
+                orders = col.order()
+                if orders is not None:
+                    if not isinstance(orders, (tuple, list)):
+                        orders = [orders]
+                    for order in orders:
+                        if self.req.params['sSortDir_%s' % index] == 'desc':
+                            order = desc(order)
+                        query = query.order_by(order)
 
         query = query.order_by(self.model.pk)
         query = query\
@@ -221,7 +210,24 @@ class DataTable(object):
         return query
 
     def toolbar(self):
-        return button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener')
+        """
+        """
+        return HTML.div(
+            HTML.a(
+                icon('download-alt'),
+                HTML.span(class_="caret"),
+                **{
+                    'class_': "btn dropdown-toggle",
+                    'data-toggle': "dropdown",
+                    'href': "#",
+                }
+            ),
+            HTML.ul(
+                HTML.li(HTML.a('csv', href="#")),
+                class_="dropdown-menu",
+            ),
+            button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
+            class_='btn-group right')
 
     def get_options(self):
         return {

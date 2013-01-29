@@ -1,5 +1,6 @@
 from json import dumps
 
+from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML
 
@@ -12,7 +13,8 @@ def link(req, obj, **kw):
             break
 
     assert rsc
-    href = kw.pop('href', req.route_url(rsc.name, id=obj.id))
+    kw.setdefault('class', rsc.interface.__name__[1:])
+    href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
     label = kw.pop('label', getattr(obj, 'name', obj.id))
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
@@ -46,3 +48,20 @@ def text2html(text):
             chunks.append(HTML.br())
         chunks.append(line)
     return HTML.p(*chunks)
+
+
+def linked_contributors(req, contribution):
+    chunks = []
+    for i, c in enumerate(contribution.primary_contributors):
+        if i > 0:
+            chunks.append(' and ')
+        chunks.append(link(req, c))
+
+    for i, c in enumerate(contribution.secondary_contributors):
+        if i == 0:
+            chunks.append(' with ')
+        if i > 0:
+            chunks.append(' and ')
+        chunks.append(link(req, c))
+
+    return HTML.span(*chunks)

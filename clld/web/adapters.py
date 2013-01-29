@@ -1,4 +1,8 @@
+"""
+Adaption is used to derive appropriate representations from resources.
+"""
 from itertools import groupby
+from string import Template as StringTemplate
 try:
     from simplejson import dumps
 except ImportError:
@@ -12,6 +16,7 @@ from pyramid.renderers import render as pyramid_render
 from sqlalchemy.orm import object_mapper
 
 from clld import interfaces
+from clld.lib import bibtex
 
 #    "xml":    "application/xml"+CHARSET_SUFFIX,
 #    'xhtml':  'text/html'+CHARSET_SUFFIX,
@@ -22,9 +27,16 @@ from clld import interfaces
 #    "rdf":    "application/rdf+xml"+CHARSET_SUFFIX,
 #    "json":   "application/json",
 #    "osd":    "application/opensearchdescription+xml"+CHARSET_SUFFIX,
+# 'ris': application/x-Research-Info-Systems
+# 'bib': text/x-bibtex
 
 
 class Renderable(object):
+    """Virtual base class for adapters
+
+    Adapters can provide custom behaviour either by specifying a template to use for
+    rendering, or by overwriting the render method.
+    """
     template = None
     mimetype = 'text/plain'
     extension = None
@@ -52,19 +64,65 @@ class Renderable(object):
 
 @implementer(interfaces.IRepresentation)
 class Representation(Renderable):
+    """Base class for adapters implementing IRepresentation
+    """
+    pass
+
+
+@implementer(interfaces.IIndex)
+class Index(Renderable):
+    """Base class for adapters implementing IIndex
+    """
     pass
 
 
 @implementer(interfaces.IRepresentation)
-class GeoJson(object):
+class BibTex(Representation):
+    """Render a resource's metadata as BibTex record.
+    """
+    extension = 'bib'
+    mimetype = 'text/x-bibtex'
+    genre = 'incollection'
+
+    def render(self, ctx, req):
+        rec = bibtex.Record(
+            self.genre,
+            ctx.id,
+            title=ctx.name,
+            url=req.resource_url(ctx),
+            author=[c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
+        return rec.serialize()
+
+
+@implementer(interfaces.IRepresentation)
+class TxtCitation(Representation):
+    """Render a resource's metadata as plain text string.
+    """
+    extension = 'txt'
+    mimetype = 'text/plain'
+
+    def render(self, ctx, req):
+        template = StringTemplate("""\
+$authors. $year. $title.
+In: $editors (eds.)
+$sitetitle.
+Munich: Max Planck Digital Library, chapter 3.
+Available online at $url
+Accessed on 2013-01-29.
+""")
+        return template.safe_substitute(
+            authors=', '.join(c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
+            title=ctx.name,
+            url=req.resource_url(ctx))
+
+
+@implementer(interfaces.IRepresentation)
+class GeoJson(Renderable):
+    """Base class for adapters which render geojson feature collections.
+    """
     extension = 'geojson'
     mimetype = 'application/geojson'
-
-    def __init__(self, obj):
-        self.obj = obj
-
-    def render_to_response(self, ctx, req):
-        return Response(self.render(ctx, req), content_type='application/json')
+    send_mimetype = 'application/json'
 
     def featurecollection_properties(self, ctx, req):
         return {}
@@ -103,6 +161,8 @@ class GeoJson(object):
 
 
 class GeoJsonParameter(GeoJson):
+    """Render a parameter's values as geojson feature collection.
+    """
     def featurecollection_properties(self, ctx, req):
         return {'name': ctx.name}
 
@@ -120,6 +180,8 @@ class GeoJsonParameter(GeoJson):
 
 @implementer(interfaces.IIndex)
 class GeoJsonLanguages(GeoJson):
+    """Render a collection of languages as geojson feature collection.
+    """
     def feature_iterator(self, ctx, req):
         return ctx.get_query(limit=5000)
 
@@ -130,12 +192,9 @@ class GeoJsonLanguages(GeoJson):
         return {'name': feature.name, 'id': feature.id}
 
 
-@implementer(interfaces.IIndex)
-class Index(Renderable):
-    pass
-
-
 def includeme(config):
+    """register adapters
+    """
     specs = []
     for name, interface in [
         ('language', interfaces.ILanguage),
@@ -152,6 +211,8 @@ def includeme(config):
         specs.append((interface, Representation, 'text/html', 'html', name + '/detail_html.mako', {}))
         specs.append((interface, Representation, 'application/vnd.clld.snippet+xml', 'snippet.html', name + '/snippet_html.mako', {}))
 
+    specs.append((interfaces.IContribution, Representation, 'application/vnd.clld.md+xml', 'md.html', 'contribution/md_html.mako', {}))
+
     specs.extend([
         (interfaces.ILanguage, Index, 'application/vnd.google-earth.kml+xml', 'kml', 'clld:web/templates/language/kml.mako', {'send_mimetype': 'application/xml'}),
         (interfaces.ILanguage, Representation, 'application/rdf+xml', 'rdf', 'clld:web/templates/language/rdf.pt', {}),
@@ -165,9 +226,29 @@ def includeme(config):
         cls = type('Renderer%s' % i, (base,), extra)
         config.registry.registerAdapter(cls, (interface,), list(implementedBy(base))[0], name=mimetype)
 
-    #
-    # TODO: Register maps, which in turn should register appropriate GeoJson data adapters!
-    #
-    config.registry.registerAdapter(GeoJsonLanguages, (interfaces.ILanguage,), interfaces.IIndex, name=GeoJson.mimetype)
+    config.registry.registerAdapter(BibTex, (interfaces.IContribution,), interfaces.IRepresentation, name=BibTex.mimetype)
+    config.registry.registerAdapter(TxtCitation, (interfaces.IContribution,), interfaces.IRepresentation, name=TxtCitation.mimetype)
 
+    config.registry.registerAdapter(GeoJsonLanguages, (interfaces.ILanguage,), interfaces.IIndex, name=GeoJson.mimetype)
     config.registry.registerAdapter(GeoJsonParameter, (interfaces.IParameter,), interfaces.IRepresentation, name=GeoJson.mimetype)
+
+
+def get_adapter(interface, ctx, req, ext=None, name=None):
+    """
+    """
+    # ctx can be a DataTable instance. In this case we create a resource by instantiating
+    # the model class associated with the DataTable
+    resource = ctx.model() if hasattr(ctx, 'model') else ctx
+    adapters = dict(req.registry.getAdapters([resource], interface))
+
+    if ext:
+        # find adapter by requested file extension
+        adapter = [r for r in adapters.values() if r.extension == ext]
+    elif name:
+        # or by mime type
+        adapter = adapters.get(name)
+    else:
+        # or by content negotiation
+        adapter = adapters.get(req.accept.best_match(adapters.keys()))
+
+    return adapter[0] if isinstance(adapter, list) and adapter else adapter
