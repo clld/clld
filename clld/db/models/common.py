@@ -435,7 +435,7 @@ class UnitValue(Base,
     def unit(cls):
         return relationship('Unit', backref=backref('unitvalues', order_by=cls.unit_pk))
 
-    @validates('parameter_pk')
+    @validates('unitparameter_pk')
     def validate_parameter_pk(self, key, unitparameter_pk):
         """We have to make sure, the parameter a value is tied to and the parameter a
         possible domainelement is tied to stay in sync.
@@ -460,15 +460,15 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
         assert type in ['wals', 'iso639-3', 'glottolog']
         return type
 
-    def url(self):
-        """
-        :return: canonical URL for a language identifier
-        """
-        #
-        # TODO!
-        #
-        if self.type == 'wals':
-            return 'http://wals.info/...'
+    #def url(self):
+    #    """
+    #    :return: canonical URL for a language identifier
+    #    """
+    #    #
+    #    # TODO!
+    #    #
+    #    if self.type == 'wals':
+    #        return 'http://wals.info/...'
 
 
 class LanguageIdentifier(Base, Versioned):

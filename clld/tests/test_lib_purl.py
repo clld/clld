@@ -260,6 +260,10 @@ class BuilderTests(TestCase):
 
 class MiscTests(TestCase):
 
+    def test_url_repr(self):
+        u = URL.from_string('http://google.com')
+        repr(u)
+
     def test_url_can_be_used_as_key_in_dict(self):
         u = URL.from_string('http://google.com')
         {u: 0}

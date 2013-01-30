@@ -2,13 +2,15 @@ CLLD = {
     'routes': {
         'language': '/language/{id}',
         'language_alt': '/language/{id}.{ext}'
-    },
+    }
 };
 
 CLLD.test = function(x){return x};
 
 CLLD.route_url = function(route, data, query) {
-    var key, url = CLLD.routes[route], sep = '?';
+    var key,
+        url = CLLD.routes[route],
+        sep = '?';
 
     for (key in data) {
         if (data.hasOwnProperty(key)) {
@@ -399,7 +401,7 @@ CLLD.Map = (function(){
             CLLD.Map.layers,
             {
                 onUnselect: onFeatureUnselect,
-                onSelect: onFeatureSelect,
+                onSelect: onFeatureSelect
             }
         );
 

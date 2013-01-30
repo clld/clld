@@ -32,7 +32,7 @@ def _history_mapper(local_mapper):
         cols = []
         for column in local_mapper.local_table.c:
             if column.name == 'version':
-                continue
+                continue  # pragma: no cover
 
             col = column.copy()
             col.unique = False
@@ -57,7 +57,7 @@ def _history_mapper(local_mapper):
         table = Table(local_mapper.local_table.name + '_history', local_mapper.local_table.metadata,
            *cols
         )
-    else:
+    else:  # pragma: no cover
         # single table inheritance.  take any additional columns that may have
         # been added and add them to the history table.
         for column in local_mapper.local_table.c:
@@ -104,6 +104,7 @@ def versioned_objects(iter):
         if hasattr(obj, '__history_mapper__'):
             yield obj
 
+
 def create_version(obj, session, deleted = False):
     obj_mapper = object_mapper(obj)
     history_mapper = obj.__history_mapper__
@@ -117,7 +118,7 @@ def create_version(obj, session, deleted = False):
 
     for om, hm in zip(obj_mapper.iterate_to_root(), history_mapper.iterate_to_root()):
         if hm.single:
-            continue
+            continue  # pragma: no cover
 
         for hist_col in hm.local_table.c:
             if hist_col.key == 'version':
@@ -131,7 +132,7 @@ def create_version(obj, session, deleted = False):
             # that have a different keyname than that of the mapped column.
             try:
                 prop = obj_mapper.get_property_by_column(obj_col)
-            except UnmappedColumnError:
+            except UnmappedColumnError:  # pragma: no cover
                 # in the case of single table inheritance, there may be
                 # columns on the mapped table intended for the subclass only.
                 # the "unmapped" status of the subclass column on the
@@ -164,11 +165,11 @@ def create_version(obj, session, deleted = False):
                     if attributes.get_history(obj, prop.key).has_changes():
                         obj_changed = True
                         break
-                except CompileError:
+                except CompileError:  # pragma: no cover
                     pass
 
     if not obj_changed and not deleted:
-        return
+        return  # pragma: no cover
 
     attr['version'] = obj.version
     hist = history_cls()
@@ -184,5 +185,5 @@ def versioned_session(session):
         for obj in versioned_objects(session.dirty):
             create_version(obj, session)
         for obj in versioned_objects(session.deleted):
-            create_version(obj, session, deleted = True)
+            create_version(obj, session, deleted=True)
     return session
