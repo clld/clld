@@ -6,5 +6,5 @@ class Tests(unittest.TestCase):
         from clld.lib.bibtex import Record
 
         rec = Record('book', '1', title='The Title')
-        self.assert_('@book' in rec.serialize())
+        self.assertTrue('@book' in rec.serialize())
 

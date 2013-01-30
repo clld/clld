@@ -7,7 +7,7 @@ class Record(dict):
 
     def serialize(self):
         fields = []
-        m = max([0] + map(len, self.keys()))
+        m = max([0] + list(map(len, self.keys())))
 
         for k in sorted(self.keys()):
             values = self[k]

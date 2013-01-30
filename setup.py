@@ -27,10 +27,11 @@ install_requires = [
     'sqlalchemy>=0.7.9',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
-    'purl',
+    #'purl',
     'path.py',
     'pyramid-exclog',
-    ]
+    'zope.sqlalchemy',
+]
 
 if not PY3:
     install_requires.append('Babel')
@@ -38,7 +39,7 @@ if not PY3:
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     'pep8',
-    ]
+]
 
 if not PY3:
     tests_require.append('zope.component>=3.11.0')
@@ -51,6 +52,7 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
+    #'nosexcover',
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
@@ -80,10 +82,7 @@ setup(name='clld',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
-      extras_require = {
-          'testing':testing_extras,
-          'docs':docs_extras,
-          },
+      extras_require = {'testing': testing_extras, 'docs': docs_extras},
       tests_require = tests_require,
       test_suite="clld.tests",
       message_extractors = {'clld': [

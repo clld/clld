@@ -10,7 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
-from purl import URL
+#from purl import URL
+from clld.lib.purl import URL
 
 from clld.db.meta import (
     DBSession,

@@ -7,16 +7,21 @@ from path import path
 from pyramid.paster import bootstrap
 from pyramid.config import Configurator
 import transaction
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, Unicode, ForeignKey
 from webtest import TestApp
 from webob.request import environ_add_POST
 
 import clld
-from clld.db.meta import DBSession, VersionedDBSession, Base
+from clld.db.meta import DBSession, VersionedDBSession, Base, CustomModelMixin
 from clld.db.models import common
 
 
 ENV = None
+
+
+class CustomLanguage(common.Language, CustomModelMixin):
+    pk = Column(Integer, ForeignKey('language.pk'), primary_key=True)
+    custom = Column(Unicode)
 
 
 def main(global_config, **settings):
@@ -77,7 +82,7 @@ class TestWithEnv(TestWithDbAndData):
             try:
                 setattr(self.env['request'], k, v)
             except:
-                print k
+                print(k)
                 raise
 
     def set_request_properties(self, **props):

@@ -11,4 +11,4 @@ class Tests(TestWithEnv):
     def test_button(self):
         from clld.web.util.helpers import button
 
-        self.assert_('click' in button('click'))
+        self.assertTrue('click' in button('click'))

@@ -1,3 +1,5 @@
+import sys
+
 from clld.db.models.common import (
     Contribution,
     Parameter,
@@ -20,6 +22,9 @@ from clld.interfaces import (
     IUnitParameter,
     IUnit,
 )
+
+
+PY3 = sys.version_info[:2][0] == 3
 
 
 class Resource(object):

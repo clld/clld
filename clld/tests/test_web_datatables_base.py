@@ -11,5 +11,5 @@ class Tests(TestWithEnv):
         col = dt.cols[0]
 
         dt.render()
-        self.assert_(isinstance(dt.options, dict))
+        self.assertTrue(isinstance(dt.options, dict))
         dt.get_query()
