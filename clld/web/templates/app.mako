@@ -17,6 +17,11 @@
         <link href="${request.static_url('clld:web/static/css/bootstrap.css')}" rel="stylesheet">
         <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
 
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("feeds", "1");
+        </script>
+
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
         ##<script type="text/javascript"
         ##        src="https://maps.googleapis.com/maps/api/js?sensor=false">##</script>?key=AIzaSyCBKZ6iuwHMVqtwkAegSmtCVIboFHk94AA&sensor=false">

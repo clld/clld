@@ -134,7 +134,7 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def deploy(app, environment):
+def deploy(app, environment, db=False):
     template_variables = dict(
         app=app, env=env, config=config, gunicorn=app.bin('gunicorn_paster'))
 
@@ -142,7 +142,7 @@ def deploy(app, environment):
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)
     require.files.directory(app.venv, use_sudo=True)
-    require.python.virtualenv(app.venv)
+    require.python.virtualenv(app.venv, use_sudo=True)
     require.files.directory(app.logs, use_sudo=True)
 
     with virtualenv(app.venv):
@@ -153,10 +153,10 @@ def deploy(app, environment):
     #
     # TODO: replace with initialization of db from wold-data repos!
     #
-    if False:  # recreate the db only if necessary!
-        local('pg_dump -f /tmp/wold2.sql wold2')
-        require.files.file('/tmp/wold2.sql', source="/tmp/wold2.sql")
-        sudo('sudo -u wold2 psql -f /tmp/wold2.sql -d wold2')
+    if db:  # recreate the db only if necessary!
+        local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
+        require.files.file('/tmp/{0.name}.sql'.format(app), source="/tmp/{0.name}.sql".format(app))
+        sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))

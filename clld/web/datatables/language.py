@@ -2,8 +2,6 @@ from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol,
 
 
 class Languages(DataTable):
-    show_details = True
-
     def col_defs(self):
         return [
             DetailsRowLinkCol(self, route_name='language'),

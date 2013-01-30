@@ -28,6 +28,32 @@ CLLD.route_url = function(route, data, query) {
 }
 
 
+CLLD.Feed = (function(){
+    var _init = function(spec) {
+        var feed = new google.feeds.Feed(spec.url);
+
+        feed.setNumEntries(spec.numEntries == undefined ? 4 : spec.numEntries);
+        feed.load(function(result) {
+            if (!result.error) {
+                var title = spec.title == undefined ? result.feed.title : spec.title
+                var content = '<h3><a href="'+result.feed.link+'">'+title+'</a></h3>';
+                for (var j = 0; j < result.feed.entries.length; j++) {
+                    var entry = result.feed.entries[j];
+                    content += '<h4><a href="'+entry.link+'">'+entry.title+'</a></h4>';
+                    content += '<p class="muted"><small>'+entry.publishedDate+'</small></p>';
+                    content += '<p>'+entry.contentSnippet+'</p>';
+                }
+                $('#'+spec.eid).html(content);
+            }
+        });
+    }
+
+    return {
+        init: _init
+    }
+})();
+
+
 CLLD.Modal = (function(){
     var _show = function(title, url) {
         $('#ModalLabel').html(title);
