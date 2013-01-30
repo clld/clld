@@ -13,14 +13,18 @@ class ValueNameCol(Col):
             return item.domainelement.name
         return item.description
 
-    def order(self, direction):
-        order_col = DomainElement.id if self.dt.parameter.domain else Value.description
-        return desc(order_col) if direction == 'desc' else order_col
+    def order(self):
+        return DomainElement.id if self.dt.parameter.domain else Value.description
 
     def search(self, qs):
         if self.dt.parameter.domain:
             return DomainElement.name.contains(qs)
         return Value.description.contains(qs)
+
+
+class LanguageCol(LinkCol):
+    def get_obj(self, item):
+        return item.language
 
 
 class Values(DataTable):
@@ -46,8 +50,8 @@ class Values(DataTable):
 
     def col_defs(self):
         return [
-            LinkCol(self, 'id', route_name='value', get_label=lambda item: item.id, bSearchable=False),
-            LinkCol(self, 'language', route_name='language', get_label=lambda item: item.language.name, model_col=Language.name),
+            LinkCol(self, 'id', get_label=lambda item: item.id, bSearchable=False),
+            LanguageCol(self, 'language', model_col=Language.name),
             ValueNameCol(self, 'value', choices=[de.name for de in self.parameter.domain]),
         ]
 

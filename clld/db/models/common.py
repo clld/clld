@@ -94,7 +94,7 @@ class HasFilesMixin(object):
         return dict((f.name, f.file) for f in self.files)
 
     @declared_attr
-    def data(cls):
+    def files(cls):
         return relationship(cls.__name__ + '_files')
 
 
@@ -211,11 +211,6 @@ class Parameter(Base,
                 HasFilesMixin):
     __table_args__ = (UniqueConstraint('name'),)
     domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
-
-    @property
-    def languages(self):
-        for language, values in groupby(self.values, lambda v: v.language):
-            yield language
 
 
 class Source_data(Base, Versioned, DataMixin):

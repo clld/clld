@@ -97,4 +97,4 @@ class CustomModelMixin(object):
     """
     @declared_attr
     def __mapper_args__(cls):
-        return {'polymorphic_identity': 'custom'}
+        return {'polymorphic_identity': 'custom'}  # pragma: no cover

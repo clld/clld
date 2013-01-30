@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapper, class_mapper, attributes, object_mapper
-from sqlalchemy.orm.exc import UnmappedClassError, UnmappedColumnError
+from sqlalchemy.orm import mapper, attributes, object_mapper
+from sqlalchemy.orm.exc import UnmappedColumnError
 from sqlalchemy import Table, Column, ForeignKeyConstraint, Integer
 from sqlalchemy import event
 from sqlalchemy.exc import CompileError

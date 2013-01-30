@@ -8,6 +8,7 @@ import time
 import json
 
 from fabric.api import sudo, run, local, put, env
+from fabric.contrib.console import confirm
 from fabtools import require
 from fabtools.python import virtualenv
 from fabtools import service
@@ -26,6 +27,14 @@ location /{app.name} {{
         proxy_read_timeout 10;
         proxy_pass http://127.0.0.1:{app.port}/;
 }}
+
+location /{app.name}/clld-static/ {
+        alias {app.venv}/src/clld/clld/web/static/;
+}
+
+location /{app.name}/static/ {
+        alias {app.venv}/src/wold2/wold2/static/;
+}
 """
 
 SUPERVISOR_TEMPLATE = """\
@@ -57,7 +66,9 @@ exclog.extra_info = true
 use = egg:waitress#main
 host = 0.0.0.0
 port = {app.port}
-worker = 3
+workers = 3
+proc_name = {app.name}
+max_requests = 1000
 
 [loggers]
 keys = root, {app.name}, sqlalchemy, exc_logger
@@ -134,7 +145,7 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def deploy(app, environment, db=False):
+def deploy(app, environment):
     template_variables = dict(
         app=app, env=env, config=config, gunicorn=app.bin('gunicorn_paster'))
 
@@ -153,7 +164,7 @@ def deploy(app, environment, db=False):
     #
     # TODO: replace with initialization of db from wold-data repos!
     #
-    if db:  # recreate the db only if necessary!
+    if confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
         require.files.file('/tmp/{0.name}.sql'.format(app), source="/tmp/{0.name}.sql".format(app))
         sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
@@ -161,10 +172,11 @@ def deploy(app, environment, db=False):
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
 
+    sudo('/etc/init.d/supervisor stop')
+
     create_file_as_root(
         app.supervisor, SUPERVISOR_TEMPLATE.format(**template_variables), mode='644')
 
-    sudo('/etc/init.d/supervisor stop')
     sudo('/etc/init.d/supervisor start')
     time.sleep(2)
     res = run('curl http://localhost:%s/_ping' % app.port)

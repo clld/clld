@@ -13,7 +13,8 @@ def view(interface, ctx, req):
     """renders a resource as pyramid response using the most appropriate adapter
     for the accept header sent.
     """
-    adapter = get_adapter(interface, ctx, req, ext=req.matchdict.get('ext'))
+    adapter = get_adapter(
+        interface, ctx, req, ext=req.matchdict and req.matchdict.get('ext'))
     if not adapter:
         raise HTTPNotAcceptable()
     return adapter.render_to_response(ctx, req)
@@ -73,4 +74,5 @@ def robots(req):
 
 
 def sitemapindex(req):
+    req.response.content_type = 'application/xml'
     return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml') for r in RESOURCES]}

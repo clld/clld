@@ -92,8 +92,8 @@ def includeme(config):
     config.add_translation_dirs('clld:locale')
 
     # event subscribers:
-    config.add_subscriber(add_renderer_globals, events.BeforeRender)
     config.add_subscriber(add_localizer, events.NewRequest)
+    config.add_subscriber(add_renderer_globals, events.BeforeRender)
     config.add_subscriber(init_map, events.ContextFound)
 
     config.add_static_view(name='clld-static', path='clld:web/static')
