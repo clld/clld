@@ -1,10 +1,10 @@
 """HTML/XHTML tag builder
 
-HTML Builder provides: 
+HTML Builder provides:
 
-* an ``HTML`` object that creates (X)HTML tags in a Pythonic way.  
+* an ``HTML`` object that creates (X)HTML tags in a Pythonic way.
 
-* a ``literal`` class used to mark strings containing intentional HTML markup. 
+* a ``literal`` class used to mark strings containing intentional HTML markup.
 
 * a smart ``escape()`` function that preserves literals but
   escapes other strings that may accidentally contain markup characters ("<",
@@ -26,7 +26,7 @@ MarkupSafe. Its advantages are a C speedup for escaping,
 escaping single-quotes for security, and adding new methods to
 ``literal``. **literal** is now a subclass of ``markupsafe.Markup``.
 **escape** is ``markupsafe.escape_silent``. (The latter does not exist yet in
-MarkupSafe 0.9.3, but WebHelpers itself converts None to "" in the meantime). 
+MarkupSafe 0.9.3, but WebHelpers itself converts None to "" in the meantime).
 
 Single-quote escaping affects HTML attributes that are written like this:
 *alt='Some text.'* rather than the normal *alt="Some text."*  If the text is a
@@ -40,7 +40,7 @@ MarkupSafe has some slight differences which should not cause compatibility
 issues but may in the following edge cases.  (A) The ``force`` argument to
 ``escape()`` is gone. We doubt it was ever used. (B) The default encoding of
 ``literal()`` is "ascii" instead of "utf-8". (C) Double quotes are escaped as
-"&#34;" instead of "&quot;". Single quotes are escaped as "&#39;". 
+"&#34;" instead of "&quot;". Single quotes are escaped as "&#39;".
 
 When ``literal`` is used in a mixed expression containing both literals and
 ordinary strings, it tries hard to escape the strings and return a literal.
@@ -77,7 +77,7 @@ The ``HTML`` object has the following methods for tag building:
     Same as ``literal`` but concatenates multiple arguments.
 
 ``HTML.comment(*strings)``
-    Escape and concatenate the strings, and wrap the result in an HTML 
+    Escape and concatenate the strings, and wrap the result in an HTML
     comment.
 
 ``HTML.tag(tag, *content, **attrs)``
@@ -87,7 +87,7 @@ The ``HTML`` object has the following methods for tag building:
     (notably "class"), append an underscore.  If an attribute value is
     ``None``, the attribute is not inserted.  Two special keyword args are
     recognized:
-    
+
     ``c``
         Specifies the content.  This cannot be combined with content in
         positional args.  The purpose of this argument is to position the
@@ -106,7 +106,7 @@ The ``HTML`` object has the following methods for tag building:
 
     Example:
 
-    >>> HTML.tag("a", href="http://www.yahoo.com", name=None, 
+    >>> HTML.tag("a", href="http://www.yahoo.com", name=None,
     ... c="Click Here")
     literal('<a href="http://www.yahoo.com">Click Here</a>')
 
@@ -159,29 +159,30 @@ from __future__ import unicode_literals
 import re
 try:
     from urllib import quote as url_escape
-except ImportError:
+except ImportError:  # pragma: no cover
     from urllib.parse import quote as url_escape
 try:
     from UserDict import DictMixin
-except ImportError:
+except ImportError:  # pragma: no cover
     from collections import MutableMapping as DictMixin
 
 import markupsafe
 try:
     from markupsafe import escape_silent as escape
-except ImportError:
+except ImportError:  # pragma: no cover
     def escape(s):
         if s is None:
             return EMPTY
         return markupsafe.escape(s)
 
+
 class literal(markupsafe.Markup):
     """Represents an HTML literal.
-    
-    This subclass of unicode has a ``.__html__()`` method that is 
+
+    This subclass of unicode has a ``.__html__()`` method that is
     detected by the ``escape()`` function.
-    
-    Also, if you add another string to this string, the other string 
+
+    Also, if you add another string to this string, the other string
     will be quoted and you will get back another literal object.  Also
     ``literal(...) % obj`` will quote any value(s) from ``obj``.  If
     you do something like ``literal(...) + literal(...)``, neither
@@ -191,7 +192,6 @@ class literal(markupsafe.Markup):
     Changed in WebHelpers 1.2: the implementation is now now a subclass of
     ``markupsafe.Markup``.  This brings some new methods: ``.escape`` (class
     method), ``.unescape``, and ``.striptags``.
-    
     """
     __slots__ = ()
 
@@ -202,15 +202,15 @@ class literal(markupsafe.Markup):
         return super(literal, cls).escape(s)
 
 
-__all__ = ["HTML", "escape", "literal", "url_escape", "lit_sub"]
+__all__ = ["HTML", "escape", "literal", "url_escape"]
 
-# Not included in __all__ because for specialized purposes only: 
+# Not included in __all__ because for specialized purposes only:
 # "format_attrs".
 
+
 class UnfinishedTag(object):
-    
     """Represents an unfinished or empty tag."""
-    
+
     def __init__(self, tag):
         """Initialize with the tag name."""
         self._tag = tag
@@ -229,13 +229,12 @@ class UnfinishedTag(object):
 
 
 class UnfinishedComment(object):
-    
     """Represents an unfinished or empty comment."""
-    
+
     def __call__(self, *args):
         """Create the HTML comment."""
         return literal('<!--%s-->' % ''.join([str(x) for x in args]))
-        
+
     def __html__(self):
         """Return the HTML escaped tag."""
         raise NotImplementedError(
@@ -243,9 +242,8 @@ class UnfinishedComment(object):
 
 
 class UnfinishedLiteral(object):
-    
     """Represent an unfinished literal value."""
-    
+
     def __call__(self, *args):
         """Return the literal HTML."""
         return literal(*args)
@@ -257,12 +255,11 @@ class UnfinishedLiteral(object):
 
 
 class HTMLBuilder(object):
-    
     """Base HTML object."""
-    
+
     comment = UnfinishedComment()
     literal = UnfinishedLiteral()
-    
+
     def __getattr__(self, attr):
         """Generate the tag for the given attribute name."""
         if attr.startswith('_'):
@@ -277,10 +274,10 @@ class HTMLBuilder(object):
     def tag(self, tag, *args, **kw):
         return make_tag(tag, *args, **kw)
 
-    def cdata(self, *content): 
+    def cdata(self, *content):
         """Wrap the content in a "<![CDATA[ ... ]]>" section.
 
-        The content will not be escaped because CDATA itself is an 
+        The content will not be escaped because CDATA itself is an
         escaping syntax.
         """
         # _CDATA_START and _CDATA_END are defined at end of module.
@@ -290,6 +287,7 @@ class HTMLBuilder(object):
         parts.append(_CDATA_END)
         s = "".join(parts)
         return literal(s)
+
 
 def _attr_decode(v):
     """Parse out attributes that begin with '_'."""
@@ -323,6 +321,7 @@ def make_tag(tag, *args, **kw):
         html += "\n"
     return literal(html)
 
+
 def format_attrs(**attrs):
     """Format HTML attributes into a string of ' key="value"' pairs which
     can be inserted into an HTML tag.
@@ -344,20 +343,6 @@ def format_attrs(**attrs):
     return literal("".join(strings))
 
 
-def lit_sub(*args, **kw):
-    """Literal-safe version of re.sub.  If the string to be operated on is
-    a literal, return a literal result.  All arguments are passed directly to
-    ``re.sub``.
-    """
-    lit = hasattr(args[2], '__html__')
-    cls = args[2].__class__
-    result = re.sub(*args, **kw)
-    if lit:
-        return cls(result)
-    else:
-        return result
-
-
 empty_tags = set(["area", "base", "basefont", "br", "col", "frame", "hr",
     "img", "input", "isindex", "link", "meta", "param"])
 
@@ -367,5 +352,5 @@ HTML = HTMLBuilder()
 NL = literal("\n")
 EMPTY = literal("")
 BR = HTML.br(_nl=True)
-_CDATA_START = literal("<![CDATA[") 
+_CDATA_START = literal("<![CDATA[")
 _CDATA_END = literal("]]>")

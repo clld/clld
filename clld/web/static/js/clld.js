@@ -5,8 +5,6 @@ CLLD = {
     }
 };
 
-CLLD.test = function(x){return x};
-
 CLLD.route_url = function(route, data, query) {
     var key,
         url = CLLD.routes[route],

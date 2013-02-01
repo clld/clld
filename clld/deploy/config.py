@@ -60,6 +60,7 @@ class App(object):
 APPS = dict((app.name, app) for app in [
     App('wold2', 8888, domain='wold.livingsources.org'),
     App('wals3', 8887, domain='wals.info'),
+    App('solr', 8080),
 ])
 
 ERROR_EMAIL = 'robert_forkel@eva.mpg.de'
