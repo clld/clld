@@ -30,6 +30,9 @@
 		    </li>
 		</ul>
 		% endif
+		% if hasattr(map, 'legend'):
+		${map.legend()}
+		% endif
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
 		<script>
 $(window).load(function() {

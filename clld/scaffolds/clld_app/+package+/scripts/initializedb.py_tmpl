@@ -1,0 +1,66 @@
+from __future__ import unicode_literals
+import os
+import sys
+import transaction
+from collections import defaultdict
+from itertools import groupby
+
+from sqlalchemy import engine_from_config, create_engine
+
+from pyramid.paster import (
+    get_appsettings,
+    setup_logging,
+)
+
+from clld.db.meta import (
+    DBSession,
+    VersionedDBSession,
+    Base,
+)
+from clld.db.models import common
+
+from {{package}} import models
+
+
+def usage(argv):
+    cmd = os.path.basename(argv[0])
+    print('usage: %s <config_uri>\n'
+          '(example: "%s development.ini")' % (cmd, cmd))
+    sys.exit(1)
+
+
+def setup_session(argv=sys.argv):
+    if len(argv) < 2:
+        usage(argv)
+
+    config_uri = argv[1]
+    setup_logging(config_uri)
+    settings = get_appsettings(config_uri)
+    engine = engine_from_config(settings, 'sqlalchemy.')
+    DBSession.configure(bind=engine)
+    Base.metadata.create_all(engine)
+    VersionedDBSession.configure(bind=engine)
+
+
+def main():
+    setup_session()
+
+    with transaction.manager:
+        pass
+
+
+def prime_cache():
+    """If data needs to be denormalized for lookup, do that here.
+    This procedure should be separate from the db initialization, because
+    it will have to be run periodiucally whenever data has been updated.
+    """
+    setup_session()
+
+    with transaction.manager:
+        pass
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        main()
+    prime_cache()

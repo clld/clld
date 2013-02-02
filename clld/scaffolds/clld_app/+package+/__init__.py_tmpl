@@ -10,6 +10,7 @@ def main(global_config, **settings):
     settings['clld.app_template'] = "{{package}}.mako"
 
     config = Configurator(settings=settings)
+    config.add_translation_dirs('{{package}}:locale')
     config.include('clld.web.app')
 
     config.add_static_view('static', 'static', cache_max_age=3600)

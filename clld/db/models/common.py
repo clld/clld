@@ -114,10 +114,6 @@ class DataMixin(object):
     def object_pk(cls):
         return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
 
-    #@declared_attr
-    #def object(cls):
-    #    return relationship(cls.owner_class(), backref=backref('data', order_by=cls.ord))
-
 
 class HasDataMixin(object):
     """Adds a convenience method to retrieve the key-value pairs from data as dict.
@@ -253,12 +249,12 @@ class Contribution(Base,
     @property
     def primary_contributors(self):
         return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: a.ord) if assoc.primary]
+                sorted(self.contributor_assocs, key=lambda a: (a.ord, a.contributor.id)) if assoc.primary]
 
     @property
     def secondary_contributors(self):
         return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: a.ord) if not assoc.primary]
+                sorted(self.contributor_assocs, key=lambda a: (a.ord, a.contributor.id)) if not assoc.primary]
 
 
 class Value_data(Base, Versioned, DataMixin):
