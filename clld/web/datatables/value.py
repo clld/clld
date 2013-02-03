@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload
 
 from clld.db.meta import DBSession
 from clld.db.models.common import Value, Parameter, DomainElement, Language
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
+from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol
 
 
 class ValueNameCol(Col):
@@ -23,6 +23,11 @@ class ValueNameCol(Col):
 
 
 class LanguageCol(LinkCol):
+    def get_obj(self, item):
+        return item.language
+
+
+class _LinkToMapCol(LinkToMapCol):
     def get_obj(self, item):
         return item.language
 
@@ -49,11 +54,14 @@ class Values(DataTable):
         return query
 
     def col_defs(self):
-        return [
+        res = [
             LinkCol(self, 'id', get_label=lambda item: item.id, bSearchable=False),
             LanguageCol(self, 'language', model_col=Language.name),
             ValueNameCol(self, 'value', choices=[de.name for de in self.parameter.domain]),
         ]
+        if self.parameter:
+            res.append(_LinkToMapCol(self))
+        return res
 
     def get_options(self):
         opts = DataTable.get_options(self)

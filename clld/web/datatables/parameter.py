@@ -6,5 +6,6 @@ from clld.web.datatables.value import Values
 class Parameters(DataTable):
     def col_defs(self):
         return [
+            DetailsRowLinkCol(self),
             LinkCol(self, 'name'),
         ]

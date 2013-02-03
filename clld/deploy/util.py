@@ -6,6 +6,9 @@ Deployment utilities for clld apps
 #
 import time
 import json
+import crypt
+import random
+from getpass import getpass
 
 from fabric.api import sudo, run, local, put, env
 from fabric.contrib.console import confirm
@@ -18,6 +21,7 @@ from clld.deploy import config
 
 LOCATION_TEMPLATE = """\
 location /{app.name} {{
+{auth}
         proxy_pass_header Server;
         proxy_set_header Host $http_host;
         proxy_redirect off;
@@ -28,13 +32,13 @@ location /{app.name} {{
         proxy_pass http://127.0.0.1:{app.port}/;
 }}
 
-location /{app.name}/clld-static/ {
+location /{app.name}/clld-static/ {{
         alias {app.venv}/src/clld/clld/web/static/;
-}
+}}
 
-location /{app.name}/static/ {
-        alias {app.venv}/src/wold2/wold2/static/;
-}
+location /{app.name}/static/ {{
+        alias {app.venv}/src/{app.name}/{app.name}/static/;
+}}
 """
 
 SUPERVISOR_TEMPLATE = """\
@@ -136,6 +140,13 @@ pipeline =
 }
 
 
+def hashpw(pw):
+    letters = 'abcdefghijklmnopqrstuvwxyz' \
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' \
+        '0123456789/.'
+    return crypt.crypt(pw, random.choice(letters) + random.choice(letters))
+
+
 def install_repos(name):
     sudo('pip install -e git+%s#egg=%s' % (config.repos(name), name))
 
@@ -147,7 +158,11 @@ def create_file_as_root(path, content, **kw):
 
 def deploy(app, environment):
     template_variables = dict(
-        app=app, env=env, config=config, gunicorn=app.bin('gunicorn_paster'))
+        app=app,
+        env=env,
+        config=config,
+        gunicorn=app.bin('gunicorn_paster'),
+        auth='')
 
     require.users.user(app.name, shell='/bin/bash')
     require.postgres.user(app.name, app.name)
@@ -183,6 +198,13 @@ def deploy(app, environment):
     assert json.loads(res)['status'] == 'ok'
 
     if environment == 'test':
+        pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
+        if pw:
+            create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
+            template_variables['auth'] = """\
+        auth_basic "%s";
+        auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
+
         create_file_as_root(
             app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
     elif environment == 'production':

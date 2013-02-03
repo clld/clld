@@ -104,30 +104,30 @@ class LinkToMapCol(Col):
         kw.setdefault('bSortable', False)
         Col.__init__(self, dt, name or '', **kw)
 
+    def get_obj(self, item):
+        return item
+
     def format(self, item):
+        obj = self.get_obj(item)
         return button(
             icon('icon-globe'),
-            title='show %s on map' % getattr(item, 'name', ''),
-            onclick='CLLD.Map.showInfoWindow("id", "%s")' % item.id,
+            title='show %s on map' % getattr(obj, 'name', ''),
+            onclick='CLLD.Map.showInfoWindow("id", "%s")' % obj.id,
         )
 
 
 class DetailsRowLinkCol(Col):
-    def __init__(self, dt, name=None, route_name=None, **kw):
+    def __init__(self, dt, name=None, **kw):
         kw.setdefault('bSortable', False)
         kw.setdefault('bSearchable', False)
         kw.setdefault('sClass', 'center')
         kw.setdefault('sType', 'html')
-        name = name or ''
-        self.route_name = route_name or name
-        if not self.route_name.endswith('_alt'):
-            self.route_name = self.route_name + '_alt'
-        Col.__init__(self, dt, name, **kw)
+        Col.__init__(self, dt, name or '', **kw)
 
     def format(self, item):
         return button(
             icon('info-sign', inverted=True),
-            href=self.dt.req.route_url(self.route_name, ext='snippet.html', id=item.id),
+            href=self.dt.req.resource_url(item, ext='snippet.html'),
             title="show details",
             class_="btn-info details")
 

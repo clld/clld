@@ -49,6 +49,10 @@ class App(object):
         return path('/etc/nginx/locations.d').joinpath('%s.conf' % self.name)
 
     @property
+    def nginx_htpasswd(self):
+        return path('/etc/nginx/locations.d').joinpath('%s.htpasswd' % self.name)
+
+    @property
     def nginx_site(self):
         return path('/etc/nginx/sites-enabled').joinpath(self.name)
 
@@ -60,6 +64,7 @@ class App(object):
 APPS = dict((app.name, app) for app in [
     App('wold2', 8888, domain='wold.livingsources.org'),
     App('wals3', 8887, domain='wals.info'),
+    App('apics', 8886),
     App('solr', 8080),
 ])
 
