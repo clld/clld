@@ -224,6 +224,9 @@ class Source(Base,
              IdNameDescriptionMixin,
              HasDataMixin,
              HasFilesMixin):
+    authors = Column(Unicode)
+    year = Column(Unicode)
+
     glottolog_id = Column(String)
     google_book_search_id = Column(String)
 
@@ -334,9 +337,20 @@ class Sentence_files(Base, Versioned, FilesMixin):
 class Sentence(Base,
                PolymorphicBaseMixin,
                Versioned,
+               IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
-    pass
+    analyzed = Column(Unicode)
+    gloss = Column(Unicode)
+    source = Column(Unicode)
+    comment = Column(Unicode)
+    original_script = Column(Unicode)
+
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+
+    @declared_attr
+    def language(cls):
+        return relationship('Language', backref=backref('sentences', order_by=cls.language_pk))
 
 
 class Unit_data(Base, Versioned, DataMixin):
@@ -502,20 +516,21 @@ class ValueReference(Base, Versioned, HasSourceMixin):
     linkage, e.g. 'pp. 30-34'.
     """
     value_pk = Column(Integer, ForeignKey('value.pk'))
-
-    @declared_attr
-    def value(cls):
-        return relationship(Value, backref=backref("references", order_by=cls.key))
+    value = relationship(Value, backref="references")
 
 
 class SentenceReference(Base, Versioned, HasSourceMixin):
     """
     """
     sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
+    sentence = relationship(Sentence, backref="references")
 
-    @declared_attr
-    def sentence(cls):
-        return relationship(Sentence, backref=backref("references", order_by=cls.key))
+
+class ContributionReference(Base, Versioned, HasSourceMixin):
+    """
+    """
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
+    contribution = relationship(Contribution, backref="references")
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):

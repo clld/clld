@@ -1,6 +1,7 @@
 from pyramid.config import Configurator
 
 from {{package}} import views
+from {{package}} import models
 
 
 def main(global_config, **settings):

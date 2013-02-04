@@ -22,8 +22,8 @@ def add_localizer(event):
 
 def init_map(event):
     req = event.request
-    map_ = req.registry.queryUtility(interfaces.IMap, name=req.matched_route.name)
-    if map_:
-        req.map = map_(event.request.context, event.request)
-    else:
-        req.map = None
+    req.map = None
+    if req.matched_route:
+        map_ = req.registry.queryUtility(interfaces.IMap, name=req.matched_route.name)
+        if map_:
+            req.map = map_(event.request.context, event.request)

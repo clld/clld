@@ -198,6 +198,7 @@ def includeme(config):
     specs = []
     for name, interface in [
         ('language', interfaces.ILanguage),
+        ('value', interfaces.IValue),
         ('contribution', interfaces.IContribution),
         ('contributor', interfaces.IContributor),
         ('parameter', interfaces.IParameter),
