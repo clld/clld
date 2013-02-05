@@ -12,8 +12,8 @@
 ## TODO: must get list of available formats from registry!
 ##
 <ul class="nav nav-tabs">
-    ${li('txt', 'Text')}
-    ${li('bib', 'BibTex')}
+    ${li('txt', ${_('Text')})}
+    ${li('bib', ${_('BibTex')})}
 ##    ${li('ris', 'RIS')}
 </ul>
 <% from clld.web.adapters import get_adapter %>

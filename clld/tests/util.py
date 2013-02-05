@@ -28,6 +28,7 @@ def main(global_config, **settings):
     settings['mako.directories'] = ['clld:web/templates']
     config = Configurator(settings=settings)
     config.include('clld.web.app')
+    config.register_app()
     return config.make_wsgi_app()
 
 

@@ -12,7 +12,7 @@
     </li>
 </%def>
 
-<div id="md-${ctx.id}">
+<div id="md-${ctx.id}" class="tabbable tabs-left">
     <ul class="nav nav-tabs">
         ${li('txt', 'Text')}
         ${li('bib', 'BibTex')}

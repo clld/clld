@@ -6,12 +6,7 @@
 
 <h2>${_('Contribution')} ${ctx.name}</h2>
 
-<ol>
-% for k, v in ctx.datadict().items():
-<dt>${k}</dt>
-<dd>${v}</dd>
-% endfor
-</ol>
+${util.data()}
 
 <% dt = request.registry.queryUtility(IDataTable, 'values'); dt = dt(request, Value, contribution=ctx) %>
 % if dt:

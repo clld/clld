@@ -57,7 +57,7 @@ class Col(object):
     def __init__(self, dt, name, **kw):
         self.dt = dt
         self.name = name
-        self.js_args = {'sName': name, 'sTitle': self.dt.req.translate('dt-' + name)}
+        self.js_args = {'sName': name, 'sTitle': '' if not name else self.dt.req.translate(name.capitalize())}
 
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):
@@ -167,6 +167,8 @@ class DataTable(object):
         return self._options
 
     def base_query(self, query):
+        """Custom DataTables can overwrite this method to add joins, or apply filters.
+        """
         return query
 
     def render(self):

@@ -9,3 +9,10 @@
 <li>${identifier.id}</li>
 % endfor
 </ul>
+
+
+<%def name="sidebar()">
+    % if request.map:
+    ${request.map.render()}
+    % endif
+</%def>

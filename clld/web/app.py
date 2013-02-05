@@ -7,11 +7,15 @@ from collections import OrderedDict
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
+from path import path
+
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
+from pyramid.asset import resolve_asset_spec
 #from purl import URL
 from clld.lib.purl import URL
+from clld.config import get_config
 
 from clld.db.meta import (
     DBSession,
@@ -23,7 +27,7 @@ from clld.web.views import index_view, resource_view, robots, sitemapindex, _rai
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
-from clld.web.maps import Map, ParameterMap
+from clld.web.maps import Map, ParameterMap, LanguageMap
 
 
 class ClldRequest(Request):
@@ -81,6 +85,46 @@ def register_cls(interface, config, route, cls):
     config.registry.registerUtility(cls, provided=interface, name=route)
 
 
+def register_app(config, pkg=None):
+    """This hook can be used by apps to have some conventional locations for resources
+    within the package be exploited automatically to update the registry.
+    """
+    if pkg is None:
+        config.add_translation_dirs('clld:locale')
+        config.add_route('home', '/')
+        menuitems = OrderedDict(home=partial(menu_item, 'home'))
+        config.registry.registerUtility(menuitems, IMenuItems)
+        return
+
+    if not hasattr(pkg, '__file__'):
+        pkg = __import__(pkg)
+    name = pkg.__name__
+    pkg_dir = path(pkg.__file__).dirname().abspath()
+
+    if pkg_dir.joinpath('locale').exists():
+        config.add_translation_dirs('%s:locale' % name)
+        config.add_translation_dirs('clld:locale')
+
+    if pkg_dir.joinpath('appconf.ini').exists():
+        cfg = get_config(pkg_dir.joinpath('appconf.ini'))
+        if 'mako.directories_list' in cfg:
+            cfg['mako.directories'] = cfg['mako.directories_list']
+        config.add_settings(cfg)
+
+    config.add_static_view('static', '%s:static' % name, cache_max_age=3600)
+    config.add_route('home', '/')
+    if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
+        config.scan('%s.views' % name)
+
+    menuitems = OrderedDict(home=partial(menu_item, 'home'))
+    for plural in config.registry.settings.get(
+        'clld.menuitems_list',
+        ['contributions', 'parameters', 'languages', 'contributors']
+    ):
+        menuitems[plural] = partial(menu_item, plural)
+    config.registry.registerUtility(menuitems, IMenuItems)
+
+
 def includeme(config):
     config.set_request_factory(ClldRequest)
 
@@ -90,7 +134,6 @@ def includeme(config):
     Base.metadata.bind = engine
 
     config.add_settings({'pyramid.default_locale_name': 'en'})
-    config.add_translation_dirs('clld:locale')
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
@@ -120,15 +163,14 @@ def includeme(config):
 
     config.add_directive('add_route_and_view', add_route_and_view)
 
+    config.add_directive('register_app', register_app)
+
     #
     # routes and views
     #
     # add some maintenance hatches
     config.add_route_and_view('_raise', '/_raise', _raise)
     config.add_route_and_view('_ping', '/_ping', _ping, renderer='json')
-
-    config.add_route('home', '/')
-    menuitems = OrderedDict(home=partial(menu_item, 'home'))
 
     config.add_route_and_view('robots', '/robots.txt', robots)
     config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
@@ -149,13 +191,9 @@ def includeme(config):
         config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % name, resource_view, **kw)
         config.add_route_and_view('%s_alt' % name, '/%s/{id:[^/\.]+}.{ext}' % name, resource_view, **kw)
 
-        if plural in config.registry.settings.get(
-            'clld.menuitems', 'contributions parameters languages contributors').split():
-            menuitems[plural] = partial(menu_item, plural)
-
     # maps
     config.register_map('languages', Map)
+    config.register_map('language', LanguageMap)
     config.register_map('parameter', ParameterMap)
 
-    config.registry.registerUtility(menuitems, IMenuItems)
     config.include('clld.web.adapters')

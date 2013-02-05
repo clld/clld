@@ -9,11 +9,6 @@ body {
 
 #sidebar {margin-top: 10px;}
 
-#sidebar .well {
-    padding-top: 0px;
-    padding-bottom: 5px;
-}
-
 td.right{
     text-align: right !important;
 }

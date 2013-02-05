@@ -1,4 +1,5 @@
 from json import dumps
+from itertools import groupby
 
 from clld import interfaces
 from clld import RESOURCES

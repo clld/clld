@@ -139,7 +139,7 @@ class GeoJson(Renderable):
         """
         return [0.0, 0.0]
 
-    def render(self, ctx, req):
+    def render(self, ctx, req, dump=True):
         features = []
 
         for feature in self.feature_iterator(ctx, req):

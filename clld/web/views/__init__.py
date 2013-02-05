@@ -31,9 +31,11 @@ def resource_view(ctx, req):
 
 
 def datatable_xhr_view(ctx, req):
+    # call get_query, thereby - as side effect - making sure, the counts are set.
+    items = ctx.get_query()
     if hasattr(ctx, 'row_class'):
         data = []
-        for item in ctx.get_query():
+        for item in items:
             _d = {'DT_RowId': 'row_%s' % item.pk}
             row_class = ctx.row_class(item)
             if row_class:
@@ -42,7 +44,7 @@ def datatable_xhr_view(ctx, req):
                 _d[str(i)] = col.format(item)
             data.append(_d)
     else:
-        data = [[col.format(item) for col in ctx.cols] for item in ctx.get_query()]
+        data = [[col.format(item) for col in ctx.cols] for item in items]
 
     # sEcho parameter.
     # Note that it strongly recommended for security reasons that you 'cast' this

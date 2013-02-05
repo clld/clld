@@ -48,7 +48,7 @@
         <%block name="head"> </%block>
     </head>
     <body>
-        <div class="container-fluid">
+        <div id="header" class="container-fluid">
             <%block name="header"></%block>
         </div>
 

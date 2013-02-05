@@ -9,6 +9,7 @@ from pyramid.renderers import render
 
 from clld.interfaces import IDataTable
 from clld.web.util import htmllib
+from clld.web.adapters import GeoJsonLanguages
 
 
 class Map(object):
@@ -50,15 +51,28 @@ class ParameterMap(Map):
         if self.ctx.domain:
             return [{
                 'name': de.name,
-                'url': self.req.route_url(
-                    'parameter_alt',
-                    id=self.ctx.id, ext='geojson',
-                    _query=dict(domainelement=str(de.id))),
+                'url': self.req.resource_url(
+                    self.ctx, ext='geojson', _query=dict(domainelement=str(de.id))),
             } for de in self.ctx.domain]
         return [{
+            'name': self.ctx.name, 'url': self.req.resource_url(self.ctx, ext='geojson')}]
+
+
+class _GeoJson(GeoJsonLanguages):
+    def feature_iterator(self, ctx, req):
+        return [ctx]
+
+
+class LanguageMap(Map):
+    def get_layers(self):
+        geojson = _GeoJson(self.ctx)
+        return [{
             'name': self.ctx.name,
-            'url': self.req.route_url('parameter_alt', id=self.ctx.id, ext='geojson'),
+            'data': geojson.render(self.ctx, self.req, dump=False),
         }]
+
+    def options(self):
+        return {'center': [self.ctx.longitude, self.ctx.latitude], 'zoom': 3, 'no_popup': True, 'sidebar': True}
 
 
 """

@@ -58,16 +58,16 @@ class Values(DataTable):
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
-        query = query.join(Language).join(Parameter).options(joinedload(Value.language))
+        query = query.join(Language).options(joinedload(Value.language))
 
         if self.parameter:
             query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
-
-        if self.parameter:
             return query.filter(Value.parameter_pk == self.parameter.pk)
 
         if self.contribution:
+            query = query.join(Parameter)
             return query.filter(Value.contribution_pk == self.contribution.pk)
+
         return query
 
     def col_defs(self):

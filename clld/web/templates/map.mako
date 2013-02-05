@@ -1,3 +1,17 @@
+<% options = map.options() %>
+% if options.get('sidebar'):
+<div class="well well-small">
+    % if hasattr(map, 'legend'):
+    ${map.legend()}
+    % endif
+    <div id="${map.eid}" style="width: 100%; height: 200px;"> </div>
+    <script>
+$(window).load(function() {
+    CLLD.Map.init(${h.dumps(map.layers)|n}, ${h.dumps(options)|n});
+});
+    </script>
+</div>
+% else:
 <div class="accordion" id="map-container">
     <div class="accordion-group">
         <div class="accordion-heading">
@@ -36,10 +50,11 @@
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
 		<script>
 $(window).load(function() {
-    CLLD.Map.init(${h.dumps(map.layers)|n}, ${h.dumps(map.options())|n});
+    CLLD.Map.init(${h.dumps(map.layers)|n}, ${h.dumps(options)|n});
 });
 		</script>
             </div>
         </div>
     </div>
 </div>
+% endif

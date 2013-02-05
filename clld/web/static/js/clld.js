@@ -303,7 +303,7 @@ CLLD.Map = (function(){
 
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom,
+        var i, layer, layer_options, spec, center, zoom, map_options,
             styles = CLLD.Map.style_maps['default'];
 
         // World Geodetic System 1984 projection (lon/lat)
@@ -316,13 +316,12 @@ CLLD.Map = (function(){
         CLLD.Map.options = options == undefined ? {} : options;
 
         center = CLLD.Map.options.center == undefined ? (0, 0) : CLLD.Map.options.center;
-        zoom = CLLD.Map.options.zoom == undefined ? 2 : CLLD.Map.options.zoom;
 
         if (CLLD.Map.options.style_map) {
             styles = CLLD.Map.style_maps[CLLD.Map.options.style_map];
         }
 
-        CLLD.Map.map = new OpenLayers.Map('map', {
+        map_options = {
             projection: WGS84_google_mercator,
             layers: [
                 new OpenLayers.Layer.Google(
@@ -342,11 +341,16 @@ CLLD.Map = (function(){
                     {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
                 )*/
             ],
+            center: new OpenLayers.LonLat(center[0], center[1]).transform(WGS84, WGS84_google_mercator),
             maxExtent: new OpenLayers.Bounds(-180, -85.0511, 180, 85.0511).transform(WGS84, WGS84_google_mercator)
-        });
+        }
+        if (CLLD.Map.options.zoom) {
+            map_options.zoom = CLLD.Map.options.zoom;
+        }
 
-        CLLD.Map.map.setCenter(new OpenLayers.LonLat(center[0], center[1])
-                               .transform(WGS84, WGS84_google_mercator), zoom);
+        CLLD.Map.map = new OpenLayers.Map('map', map_options);
+
+        //CLLD.Map.map.setCenter(new OpenLayers.LonLat(center[0], center[1]).transform(WGS84, WGS84_google_mercator), zoom);
 
         CLLD.Map.map.addControl(new OpenLayers.Control.LayerSwitcher());
 
@@ -394,22 +398,24 @@ CLLD.Map = (function(){
                 renderIntent: "temporary"
             }
         );
-
-        selectCtrl = new OpenLayers.Control.SelectFeature(
-            CLLD.Map.layers,
-            {
-                onUnselect: onFeatureUnselect,
-                onSelect: onFeatureSelect
-            }
-        );
-
         CLLD.Map.map.addControl(highlightCtrl);
-        CLLD.Map.map.addControl(selectCtrl);
-
         highlightCtrl.activate();
+
+        var select_options = {
+            onUnselect: onFeatureUnselect,
+            onSelect: onFeatureSelect
+        };
+        if (CLLD.Map.options.no_popup) {
+            select_options = {};
+        }
+
+        selectCtrl = new OpenLayers.Control.SelectFeature(CLLD.Map.layers, select_options);
+        CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
 
-        CLLD.Map.map.zoomToMaxExtent();
+        if (CLLD.Map.options.zoom === undefined) {
+            CLLD.Map.map.zoomToMaxExtent();
+        }
         //var mapextent = new OpenLayers.Bounds(-179, -80, 179, 80)
         //    .transform(WGS84, map.getProjectionObject());
         //CLLD.Map.map.zoomToExtent(mapextent);
@@ -437,7 +443,7 @@ CLLD.Map = (function(){
             return undefined;
         },
         showInfoWindow: function(property, value, layer) {
-            if (selectedFeature) {
+            if (selectedFeature && selectedFeature.popup) {
                 selectCtrl.unselect(selectedFeature);
             }
             var features;
