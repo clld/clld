@@ -10,11 +10,12 @@ import crypt
 import random
 from getpass import getpass
 
-from fabric.api import sudo, run, local, put, env
+from fabric.api import sudo, run, local, put, env, cd
 from fabric.contrib.console import confirm
 from fabtools import require
 from fabtools.python import virtualenv
 from fabtools import service
+from fabtools import postgres
 
 from clld.deploy import config
 
@@ -41,13 +42,17 @@ location /{app.name}/static/ {{
 }}
 """
 
-SUPERVISOR_TEMPLATE = """\
+_SUPERVISOR_TEMPLATE = """\
 [program:{app.name}]
 command={gunicorn} -u {app.name} -g {app.name} --error-logfile {app.error_log} {app.config}
-autostart=true
-autorestart=true
+autostart=%s
+autorestart=%s
 redirect_stderr=True
 """
+SUPERVISOR_TEMPLATE = {
+    'pause': _SUPERVISOR_TEMPLATE % ('false', 'false'),
+    'run': _SUPERVISOR_TEMPLATE % ('true', 'true'),
+}
 
 _CONFIG_TEMPLATE = """\
 [app:{app.name}]
@@ -156,6 +161,15 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
+def supervisor(app, command, template_variables):
+    assert command in SUPERVISOR_TEMPLATE
+    sudo('/etc/init.d/supervisor stop')
+    create_file_as_root(
+        app.supervisor,
+        SUPERVISOR_TEMPLATE[command].format(**template_variables), mode='644')
+    sudo('/etc/init.d/supervisor start')
+
+
 def deploy(app, environment):
     template_variables = dict(
         app=app,
@@ -177,22 +191,27 @@ def deploy(app, environment):
         install_repos(app.name)
 
     #
-    # TODO: replace with initialization of db from wold-data repos!
+    # TODO: replace with initialization of db from data repos!
     #
     if confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
         require.files.file('/tmp/{0.name}.sql'.format(app), source="/tmp/{0.name}.sql".format(app))
+
+        if postgres.database_exists(app.name):
+            supervisor(app, 'pause', template_variables)
+
+            with cd('/var/lib/postgresql'):
+                sudo('sudo -u postgres dropdb %s' % app.name)
+
+            require.postgres.database(app.name, app.name)
+
         sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
 
-    sudo('/etc/init.d/supervisor stop')
+    supervisor(app, 'run', template_variables)
 
-    create_file_as_root(
-        app.supervisor, SUPERVISOR_TEMPLATE.format(**template_variables), mode='644')
-
-    sudo('/etc/init.d/supervisor start')
     time.sleep(2)
     res = run('curl http://localhost:%s/_ping' % app.port)
     assert json.loads(res)['status'] == 'ok'
