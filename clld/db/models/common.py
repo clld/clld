@@ -285,6 +285,7 @@ class Value(Base,
     # Languages may have multiple values for the same parameter. Their relative
     # frequency can be stored here.
     frequency = Column(Float)
+    confidence = Column(Unicode)
 
     parameter = relationship('Parameter', backref='values')
     domainelement = relationship('DomainElement', backref='values')

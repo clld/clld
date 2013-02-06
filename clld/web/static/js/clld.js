@@ -2,12 +2,14 @@ CLLD = {
     'routes': {
         'language': '/language/{id}',
         'language_alt': '/language/{id}.{ext}'
-    }
+    },
+    'base_url': ''
 };
 
 CLLD.route_url = function(route, data, query) {
+    // TODO: respect base url!!
     var key,
-        url = CLLD.routes[route],
+        url = CLLD.base_url + CLLD.routes[route],
         sep = '?';
 
     for (key in data) {
@@ -258,7 +260,7 @@ CLLD.Map = (function(){
             labelOutlineWidth: 3
         },
         "select": {
-            externalGraphic: "http://chart.googleapis.com/chart?cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00",
+            //externalGraphic: "http://chart.googleapis.com/chart?cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00",
             label: "",
             //pointRadius: 25,
             graphicWidth: 38,
@@ -303,7 +305,7 @@ CLLD.Map = (function(){
 
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom, map_options,
+        var i, layer, layer_options, spec, center, zoom, map_options, bounds,
             styles = CLLD.Map.style_maps['default'];
 
         // World Geodetic System 1984 projection (lon/lat)
@@ -413,8 +415,15 @@ CLLD.Map = (function(){
         CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
 
-        if (CLLD.Map.options.zoom === undefined) {
-            CLLD.Map.map.zoomToMaxExtent();
+        if (CLLD.Map.options.center === undefined) {
+            bounds = new OpenLayers.Bounds();
+            console.log(bounds);
+           for (i=0; i<CLLD.Map.layers.length; i++) {
+                bounds.extend(CLLD.Map.layers[i].getDataExtent());
+                console.log(bounds);
+            }
+            CLLD.Map.map.zoomToExtent(bounds, true);
+            CLLD.Map.map.zoomTo(Math.min(CLLD.Map.map.getZoomForExtent(bounds) - 1, 4));
         }
         //var mapextent = new OpenLayers.Bounds(-179, -80, 179, 80)
         //    .transform(WGS84, map.getProjectionObject());

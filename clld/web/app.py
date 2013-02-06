@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
 
+from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
@@ -148,7 +149,9 @@ def includeme(config):
     config.add_directive('register_datatable', partial(register_cls, IDataTable))
     config.add_directive('register_map', partial(register_cls, IMap))
 
-    def register_adapter(config, cls, from_, to_, name):
+    def register_adapter(config, cls, from_, to_=None, name=None):
+        to_ = to_ or list(implementedBy(cls))[0]
+        name = name or cls.mimetype
         config.registry.registerAdapter(cls, (from_,), to_, name=name)
 
     config.add_directive('register_adapter', register_adapter)
@@ -160,6 +163,9 @@ def includeme(config):
             route_kw['factory'] = factory
         config.add_route(route_name, route_pattern, **route_kw)
         config.add_view(view, route_name=route_name, **kw)
+
+        config.add_route(route_name + '_alt', route_pattern + '.{ext}', **route_kw)
+        config.add_view(view, route_name=route_name + '_alt', **kw)
 
     config.add_directive('add_route_and_view', add_route_and_view)
 
@@ -180,16 +186,14 @@ def includeme(config):
         plural = name + 's'
         factory = partial(ctx_factory, model, 'index')
 
-        for route_name, pattern in [
-            (plural, '/%s' % plural), ('%s_alt' % plural, '/%s.{ext}' % plural),
-        ]:
-            config.add_route_and_view(route_name, pattern, index_view, factory=factory)
+        config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
+        for route_name in [plural, '%s_alt' % plural]:
             config.register_datatable(
                 route_name, getattr(datatables, plural.capitalize(), DataTable))
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
+
         config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % name, resource_view, **kw)
-        config.add_route_and_view('%s_alt' % name, '/%s/{id:[^/\.]+}.{ext}' % name, resource_view, **kw)
 
     # maps
     config.register_map('languages', Map)

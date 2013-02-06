@@ -57,6 +57,9 @@ class ParameterMap(Map):
         return [{
             'name': self.ctx.name, 'url': self.req.resource_url(self.ctx, ext='geojson')}]
 
+    def options(self):
+        return {'info_query': {'parameter': self.ctx.pk}}
+
 
 class _GeoJson(GeoJsonLanguages):
     def feature_iterator(self, ctx, req):

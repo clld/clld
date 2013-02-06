@@ -4,6 +4,8 @@ from itertools import groupby
 from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML
+from clld.db.meta import DBSession
+from clld.db.models import common as models
 
 
 def link(req, obj, **kw):
@@ -17,6 +19,12 @@ def link(req, obj, **kw):
     kw.setdefault('class', rsc.interface.__name__[1:])
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
     label = kw.pop('label', getattr(obj, 'name', obj.id))
+    if not label and rsc.interface == interfaces.IValue and obj.domainelement:
+        label = obj.domainelement.name
+    #if rsc.interface == interfaces.IValue:
+    #    label = '%s, %s, %s' % (obj.language.name, obj.parameter.name, label)
+    #if rsc.interface == interfaces.ISentence:
+    #    label = '%s, %s' % (obj.language.name, label)
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
 
