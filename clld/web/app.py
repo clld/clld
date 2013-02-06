@@ -22,7 +22,7 @@ from clld.db.meta import (
     DBSession,
     Base,
 )
-from clld import RESOURCES
+from clld import Resource, RESOURCES
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
 from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
@@ -148,6 +148,16 @@ def includeme(config):
     #
     config.add_directive('register_datatable', partial(register_cls, IDataTable))
     config.add_directive('register_map', partial(register_cls, IMap))
+
+    def register_resource(config, name, model, interface):
+        RESOURCES.append(Resource(name, model, interface))
+        config.add_route_and_view(
+            name,
+            '/%s/{id:[^/\.]+}' % name,
+            resource_view,
+            factory=partial(ctx_factory, model, 'rsc'))
+
+    config.add_directive('register_resource', register_resource)
 
     def register_adapter(config, cls, from_, to_=None, name=None):
         to_ = to_ or list(implementedBy(cls))[0]
