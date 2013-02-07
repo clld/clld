@@ -36,6 +36,11 @@ class _LinkToMapCol(LinkToMapCol):
     def get_obj(self, item):
         return item.language
 
+    def get_layer(self, item):
+        if item.domainelement:
+            return item.domainelement.name
+        return LinkToMapCol.get_layer(self, item)
+
 
 class Values(DataTable):
 

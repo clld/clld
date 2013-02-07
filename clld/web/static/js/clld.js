@@ -443,7 +443,7 @@ CLLD.Map = (function(){
         },
         getLayer: function(spec) {
             var i, layer;
-            spec = spec === undefined ? 0 : spec;
+            spec = spec == undefined || spec == null ? 0 : spec;
 
             if (typeof spec == 'string') {
                 for (i=0; i<CLLD.Map.layers.length; i++) {
@@ -451,7 +451,11 @@ CLLD.Map = (function(){
                         return CLLD.Map.layers[i];
                     }
                 }
+                alert(spec);
             } else {
+                if (spec == -1) {
+                    return CLLD.Map.layers[CLLD.Map.layers.length - 1];
+                }
                 return CLLD.Map.layers[spec];
             }
             return undefined;

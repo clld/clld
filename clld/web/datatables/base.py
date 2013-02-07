@@ -16,7 +16,7 @@ from zope.interface import implementer
 
 from clld.db.meta import DBSession
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import link, button, icon
+from clld.web.util.helpers import link, button, icon, JSMap
 from clld.interfaces import IDataTable
 
 
@@ -107,17 +107,21 @@ class LinkToMapCol(Col):
     def __init__(self, dt, name=None, **kw):
         kw.setdefault('bSearchable', False)
         kw.setdefault('bSortable', False)
-        Col.__init__(self, dt, name or '', **kw)
+        super(LinkToMapCol, self).__init__(dt, name or '', **kw)
 
     def get_obj(self, item):
         return item
+
+    def get_layer(self, item):
+        return -1
 
     def format(self, item):
         obj = self.get_obj(item)
         return button(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),
-            onclick='CLLD.Map.showInfoWindow("id", "%s")' % obj.id,
+            onclick=JSMap.showInfoWindow('id', obj.id, self.get_layer(item))
+            #'CLLD.Map.showInfoWindow("id", "%s", "%s")' % obj.id,
         )
 
 
