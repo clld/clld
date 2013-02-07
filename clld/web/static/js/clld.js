@@ -317,7 +317,8 @@ CLLD.Map = (function(){
     }
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom, map_options, select_layers,
+        var i, layer, layer_options, spec, center, zoom, map_options,
+            select_layers = [],
             styles = CLLD.Map.style_maps['default'];
 
         // World Geodetic System 1984 projection (lon/lat)
