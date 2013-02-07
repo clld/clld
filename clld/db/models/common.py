@@ -187,8 +187,6 @@ class DomainElement(Base,
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
 
-    # do we need a numeric value for these?
-
 
 class Parameter_data(Base, Versioned, DataMixin):
     pass
@@ -557,6 +555,9 @@ class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
     value_pk = Column(Integer, ForeignKey('value.pk'))
     sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
     description = Column(Unicode())
+
+    value = relationship(Value, backref='sentence_assocs')
+    sentence = relationship(Sentence, backref='value_assocs')
 
 
 class UnitParameterUnit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
