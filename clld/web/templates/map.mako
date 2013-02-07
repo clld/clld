@@ -5,11 +5,7 @@
     ${map.legend()}
     % endif
     <div id="${map.eid}" style="width: 100%; height: 200px;"> </div>
-    <script>
-$(window).load(function() {
-    CLLD.Map.init(${h.dumps(map.layers)|n}, ${h.dumps(options)|n});
-});
-    </script>
+    <script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
 </div>
 % else:
 <div class="accordion" id="map-container">
@@ -30,7 +26,7 @@ $(window).load(function() {
 			</a>
 			<ul class="dropdown-menu">
 			% for layer in map.layers:
-			    <li onclick="CLLD.Map.toggleLayer('${layer["name"]}', this.firstElementChild.firstElementChild);">
+			    <li onclick='${h.JSMap.toggleLayer(layer["name"], h.JS("this.firstElementChild.firstElementChild"))|n}'>
 			        <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
 				    <input type="checkbox" checked="checked">
 				    % if 'marker' in layer:
@@ -48,11 +44,7 @@ $(window).load(function() {
 		${map.legend()}
 		% endif
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
-		<script>
-$(window).load(function() {
-    CLLD.Map.init(${h.dumps(map.layers)|n}, ${h.dumps(options)|n});
-});
-		</script>
+		<script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
             </div>
         </div>
     </div>

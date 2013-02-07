@@ -1,13 +1,15 @@
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol
+from clld.web.datatables.base import (
+    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IdCol,
+)
 
 
 class Languages(DataTable):
     def col_defs(self):
         return [
             DetailsRowLinkCol(self),
-            LinkCol(self, 'id', route_name='language', get_label=lambda item: item.id),
-            LinkCol(self, 'name', route_name='language'),
+            IdCol(self, 'id'),
+            LinkCol(self, 'name'),
             LinkToMapCol(self),
-            Col(self, 'latitude', sDescription='<h2>Hallo</h2>'),
+            Col(self, 'latitude', sDescription='<small>The geographic latitude</small>'),
             Col(self, 'longitude'),
         ]

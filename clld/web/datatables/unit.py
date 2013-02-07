@@ -6,13 +6,23 @@ from clld.db.models.common import Unit, Language
 from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
 
 
+class LanguageLinkCol(LinkCol):
+    def get_obj(self, item):
+        return item.language
+
+
+class DescriptionLinkCol(LinkCol):
+    def get_attrs(self, item):
+        return {'label': item.description}
+
+
 class Units(DataTable):
 
     def __init__(self, req, model, language=None, **kw):
         if language:
             self.language = language
         elif 'language' in req.params:
-            self.language = DBSession.query(Language).get(int(req.params['language']))
+            self.language = Language.get(req.params['language'])
         else:
             self.language = None
 
@@ -27,14 +37,14 @@ class Units(DataTable):
 
     def col_defs(self):
         return [
-            LinkCol(self, 'name', route_name='unit', get_label=lambda item: item.name),
-            LinkCol(self, 'description', route_name='unit', get_label=lambda item: item.description),
-            LinkCol(self, 'language', route_name='language', get_id=lambda item: item.language.id, get_label=lambda item: item.language.name, model_col=Language.name),
+            LinkCol(self, 'name'),
+            DescriptionLinkCol(self, 'description'),
+            LanguageLinkCol(self, 'language', model_col=Language.name),
         ]
 
     def get_options(self):
         opts = DataTable.get_options(self)
         if self.language:
-            opts['sAjaxSource'] = self.req.route_url('units', _query={'language': str(self.language.pk)})
+            opts['sAjaxSource'] = self.req.route_url('units', _query={'language': self.language.id})
             #opts["aaSorting"] = [[ 2, "asc" ]]
         return opts

@@ -2,7 +2,7 @@
 <%def name="li(_format, title)">
     <% url = request.route_url('contribution_alt', id=ctx.id, ext='md.html', _query=dict(format=_format)) %>
     <li class="${'active' if format == _format else ''}">
-        <a onclick='CLLD.Modal.show(${h.dumps(ctx.name)|n}, ${h.dumps(url)|n}); return false'
+        <a onclick='${h.JSModal.show(ctx.name, url)|n}; return false'
            href='#'>
             ${title}
         </a>

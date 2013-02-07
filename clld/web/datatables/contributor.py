@@ -9,7 +9,7 @@ from clld.db.models.common import Contributor
 class ContributionsCol(Col):
     def format(self, item):
         return HTML.ul(
-            *[HTML.li(HTML.a(c.contribution.name, href=self.dt.req.route_url('contribution', id=c.contribution.id)))
+            *[HTML.li(HTML.a(c.contribution.name, href=self.dt.req.resource_url(c.contribution)))
               for c in item.contribution_assocs]
         )
 

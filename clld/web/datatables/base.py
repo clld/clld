@@ -98,6 +98,11 @@ class LinkCol(Col):
         return link(self.dt.req, self.get_obj(item), **self.get_attrs(item))
 
 
+class IdCol(LinkCol):
+    def get_attrs(self, item):
+        return {'label': item.id}
+
+
 class LinkToMapCol(Col):
     def __init__(self, dt, name=None, **kw):
         kw.setdefault('bSearchable', False)

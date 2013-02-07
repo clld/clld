@@ -45,6 +45,6 @@
 </table>
 <script>
 $(document).ready(function() {
-    CLLD.DataTable.init("${datatable.eid}", ${h.dumps(datatable.toolbar())|n}, ${h.dumps(datatable.options)|n});
+    ${h.JSDataTable.init(datatable.eid, datatable.toolbar(), datatable.options)|n};
 });
 </script>

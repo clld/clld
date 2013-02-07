@@ -1,5 +1,5 @@
 from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
-from clld.web.util.helpers import linked_contributors, button, dumps
+from clld.web.util.helpers import linked_contributors, button, dumps, JSModal
 
 
 class ContributorsCol(Col):
@@ -9,8 +9,10 @@ class ContributorsCol(Col):
 
 class CitationCol(Col):
     def format(self, item):
-        return button('cite', onclick="CLLD.Modal.show(%s, %s)" % \
-                      (dumps(item.name), dumps(self.dt.req.route_url('contribution_alt', id=item.id, ext='md.html'))))
+        return button(
+            'cite',
+            onclick=JSModal.show(item.name, self.dt.req.resource_url(item, ext='md.html'))
+        )
 
 
 class Contributions(DataTable):

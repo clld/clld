@@ -303,6 +303,22 @@ CLLD.Map = (function(){
         feature.popup = null;
     }
 
+    function zoomToExtent() {
+        if (CLLD.Map.options.center === undefined) {
+            var bounds = new OpenLayers.Bounds();
+            for (i=0; i<CLLD.Map.layers.length; i++) {
+                bounds.extend(CLLD.Map.layers[i].getDataExtent());
+            }
+            CLLD.Map.map.zoomToExtent(bounds, true);
+            zoom = CLLD.Map.map.getZoomForExtent(bounds);
+            if (zoom && zoom > 2) {
+                zoom = zoom - 1;
+            }
+            if (zoom) {
+                CLLD.Map.map.zoomTo(Math.min(zoom, 4));
+            }
+        }
+    }
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
         var i, layer, layer_options, spec, center, zoom, map_options, bounds,
@@ -360,9 +376,11 @@ CLLD.Map = (function(){
         // or use pie charts from google via externalGraphic!
 
         var geojsonParser = new OpenLayers.Format.GeoJSON({
-                'internalProjection': WGS84_google_mercator,
-                'externalProjection': WGS84
-            });
+            'internalProjection': WGS84_google_mercator,
+            'externalProjection': WGS84
+        });
+
+        bounds = new OpenLayers.Bounds();
 
         for (i=0; i<data_layers.length; i++) {
             spec = data_layers[i];
@@ -386,6 +404,10 @@ CLLD.Map = (function(){
 
             if (spec.data) {
                 layer.addFeatures(geojsonParser.read(spec.data));
+            } else {
+                layer.events.register("loadend", layer, function() {
+                    zoomToExtent();
+                });
             }
 
             CLLD.Map.layers.push(layer);
@@ -415,16 +437,7 @@ CLLD.Map = (function(){
         CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
 
-        if (CLLD.Map.options.center === undefined) {
-            bounds = new OpenLayers.Bounds();
-            console.log(bounds);
-           for (i=0; i<CLLD.Map.layers.length; i++) {
-                bounds.extend(CLLD.Map.layers[i].getDataExtent());
-                console.log(bounds);
-            }
-            CLLD.Map.map.zoomToExtent(bounds, true);
-            CLLD.Map.map.zoomTo(Math.min(CLLD.Map.map.getZoomForExtent(bounds) - 1, 4));
-        }
+        zoomToExtent();
         //var mapextent = new OpenLayers.Bounds(-179, -80, 179, 80)
         //    .transform(WGS84, map.getProjectionObject());
         //CLLD.Map.map.zoomToExtent(mapextent);

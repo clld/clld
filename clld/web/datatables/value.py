@@ -44,14 +44,14 @@ class Values(DataTable):
         if parameter:
             self.parameter = parameter
         elif 'parameter' in req.params:
-            self.parameter = DBSession.query(Parameter).get(int(req.params['parameter']))
+            self.parameter = Parameter.get(req.params['parameter'])
         else:
             self.parameter = None
 
         if contribution:
             self.contribution = contribution
         elif 'contribution' in req.params:
-            self.contribution = DBSession.query(Contribution).get(int(req.params['contribution']))
+            self.contribution = Contribution.get(req.params['contribution'])
         else:
             self.contribution = None
 
@@ -95,9 +95,9 @@ class Values(DataTable):
     def get_options(self):
         opts = DataTable.get_options(self)
         if self.parameter:
-            opts['sAjaxSource'] = self.req.route_url('values', _query={'parameter': str(self.parameter.pk)})
+            opts['sAjaxSource'] = self.req.route_url('values', _query={'parameter': self.parameter.id})
             opts["aaSorting"] = [[2, "asc"]]
         if self.contribution:
-            opts['sAjaxSource'] = self.req.route_url('values', _query={'contribution': str(self.contribution.pk)})
+            opts['sAjaxSource'] = self.req.route_url('values', _query={'contribution': self.contribution.id})
             opts["aaSorting"] = [[2, "asc"]]
         return opts

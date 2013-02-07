@@ -18,10 +18,7 @@ from pyramid.asset import resolve_asset_spec
 from clld.lib.purl import URL
 from clld.config import get_config
 
-from clld.db.meta import (
-    DBSession,
-    Base,
-)
+from clld.db.meta import DBSession, Base
 from clld import Resource, RESOURCES
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
 from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping
@@ -40,6 +37,13 @@ class ClldRequest(Request):
         request's URL.
         """
         return URL(self.url)
+
+    @property
+    def db(self):
+        """We make the db session available as request attribute, so we do not have to
+        import it in templates.
+        """
+        return DBSession
 
     def resource_url(self, obj, rsc=None, **kw):
         if rsc is None:
@@ -77,7 +81,7 @@ def ctx_factory(model, type_, req):
         return datatable(req, model)
 
     try:
-        return DBSession.query(model).filter(model.id==req.matchdict['id']).one()
+        return model.get(req.matchdict['id'])
     except NoResultFound:
         raise HTTPNotFound()
 

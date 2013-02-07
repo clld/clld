@@ -67,6 +67,15 @@ class Base(object):
     active = Column(Boolean, default=True)
     jsondata = Column(JSONEncodedDict)
 
+    @classmethod
+    def get(cls, value, key=None):
+        if key is None:
+            if isinstance(value, int):
+                key = 'pk'
+            else:
+                key = 'id'
+        return DBSession.query(cls).filter_by(**{key: value}).one()
+
 
 Base = declarative_base(cls=Base)
 

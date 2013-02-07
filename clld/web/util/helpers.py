@@ -8,6 +8,23 @@ from clld.db.meta import DBSession
 from clld.db.models import common as models
 
 
+class JS(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self, *args):
+        return '%s(%s)' % (self.name, ', '.join(
+            arg.name if isinstance(arg, JS) else dumps(arg) for arg in args))
+
+    def __getattr__(self, attr):
+        return JS('%s.%s' % (self.name, attr))
+
+
+JSMap = JS('CLLD.Map')
+JSModal = JS('CLLD.Modal')
+JSDataTable = JS('CLLD.DataTable')
+
+
 def link(req, obj, **kw):
     rsc = None
     for _rsc in RESOURCES:
