@@ -31,6 +31,7 @@ install_requires = [
     'path.py',
     'pyramid-exclog',
     'zope.sqlalchemy',
+    'purl',
 ]
 
 if not PY3:
