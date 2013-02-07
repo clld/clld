@@ -268,10 +268,8 @@ CLLD.Map = (function(){
         }
     });
 
-
     var selectedFeature;
     var selectCtrl;
-
 
     function onFeatureSelectCallback(data) {
         popup = new OpenLayers.Popup.FramedCloud("chicken",
@@ -303,12 +301,10 @@ CLLD.Map = (function(){
         feature.popup = null;
     }
 
+    var bounds = new OpenLayers.Bounds();
+
     function zoomToExtent() {
         if (CLLD.Map.options.center === undefined) {
-            var bounds = new OpenLayers.Bounds();
-            for (i=0; i<CLLD.Map.layers.length; i++) {
-                bounds.extend(CLLD.Map.layers[i].getDataExtent());
-            }
             CLLD.Map.map.zoomToExtent(bounds, true);
             zoom = CLLD.Map.map.getZoomForExtent(bounds);
             if (zoom && zoom > 2) {
@@ -321,7 +317,7 @@ CLLD.Map = (function(){
     }
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom, map_options, bounds,
+        var i, layer, layer_options, spec, center, zoom, map_options, select_layers,
             styles = CLLD.Map.style_maps['default'];
 
         // World Geodetic System 1984 projection (lon/lat)
@@ -368,25 +364,18 @@ CLLD.Map = (function(){
 
         CLLD.Map.map = new OpenLayers.Map('map', map_options);
 
-        //CLLD.Map.map.setCenter(new OpenLayers.LonLat(center[0], center[1]).transform(WGS84, WGS84_google_mercator), zoom);
-
         CLLD.Map.map.addControl(new OpenLayers.Control.LayerSwitcher());
-
-        // more info: http://docs.openlayers.org/library/feature_styling.html
-        // or use pie charts from google via externalGraphic!
 
         var geojsonParser = new OpenLayers.Format.GeoJSON({
             'internalProjection': WGS84_google_mercator,
             'externalProjection': WGS84
         });
 
-        bounds = new OpenLayers.Bounds();
-
         for (i=0; i<data_layers.length; i++) {
             spec = data_layers[i];
 
             layer_options = {
-                styleMap: spec.style_map === undefined ? styles : spec.style_map,
+                styleMap: spec.style_map === undefined ? styles : CLLD.Map.style_maps[spec.style_map],
                 displayInLayerSwitcher: false,
                 rendererOptions: {zIndexing: true},
                 projection: WGS84
@@ -404,14 +393,19 @@ CLLD.Map = (function(){
 
             if (spec.data) {
                 layer.addFeatures(geojsonParser.read(spec.data));
+                bounds.extend(layer.getDataExtent());
             } else {
                 layer.events.register("loadend", layer, function() {
+                    bounds.extend(this.getDataExtent());
                     zoomToExtent();
                 });
             }
 
             CLLD.Map.layers.push(layer);
             CLLD.Map.map.addLayer(layer);
+            if (spec.no_select == undefined || !spec.no_select) {
+                select_layers.push(layer);
+            }
         }
 
         var highlightCtrl = new OpenLayers.Control.SelectFeature(
@@ -433,14 +427,11 @@ CLLD.Map = (function(){
             select_options = {};
         }
 
-        selectCtrl = new OpenLayers.Control.SelectFeature(CLLD.Map.layers, select_options);
+        selectCtrl = new OpenLayers.Control.SelectFeature(select_layers, select_options);
         CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
 
         zoomToExtent();
-        //var mapextent = new OpenLayers.Bounds(-179, -80, 179, 80)
-        //    .transform(WGS84, map.getProjectionObject());
-        //CLLD.Map.map.zoomToExtent(mapextent);
     };
 
     return {

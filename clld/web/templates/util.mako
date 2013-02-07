@@ -11,7 +11,7 @@
     <% obj = obj or ctx %>
     % if obj.data:
     <dl>
-	% for key, items in h.groupby(sorted(obj.data, lambda o: (o.ord, o.key)), lambda x: x.key):
+	% for key, items in h.groupby(sorted(obj.data, key=lambda o: (o.ord, o.key)), lambda x: x.key):
 	    % if not key.startswith('_'):  ## we respect a convention to mark "private" data
 	    <dt>${key}</dt>
 	        % for item in items:
@@ -27,7 +27,7 @@
     <% obj = obj or ctx %>
     % if obj.files:
     <dl>
-	% for key, items in h.groupby(sorted(obj.files, lambda o: (o.ord, o.name)), lambda x: x.name):
+	% for key, items in h.groupby(sorted(obj.files, key=lambda o: (o.ord, o.name)), lambda x: x.name):
 	    % if not key.startswith('_'):  ## we respect a convention to mark "private" data
 	    <dt>${key}</dt>
 	        % for item in items:
