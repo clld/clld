@@ -1,13 +1,10 @@
 CLLD = {
-    'routes': {
-        'language': '/language/{id}',
-        'language_alt': '/language/{id}.{ext}'
-    },
+    'routes': {},
     'base_url': ''
 };
 
+
 CLLD.route_url = function(route, data, query) {
-    // TODO: respect base url!!
     var key,
         url = CLLD.base_url + CLLD.routes[route],
         sep = '?';
@@ -28,6 +25,30 @@ CLLD.route_url = function(route, data, query) {
 
     return url;
 }
+
+
+CLLD.TreeView = (function(){
+    return {
+        init: function() {
+            $('input.treeview').change(function () {
+                var icon = $('label[for="'+this.getAttribute('id')+'"]').children('i');
+                if ($(this).prop('checked')) {
+                    icon.addClass('icon-chevron-down');
+                    icon.removeClass('icon-chevron-right');
+                } else {
+                    icon.addClass('icon-chevron-right');
+                    icon.removeClass('icon-chevron-down');
+                }
+            });
+        },
+        show: function(level) {
+            $('input.level'+level+':not(:checked)').trigger('click');
+        },
+        hide: function(level) {
+            $('input.level'+level+':checked').trigger('click');
+        }
+    }
+})();
 
 
 CLLD.Feed = (function(){

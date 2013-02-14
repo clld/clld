@@ -17,8 +17,8 @@
         </div>
         <div id="map-inner" class="accordion-body collapse in">
             <div class="accordion-inner">
-		% if len(map.layers) > 1:
 	        <ul class="nav nav-pills">
+		% if len(map.layers) > 1:
 		    <li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#">
 			    Layers
@@ -38,11 +38,11 @@
 			% endfor
 			</ul>
 		    </li>
-		</ul>
 		% endif
 		% if hasattr(map, 'legend'):
-		${map.legend()}
+		    ${map.legend()}
 		% endif
+		</ul>
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
 		<script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
             </div>

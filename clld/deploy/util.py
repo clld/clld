@@ -77,7 +77,6 @@ host = 0.0.0.0
 port = {app.port}
 workers = 3
 proc_name = {app.name}
-max_requests = 1000
 
 [loggers]
 keys = root, {app.name}, sqlalchemy, exc_logger

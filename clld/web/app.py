@@ -21,7 +21,7 @@ from clld.config import get_config
 from clld.db.meta import DBSession, Base
 from clld import Resource, RESOURCES
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
-from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping
+from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping, js
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -188,6 +188,8 @@ def includeme(config):
     #
     # routes and views
     #
+    config.add_route_and_view('_js', '/_js', js, http_cache=3600)
+
     # add some maintenance hatches
     config.add_route_and_view('_raise', '/_raise', _raise)
     config.add_route_and_view('_ping', '/_ping', _ping, renderer='json')

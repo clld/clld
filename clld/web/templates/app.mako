@@ -45,9 +45,10 @@
           <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
 
-        <script>
-            CLLD.base_url = ${h.dumps(request.application_url)|n};
-        </script>
+        <script src="${request.route_url('_js')}"></script>
+        ##
+        ##    CLLD.base_url = ${h.dumps(request.application_url)|n};
+        ##</script>
         <%block name="head"> </%block>
     </head>
     <body>

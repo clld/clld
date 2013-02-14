@@ -102,3 +102,25 @@ div.olMap img {
     text-align: left !important;
     min-width: 100px !important;
 }
+
+/*
+ * CSS Treeview
+ *
+ * see http://acidmartin.wordpress.com/2011/09/26/css3-treevew-no-javascript/ for details
+ */
+.treeview ul {list-style-type: none;}
+.treeview label {padding-left: 15px;}
+.treeview li {padding-left: 15px;}
+
+.treeview input + label + ul {
+    display: none;
+}
+
+.treeview input:checked + label + ul {
+    display: block;
+}
+
+.treeview input {
+    position: absolute;
+    opacity: 0;
+}

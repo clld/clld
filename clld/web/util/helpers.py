@@ -20,6 +20,7 @@ class JS(object):
         return JS('%s.%s' % (self.name, attr))
 
 
+JSFeed = JS('CLLD.Feed')
 JSMap = JS('CLLD.Map')
 JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
