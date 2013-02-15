@@ -3,6 +3,7 @@ import unittest
 import warnings
 warnings.filterwarnings('ignore', message='At least one scoped session is already present.')
 
+from mock import Mock
 from path import path
 from pyramid.paster import bootstrap
 from pyramid.config import Configurator
@@ -17,6 +18,12 @@ from clld.db.models import common
 
 
 ENV = None
+
+
+class Route(Mock):
+    def __init__(self, name='home'):
+        super(Mock, self).__init__()
+        self.name = name
 
 
 class CustomLanguage(common.Language, CustomModelMixin):
@@ -58,7 +65,11 @@ class TestWithDbAndData(TestWithDb):
             contribution=contribution, primary=True, contributor=contributors['a'])
         assoc2 = common.ContributionContributor(
             contribution=contribution, primary=False, contributor=contributors['b'])
+
         DBSession.add(contribution)
+
+        param = common.Parameter(id='p', name='Parameter')
+        DBSession.add(param)
 
 
 class TestWithEnv(TestWithDbAndData):

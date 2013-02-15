@@ -12,3 +12,8 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import button
 
         self.assertTrue('click' in button('click'))
+
+    def test_linked_contributors(self):
+        from clld.web.util.helpers import linked_contributors
+
+        linked_contributors(self.env['request'], common.Contribution.first())

@@ -70,11 +70,12 @@ class Base(object):
     @classmethod
     def get(cls, value, key=None):
         if key is None:
-            if isinstance(value, int):
-                key = 'pk'
-            else:
-                key = 'id'
+            key = 'pk' if isinstance(value, int) else 'id'
         return DBSession.query(cls).filter_by(**{key: value}).one()
+
+    @classmethod
+    def first(cls):
+        return DBSession.query(cls).order_by(cls.pk).first()
 
 
 Base = declarative_base(cls=Base)
