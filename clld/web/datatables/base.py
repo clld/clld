@@ -215,8 +215,11 @@ class DataTable(object):
                         query = query.order_by(order)
 
         query = query.order_by(self.model.pk)
+        limit = int(self.req.params.get('iDisplayLength', limit))
+        if limit == -1:
+            limit = 200
         query = query\
-            .limit(int(self.req.params.get('iDisplayLength', limit)))\
+            .limit(limit)\
             .offset(int(self.req.params.get('iDisplayStart', offset)))
         return query
 
@@ -243,7 +246,7 @@ class DataTable(object):
     def get_options(self):
         return {
             "bStateSave": True,
-            "sDom": "<'row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
             "bServerSide": True,

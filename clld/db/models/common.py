@@ -166,6 +166,7 @@ class Language(Base,
     latitude = Column(Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
     longitude = Column(Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
     identifiers = association_proxy('languageidentifier', 'identifier')
+    sources = association_proxy('languagesource', 'source')
 
 
 class DomainElement_data(Base, Versioned, DataMixin):
@@ -227,6 +228,8 @@ class Source(Base,
 
     glottolog_id = Column(String)
     google_book_search_id = Column(String)
+
+    languages = association_proxy('languagesource', 'language')
 
 
 class Contribution_data(Base, Versioned, DataMixin):
@@ -492,6 +495,17 @@ class LanguageIdentifier(Base, Versioned):
     language = relationship(
         Language,
         backref=backref("languageidentifier", cascade="all, delete-orphan"))
+
+
+class LanguageSource(Base, Versioned):
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    source_pk = Column(Integer, ForeignKey('source.pk'))
+    source = relationship(
+        Source,
+        backref=backref("languagesource", cascade="all, delete-orphan"))
+    language = relationship(
+        Language,
+        backref=backref("languagesource", cascade="all, delete-orphan"))
 
 
 #

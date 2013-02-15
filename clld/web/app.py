@@ -88,6 +88,8 @@ def ctx_factory(model, type_, req):
 
 def register_cls(interface, config, route, cls):
     config.registry.registerUtility(cls, provided=interface, name=route)
+    if not route.endswith('_alt'):
+        config.registry.registerUtility(cls, provided=interface, name=route + '_alt')
 
 
 def register_app(config, pkg=None):
@@ -203,9 +205,7 @@ def includeme(config):
         factory = partial(ctx_factory, model, 'index')
 
         config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
-        for route_name in [plural, '%s_alt' % plural]:
-            config.register_datatable(
-                route_name, getattr(datatables, plural.capitalize(), DataTable))
+        config.register_datatable(plural, getattr(datatables, plural.capitalize(), DataTable))
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
 

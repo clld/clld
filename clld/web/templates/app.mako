@@ -51,7 +51,7 @@
         ##</script>
         <%block name="head"> </%block>
     </head>
-    <body>
+    <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
         <div id="header" class="container-fluid">
             <%block name="header"></%block>
         </div>

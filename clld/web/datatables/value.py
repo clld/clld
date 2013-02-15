@@ -6,15 +6,14 @@ from clld.db.models.common import Value, Parameter, DomainElement, Language, Con
 from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol
 
 
-class ValueNameCol(Col):
+class ValueNameCol(LinkCol):
 
-    def format(self, item):
-        if item.domainelement:
-            return item.domainelement.name
-        return item.description
+    def get_attrs(self, item):
+        label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
+        return {'label': label}
 
     def order(self):
-        return DomainElement.id if self.dt.parameter.domain else Value.description
+        return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
 
     def search(self, qs):
         if self.dt.parameter.domain:
@@ -44,26 +43,36 @@ class _LinkToMapCol(LinkToMapCol):
 
 class Values(DataTable):
 
-    def __init__(self, req, model, parameter=None, contribution=None, search='col', **kw):
+    def __init__(self,
+                 req,
+                 model,
+                 parameter=None,
+                 contribution=None,
+                 language=None,
+                 search='col',
+                 **kw):
         self.search = search
-        if parameter:
-            self.parameter = parameter
-        elif 'parameter' in req.params:
-            self.parameter = Parameter.get(req.params['parameter'])
-        else:
-            self.parameter = None
 
-        if contribution:
-            self.contribution = contribution
-        elif 'contribution' in req.params:
-            self.contribution = Contribution.get(req.params['contribution'])
-        else:
-            self.contribution = None
+        for attr, _model in [
+            ('parameter', Parameter),
+            ('contribution', Contribution),
+            ('language', Language),
+        ]:
+            if locals()[attr]:
+                setattr(self, attr, locals()[attr])
+            elif attr in req.params:
+                setattr(self, attr, _model.get(req.params[attr]))
+            else:
+                setattr(self, attr, None)
 
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
         query = query.join(Language).options(joinedload(Value.language))
+
+        if self.language:
+            query = query.join(Parameter).options(joinedload(Value.parameter))
+            return query.filter(Value.language_pk == self.language.pk)
 
         if self.parameter:
             query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
@@ -79,30 +88,56 @@ class Values(DataTable):
         #
         # TODO: move the first col def to apics-specific table!
         #
+        name_col = ValueNameCol(self, 'value')
+        if self.parameter and self.parameter.domain:
+            name_col.choices = [de.name for de in self.parameter.domain]
+
         if self.contribution:
-            res = [DetailsRowLinkCol(self)]
-        else:
-            res = []
-        res.extend([
-            LinkCol(self, 'id', get_label=lambda item: item.id, bSearchable=False),
-            LanguageCol(self, 'language', model_col=Language.name),
-        ])
-        if self.parameter:
-            res.extend([
-                ValueNameCol(self, 'value', choices=[de.name for de in self.parameter.domain]),
-                _LinkToMapCol(self)])
-        else:
-            res.extend([
+            return [
+                DetailsRowLinkCol(self),
+                name_col,
+                LanguageCol(self, 'language', model_col=Language.name),
                 ParameterCol(self, 'parameter', model_col=Parameter.name),
-                ValueNameCol(self, 'value')])
-        return res
+            ]
+
+        if self.parameter:
+            return [
+                name_col,
+                LanguageCol(self, 'language', model_col=Language.name),
+                _LinkToMapCol(self),
+            ]
+
+        if self.language:
+            return [
+                name_col,
+                ParameterCol(self, 'parameter', model_col=Parameter.name),
+                #
+                # TODO: refs?
+                #
+            ]
+
+        return [
+            name_col,
+            ParameterCol(self, 'parameter', model_col=Parameter.name),
+            LanguageCol(self, 'language', model_col=Language.name),
+            #
+            # TODO: contribution col?
+            #
+        ]
+
+    def toolbar(self):
+        return ''
 
     def get_options(self):
         opts = DataTable.get_options(self)
-        if self.parameter:
-            opts['sAjaxSource'] = self.req.route_url('values', _query={'parameter': self.parameter.id})
-            opts["aaSorting"] = [[2, "asc"]]
-        if self.contribution:
-            opts['sAjaxSource'] = self.req.route_url('values', _query={'contribution': self.contribution.id})
-            opts["aaSorting"] = [[2, "asc"]]
+        #opts["aaSorting"] = [[1, "asc"]]
+
+        #opts['bLengthChange'] = False
+        #opts['bPaginate'] = False
+        #opts['bInfo'] = False
+
+        for attr in ['parameter', 'contribution', 'language']:
+            if getattr(self, attr):
+                opts['sAjaxSource'] = self.req.route_url('values', _query={attr: getattr(self, attr).id})
+
         return opts
