@@ -155,6 +155,13 @@ def includeme(config):
     config.add_directive('register_datatable', partial(register_cls, IDataTable))
     config.add_directive('register_map', partial(register_cls, IMap))
 
+    def add_menu_item(config, name, factory):
+        menuitems = config.registry.getUtility(IMenuItems)
+        menuitems[name] = factory
+        config.registry.registerUtility(menuitems, IMenuItems)
+
+    config.add_directive('add_menu_item', add_menu_item)
+
     def register_resource(config, name, model, interface):
         RESOURCES.append(Resource(name, model, interface))
         config.add_route_and_view(
