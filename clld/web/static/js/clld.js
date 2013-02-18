@@ -328,9 +328,6 @@ CLLD.Map = (function(){
         if (CLLD.Map.options.center === undefined) {
             CLLD.Map.map.zoomToExtent(bounds, true);
             zoom = CLLD.Map.map.getZoomForExtent(bounds);
-            if (zoom && zoom > 2) {
-                zoom = zoom - 1;
-            }
             if (zoom) {
                 CLLD.Map.map.zoomTo(Math.min(zoom, 4));
             }
@@ -362,7 +359,7 @@ CLLD.Map = (function(){
             layers: [
                 new OpenLayers.Layer.Google(
                     "Google Physical",
-                    {type: google.maps.MapTypeId.TERRAIN, minZoomLevel: 1}
+                    {type: google.maps.MapTypeId.TERRAIN, maxZoomLevel: 8, wrapDateLine: false}
                 )/*,
                 new OpenLayers.Layer.Google(
                     "Google Streets", // the default

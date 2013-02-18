@@ -463,14 +463,10 @@ class UnitValue(Base,
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
     """We want to be able to link languages to languages in other systems. Thus,
     we store identifiers of various types like 'wals', 'iso639-3', 'glottolog'.
+    But we might as well just store alternative names for languages.
     """
-    __table_args__ = (UniqueConstraint('name', 'type'), UniqueConstraint('id'))
+    __table_args__ = (UniqueConstraint('id', 'name', 'type'),)
     type = Column(String)
-
-    @validates('type')
-    def validate_type(self, key, type):
-        assert type in ['wals', 'iso639-3', 'glottolog']
-        return type
 
     #def url(self):
     #    """

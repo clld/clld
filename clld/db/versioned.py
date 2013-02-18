@@ -105,7 +105,7 @@ def versioned_objects(iter):
             yield obj
 
 
-def create_version(obj, session, deleted = False):
+def create_version(obj, session, deleted=False):
     obj_mapper = object_mapper(obj)
     history_mapper = obj.__history_mapper__
     history_cls = history_mapper.class_

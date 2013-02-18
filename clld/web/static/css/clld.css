@@ -7,6 +7,8 @@ body {
 
 .dt-toolbar {float: right; text-align: right;}
 
+#contextnav ul {margin-top: 10px; margin-bottom: 10px;}
+
 #sidebar {margin-top: 10px;}
 
 td.right{

@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     String,
     Boolean,
+    desc,
 )
 from sqlalchemy.ext.declarative import (
     declarative_base,
@@ -18,6 +19,7 @@ from sqlalchemy.ext.declarative import (
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
+    object_mapper,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 
@@ -76,6 +78,15 @@ class Base(object):
     @classmethod
     def first(cls):
         return DBSession.query(cls).order_by(cls.pk).first()
+
+    def history(self):
+        model = object_mapper(self).class_
+        if not hasattr(model, '__history_mapper__'):
+            return []
+
+        history_class = model.__history_mapper__.class_
+        return DBSession.query(history_class).filter(history_class.pk == self.pk)\
+            .order_by(desc(history_class.version))
 
 
 Base = declarative_base(cls=Base)

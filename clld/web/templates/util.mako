@@ -1,12 +1,4 @@
 
-<%def name="contextnav(*items)">
-    <ul class="nav nav-pills">
-        % for anchor, active in reversed(list(items)):
-        <li class="pull-right${' active' if active else ''}">${anchor}</li>
-        % endfor
-    </ul>
-</%def>
-
 <%def name="data(obj=None)">
     <% obj = obj or ctx %>
     % if obj.data:
@@ -45,4 +37,19 @@
 	<i class="icon-chevron-${'down' if checked else 'right'}"> </i>
 	${caller.body()}
     </label>
+</%def>
+
+<%def name="accordion_group(eid, parent, title, open=False)">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#${parent}" href="#${eid}">
+                ${title}
+            </a>
+        </div>
+        <div id="${eid}" class="accordion-body collapse${' in' if open else ''}">
+            <div class="accordion-inner">
+                ${caller.body()}
+            </div>
+        </div>
+    </div>
 </%def>

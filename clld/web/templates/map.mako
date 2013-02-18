@@ -1,6 +1,6 @@
 <% options = map.options() %>
 % if options.get('sidebar'):
-<div class="well well-small">
+<div>
     % if hasattr(map, 'legend'):
     ${map.legend()}
     % endif
