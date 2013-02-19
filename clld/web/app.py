@@ -108,6 +108,15 @@ def register_app(config, pkg=None):
     name = pkg.__name__
     pkg_dir = path(pkg.__file__).dirname().abspath()
 
+    if pkg_dir.joinpath('util.py').exists():
+
+        u = __import__(pkg.__name__ + '.util', fromlist=[pkg.__name__])
+
+        def add_util(event):
+            event['u'] = u
+
+        config.add_subscriber(add_util, events.BeforeRender)
+
     if pkg_dir.joinpath('locale').exists():
         config.add_translation_dirs('%s:locale' % name)
         config.add_translation_dirs('clld:locale')
