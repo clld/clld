@@ -3,7 +3,9 @@ from sqlalchemy.orm import joinedload
 
 from clld.db.meta import DBSession
 from clld.db.models.common import Value, Parameter, DomainElement, Language, Contribution
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol
+from clld.web.datatables.base import (
+    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
+)
 
 
 class ValueNameCol(LinkCol):
@@ -19,11 +21,6 @@ class ValueNameCol(LinkCol):
         if self.dt.parameter and self.dt.parameter.domain:
             return DomainElement.name.contains(qs)
         return Value.description.contains(qs)
-
-
-class LanguageCol(LinkCol):
-    def get_obj(self, item):
-        return item.language
 
 
 class ParameterCol(LinkCol):

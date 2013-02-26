@@ -5,3 +5,4 @@ from clld.web.datatables.contribution import Contributions
 from clld.web.datatables.contributor import Contributors
 from clld.web.datatables.unit import Units
 from clld.web.datatables.source import Sources
+from clld.web.datatables.sentence import Sentences

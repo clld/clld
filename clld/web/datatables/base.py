@@ -15,6 +15,7 @@ from markupsafe import Markup
 from zope.interface import implementer
 
 from clld.db.meta import DBSession
+from clld.db.models.common import Language
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JSMap
 from clld.interfaces import IDataTable
@@ -96,6 +97,17 @@ class LinkCol(Col):
 
     def format(self, item):
         return link(self.dt.req, self.get_obj(item), **self.get_attrs(item))
+
+
+class LanguageCol(LinkCol):
+    def get_obj(self, item):
+        return item.language
+
+    def order(self):
+        return Language.name
+
+    def search(self, qs):
+        return Language.name.contains(qs)
 
 
 class IdCol(LinkCol):
