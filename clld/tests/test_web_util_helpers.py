@@ -7,6 +7,12 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import link
 
         link(self.env['request'], common.Language(id='id', name='Name'))
+        link(self.env['request'], common.Value.first())
+
+    def test_external_link(self):
+        from clld.web.util.helpers import external_link
+
+        self.assertTrue('http://wals.info' in external_link('http://wals.info'))
 
     def test_button(self):
         from clld.web.util.helpers import button
@@ -17,3 +23,8 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import linked_contributors
 
         linked_contributors(self.env['request'], common.Contribution.first())
+
+    def test_text2html(self):
+        from clld.web.util.helpers import text2html
+
+        self.assertTrue('<br' in text2html('abc\ndef'))

@@ -10,4 +10,12 @@ class Tests(TestWithEnv):
         dt = Units(self.env['request'], common.Unit)
         dt.render()
         self.assertTrue(isinstance(dt.options, dict))
-        dt.get_query()
+        for item in dt.get_query():
+            for col in dt.cols:
+                col.format(item)
+
+        dt = Units(self.env['request'], common.Unit, language=common.Language.first())
+        dt.render()
+        for item in dt.get_query():
+            for col in dt.cols:
+                col.format(item)

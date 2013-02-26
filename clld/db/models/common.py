@@ -1,5 +1,6 @@
-from itertools import groupby
-
+"""
+Common models for all clld apps
+"""
 from sqlalchemy import (
     Column,
     Float,
@@ -184,6 +185,8 @@ class DomainElement(Base,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):
+    """DomainElements can be used to model controlled lists of values for a Parameter.
+    """
     __table_args__ = (UniqueConstraint('name', 'parameter_pk'),)
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
@@ -204,6 +207,8 @@ class Parameter(Base,
                 IdNameDescriptionMixin,
                 HasDataMixin,
                 HasFilesMixin):
+    """A measurable attribute of a language.
+    """
     __table_args__ = (UniqueConstraint('name'),)
     domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
 
@@ -223,6 +228,8 @@ class Source(Base,
              IdNameDescriptionMixin,
              HasDataMixin,
              HasFilesMixin):
+    """A bibliographic record, cited as source for some statement.
+    """
     authors = Column(Unicode)
     year = Column(Unicode)
 
@@ -247,6 +254,8 @@ class Contribution(Base,
                    IdNameDescriptionMixin,
                    HasDataMixin,
                    HasFilesMixin):
+    """A set of data contributed within the same context by the same set of contributors.
+    """
     __table_args__ = (UniqueConstraint('name'),)
     date = Column(Date)
 
@@ -276,6 +285,8 @@ class Value(Base,
             IdNameDescriptionMixin,
             HasDataMixin,
             HasFilesMixin):
+    """A measurement of a parameter for a particular language.
+    """
     language_pk = Column(Integer, ForeignKey('language.pk'))
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
@@ -301,7 +312,7 @@ class Value(Base,
         """We have to make sure, the parameter a value is tied to and the parameter a
         possible domainelement is tied to stay in sync.
         """
-        if self.domainelement:
+        if self.domainelement and self.domainelement.parameter_pk and parameter_pk:
             assert self.domainelement.parameter_pk == parameter_pk
         return parameter_pk
 
@@ -321,6 +332,8 @@ class Contributor(Base,
                   IdNameDescriptionMixin,
                   HasDataMixin,
                   HasFilesMixin):
+    """Creator of a contribution.
+    """
     __table_args__ = (UniqueConstraint('name'),)
     url = Column(Unicode())
     email = Column(String)
@@ -342,11 +355,14 @@ class Sentence(Base,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
+    """Sentence of a language serving as example for some statement.
+    """
     analyzed = Column(Unicode)
     gloss = Column(Unicode)
     source = Column(Unicode)
     comment = Column(Unicode)
     original_script = Column(Unicode)
+    xhtml = Column(Unicode)
 
     language_pk = Column(Integer, ForeignKey('language.pk'))
 
@@ -370,6 +386,8 @@ class Unit(Base,
            IdNameDescriptionMixin,
            HasDataMixin,
            HasFilesMixin):
+    """A linguistic unit of a language.
+    """
     language_pk = Column(Integer, ForeignKey('language.pk'))
     language = relationship(Language)
 
@@ -410,6 +428,8 @@ class UnitParameter(Base,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):
+    """A measurable attribute of a unit.
+    """
     domain = relationship('UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
 
 
@@ -460,6 +480,13 @@ class UnitValue(Base,
 #-----------------------------------------------------------------------------
 # Non-core mappers and association tables
 #-----------------------------------------------------------------------------
+class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
+    __table_args__ = (UniqueConstraint('id', 'language_pk'),)
+
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    language = relationship(Language, backref="gloss_abbreviations")
+
+
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
     """We want to be able to link languages to languages in other systems. Thus,
     we store identifiers of various types like 'wals', 'iso639-3', 'glottolog'.

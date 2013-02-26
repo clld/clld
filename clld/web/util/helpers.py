@@ -1,5 +1,9 @@
 from json import dumps
 from itertools import groupby
+import re
+
+from sqlalchemy import or_
+from markupsafe import Markup
 
 from clld import interfaces
 from clld import RESOURCES
@@ -58,6 +62,71 @@ def button(*content, **attrs):
         class_.append('btn')
     attrs['class'] = ' '.join(class_)
     return HTML.button(*content, **attrs)
+
+
+def rendered_sentence(sentence, abbrs=None):
+    assert sentence.xhtml or (sentence.analyzed and sentence.gloss)
+
+    if sentence.xhtml:
+        return HTML.div(
+            HTML.div(Markup(sentence.xhtml), class_='body'), class_="sentence")
+
+    if abbrs is None:
+        q = DBSession.query(models.GlossAbbreviation).filter(
+            or_(models.GlossAbbreviation.language_pk == sentence.language_pk,
+                models.GlossAbbreviation.language_pk == None)
+        )
+        abbrs = dict((g.id, g.name) for g in q)
+
+    def gloss_with_tooltip(gloss):
+        person_map = {
+            '1': 'first person',
+            '2': 'second person',
+            '3': 'third person',
+        }
+
+        res = []
+        end = 0
+        for match in re.finditer('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?', gloss):
+            if match.start() > end:
+                res.append(gloss[end:match.start()])
+
+            abbr = match.group('abbr')
+            if abbr in abbrs:
+                explanation = abbrs[abbr]
+                if match.group('personprefix'):
+                    explanation = '%s %s' % (person_map[match.group('personprefix')], explanation)
+
+                if match.group('personsuffix'):
+                    explanation = '%s %s' % (explanation, person_map[match.group('personsuffix')])
+
+                res.append(HTML.span(
+                    gloss[match.start():match.end()].lower(),
+                    **{'data-original-title': explanation, 'rel': 'tooltip', 'class': 'sc ttip'}))
+            else:
+                res.append(abbr)
+
+            end = match.end()
+
+        res.append(gloss[end:])
+        return filter(None, res)
+
+    units = []
+    for morpheme, gloss in zip(sentence.analyzed.split('\t'), sentence.gloss.split('\t')):
+        units.append(HTML.div(
+            HTML.div(morpheme, class_='morpheme'),
+            HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
+            class_='gloss-unit'))
+
+    return HTML.div(
+        HTML.div(
+            HTML.div(sentence.name, class_='object-language'),
+            HTML.div(*units, **{'class': 'gloss-box'}),
+            HTML.div(sentence.description, class_='translation') if sentence.description else '',
+            class_='body',
+        ),
+        class_="sentence",
+    )
 
 
 def icon(class_, inverted=False):

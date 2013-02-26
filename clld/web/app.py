@@ -109,7 +109,6 @@ def register_app(config, pkg=None):
     pkg_dir = path(pkg.__file__).dirname().abspath()
 
     if pkg_dir.joinpath('util.py').exists():
-
         u = __import__(pkg.__name__ + '.util', fromlist=[pkg.__name__])
 
         def add_util(event):

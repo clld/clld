@@ -125,19 +125,19 @@ class GeoJson(Renderable):
     send_mimetype = 'application/json'
 
     def featurecollection_properties(self, ctx, req):
-        return {}
+        return {}  # pragma: no cover
 
     def feature_iterator(self, ctx, req):
-        return iter([])
+        return iter([])  # pragma: no cover
 
     def feature_properties(self, ctx, req, feature):
-        return {}
+        return {}  # pragma: no cover
 
     def feature_coordinates(self, ctx, req, feature):
         """
         :return: lonlat
         """
-        return [0.0, 0.0]
+        return [0.0, 0.0]  # pragma: no cover
 
     def render(self, ctx, req, dump=True):
         features = []

@@ -126,3 +126,77 @@ div.olMap img {
     position: absolute;
     opacity: 0;
 }
+
+/*
+ * sentences
+ */
+/* specifically for verbs layouts */
+/* line 4, ../../app/assets/stylesheets/examples.scss */
+span.sc {
+  text-transform: lowercase;
+  font-variant: small-caps;
+}
+
+.object-language {
+    font-style: italic;
+}
+
+.translation:before { content: "\2018"; }
+.translation:after { content: "\2019"; }
+
+.ttip {
+    border-bottom: 1px dotted #333333;
+}
+
+/* line 11, ../../app/assets/stylesheets/examples.scss */
+.sentences-container {
+  display: table;
+}
+
+/* line 14, ../../app/assets/stylesheets/examples.scss */
+.sentence {
+  display: table-row;
+}
+/* line 16, ../../app/assets/stylesheets/examples.scss */
+.sentence .body {
+  display: table-cell;
+}
+/* line 20, ../../app/assets/stylesheets/examples.scss */
+.sentence + div .body {
+  padding-top: 1em;
+}
+/* line 24, ../../app/assets/stylesheets/examples.scss */
+.sentence .number {
+  display: table-cell;
+  padding-right: 12px;
+}
+/* line 30, ../../app/assets/stylesheets/examples.scss */
+.sentence.in-table .number {
+  padding-right: 6px;
+}
+/* line 34, ../../app/assets/stylesheets/examples.scss */
+.sentence.in-table + div .body {
+  padding-top: 0.5em;
+}
+/* line 41, ../../app/assets/stylesheets/examples.scss */
+.sentence .gloss-unit {
+  display: inline-block;
+  margin-bottom: 0.5em;
+}
+/* line 44, ../../app/assets/stylesheets/examples.scss */
+.sentence .gloss-unit:not(:last-child) {
+  margin-right: 0.5em;
+}
+/* line 47, ../../app/assets/stylesheets/examples.scss */
+.sentence .gloss-unit .gloss {
+  font-size: 90%;
+}
+/* line 49, ../../app/assets/stylesheets/examples.scss */
+.sentence .gloss-unit .gloss .sc {
+  font-size: 120%;
+  line-height: 1.1em;
+}
+/* line 55, ../../app/assets/stylesheets/examples.scss */
+.sentence .gloss-box + .translation {
+  margin-top: -0.5em;
+}

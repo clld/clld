@@ -23,9 +23,6 @@
         </script>
 
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
-        ##<script type="text/javascript"
-        ##        src="https://maps.googleapis.com/maps/api/js?sensor=false">##</script>?key=AIzaSyCBKZ6iuwHMVqtwkAegSmtCVIboFHk94AA&sensor=false">
-        ##</script>
 
         <script src="${request.static_url('clld:web/static/js/jquery-1.8.2.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/bootstrap.js')}"></script>
@@ -42,7 +39,7 @@
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
-          <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        ##  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
 
         <script src="${request.route_url('_js')}"></script>
@@ -137,6 +134,9 @@
         </div>
 
         <script>
+$(document).ready(function() {
+    $('.ttip').tooltip({placement: 'bottom', delay: {hide: 300}});
+});
             <%block name="javascript"> </%block>
         </script>
     </body>

@@ -15,3 +15,20 @@
     <dd>${v}</dd>
     % endfor
 </dl>
+
+% if ctx.sentence_assocs:
+<h3>${_('Sentences')}</h3>
+<ol>
+    % for a in ctx.sentence_assocs:
+    <li>
+        % if a.description:
+        <p>${a.description}</p>
+        % endif
+        ${h.rendered_sentence(a.sentence)}
+        % if a.sentence.references:
+        <p>See ${', '.join(h.link(request, ref.source) for ref in a.sentence.references)|n}</p>
+        % endif
+    </li>
+    % endfor
+</ol>
+% endif

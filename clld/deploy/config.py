@@ -65,6 +65,7 @@ APPS = dict((app.name, app) for app in [
     App('wold2', 8888, domain='wold.livingsources.org'),
     App('wals3', 8887, domain='wals.info'),
     App('apics', 8886),
+    App('crossgram', 8885),
     App('solr', 8080),
 ])
 

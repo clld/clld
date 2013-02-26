@@ -21,9 +21,7 @@ class NameCol(Col):
 
 class UrlCol(Col):
     def format(self, item):
-        if item.url:
-            return external_link(item.url, 'homepage')
-        return ''
+        return external_link(item.url, 'homepage') if item.url else ''
 
 
 class Contributors(DataTable):

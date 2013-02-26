@@ -7,20 +7,25 @@
 <dl>
     <dt>Language:</dt>
     <dd>${h.link(request, ctx.language)}</dd>
-    <dt>Text:</dt>
-    <dd>${ctx.name}</dd>
-% if ctx.analyzed:
-<dt>Analyzed text:</dt>
-<dd>${ctx.analyzed}</dd>
-% endif
-% if ctx.gloss:
-<dt>Gloss:</dt>
-<dd>${ctx.gloss}</dd>
-% endif
-% if ctx.description:
-<dt>Translation:</dt>
-<dd>${ctx.description}</dd>
-% endif
+##    <dt>Text:</dt>
+##    <dd>${ctx.name}</dd>
+##% if ctx.analyzed:
+##<dt>Analyzed text:</dt>
+##<dd>${ctx.analyzed}</dd>
+##% endif
+##% if ctx.gloss:
+##<dt>Gloss:</dt>
+##<dd>${ctx.gloss}</dd>
+##% endif
+##% if ctx.description:
+##<dt>Translation:</dt>
+##<dd>${ctx.description}</dd>
+##% endif
+</dl>
+
+${h.rendered_sentence(ctx)|n}
+
+<dl>
 % if ctx.comment:
 <dt>Comment:</dt>
 <dd>${ctx.comment}</dd>

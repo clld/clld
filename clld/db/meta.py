@@ -1,3 +1,6 @@
+"""
+We provide some infrastructure to build extensible database models.
+"""
 from datetime import datetime
 try:
     import simplejson as json
@@ -61,25 +64,43 @@ class Base(object):
     """
     @declared_attr
     def __tablename__(cls):
+        """We derive the table name from the model class name. This should be safe,
+        because we don't want to have model classes with the same name either.
+        Care has to be taken, though, to prevent collisions with the names of tables
+        which are automatically created (history tables for example).
+        """
         return cls.__name__.lower()
 
     pk = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # The active flag is meant as an easy way to mark records as obsolete or inactive,
+    # without actually deleting them. A custom Query class could then be used which
+    # filters out inactive records.
     active = Column(Boolean, default=True)
+
+    # To allow storage of key,value pairs with typed values:
     jsondata = Column(JSONEncodedDict)
 
     @classmethod
     def get(cls, value, key=None):
+        """A convenience method.
+        """
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
         return DBSession.query(cls).filter_by(**{key: value}).one()
 
     @classmethod
     def first(cls):
+        """More convenience.
+        """
         return DBSession.query(cls).order_by(cls.pk).first()
 
     def history(self):
+        """
+        :return: Result proxy to iterate over previous versions of a record.
+        """
         model = object_mapper(self).class_
         if not hasattr(model, '__history_mapper__'):
             return []
@@ -119,3 +140,4 @@ class CustomModelMixin(object):
     @declared_attr
     def __mapper_args__(cls):
         return {'polymorphic_identity': 'custom'}  # pragma: no cover
+

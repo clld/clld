@@ -11,6 +11,10 @@
 % endfor
 </ul>
 
+<div>
+    <% dt = request.registry.getUtility(h.interfaces.IDataTable, 'values'); dt = dt(request, h.models.Value, language=ctx) %>
+    ${dt.render()}
+</div>
 
 <%def name="sidebar()">
     % if request.map:

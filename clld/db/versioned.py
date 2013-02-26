@@ -1,3 +1,6 @@
+"""
+Support for per-record versioning; based on an sqlalchemy recipe.
+"""
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper, attributes, object_mapper
 from sqlalchemy.orm.exc import UnmappedColumnError
@@ -187,3 +190,4 @@ def versioned_session(session):
         for obj in versioned_objects(session.deleted):
             create_version(obj, session, deleted=True)
     return session
+

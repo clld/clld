@@ -16,7 +16,7 @@ class ValueNameCol(LinkCol):
         return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
 
     def search(self, qs):
-        if self.dt.parameter.domain:
+        if self.dt.parameter and self.dt.parameter.domain:
             return DomainElement.name.contains(qs)
         return Value.description.contains(qs)
 

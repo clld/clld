@@ -45,3 +45,8 @@ class Tests(TestWithEnv):
         from clld.web.views import _ping
 
         self.assertEqual(_ping(None)['status'], 'ok')
+
+    def test_js(self):
+        from clld.web.views import js
+
+        js(self.env['request'])
