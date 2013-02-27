@@ -37,13 +37,7 @@ ${h.rendered_sentence(ctx)|n}
 % if ctx.references:
 <dt>References</dt>
 <dd>
-    <ul class="unstyled">
-        % for ref in ctx.references:
-        <li>
-            ${h.link(request, ref.source)} ${'(' + ref.description + ')' if ref.description else ''}
-        </li>
-        % endfor
-    </ul>
+    ${h.linked_references(ctx)|n}
 </dd>
 % endif
 </dl>

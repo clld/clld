@@ -48,6 +48,11 @@ chf: make sure backgroud is transparent (the 00 added to the color spec)
 # We augment mapper classes for basic objects using mixins to add the ability
 # to store arbitrary key-value pairs and files associated with an object.
 #-----------------------------------------------------------------------------
+class Config(Base):
+    key = Column(Unicode)
+    value = Column(Unicode)
+
+
 class File(Base):
     """Model for storage of files in the database.
     """

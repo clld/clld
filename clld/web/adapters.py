@@ -7,6 +7,7 @@ try:
     from simplejson import dumps
 except ImportError:
     from json import dumps
+import datetime
 
 from zope.interface import implementer, implementedBy
 from markupsafe import Markup
@@ -102,18 +103,25 @@ class TxtCitation(Representation):
     mimetype = 'text/plain'
 
     def render(self, ctx, req):
-        template = StringTemplate("""\
+        md = {
+            'authors': ', '.join(c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
+            'title': ctx.name,
+            'url': req.resource_url(ctx),
+            'accessed': str(datetime.date.today()),
+        }
+        for key, value in req.registry.settings.items():
+            if key.startswith('clld.publication.'):
+                md[key.split('clld.publication.', 1)[1]] = value
+
+        template = StringTemplate(md.get('template', """\
 $authors. $year. $title.
 In: $editors (eds.)
 $sitetitle.
-Munich: Max Planck Digital Library, chapter 3.
+$place: $publisher.
 Available online at $url
-Accessed on 2013-01-29.
-""")
-        return template.safe_substitute(
-            authors=', '.join(c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
-            title=ctx.name,
-            url=req.resource_url(ctx))
+Accessed on $accessed.
+"""))
+        return template.safe_substitute(**md)
 
 
 @implementer(interfaces.IRepresentation)

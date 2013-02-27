@@ -14,7 +14,7 @@ class ContributionsCol(Col):
         )
 
 
-class NameCol(Col):
+class NameCol(LinkCol):
     def order(self):
         return Contributor.id
 

@@ -9,4 +9,5 @@ class Tests(TestWithApp):
         res = self.app.get('/sitemap.xml', status=200)
 
     def test_language(self):
-        res = self.app.get('/language/l1', headers={'accept': 'text/html'}, status=200)
+        #res = self.app.get('/language/l1', headers={'accept': 'text/html'}, status=200)
+        res = self.app.get('/languages', headers={'accept': 'text/html'}, status=200)

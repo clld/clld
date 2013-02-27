@@ -10,6 +10,10 @@
     <dd>${h.link(request, ctx.language)}</dd>
     <dt>Parameter:</dt>
     <dd>${h.link(request, ctx.parameter)}</dd>
+    % if ctx.references:
+    <dt>References</dt>
+    <dd>${h.linked_references(ctx)|n}</dd>
+    % endif
     % for k, v in ctx.datadict().items():
     <dt>${k}</dt>
     <dd>${v}</dd>
@@ -26,7 +30,7 @@
         % endif
         ${h.rendered_sentence(a.sentence)}
         % if a.sentence.references:
-        <p>See ${', '.join(h.link(request, ref.source) for ref in a.sentence.references)|n}</p>
+        <p>See ${h.linked_references(a.sentence)|n}</p>
         % endif
     </li>
     % endfor

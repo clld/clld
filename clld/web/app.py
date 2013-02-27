@@ -8,6 +8,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
+import transaction
 
 from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
@@ -15,10 +16,11 @@ from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.asset import resolve_asset_spec
 #from purl import URL
+
 from clld.lib.purl import URL
 from clld.config import get_config
-
 from clld.db.meta import DBSession, Base
+from clld.db.models.common import Config
 from clld import Resource, RESOURCES
 from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
 from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping, js
@@ -148,7 +150,14 @@ def includeme(config):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
-    config.add_settings({'pyramid.default_locale_name': 'en'})
+    settings = {'pyramid.default_locale_name': 'en'}
+    transaction.begin()
+    session = DBSession()
+    for kv in session.query(Config):
+        settings['clld.%s' % kv.key] = kv.value
+    transaction.abort()
+
+    config.add_settings(settings)
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)

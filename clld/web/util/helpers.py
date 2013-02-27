@@ -87,7 +87,7 @@ def rendered_sentence(sentence, abbrs=None):
 
         res = []
         end = 0
-        for match in re.finditer('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?', gloss):
+        for match in re.finditer('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))', gloss):
             if match.start() > end:
                 res.append(gloss[end:match.start()])
 
@@ -160,4 +160,19 @@ def linked_contributors(req, contribution):
             chunks.append(' and ')
         chunks.append(link(req, c))
 
+    return HTML.span(*chunks)
+
+
+def linked_references(req, obj):
+    chunks = []
+    for i, ref in enumerate(getattr(obj, 'references', [])):
+        if i > 0:
+            chunks.append('; ')
+        chunks.append(HTML.span(
+            link(req, ref.source),
+            HTML.span(
+                ' [%s]' % ref.description if ref.description else '',
+                class_='pages'),
+            class_='citation',
+        ))
     return HTML.span(*chunks)

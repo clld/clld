@@ -1,11 +1,14 @@
 from sqlalchemy import desc
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, joinedload_all
 
 from clld.db.meta import DBSession
-from clld.db.models.common import Value, Parameter, DomainElement, Language, Contribution
+from clld.db.models.common import (
+    Value, Parameter, DomainElement, Language, Contribution, ValueReference,
+)
 from clld.web.datatables.base import (
     DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
 )
+from clld.web.util.helpers import linked_references
 
 
 class ValueNameCol(LinkCol):
@@ -38,6 +41,11 @@ class _LinkToMapCol(LinkToMapCol):
         return LinkToMapCol.get_layer(self, item)
 
 
+class RefsCol(Col):
+    def format(self, item):
+        return linked_references(self.dt.req, item)
+
+
 class Values(DataTable):
 
     def __init__(self,
@@ -65,7 +73,10 @@ class Values(DataTable):
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
-        query = query.join(Language).options(joinedload(Value.language))
+        query = query.join(Language)\
+            .options(
+                joinedload(Value.language),
+                joinedload_all(Value.references, ValueReference.source))
 
         if self.language:
             query = query.join(Parameter).options(joinedload(Value.parameter))
@@ -89,34 +100,30 @@ class Values(DataTable):
         if self.parameter and self.parameter.domain:
             name_col.choices = [de.name for de in self.parameter.domain]
 
-        if self.contribution:
-            return [
-                DetailsRowLinkCol(self),
-                name_col,
-                LanguageCol(self, 'language', model_col=Language.name),
-                ParameterCol(self, 'parameter', model_col=Parameter.name),
-            ]
+        refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
+
+        res = [DetailsRowLinkCol(self), name_col]
 
         if self.parameter:
-            return [
-                name_col,
+            return res + [
                 LanguageCol(self, 'language', model_col=Language.name),
+                refs_col,
                 _LinkToMapCol(self),
             ]
 
         if self.language:
-            return [
-                name_col,
+            return res + [
                 ParameterCol(self, 'parameter', model_col=Parameter.name),
+                refs_col,
                 #
                 # TODO: refs?
                 #
             ]
 
-        return [
-            name_col,
+        return res + [
             ParameterCol(self, 'parameter', model_col=Parameter.name),
             LanguageCol(self, 'language', model_col=Language.name),
+            refs_col,
             #
             # TODO: contribution col?
             #
