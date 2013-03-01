@@ -321,6 +321,11 @@ class Value(Base,
             assert self.domainelement.parameter_pk == parameter_pk
         return parameter_pk
 
+    def __json__(self, req):
+        res = Base.__json__(self, req)
+        res['domainelement'] = self.domainelement.__json__(req)
+        return res
+
 
 class Contributor_data(Base, Versioned, DataMixin):
     pass

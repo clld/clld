@@ -64,6 +64,11 @@ def button(*content, **attrs):
     return HTML.button(*content, **attrs)
 
 
+# regex to match standard abbreviations in gloss units:
+# We look for sequences of uppercase letters which are not followed by a lowercase letter.
+GLOSS_ABBR_PATTERN = re.compile('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
+
+
 def rendered_sentence(sentence, abbrs=None):
     assert sentence.xhtml or (sentence.analyzed and sentence.gloss)
 
@@ -87,7 +92,7 @@ def rendered_sentence(sentence, abbrs=None):
 
         res = []
         end = 0
-        for match in re.finditer('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))', gloss):
+        for match in GLOSS_ABBR_PATTERN.finditer(gloss):
             if match.start() > end:
                 res.append(gloss[end:match.start()])
 

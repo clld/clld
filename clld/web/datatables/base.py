@@ -132,7 +132,7 @@ class LinkToMapCol(Col):
         return button(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),
-            onclick=JSMap.showInfoWindow('id', obj.id, self.get_layer(item))
+            onclick=JSMap.showInfoWindow('language_id', obj.id, self.get_layer(item))
             #'CLLD.Map.showInfoWindow("id", "%s", "%s")' % obj.id,
         )
 

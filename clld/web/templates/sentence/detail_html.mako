@@ -37,7 +37,7 @@ ${h.rendered_sentence(ctx)|n}
 % if ctx.references:
 <dt>References</dt>
 <dd>
-    ${h.linked_references(ctx)|n}
+    ${h.linked_references(request, ctx)|n}
 </dd>
 % endif
 </dl>

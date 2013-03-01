@@ -26,9 +26,9 @@
 			</a>
 			<ul class="dropdown-menu">
 			% for layer in map.layers:
-			    <li onclick='${h.JSMap.toggleLayer(layer["name"], h.JS("this.firstElementChild.firstElementChild"))|n}'>
+			    <li>
 			        <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
-				    <input type="checkbox" checked="checked">
+				    <input type="checkbox" checked="checked" onclick='${h.JSMap.toggleLayer(layer["name"], h.JS("this"))|n}'>
 				    % if 'marker' in layer:
 				    ${layer['marker']}
 				    % endif

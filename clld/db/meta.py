@@ -109,6 +109,12 @@ class Base(object):
         return DBSession.query(history_class).filter(history_class.pk == self.pk)\
             .order_by(desc(history_class.version))
 
+    def __json__(self, req):
+        cols = []
+        for om in object_mapper(self).iterate_to_root():
+            cols.extend(col.key for col in om.local_table.c)
+        return dict((col, getattr(self, col)) for col in set(cols) if col not in ['created', 'updated'])
+
 
 Base = declarative_base(cls=Base)
 
@@ -140,4 +146,3 @@ class CustomModelMixin(object):
     @declared_attr
     def __mapper_args__(cls):
         return {'polymorphic_identity': 'custom'}  # pragma: no cover
-

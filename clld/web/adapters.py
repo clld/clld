@@ -18,6 +18,7 @@ from sqlalchemy.orm import object_mapper
 
 from clld import interfaces
 from clld.lib import bibtex
+from clld.util import flatten_dict
 
 #    "xml":    "application/xml"+CHARSET_SUFFIX,
 #    'xhtml':  'text/html'+CHARSET_SUFFIX,
@@ -161,11 +162,12 @@ class GeoJson(Renderable):
                     "properties": properties,
                 })
 
-        return dumps({
+        res = {
             'type': 'FeatureCollection',
             'properties': self.featurecollection_properties(ctx, req),
             'features': features,
-        })
+        }
+        return pyramid_render('json', res, request=req) if dump else res
 
 
 class GeoJsonParameter(GeoJson):
@@ -183,7 +185,10 @@ class GeoJsonParameter(GeoJson):
 
     def feature_properties(self, ctx, req, feature):
         language, values = feature
-        return {'name': language.name, 'id': language.id, 'values': ', '.join(v.name or v.id for v in values)}
+        _d = {'language': language.__json__(req)}
+        for i, v in enumerate(values):
+            _d['values_%s' % i] = v.__json__(req)
+        return flatten_dict(_d)
 
 
 @implementer(interfaces.IIndex)

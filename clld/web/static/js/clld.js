@@ -307,7 +307,7 @@ CLLD.Map = (function(){
 
         selectedFeature = feature;
         $.get(
-            CLLD.route_url(route, {'id': feature.data.id, 'ext': 'snippet.html'}, CLLD.Map.options.info_query),
+            CLLD.route_url(route, {'id': feature.data.language_id, 'ext': 'snippet.html'}, CLLD.Map.options.info_query),
             CLLD.Map.options.info_query == undefined ? {} : CLLD.Map.options.info_query,
             function(data, textStatus, jqXHR) {
                 onFeatureSelectCallback(data);
@@ -469,7 +469,6 @@ CLLD.Map = (function(){
                         return CLLD.Map.layers[i];
                     }
                 }
-                alert(spec);
             } else {
                 if (spec == -1) {
                     return CLLD.Map.layers[CLLD.Map.layers.length - 1];
@@ -491,8 +490,7 @@ CLLD.Map = (function(){
         },
         toggleLayer: function(layer, ctrl) {
             layer = CLLD.Map.getLayer(layer);
-            layer.display(!$(ctrl).prop('checked'));
-            $(ctrl).prop('checked', !$(ctrl).prop('checked'));
+            layer.display($(ctrl).prop('checked'));
         },
         style_maps: {'default': styles}
     }
