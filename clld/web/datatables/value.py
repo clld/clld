@@ -102,17 +102,19 @@ class Values(DataTable):
 
         refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
 
-        res = [DetailsRowLinkCol(self), name_col]
+        res = [DetailsRowLinkCol(self)]
 
         if self.parameter:
             return res + [
                 LanguageCol(self, 'language', model_col=Language.name),
+                name_col,
                 refs_col,
                 _LinkToMapCol(self),
             ]
 
         if self.language:
             return res + [
+                name_col,
                 ParameterCol(self, 'parameter', model_col=Parameter.name),
                 refs_col,
                 #
@@ -121,8 +123,9 @@ class Values(DataTable):
             ]
 
         return res + [
-            ParameterCol(self, 'parameter', model_col=Parameter.name),
             LanguageCol(self, 'language', model_col=Language.name),
+            name_col,
+            ParameterCol(self, 'parameter', model_col=Parameter.name),
             refs_col,
             #
             # TODO: contribution col?

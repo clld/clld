@@ -202,7 +202,7 @@ class GeoJsonLanguages(GeoJson):
         return [feature.longitude, feature.latitude]
 
     def feature_properties(self, ctx, req, feature):
-        return {'name': feature.name, 'id': feature.id}
+        return flatten_dict({'language': feature.__json__(req)})
 
 
 def includeme(config):
