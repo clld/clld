@@ -177,16 +177,14 @@ class GeoJsonParameter(GeoJson):
         return {'name': ctx.name}
 
     def feature_iterator(self, ctx, req):
-        return groupby(ctx.values, lambda v: v.language)
+        return [vs for vs in ctx.valuesets if vs.values]
 
-    def feature_coordinates(self, ctx, req, feature):
-        language, values = feature
-        return [language.longitude, language.latitude]
+    def feature_coordinates(self, ctx, req, valueset):
+        return [valueset.language.longitude, valueset.language.latitude]
 
-    def feature_properties(self, ctx, req, feature):
-        language, values = feature
-        _d = {'language': language.__json__(req)}
-        for i, v in enumerate(values):
+    def feature_properties(self, ctx, req, valueset):
+        _d = {'language': valueset.language.__json__(req)}
+        for i, v in enumerate(valueset.values):
             _d['values_%s' % i] = v.__json__(req)
         return flatten_dict(_d)
 
@@ -212,6 +210,7 @@ def includeme(config):
     for name, interface in [
         ('language', interfaces.ILanguage),
         ('value', interfaces.IValue),
+        ('valueset', interfaces.IValueSet),
         ('contribution', interfaces.IContribution),
         ('contributor', interfaces.IContributor),
         ('parameter', interfaces.IParameter),

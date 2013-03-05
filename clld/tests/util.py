@@ -73,11 +73,16 @@ class TestWithDbAndData(TestWithDb):
         language = common.Language(id='l1', name='Language 1')
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
-        value = common.Value(id='v',
-                             language=language,
-                             parameter=param,
-                             domainelement=de,
-                             contribution=contribution)
+        valueset = common.ValueSet(
+            id='vs',
+            language=language,
+            parameter=param,
+            contribution=contribution)
+
+        value = common.Value(
+            id='v',
+            domainelement=de,
+            valueset=valueset)
         DBSession.add(value)
 
         unit = common.Unit(id='u', name='Unit', language=language)

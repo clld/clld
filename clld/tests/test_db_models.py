@@ -30,22 +30,6 @@ class Tests(TestWithDb):
         DBSession.refresh(l)
         self.assertEqual(l.datadict()['abstract'], 'c')
 
-    def test_Value(self):
-        from clld.db.meta import DBSession
-        from clld.db.models.common import Language, Parameter, Value, DomainElement
-
-        p1 = Parameter()
-        p2 = Parameter()
-        v = Value(domainelement=DomainElement(parameter=p1))
-        DBSession.add(v)
-        DBSession.add(p2)
-        DBSession.flush()
-        v.parameter = p2
-        self.assertRaises(AssertionError, DBSession.flush)
-
-        v.parameter_pk = p1.pk
-        DBSession.flush()
-
     def test_UnitValue(self):
         from clld.db.meta import DBSession
         from clld.db.models.common import UnitParameter, UnitValue, UnitDomainElement

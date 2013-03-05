@@ -233,7 +233,7 @@ def includeme(config):
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
 
-        config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % name, resource_view, **kw)
+        config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % plural, resource_view, **kw)
 
     # maps
     config.register_map('languages', Map)

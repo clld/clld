@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload, joinedload_all
 
 from clld.db.meta import DBSession
 from clld.db.models.common import (
-    Value, ValueSet, Parameter, DomainElement, Language, Contribution, ValueSetReference,
+    ValueSet, Parameter, DomainElement, Language, Contribution, ValueSetReference,
 )
 from clld.web.datatables.base import (
     DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
@@ -11,39 +11,34 @@ from clld.web.datatables.base import (
 from clld.web.util.helpers import linked_references
 
 
-class ValueNameCol(LinkCol):
-
-    def get_attrs(self, item):
-        label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
-        return {'label': label}
-
-    def order(self):
-        return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
-
-    def search(self, qs):
-        if self.dt.parameter and self.dt.parameter.domain:
-            return DomainElement.name.contains(qs)
-        return Value.description.contains(qs)
+#class ValueNameCol(LinkCol):
+#
+#    def get_attrs(self, item):
+#        label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
+#        return {'label': label}
+#
+#    def order(self):
+#        return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
+#
+#    def search(self, qs):
+#        if self.dt.parameter and self.dt.parameter.domain:
+#            return DomainElement.name.contains(qs)
+#        return Value.description.contains(qs)
 
 
 class ParameterCol(LinkCol):
     def get_obj(self, item):
-        return item.valueset.parameter
-
-
-class _LanguageCol(LanguageCol):
-    def get_obj(self, item):
-        return item.valueset.language
+        return item.parameter
 
 
 class _LinkToMapCol(LinkToMapCol):
     def get_obj(self, item):
-        return item.valueset.language
+        return item.language
 
     def get_layer(self, item):
         if item.domainelement:
             return item.domainelement.name
-        return LinkToMapCol.get_layer(self, item.valueset)
+        return LinkToMapCol.get_layer(self, item)
 
 
 class RefsCol(Col):
@@ -51,7 +46,7 @@ class RefsCol(Col):
         return linked_references(self.dt.req, item)
 
 
-class Values(DataTable):
+class Valuesets(DataTable):
 
     def __init__(self,
                  req,
@@ -78,21 +73,22 @@ class Values(DataTable):
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
-        query = query.join(ValueSet, Language, Parameter)\
+        query = query.join(Language)\
             .options(
-                joinedload(Value.valueset, ValueSet.language),
-                joinedload(Value.valueset, ValueSet.parameter),
-                joinedload_all(Value.valueset, ValueSet.references, ValueSetReference.source))
+                joinedload(ValueSet.language),
+                joinedload_all(ValueSet.references, ValueSetReference.source))
 
         if self.language:
-            return query.filter(ValueSet.language_pk == self.language.pk)
+            query = query.join(Parameter).options(joinedload(Value.parameter))
+            return query.filter(Value.language_pk == self.language.pk)
 
         if self.parameter:
-            query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
-            return query.filter(ValueSet.parameter_pk == self.parameter.pk)
+            #query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
+            return query.filter(Value.parameter_pk == self.parameter.pk)
 
         if self.contribution:
-            return query.filter(ValueSet.contribution_pk == self.contribution.pk)
+            query = query.join(Parameter)
+            return query.filter(Value.contribution_pk == self.contribution.pk)
 
         return query
 
@@ -100,9 +96,9 @@ class Values(DataTable):
         #
         # TODO: move the first col def to apics-specific table!
         #
-        name_col = ValueNameCol(self, 'value')
-        if self.parameter and self.parameter.domain:
-            name_col.choices = [de.name for de in self.parameter.domain]
+        #name_col = ValueNameCol(self, 'value')
+        #if self.parameter and self.parameter.domain:
+        #    name_col.choices = [de.name for de in self.parameter.domain]
 
         refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
 
@@ -110,15 +106,15 @@ class Values(DataTable):
 
         if self.parameter:
             return res + [
-                _LanguageCol(self, 'language', model_col=Language.name),
-                name_col,
+                LanguageCol(self, 'language', model_col=Language.name),
+                #name_col,
                 refs_col,
                 _LinkToMapCol(self),
             ]
 
         if self.language:
             return res + [
-                name_col,
+                #name_col,
                 ParameterCol(self, 'parameter', model_col=Parameter.name),
                 refs_col,
                 #
@@ -127,8 +123,8 @@ class Values(DataTable):
             ]
 
         return res + [
-            _LanguageCol(self, 'language', model_col=Language.name),
-            name_col,
+            LanguageCol(self, 'language', model_col=Language.name),
+            #name_col,
             ParameterCol(self, 'parameter', model_col=Parameter.name),
             refs_col,
             #

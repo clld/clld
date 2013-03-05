@@ -28,6 +28,11 @@ class IParameter(Interface):
     """
 
 
+class IValueSet(Interface):
+    """marker interface
+    """
+
+
 class IValue(Interface):
     """marker interface
     """

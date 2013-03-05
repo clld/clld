@@ -2,28 +2,29 @@
 
 % if request.params.get('parameter'):
 ## called for the info windows on parameter maps
-<% values = h.DBSession.query(h.models.Value).filter(h.models.Value.parameter_pk == int(request.params['parameter'])).filter(h.models.Value.language_pk == ctx.pk) %>
+<% valueset = h.DBSession.query(h.models.ValueSet).filter(h.models.ValueSet.parameter_pk == int(request.params['parameter'])).filter(h.models.ValueSet.language_pk == ctx.pk).first() %>
 <h3>${h.link(request, ctx)}</h3>
-<h4>Values</h4>
+% if valueset:
+<h4>${_('Values')}</h4>
 <ul class='unstyled'>
-    % for value in values:
+    % for value in valueset.values:
     <li>
         % if value.domainelement:
         ${value.domainelement.name}
         % else:
         ${value.name}
         % endif
-        % if value.references:
-            % for i, ref in enumerate(value.references):
-            ${', ' if i > 0 else ''}
-            ${h.link(request, ref.source)}
-            ${'(' + ref.description + ')' if ref.description else ''}
-            % endfor
-        % endif
+        ##
+        ## TODO: confidence, frequency
+        ##
     </li>
     % endfor
 </ul>
+% if valueset.references:
+<h4>${_('References')}</h4>
+<p>${h.linked_references(request, valueset)}</p>
+% endif
+% endif
 % else:
-
 <h3>${h.link(request, ctx)}</h3>
 % endif

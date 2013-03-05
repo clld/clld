@@ -13,6 +13,7 @@ from sqlalchemy import (
     CheckConstraint,
     UniqueConstraint,
     ForeignKey,
+    and_,
 )
 from sqlalchemy.orm import (
     relationship,
@@ -275,6 +276,35 @@ class Contribution(Base,
                 sorted(self.contributor_assocs, key=lambda a: (a.ord, a.contributor.id)) if not assoc.primary]
 
 
+class ValueSet_data(Base, Versioned, DataMixin):
+    pass
+
+
+class ValueSet_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IValueSet)
+class ValueSet(Base,
+               PolymorphicBaseMixin,
+               Versioned,
+               IdNameDescriptionMixin,
+               HasDataMixin,
+               HasFilesMixin):
+    """The intersection of Language and Parameter.
+    """
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
+
+    parameter = relationship('Parameter', backref='valuesets')
+    contribution = relationship('Contribution', backref='valuesets')
+
+    @declared_attr
+    def language(cls):
+        return relationship('Language', backref=backref('valuesets', order_by=cls.language_pk))
+
+
 class Value_data(Base, Versioned, DataMixin):
     pass
 
@@ -292,10 +322,7 @@ class Value(Base,
             HasFilesMixin):
     """A measurement of a parameter for a particular language.
     """
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
-    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
-
+    valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
     # Values may be taken from a domain.
     domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
 
@@ -304,26 +331,22 @@ class Value(Base,
     frequency = Column(Float)
     confidence = Column(Unicode)
 
-    parameter = relationship('Parameter', backref='values')
     domainelement = relationship('DomainElement', backref='values')
-    contribution = relationship('Contribution', backref='values')
+    valueset = relationship(ValueSet, backref='values')
 
-    @declared_attr
-    def language(cls):
-        return relationship('Language', backref=backref('values', order_by=cls.language_pk))
-
-    @validates('parameter_pk')
-    def validate_parameter_pk(self, key, parameter_pk):
-        """We have to make sure, the parameter a value is tied to and the parameter a
-        possible domainelement is tied to stay in sync.
-        """
-        if self.domainelement and self.domainelement.parameter_pk and parameter_pk:
-            assert self.domainelement.parameter_pk == parameter_pk
-        return parameter_pk
+    #@validates('parameter_pk')
+    #def validate_parameter_pk(self, key, parameter_pk):
+    #    """We have to make sure, the parameter a value is tied to and the parameter a
+    #    possible domainelement is tied to stay in sync.
+    #    """
+    #    if self.domainelement and self.domainelement.parameter_pk and parameter_pk:
+    #        assert self.domainelement.parameter_pk == parameter_pk
+    #    return parameter_pk
 
     def __json__(self, req):
         res = Base.__json__(self, req)
         res['domainelement'] = self.domainelement.__json__(req)
+        res['valueset'] = self.valueset.__json__(req)
         return res
 
 
@@ -548,14 +571,6 @@ class HasSourceMixin(object):
         return relationship(Source, backref=cls.__name__.lower() + 's')
 
 
-class ValueReference(Base, Versioned, HasSourceMixin):
-    """Values are linked to Sources with an optional description of this
-    linkage, e.g. 'pp. 30-34'.
-    """
-    value_pk = Column(Integer, ForeignKey('value.pk'))
-    value = relationship(Value, backref="references")
-
-
 class SentenceReference(Base, Versioned, HasSourceMixin):
     """
     """
@@ -579,10 +594,8 @@ class ValueSetReference(Base, Versioned, HasSourceMixin):
     An alternative data model might only allow binary parameters, in which case a
     ValueReference for a value of False would be used.
     """
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
-    parameter = relationship(Parameter)
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    language = relationship(Language)
+    valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
+    valueset = relationship(ValueSet, backref="references")
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):

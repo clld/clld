@@ -1,27 +1,7 @@
 import sys
 
-from clld.db.models.common import (
-    Contribution,
-    Parameter,
-    Language,
-    Contributor,
-    Source,
-    Sentence,
-    Value,
-    UnitParameter,
-    Unit,
-)
-from clld.interfaces import (
-    IContribution,
-    IParameter,
-    ILanguage,
-    IContributor,
-    ISource,
-    ISentence,
-    IValue,
-    IUnitParameter,
-    IUnit,
-)
+from clld.db.models import common
+from clld import interfaces
 
 
 PY3 = sys.version_info[:2][0] == 3
@@ -37,13 +17,14 @@ class Resource(object):
 
 
 RESOURCES = [
-    Resource('contribution', Contribution, IContribution),
-    Resource('parameter', Parameter, IParameter),
-    Resource('language', Language, ILanguage),
-    Resource('contributor', Contributor, IContributor),
-    Resource('source', Source, ISource),
-    Resource('sentence', Sentence, ISentence),
-    Resource('value', Value, IValue),
-    Resource('unitparameter', UnitParameter, IUnitParameter),
-    Resource('unit', Unit, IUnit),
+    Resource('contribution', common.Contribution, interfaces.IContribution),
+    Resource('parameter', common.Parameter, interfaces.IParameter),
+    Resource('language', common.Language, interfaces.ILanguage),
+    Resource('contributor', common.Contributor, interfaces.IContributor),
+    Resource('source', common.Source, interfaces.ISource),
+    Resource('sentence', common.Sentence, interfaces.ISentence),
+    Resource('valueset', common.ValueSet, interfaces.IValueSet),
+    Resource('value', common.Value, interfaces.IValue),
+    Resource('unitparameter', common.UnitParameter, interfaces.IUnitParameter),
+    Resource('unit', common.Unit, interfaces.IUnit),
 ]

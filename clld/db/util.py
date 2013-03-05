@@ -14,8 +14,8 @@ def compute_language_sources(session=None):
 
     sl = {}
 
-    for ref in session.query(common.ValueReference):
-        sl[(ref.source_pk, ref.value.language_pk)] = True
+    for ref in session.query(common.ValueSetReference):
+        sl[(ref.source_pk, ref.valueset.language_pk)] = True
 
     for ref in session.query(common.SentenceReference):
         sl[(ref.source_pk, ref.sentence.language_pk)] = True
