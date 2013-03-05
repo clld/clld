@@ -271,7 +271,7 @@ CLLD.Map = (function(){
         "temporary": {
             pointRadius: 12,
             fillOpacity: 1,
-            label : "${name}",
+            label : "${language_name}",
             fontColor: "black",
             fontSize: "12px",
             fontFamily: "Courier New, monospace",

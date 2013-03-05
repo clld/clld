@@ -128,6 +128,7 @@ def rendered_sentence(sentence, abbrs=None):
             HTML.div(sentence.name, class_='object-language'),
             HTML.div(*units, **{'class': 'gloss-box'}),
             HTML.div(sentence.description, class_='translation') if sentence.description else '',
+            HTML.div(sentence.original_script, class_='original_script') if sentence.original_script else '',
             class_='body',
         ),
         class_="sentence",
@@ -181,3 +182,15 @@ def linked_references(req, obj):
             class_='citation',
         ))
     return HTML.span(*chunks)
+
+
+def language_identifier(req, obj):
+    label = obj.name or obj.id
+
+    if obj.type == 'iso639-3':
+        label = external_link('http://www.sil.org/iso639-3/documentation.asp?id=%s' % obj.id, label=label)
+    elif obj.type == 'ethnologue':
+        if re.match('[a-z]{3}', obj.id):
+            label = external_link('http://www.ethnologue.com/language/%s' % obj.id, label=label)
+
+    return HTML.span(label, class_='language_identifier %s' % obj.type)

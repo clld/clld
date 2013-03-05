@@ -503,17 +503,8 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
     But we might as well just store alternative names for languages.
     """
     __table_args__ = (UniqueConstraint('id', 'name', 'type'),)
+    id = Column(String)
     type = Column(String)
-
-    #def url(self):
-    #    """
-    #    :return: canonical URL for a language identifier
-    #    """
-    #    #
-    #    # TODO!
-    #    #
-    #    if self.type == 'wals':
-    #        return 'http://wals.info/...'
 
 
 class LanguageIdentifier(Base, Versioned):
@@ -577,6 +568,21 @@ class ContributionReference(Base, Versioned, HasSourceMixin):
     """
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     contribution = relationship(Contribution, backref="references")
+
+
+class ValueSetReference(Base, Versioned, HasSourceMixin):
+    """References for a set of values (related to one parameter and one language).
+
+    These references can be interpreted as justifications why a language does not "have"
+    certain values for a parameter.
+
+    An alternative data model might only allow binary parameters, in which case a
+    ValueReference for a value of False would be used.
+    """
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    parameter = relationship(Parameter)
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    language = relationship(Language)
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
