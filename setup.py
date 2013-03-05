@@ -33,6 +33,7 @@ install_requires = [
     'zope.sqlalchemy',
     'purl',
     'fabric',
+    'fabtools',
     'WebTest',
 ]
 
