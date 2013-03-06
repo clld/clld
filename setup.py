@@ -31,9 +31,6 @@ install_requires = [
     'path.py',
     'pyramid-exclog',
     'zope.sqlalchemy',
-    'purl',
-    'fabric',
-    'fabtools',
     'WebTest',
 ]
 
@@ -43,6 +40,7 @@ if not PY3:
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     'pep8',
+    'mock',
 ]
 
 if not PY3:
