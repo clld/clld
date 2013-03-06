@@ -263,6 +263,6 @@ class DataTable(object):
             "sPaginationType": "bootstrap",
             "bServerSide": True,
             "aoColumns": [col.js_args for col in self.cols],
-            "iDisplayLength": 25,
-            "aLengthMenu": [[25, 50, 100], [25, 50, 100]],
+            "iDisplayLength": 100,
+            "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
         }

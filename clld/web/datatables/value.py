@@ -1,5 +1,5 @@
 from sqlalchemy import desc
-from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm import joinedload, joinedload_all, aliased
 
 from clld.db.meta import DBSession
 from clld.db.models.common import (
@@ -12,6 +12,8 @@ from clld.web.util.helpers import linked_references
 
 
 class ValueNameCol(LinkCol):
+    def get_obj(self, item):
+        return item.valueset
 
     def get_attrs(self, item):
         label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
@@ -24,6 +26,14 @@ class ValueNameCol(LinkCol):
         if self.dt.parameter and self.dt.parameter.domain:
             return DomainElement.name.contains(qs)
         return Value.description.contains(qs)
+
+
+class ValueSetCol(LinkCol):
+    def get_obj(self, item):
+        return item.valueset
+
+    def get_attrs(self, item):
+        return {'label': item.valueset.name}
 
 
 class ParameterCol(LinkCol):
@@ -48,7 +58,7 @@ class _LinkToMapCol(LinkToMapCol):
 
 class RefsCol(Col):
     def format(self, item):
-        return linked_references(self.dt.req, item)
+        return linked_references(self.dt.req, item.valueset)
 
 
 class Values(DataTable):
@@ -78,16 +88,16 @@ class Values(DataTable):
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
-        query = query.join(ValueSet, Language, Parameter)\
-            .options(
-                joinedload(Value.valueset, ValueSet.language),
-                joinedload(Value.valueset, ValueSet.parameter),
-                joinedload_all(Value.valueset, ValueSet.references, ValueSetReference.source))
+        query = query.join(ValueSet).options(
+            joinedload_all(Value.valueset, ValueSet.references, ValueSetReference.source)
+        )
 
         if self.language:
+            query = query.join(ValueSet.parameter)
             return query.filter(ValueSet.language_pk == self.language.pk)
 
         if self.parameter:
+            query = query.join(ValueSet.language)
             query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
             return query.filter(ValueSet.parameter_pk == self.parameter.pk)
 
@@ -127,10 +137,8 @@ class Values(DataTable):
             ]
 
         return res + [
-            _LanguageCol(self, 'language', model_col=Language.name),
             name_col,
-            ParameterCol(self, 'parameter', model_col=Parameter.name),
-            refs_col,
+            ValueSetCol(self, 'valueset', bSearchable=False, bSortable=False),
             #
             # TODO: contribution col?
             #

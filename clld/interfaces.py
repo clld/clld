@@ -121,3 +121,12 @@ class IMap(Interface):
 class IMenuItems(Interface):
     """marker interface
     """
+
+
+class IMapMarker(Interface):
+    """utility
+    """
+    def __call__(self, ctx, req):
+        """
+        :return: URL for a marker to use in maps.
+        """

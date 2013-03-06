@@ -7,8 +7,9 @@ from markupsafe import Markup
 from pyramid.response import Response
 from pyramid.renderers import render
 
-from clld.interfaces import IDataTable
+from clld.interfaces import IDataTable, IMapMarker
 from clld.web.util import htmllib
+from clld.web.util import helpers
 from clld.web.adapters import GeoJsonLanguages
 
 
@@ -20,6 +21,7 @@ class Map(object):
         self.ctx = ctx
         self.eid = eid or 'map'
         self._layers = None
+        self.map_marker = req.registry.queryUtility(IMapMarker)
 
     @property
     def layers(self):
@@ -51,6 +53,7 @@ class ParameterMap(Map):
         if self.ctx.domain:
             return [{
                 'name': de.name,
+                'marker': helpers.map_marker_img(self.req, de, marker=self.map_marker),
                 'url': self.req.resource_url(
                     self.ctx, ext='geojson', _query=dict(domainelement=str(de.id))),
             } for de in self.ctx.domain]

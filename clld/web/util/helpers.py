@@ -30,6 +30,15 @@ JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
 
 
+def map_marker_img(req, obj, marker=None, height='20', width='20'):
+    marker = marker or req.registry.queryUtility(interfaces.IMapMarker)
+    if marker:
+        url = marker(obj, req)
+        if url:
+            return HTML.img(src=url, height=height, width=width)
+    return ''
+
+
 def link(req, obj, **kw):
     rsc = None
     for _rsc in RESOURCES:

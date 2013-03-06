@@ -183,7 +183,10 @@ class GeoJsonParameter(GeoJson):
         return [valueset.language.longitude, valueset.language.latitude]
 
     def feature_properties(self, ctx, req, valueset):
+        marker = req.registry.queryUtility(interfaces.IMapMarker)
         _d = {'language': valueset.language.__json__(req)}
+        if marker:
+            _d['icon'] = marker(valueset, req)
         for i, v in enumerate(valueset.values):
             _d['values_%s' % i] = v.__json__(req)
         return flatten_dict(_d)

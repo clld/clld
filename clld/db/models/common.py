@@ -304,6 +304,10 @@ class ValueSet(Base,
     def language(cls):
         return relationship('Language', backref=backref('valuesets', order_by=cls.language_pk))
 
+    @property
+    def name(self):
+        return self.language.name + ' / ' + self.parameter.name
+
 
 class Value_data(Base, Versioned, DataMixin):
     pass

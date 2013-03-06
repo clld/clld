@@ -5,45 +5,61 @@
 
 <h2>${_('Value Set')} ${h.link(request, ctx.language)}/${h.link(request, ctx.parameter)}</h2>
 
+% if ctx.description:
+<p>${h.text2html(ctx.description)}</p>
+% endif
+
+<h3>${_('Values')} ${h.map_marker_img(request, ctx, height='25', width='25')|n}</h3>
+
+<div class="accordion" id="values-accordion">
+    % for i, value in enumerate(sorted(ctx.values, key=lambda v: (v.frequency, v.confidence), reverse=True)):
+    <% name = value.domainelement.name if value.domainelement else (value.name or value.id) %>
+    <%util:accordion_group eid="acc-${value.id}" parent="values-accordion" open="${False}">
+        <%def name="title()">
+            ${h.map_marker_img(request, value.domainelement)}
+            <b>${value.domainelement.name if value.domainelement else (value.name or value.id)}</b>
+            % if value.frequency or value.confidence:
+            (
+                % if value.frequency:
+                Frequency: ${value.frequency}
+                % endif
+                % if value.confidence:
+                , Confidence: ${value.confidence}
+                % endif
+            )
+            % endif
+        </%def>
+    % if value.sentence_assocs:
+    <h4>${_('Sentences')}</h4>
+    ${util.sentences(value)}
+    % else:
+    no sentences
+    % endif
+    </%util:accordion_group>
+    % endfor
+</div>
+
+
+<%def name="sidebar()">
+<div class="well well-small">
 <dl>
-    <dt>Language:</dt>
+    <dt>${_('Contributors')}:</dt>
+    <dd>
+        ${h.linked_contributors(request, ctx.contribution)}
+        ${h.button('cite', onclick=h.JSModal.show(ctx.contribution.name, request.resource_url(ctx.contribution, ext='md.html')))}
+    </dd>
+    <dt>${_('Language')}:</dt>
     <dd>${h.link(request, ctx.language)}</dd>
-    <dt>Parameter:</dt>
+    <dt>${_('Parameter')}:</dt>
     <dd>${h.link(request, ctx.parameter)}</dd>
     % if ctx.references:
-    <dt>References</dt>
-    <dd>${h.linked_references(ctx)|n}</dd>
+    <dt>${_('References')}:</dt>
+    <dd>${h.linked_references(request, ctx)|n}</dd>
     % endif
     % for k, v in ctx.datadict().items():
     <dt>${k}</dt>
     <dd>${v}</dd>
     % endfor
 </dl>
-
-<h3>${_('Values')}</h3>
-<ul class="unstyled">
-% for value in ctx.values:
-<li>
-${h.link(request, value)}
-##
-## TODO: frequency, confidence!
-##
-% if value.sentence_assocs:
-<h4>${_('Sentences')}</h4>
-<ol>
-    % for a in value.sentence_assocs:
-    <li>
-        % if a.description:
-        <p>${a.description}</p>
-        % endif
-        ${h.rendered_sentence(a.sentence)}
-        % if a.sentence.references:
-        <p>See ${h.linked_references(a.sentence)|n}</p>
-        % endif
-    </li>
-    % endfor
-</ol>
-% endif
-</li>
-% endfor
-</ul>
+</div>
+</%def>
