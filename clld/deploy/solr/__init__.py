@@ -1,13 +1,12 @@
 import os
 from tempfile import mktemp
 
-from clld import PY3
-if PY3:
-    print('fabric requires python2.x')
-else:
+try:
     from fabric.api import sudo, cd, run, get
     from fabric.contrib.files import exists
     import fabtools
+except ImportError:
+    pass
 from path import path
 
 from clld.deploy.config import APPS

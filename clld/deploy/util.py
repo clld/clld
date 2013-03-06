@@ -10,16 +10,15 @@ import crypt
 import random
 from getpass import getpass
 
-from clld import PY3
-if PY3:
-    print('fabric requires python2.x')
-else:
+try:
     from fabric.api import sudo, run, local, put, env, cd
     from fabric.contrib.console import confirm
     from fabtools import require
     from fabtools.python import virtualenv
     from fabtools import service
     from fabtools import postgres
+except ImportError:
+    pass
 
 from clld.deploy import config
 

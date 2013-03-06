@@ -1,8 +1,7 @@
-from clld import PY3
-if PY3:
-    print('fabric requires python2.x')
-else:
+try:
     from fabric.api import task
+except ImportError:
+    pass
 
 from clld.deploy import solr
 
