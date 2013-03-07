@@ -1,3 +1,5 @@
+from sqlalchemy.orm import joinedload
+
 from clld.db.meta import DBSession
 from clld.db.models import common
 
@@ -27,3 +29,14 @@ def compute_language_sources(session=None):
     for s, l in sl:
         if (s, l) not in old_sl:
             session.add(common.LanguageSource(language_pk=l, source_pk=s))
+
+
+def compute_number_of_values(session=None):
+    """compute number of values per valueset and store it in valueset's jsondata.
+    """
+    session = session or DBSession
+
+    for valueset in session.query(common.ValueSet).options(joinedload(common.ValueSet.values)):
+        d = valueset.jsondata if valueset.jsondata else {}
+        d['_number_of_values'] = len(valueset.values)
+        valueset.jsondata = d

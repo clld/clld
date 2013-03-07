@@ -5,6 +5,7 @@ from functools import partial
 from collections import OrderedDict
 
 from sqlalchemy import engine_from_config
+from sqlalchemy.orm import joinedload_all, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
@@ -20,9 +21,9 @@ from pyramid.asset import resolve_asset_spec
 from clld.lib.purl import URL
 from clld.config import get_config
 from clld.db.meta import DBSession, Base
-from clld.db.models.common import Config
+from clld.db.models import common
 from clld import Resource, RESOURCES
-from clld.interfaces import IMenuItems, IDataTable, IIndex, IRepresentation, IMap
+from clld import interfaces
 from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping, js
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
@@ -73,17 +74,51 @@ def menu_item(resource, ctx, req):
     return req.route_url(resource), req.translate(resource.capitalize())
 
 
+@implementer(interfaces.ICtxFactoryQuery)
+class CtxFactoryQuery(object):
+    def refined_query(self, query, model, req):
+        """Derived classes may override this method to add model-specific query
+        refinements of their own.
+        """
+        return query
+
+    def __call__(self, model, req):
+        query = req.db.query(model).filter(model.id == req.matchdict['id'])
+        custom_query = self.refined_query(query, model, req)
+
+        if query == custom_query:
+            # no customizations done, apply the defaults
+            if model == common.Contribution:
+                query = query.options(
+                    joinedload_all(
+                        common.Contribution.valuesets, common.ValueSet.parameter),
+                    joinedload_all(
+                        common.Contribution.references, common.ContributionReference.source),
+                    joinedload(common.Contribution.data),
+                )
+            if model == common.ValueSet:
+                query = query.options(
+                    joinedload(common.ValueSet.values),
+                    joinedload(common.ValueSet.parameter),
+                    joinedload(common.ValueSet.language),
+                )
+        else:
+            query = custom_query
+
+        return query.one()
+
+
 def ctx_factory(model, type_, req):
     """The context of a request is either a single model instance or an instance of
     DataTable incorporating all information to retrieve an appropriately filtered list
     of model instances.
     """
     if type_ == 'index':
-        datatable = req.registry.getUtility(IDataTable, name=req.matched_route.name)
+        datatable = req.registry.getUtility(interfaces.IDataTable, name=req.matched_route.name)
         return datatable(req, model)
 
     try:
-        return model.get(req.matchdict['id'])
+        return req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
     except NoResultFound:
         raise HTTPNotFound()
 
@@ -102,7 +137,7 @@ def register_app(config, pkg=None):
         config.add_translation_dirs('clld:locale')
         config.add_route('home', '/')
         menuitems = OrderedDict(home=partial(menu_item, 'home'))
-        config.registry.registerUtility(menuitems, IMenuItems)
+        config.registry.registerUtility(menuitems, interfaces.IMenuItems)
         return
 
     if not hasattr(pkg, '__file__'):
@@ -139,11 +174,13 @@ def register_app(config, pkg=None):
         ['contributions', 'parameters', 'languages', 'contributors']
     ):
         menuitems[plural] = partial(menu_item, plural)
-    config.registry.registerUtility(menuitems, IMenuItems)
+    config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
 
 def includeme(config):
     config.set_request_factory(ClldRequest)
+
+    config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)
 
     # initialize the db connection
     engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
@@ -153,7 +190,7 @@ def includeme(config):
     settings = {'pyramid.default_locale_name': 'en'}
     transaction.begin()
     session = DBSession()
-    for kv in session.query(Config):
+    for kv in session.query(common.Config):
         settings['clld.%s' % kv.key] = kv.value
     transaction.abort()
 
@@ -169,13 +206,13 @@ def includeme(config):
     #
     # make it easy to register custom functionality
     #
-    config.add_directive('register_datatable', partial(register_cls, IDataTable))
-    config.add_directive('register_map', partial(register_cls, IMap))
+    config.add_directive('register_datatable', partial(register_cls, interfaces.IDataTable))
+    config.add_directive('register_map', partial(register_cls, interfaces.IMap))
 
     def add_menu_item(config, name, factory):
-        menuitems = config.registry.getUtility(IMenuItems)
+        menuitems = config.registry.getUtility(interfaces.IMenuItems)
         menuitems[name] = factory
-        config.registry.registerUtility(menuitems, IMenuItems)
+        config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
     config.add_directive('add_menu_item', add_menu_item)
 

@@ -12,33 +12,22 @@
 <h3>${_('Values')} ${h.map_marker_img(request, ctx, height='25', width='25')|n}</h3>
 
 <div class="accordion" id="values-accordion">
-    % for i, value in enumerate(sorted(ctx.values, key=lambda v: (v.frequency, v.confidence), reverse=True)):
-    <% name = value.domainelement.name if value.domainelement else (value.name or value.id) %>
+    % for value in ctx.values:
     <%util:accordion_group eid="acc-${value.id}" parent="values-accordion" open="${False}">
         <%def name="title()">
             ${h.map_marker_img(request, value.domainelement)}
             <b>${value.domainelement.name if value.domainelement else (value.name or value.id)}</b>
-            % if value.frequency or value.confidence:
-            (
-                % if value.frequency:
-                Frequency: ${value.frequency}
-                % endif
-                % if value.confidence:
-                , Confidence: ${value.confidence}
-                % endif
-            )
-            % endif
+            ${h.format_frequency_and_confidence(value)}
         </%def>
-    % if value.sentence_assocs:
-    <h4>${_('Sentences')}</h4>
-    ${util.sentences(value)}
-    % else:
-    no sentences
-    % endif
+        % if value.sentence_assocs:
+        <h4>${_('Sentences')}</h4>
+        ${util.sentences(value)}
+        % else:
+        no sentences
+        % endif
     </%util:accordion_group>
     % endfor
 </div>
-
 
 <%def name="sidebar()">
 <div class="well well-small">
@@ -56,10 +45,7 @@
     <dt>${_('References')}:</dt>
     <dd>${h.linked_references(request, ctx)|n}</dd>
     % endif
-    % for k, v in ctx.datadict().items():
-    <dt>${k}</dt>
-    <dd>${v}</dd>
-    % endfor
+    ${util.data(ctx, with_dl=False)}
 </dl>
 </div>
 </%def>

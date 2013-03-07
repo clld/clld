@@ -1,8 +1,12 @@
-
-<%def name="data(obj=None)">
+##
+## format the key-value pairs from resources with data as dl items
+##
+<%def name="data(obj=None, with_dl=True)">
     <% obj = obj or ctx %>
     % if obj.data:
+    %if with_dl:
     <dl>
+    % endif
 	% for key, items in h.groupby(sorted(obj.data, key=lambda o: (o.ord, o.key)), lambda x: x.key):
 	    % if not key.startswith('_'):  ## we respect a convention to mark "private" data
 	    <dt>${key}</dt>
@@ -11,10 +15,15 @@
 	        % endfor
 	    % endif
         % endfor
+    %if with_dl:
     </dl>
+    % endif
     % endif
 </%def>
 
+##
+## format files associated with a resource
+##
 <%def name="files(obj=None)">
     <% obj = obj or ctx %>
     % if obj.files:
@@ -31,6 +40,9 @@
     % endif
 </%def>
 
+##
+## format the label of a tree node in a css-only tree control
+##
 <%def name="tree_node_label(level, id, checked=True)">
     <input class="level${level} treeview" type="checkbox" id="${id}"${' checked="checked"' if checked else ''}>
     <label for="${id}">
@@ -39,6 +51,9 @@
     </label>
 </%def>
 
+##
+## format a group within a bootstrap accordion
+##
 <%def name="accordion_group(eid, parent, title=None, open=False)">
     <div class="accordion-group">
         <div class="accordion-heading">
@@ -54,6 +69,9 @@
     </div>
 </%def>
 
+##
+## format an HTML table, enhanced via jQuery DataTables
+##
 <%def name="table(items, eid='table')">
     <table id="${eid}" class="table table-hover">
         <thead>
@@ -72,6 +90,9 @@
     </script>
 </%def>
 
+##
+## format a div of class well
+##
 <%def name="well(title=None)">
     <div class="well well-small">
 	% if title:
@@ -81,6 +102,9 @@
     </div>
 </%def>
 
+##
+## format the sentences associated with a Value instance
+##
 <%def name="sentences(obj=None)">
     <% obj = obj or ctx %>
     <ol id="sentences-${obj.pk}">

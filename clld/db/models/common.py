@@ -14,6 +14,7 @@ from sqlalchemy import (
     UniqueConstraint,
     ForeignKey,
     and_,
+    desc,
 )
 from sqlalchemy.orm import (
     relationship,
@@ -302,7 +303,8 @@ class ValueSet(Base,
 
     @declared_attr
     def language(cls):
-        return relationship('Language', backref=backref('valuesets', order_by=cls.language_pk))
+        return relationship(
+            'Language', backref=backref('valuesets', order_by=cls.language_pk))
 
     @property
     def name(self):
@@ -326,6 +328,8 @@ class Value(Base,
             HasFilesMixin):
     """A measurement of a parameter for a particular language.
     """
+    # we must override the pk col declaration from Base to have it available for ordering.
+    pk = Column(Integer, primary_key=True)
     valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
     # Values may be taken from a domain.
     domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
@@ -336,16 +340,13 @@ class Value(Base,
     confidence = Column(Unicode)
 
     domainelement = relationship('DomainElement', backref='values')
-    valueset = relationship(ValueSet, backref='values')
 
-    #@validates('parameter_pk')
-    #def validate_parameter_pk(self, key, parameter_pk):
-    #    """We have to make sure, the parameter a value is tied to and the parameter a
-    #    possible domainelement is tied to stay in sync.
-    #    """
-    #    if self.domainelement and self.domainelement.parameter_pk and parameter_pk:
-    #        assert self.domainelement.parameter_pk == parameter_pk
-    #    return parameter_pk
+    @declared_attr
+    def valueset(cls):
+        return relationship(
+            ValueSet,
+            backref=backref(
+                'values', order_by=[desc(cls.frequency), cls.confidence, cls.pk]))
 
     def __json__(self, req):
         res = Base.__json__(self, req)
@@ -467,7 +468,8 @@ class UnitParameter(Base,
                     HasFilesMixin):
     """A measurable attribute of a unit.
     """
-    domain = relationship('UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
+    domain = relationship(
+        'UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
 
 
 class UnitValue_data(Base, Versioned, DataMixin):

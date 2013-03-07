@@ -39,7 +39,6 @@
             </th>
             % endfor
 	</tr>
-
     </tfoot>
     % endif
 </table>

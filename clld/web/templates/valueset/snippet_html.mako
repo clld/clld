@@ -1,3 +1,4 @@
+<%namespace name="util" file="../util.mako"/>
 
 % if ctx.description:
 <p>${h.text2html(ctx.description)}</p>
@@ -7,30 +8,10 @@
 <ul class="unstyled">
 % for value in ctx.values:
 <li>
-${h.link(request, value)}
-##
-## TODO: frequency, confidence!
-##
+${h.link(request, value)}${h.format_frequency_and_confidence(value)}
 % if value.sentence_assocs:
 <h4>${_('Sentences')}</h4>
-<ol>
-    % for a in value.sentence_assocs:
-    <li>
-        % if a.description:
-        <p>${a.description}</p>
-        % endif
-        ${h.rendered_sentence(a.sentence)}
-        % if a.sentence.references:
-        <p>See ${h.linked_references(request, a.sentence)|n}</p>
-        % endif
-    </li>
-    % endfor
-</ol>
-<script>
-$(document).ready(function() {
-    $('.ttip').tooltip({placement: 'bottom', delay: {hide: 300}});
-});
-</script>
+${util.sentences(value)}
 % endif
 
 % if not ctx.references and not ctx.sentence_assocs:

@@ -150,7 +150,8 @@ class DetailsRowLinkCol(Col):
             icon('info-sign', inverted=True),
             href=self.dt.req.resource_url(item, ext='snippet.html'),
             title="show details",
-            class_="btn-info details")
+            class_="btn-info details",
+            tag=HTML.button)
 
 
 @implementer(IDataTable)

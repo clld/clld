@@ -2,14 +2,11 @@
 <%namespace name="util" file="../util.mako"/>
 <%! active_menu_item = "contributions" %>
 
-<%! from clld.interfaces import IDataTable %>
-<%! from clld.db.models.common import Value %>
-
 <h2>${_('Contribution')} ${ctx.name}</h2>
 
 ${util.data()}
 
-<% dt = request.registry.queryUtility(IDataTable, 'values'); dt = dt(request, Value, contribution=ctx) %>
+<% dt = request.registry.queryUtility(h.interfaces.IDataTable, 'values'); dt = dt(request, h.models.Value, contribution=ctx) %>
 % if dt:
 <div>
     ${dt.render()}

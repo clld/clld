@@ -130,3 +130,12 @@ class IMapMarker(Interface):
         """
         :return: URL for a marker to use in maps.
         """
+
+
+class ICtxFactoryQuery(Interface):
+    """utility
+    """
+    def __call__(self, model, req):
+        """
+        :return: URL for a marker to use in maps.
+        """

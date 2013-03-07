@@ -30,6 +30,22 @@ JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
 
 
+def format_frequency_and_confidence(value):
+    res = ''
+    if not (value.frequency or value.confidence):
+        return res
+
+    if value.frequency:
+        res += 'Frequency: %s%%' % round(value.frequency, 1)
+
+    if value.confidence:
+        if res:
+            res += ', '
+        res += 'Confidence: %s' % value.confidence
+
+    return ' (%s)' % res
+
+
 def map_marker_img(req, obj, marker=None, height='20', width='20'):
     marker = marker or req.registry.queryUtility(interfaces.IMapMarker)
     if marker:
@@ -65,12 +81,13 @@ def external_link(url, label=None):
 
 
 def button(*content, **attrs):
+    tag = attrs.pop('tag', HTML.a if 'href' in attrs else HTML.button)
     attrs.setdefault('type', 'button')
     class_ = attrs['class'] if 'class' in attrs else attrs.pop('class_', '').split()
     if 'btn' not in class_:
         class_.append('btn')
     attrs['class'] = ' '.join(class_)
-    return HTML.button(*content, **attrs)
+    return tag(*content, **attrs)
 
 
 # regex to match standard abbreviations in gloss units:

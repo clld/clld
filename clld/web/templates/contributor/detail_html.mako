@@ -27,10 +27,7 @@
     <dt>${_('Mail:')}</dt>
     <dd>${ctx.email.replace('@', '[at]')}</dd>
     % endif
-    % for k, v in ctx.datadict().items():
-    <dt>${k}</dt>
-    <dd>${v}</dd>
-    % endfor
+    ${util.data(ctx, with_dl=False)}
 </dl>
 
 <h3>${_('Contributions')}</h3>

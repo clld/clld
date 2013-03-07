@@ -5,18 +5,12 @@
 <% valueset = h.DBSession.query(h.models.ValueSet).filter(h.models.ValueSet.parameter_pk == int(request.params['parameter'])).filter(h.models.ValueSet.language_pk == ctx.pk).first() %>
 <h3>${h.link(request, ctx)}</h3>
 % if valueset:
-<h4>${_('Values')}</h4>
+<h4>${h.link(request, valueset, label=_('Values'))}</h4>
 <ul class='unstyled'>
     % for value in valueset.values:
     <li>
-        % if value.domainelement:
-        ${value.domainelement.name}
-        % else:
-        ${value.name}
-        % endif
-        ##
-        ## TODO: confidence, frequency
-        ##
+        ${value.domainelement.name if value.domainelement else (value.name or value.id)}
+        ${h.format_frequency_and_confidence(value)}
     </li>
     % endfor
 </ul>
