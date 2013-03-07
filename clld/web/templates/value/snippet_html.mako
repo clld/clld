@@ -1,7 +1,7 @@
 
-% if ctx.references:
+% if ctx.valueset.references:
 <h4>${_('References')}</h4>
-<p>${h.linked_references(request, ctx)|n}</p>
+<p>${h.linked_references(request, ctx.valueset)|n}</p>
 % endif
 
 % if ctx.sentence_assocs:
@@ -26,6 +26,6 @@ $(document).ready(function() {
 </script>
 % endif
 
-% if not ctx.references and not ctx.sentence_assocs:
+% if not ctx.valueset.references and not ctx.sentence_assocs:
 <p>No details available</p>
 % endif

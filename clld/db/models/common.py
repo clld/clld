@@ -194,9 +194,12 @@ class DomainElement(Base,
                     HasFilesMixin):
     """DomainElements can be used to model controlled lists of values for a Parameter.
     """
-    __table_args__ = (UniqueConstraint('name', 'parameter_pk'),)
+    __table_args__ = (
+        UniqueConstraint('name', 'parameter_pk'),
+        UniqueConstraint('number', 'parameter_pk'))
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    number = Column(Integer)
 
 
 class Parameter_data(Base, Versioned, DataMixin):
@@ -595,10 +598,7 @@ class ValueSetReference(Base, Versioned, HasSourceMixin):
     """References for a set of values (related to one parameter and one language).
 
     These references can be interpreted as justifications why a language does not "have"
-    certain values for a parameter.
-
-    An alternative data model might only allow binary parameters, in which case a
-    ValueReference for a value of False would be used.
+    certain values for a parameter, too.
     """
     valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
     valueset = relationship(ValueSet, backref="references")

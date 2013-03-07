@@ -216,13 +216,19 @@ def includeme(config):
 
     config.add_directive('add_menu_item', add_menu_item)
 
-    def register_resource(config, name, model, interface):
+    def register_resource(config, name, model, interface, with_index=False):
         RESOURCES.append(Resource(name, model, interface))
         config.add_route_and_view(
             name,
-            '/%s/{id:[^/\.]+}' % name,
+            '/%ss/{id:[^/\.]+}' % name,
             resource_view,
             factory=partial(ctx_factory, model, 'rsc'))
+        if with_index:
+            config.add_route_and_view(
+                name + 's',
+                '/%ss' % name,
+                index_view,
+                factory=partial(ctx_factory, model, 'index'))
 
     config.add_directive('register_resource', register_resource)
 
