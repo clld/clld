@@ -177,6 +177,9 @@ class GeoJsonParameter(GeoJson):
         return {'name': ctx.name}
 
     def feature_iterator(self, ctx, req):
+        de = req.params.get('domainelement')
+        if de:
+            return [vs for vs in ctx.valuesets if vs.values and vs.values[0].domainelement.id == de]
         return [vs for vs in ctx.valuesets if vs.values]
 
     def feature_coordinates(self, ctx, req, valueset):
