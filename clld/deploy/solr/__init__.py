@@ -5,7 +5,7 @@ try:
     from fabric.api import sudo, cd, run, get
     from fabric.contrib.files import exists
     import fabtools
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 from path import path
 
@@ -28,26 +28,26 @@ TOMCAT_SOLR_CONFIG = """\
 CORE_CONFIG_TEMPLATE = '<core name="{0}" instanceDir="{0}" />\n'
 
 
-def core_dir(name, *comps):
+def core_dir(name, *comps):  # pragma: no cover
     args = [name] + list(comps)
     return SOLR_HOME.joinpath(*args)
 
 
-def data_dir(name=None):
+def data_dir(name=None):  # pragma: no cover
     args = ['data']
     if name:
         args.append(name)
     return SOLR_HOME.joinpath(*args)
 
 
-def restart_tomcat(check_path=None, result='200 OK'):
+def restart_tomcat(check_path=None, result='200 OK'):  # pragma: no cover
     fabtools.require.service.restarted('tomcat6')
     if check_path:
         res = run('curl -I http://localhost:8080/solr' + check_path)
         assert result in res
 
 
-def update_config(updater):
+def update_config(updater):  # pragma: no cover
     solr_xml_tmp = mktemp()
     get(SOLR_HOME.joinpath('solr.xml'), solr_xml_tmp)
     with open(solr_xml_tmp) as fp:
@@ -56,7 +56,7 @@ def update_config(updater):
     os.remove(solr_xml_tmp)
 
 
-def require_solr():
+def require_solr():  # pragma: no cover
     fabtools.require.deb.package('tomcat6')
     fabtools.require.deb.package('curl')
     fabtools.require.deb.package('apache2-utils')
@@ -86,7 +86,7 @@ def require_solr():
     restart_tomcat(check_path='/admin/ping')
 
 
-def require_core(name, schema=None):
+def require_core(name, schema=None):  # pragma: no cover
     if not exists(core_dir(name)):
         sudo('cp -R %s %s' % (core_dir('collection1'), core_dir(name)))
 
@@ -101,7 +101,7 @@ def require_core(name, schema=None):
     restart_tomcat(check_path='/%s/admin/ping' % name)
 
 
-def drop_core(name):
+def drop_core(name):  # pragma: no cover
     sudo('rm -rf %s' % data_dir(name))
     sudo('rm -rf %s' % core_dir(name))
     update_config(updater=lambda c: c.replace(CORE_CONFIG_TEMPLATE.format(name), ''))

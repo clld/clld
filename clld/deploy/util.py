@@ -17,8 +17,9 @@ try:
     from fabtools.python import virtualenv
     from fabtools import service
     from fabtools import postgres
-except ImportError:
-    pass
+except ImportError:  # pragma: no cover
+    sudo, run, local, put, env, cd, confirm, require, virtualenv, service, postgres = \
+    None, None, None, None, None, None, None, None, None, None, None
 
 from clld.deploy import config
 
@@ -42,6 +43,34 @@ location /{app.name}/clld-static/ {{
 
 location /{app.name}/static/ {{
         alias {app.venv}/src/{app.name}/{app.name}/static/;
+}}
+"""
+
+SITE_TEMPLATE = """\
+server {{
+    server_name {app.host};
+    access_log /var/logs/{app.name}/access.log main;
+
+    root {app.www};
+
+    location / {{
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Forwarded-For  $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+            proxy_connect_timeout 10;
+            proxy_read_timeout 10;
+            proxy_pass http://127.0.0.1:{app.port}/;
+    }}
+
+    location /clld-static/ {{
+            alias {app.venv}/src/clld/clld/web/static/;
+    }}
+
+    location /static/ {{
+            alias {app.venv}/src/{app.name}/{app.name}/static/;
+    }}
 }}
 """
 

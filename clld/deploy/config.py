@@ -9,6 +9,7 @@ class App(object):
     def __init__(self, name, port, **kw):
         self.name = name
         self.port = port
+        self.host = kw.get('host', '%s.clld.org' % name)
 
         for k, v in kw.items():
             setattr(self, k, v)
@@ -20,6 +21,10 @@ class App(object):
     @property
     def home(self):
         return path('/home').joinpath(self.name)
+
+    @property
+    def www(self):
+        return self.home.joinpath('www')
 
     @property
     def config(self):
@@ -35,10 +40,6 @@ class App(object):
 
     def bin(self, command):
         return self.venv.joinpath('bin', command)
-
-    @property
-    def repos(self):
-        return repos(self.name)
 
     @property
     def supervisor(self):
