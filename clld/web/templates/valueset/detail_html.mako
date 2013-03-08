@@ -15,7 +15,7 @@
     % for value in ctx.values:
     <%util:accordion_group eid="acc-${value.id}" parent="values-accordion" open="${False}">
         <%def name="title()">
-            ${h.map_marker_img(request, value.domainelement)}
+            ${h.map_marker_img(request, value)}
             <b>${value.domainelement.name if value.domainelement else (value.name or value.id)}</b>
             ${h.format_frequency_and_confidence(value)}
         </%def>

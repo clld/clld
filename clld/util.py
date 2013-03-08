@@ -1,6 +1,7 @@
 import re
 import unicodedata
 import collections
+import string
 
 
 def flatten_dict(d, parent_key='', sep='_'):
@@ -105,6 +106,12 @@ def slug(s):
     res = ''.join((c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn'))
     res = res.lower()
-    res = re.sub('\s+|\.|\-', '', res)
-    assert re.match('[a-z]+$', res)
+    res = unicode(str(res).translate(None, string.punctuation))
+    res = re.sub('\s+', '', res)
+    try:
+        assert re.match('[a-z0-9]+$', res)
+    except:
+        print(res)
+        raise
+
     return res

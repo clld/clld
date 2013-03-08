@@ -353,7 +353,7 @@ class Value(Base,
 
     def __json__(self, req):
         res = Base.__json__(self, req)
-        res['domainelement'] = self.domainelement.__json__(req)
+        res['domainelement'] = self.domainelement.__json__(req) if self.domainelement else None
         res['valueset'] = self.valueset.__json__(req)
         return res
 

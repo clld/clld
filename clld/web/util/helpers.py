@@ -7,7 +7,7 @@ from markupsafe import Markup
 
 from clld import interfaces
 from clld import RESOURCES
-from clld.web.util.htmllib import HTML
+from clld.web.util.htmllib import HTML, literal
 from clld.db.meta import DBSession
 from clld.db.models import common as models
 
@@ -155,6 +155,7 @@ def rendered_sentence(sentence, abbrs=None):
             HTML.div(*units, **{'class': 'gloss-box'}),
             HTML.div(sentence.description, class_='translation') if sentence.description else '',
             HTML.div(sentence.original_script, class_='original_script') if sentence.original_script else '',
+            HTML.blockquote(HTML.small(literal(sentence.comment)), class_='comment') if sentence.comment else '',
             class_='body',
         ),
         class_="sentence",

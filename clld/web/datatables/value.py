@@ -8,7 +8,8 @@ from clld.db.models.common import (
 from clld.web.datatables.base import (
     DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
 )
-from clld.web.util.helpers import linked_references
+from clld.web.util.helpers import linked_references, map_marker_img
+from clld.web.util.htmllib import HTML, literal
 
 
 class ValueNameCol(LinkCol):
@@ -17,7 +18,10 @@ class ValueNameCol(LinkCol):
 
     def get_attrs(self, item):
         label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
-        return {'label': label}
+        title = label
+        if self.dt.parameter:
+            label = HTML.span(map_marker_img(self.dt.req, item), literal('&nbsp;'), label)
+        return {'label': label, 'title': title}
 
     def order(self):
         return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
