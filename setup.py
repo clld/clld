@@ -32,6 +32,7 @@ install_requires = [
     'pyramid-exclog',
     'zope.sqlalchemy',
     'WebTest',
+    'six',
 ]
 
 if not PY3:

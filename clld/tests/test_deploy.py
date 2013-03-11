@@ -10,7 +10,7 @@ from mock import Mock, MagicMock, patch
                 run=Mock(return_value='{"status": "ok"}'),
                 local=Mock(),
                 put=Mock(),
-                env=Mock(),
+                env=MagicMock(),
                 service=Mock(),
                 cd=MagicMock(),
                 require=Mock(),

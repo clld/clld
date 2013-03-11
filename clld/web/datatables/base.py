@@ -7,6 +7,7 @@ from json import dumps
 import re
 from copy import copy
 
+from six import string_types
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.types import String, Unicode, Float, Integer
 from sqlalchemy.sql.expression import operator

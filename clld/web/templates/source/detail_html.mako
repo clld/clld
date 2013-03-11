@@ -14,13 +14,12 @@
 
 <%def name="sidebar()">
 % if ctx.languagesource:
-<div class="well well-small">
-    <h3>${_('Languages')}</h3>
+<%util:well title="${_('Languages')}">
     <ul class="nav nav-pills nav-stacked">
     % for source_assoc in ctx.languagesource:
         <li>${h.link(request, source_assoc.language)}</li>
     % endfor
     </ul>
-</div>
+</%util:well>
 % endif
 </%def>

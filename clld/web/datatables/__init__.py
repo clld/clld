@@ -7,3 +7,4 @@ from clld.web.datatables.contributor import Contributors
 from clld.web.datatables.unit import Units
 from clld.web.datatables.source import Sources
 from clld.web.datatables.sentence import Sentences
+from clld.web.datatables.unitvalue import Unitvalues

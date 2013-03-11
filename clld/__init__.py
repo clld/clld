@@ -27,4 +27,5 @@ RESOURCES = [
     Resource('value', common.Value, interfaces.IValue),
     Resource('unitparameter', common.UnitParameter, interfaces.IUnitParameter),
     Resource('unit', common.Unit, interfaces.IUnit),
+    Resource('unitvalue', common.UnitValue, interfaces.IUnitValue),
 ]

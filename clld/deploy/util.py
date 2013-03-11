@@ -24,6 +24,24 @@ except ImportError:  # pragma: no cover
 from clld.deploy import config
 
 
+DEFAULT_SITE = """\
+server {
+        root /usr/share/nginx/www;
+        index index.html index.htm;
+        server_name localhost;
+
+        location / {
+                try_files $uri $uri/ /index.html;
+        }
+
+        location /asjp {
+                rewrite ^/(.*) http://cldbs.eva.mpg.de/$1 permanent;
+        }
+
+        include /etc/nginx/locations.d/*.conf;
+}
+"""
+
 LOCATION_TEMPLATE = """\
 location /{app.name} {{
 {auth}
@@ -210,6 +228,10 @@ def deploy(app, environment):
         auth='')
 
     require.users.user(app.name, shell='/bin/bash')
+    require.postfix.server(env['host'])
+    require.postgres.server()
+    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor']:
+        require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)
     require.files.directory(app.venv, use_sudo=True)
@@ -248,6 +270,10 @@ def deploy(app, environment):
     assert json.loads(res)['status'] == 'ok'
 
     if environment == 'test':
+        create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
+        require.files.directory(
+            str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
+
         pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
         if pw:
             create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))

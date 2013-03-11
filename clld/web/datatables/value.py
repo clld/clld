@@ -106,6 +106,7 @@ class Values(DataTable):
             return query.filter(ValueSet.parameter_pk == self.parameter.pk)
 
         if self.contribution:
+            query = query.join(ValueSet.parameter)
             return query.filter(ValueSet.contribution_pk == self.contribution.pk)
 
         return query

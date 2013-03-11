@@ -126,3 +126,38 @@
     });
     </script>
 </%def>
+
+##
+## language meta-information
+##
+<%def name="language_meta(lang=None)">
+    <% lang = lang or ctx %>
+    <div class="accordion" id="sidebar-accordion">
+        % if request.map:
+        <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="Map" open="${True}">
+            ${request.map.render()}
+            <p>Coordinates: ${lang.latitude}, ${lang.longitude}</p>
+        </%self:accordion_group>
+        % endif
+        % if lang.sources:
+        <%self:accordion_group eid="sources" parent="sidebar-accordion" title="Sources">
+            <ul>
+                % for source in lang.sources:
+                <li>${h.link(request, source, label=source.description)}<br />
+                <small>${h.link(request, source)}</small></li>
+                % endfor
+            </ul>
+        </%self:accordion_group>
+        % endif
+        <%self:accordion_group eid="acc-names" parent="sidebar-accordion" title="Alternative names">
+            <dl>
+            % for type_, identifiers in h.groupby(sorted(lang.identifiers, key=lambda i: i.type), lambda j: j.type):
+                <dt>${type_}:</dt>
+                % for identifier in identifiers:
+                <dd>${h.language_identifier(request, identifier)}</dd>
+                % endfor
+            % endfor
+            </dl>
+        </%self:accordion_group>
+    </div>
+</%def>
