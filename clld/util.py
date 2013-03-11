@@ -106,7 +106,8 @@ def slug(s):
     res = ''.join((c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn'))
     res = res.lower()
-    res = unicode(str(res).translate(None, string.punctuation))
+    for c in string.punctuation:
+        res = res.replace(c, '')
     res = re.sub('\s+', '', res)
     try:
         assert re.match('[a-z0-9]+$', res)
