@@ -93,7 +93,12 @@ class CtxFactoryQuery(object):
                 query = query.options(
                     joinedload_all(
                         common.Contribution.valuesets,
-                        common.ValueSet.parameter),
+                        common.ValueSet.parameter,
+                    ),
+                    joinedload_all(
+                        common.Contribution.valuesets,
+                        common.ValueSet.values,
+                        common.Value.domainelement),
                     joinedload_all(
                         common.Contribution.references,
                         common.ContributionReference.source),

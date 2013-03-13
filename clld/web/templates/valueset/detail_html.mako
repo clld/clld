@@ -32,8 +32,10 @@
 <%def name="sidebar()">
 <div class="well well-small">
 <dl>
-    <dt>${_('Contributors')}:</dt>
+    <dt>${_('Contribution')}:</dt>
     <dd>
+        ${h.link(request, ctx.contribution)}
+        by
         ${h.linked_contributors(request, ctx.contribution)}
         ${h.button('cite', onclick=h.JSModal.show(ctx.contribution.name, request.resource_url(ctx.contribution, ext='md.html')))}
     </dd>
