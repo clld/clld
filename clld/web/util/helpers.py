@@ -12,6 +12,8 @@ from clld.db.meta import DBSession
 from clld.db.models import common as models
 
 
+
+
 class JS(object):
     def __init__(self, name):
         self.name = name
@@ -65,7 +67,7 @@ def link(req, obj, **kw):
     assert rsc
     kw.setdefault('class', rsc.interface.__name__[1:])
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
-    label = kw.pop('label', getattr(obj, 'label', getattr(obj, 'name', obj.id)))
+    label = kw.pop('label', obj.__unicode__())
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
 

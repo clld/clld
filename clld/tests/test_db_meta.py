@@ -50,3 +50,9 @@ class Tests(TestWithDb):
 
         f = File()
         self.assertEqual(f.history(), [])
+
+        # a bit of a hack to test the human readable representations.
+        # we exploit the fact, that on py2, string and unicode comparison does type
+        # coercion, while on py3, the two methods should actualy return the same string.
+        self.assertEqual(l.__str__(), l.__unicode__())
+        Language().__str__()

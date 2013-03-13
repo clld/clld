@@ -357,8 +357,7 @@ class Value(Base,
         res['valueset'] = self.valueset.__json__(req)
         return res
 
-    @property
-    def label(self):
+    def __unicode__(self):
         return self.domainelement.name if self.domainelement else self.name or self.id
 
 
@@ -522,8 +521,7 @@ class UnitValue(Base,
             assert self.unitdomainelement.unitparameter_pk == unitparameter_pk
         return unitparameter_pk
 
-    @property
-    def label(self):
+    def __unicode__(self):
         return self.unitdomainelement.name if self.unitdomainelement else self.name or self.id
 
 

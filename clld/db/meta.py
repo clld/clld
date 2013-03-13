@@ -7,6 +7,7 @@ try:
 except ImportError:
     import json
 
+from six import PY3
 from sqlalchemy import (
     Column,
     Integer,
@@ -114,6 +115,25 @@ class Base(object):
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
         return dict((col, getattr(self, col)) for col in set(cols) if col not in ['created', 'updated'])
+
+    def __unicode__(self):
+        """
+        :return: a human readable label for the object
+        """
+        r = getattr(self, 'name', None)
+        if not r:
+            r = getattr(self, 'id', None)
+        if not r:
+            r = repr(self)[1:].split('object')[0] + ('%s' % self.pk)
+        return r
+
+    def __str__(self):
+        """
+        :return: a human readable label for the object, appropriately encoded (or not)
+        """
+        if PY3:
+            return self.__unicode__()  # pragma: no cover
+        return unicode(self).encode('utf-8')
 
 
 Base = declarative_base(cls=Base)

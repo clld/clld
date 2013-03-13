@@ -4,9 +4,6 @@ from clld.db.models import common
 from clld import interfaces
 
 
-PY3 = sys.version_info[:2][0] == 3
-
-
 class Resource(object):
     """Resources are routable models, i.e. model instances with URL.
     """

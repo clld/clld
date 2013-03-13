@@ -16,6 +16,7 @@ import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base, CustomModelMixin
 from clld.db.models import common
 from clld.db.versioned import Versioned
+from clld import interfaces
 
 
 ENV = None
@@ -32,6 +33,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('clld.web.app')
     config.register_app()
+    config.registry.registerUtility(lambda *args: None, interfaces.IMapMarker)
     return config.make_wsgi_app()
 
 
@@ -82,11 +84,27 @@ class TestWithDbAndData(TestWithDb):
         value = common.Value(
             id='v',
             domainelement=de,
-            valueset=valueset)
+            valueset=valueset,
+            frequency=50,
+            confidence='high')
         DBSession.add(value)
+        DBSession.add(common.Parameter(id='no-domain'))
 
         unit = common.Unit(id='u', name='Unit', language=language)
         DBSession.add(unit)
+
+        DBSession.add(common.Source(id='s'))
+
+        DBSession.add(common.Sentence(
+            id='sentence',
+            name='sentence name',
+            description='sentence description',
+            analyzed='a\tmorpheme\tdoes',
+            gloss ='a\tmorpheme\t1SG',
+            source='own',
+            comment='comment',
+            original_script='a morpheme',
+            language=language))
         DBSession.flush()
 
 

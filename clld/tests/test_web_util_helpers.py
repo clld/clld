@@ -28,3 +28,14 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import text2html
 
         self.assertTrue('<br' in text2html('abc\ndef'))
+
+    def test_format_frequency_and_confidence(self):
+        from clld.web.util.helpers import format_frequency_and_confidence
+
+        format_frequency_and_confidence(common.Value.first())
+
+    def test_rendered_sentence(self):
+        from clld.web.util.helpers import rendered_sentence
+
+        rendered_sentence(common.Sentence.first())
+        rendered_sentence(common.Sentence.first(), abbrs=dict(SG='singular'))

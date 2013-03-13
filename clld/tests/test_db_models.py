@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
+from six import PY3
+
 from clld.tests.util import TestWithDb, TestWithDbAndData
-from clld import PY3
 
 
 class Tests(TestWithDb):
@@ -36,7 +37,9 @@ class Tests(TestWithDb):
 
         p1 = UnitParameter()
         p2 = UnitParameter()
-        v = UnitValue(unitdomainelement=UnitDomainElement(unitparameter_pk=p1.pk))
+        v = UnitValue(
+            unitdomainelement=UnitDomainElement(unitparameter_pk=p1.pk, name='ude'))
+        self.assertEqual(str(v), 'ude')
         DBSession.add(v)
         DBSession.add(p2)
         DBSession.flush()

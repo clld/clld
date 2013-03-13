@@ -4,7 +4,7 @@ from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 from mock import Mock
 
-from clld.db.models.common import Contribution
+from clld.db.models.common import Contribution, ValueSet, Language
 from clld.lib.purl import URL
 from clld.tests.util import TestWithEnv, Route
 
@@ -18,11 +18,15 @@ class Tests(TestWithEnv):
     def test_ctx_factory(self):
         from clld.web.app import ctx_factory
 
-        contribution = Contribution.first()
-
-        self.set_request_properties(matchdict={'id': contribution.id}, matched_route=Route('contributions'))
-        ctx_factory(Contribution, 'index', self.env['request'])
-        ctx_factory(Contribution, 'rsc', self.env['request'])
+        for model, route in [
+            (Contribution, 'contributions'),
+            (ValueSet, 'valuesets'),
+            (Language, 'languages'),
+        ]:
+            obj = model.first()
+            self.set_request_properties(matchdict={'id': obj.id}, matched_route=Route(route))
+            ctx_factory(model, 'index', self.env['request'])
+            ctx_factory(model, 'rsc', self.env['request'])
 
         self.set_request_properties(matchdict={'id': 'xxx'})
         self.assertRaises(HTTPNotFound, ctx_factory, Contribution, 'rsc', self.env['request'])

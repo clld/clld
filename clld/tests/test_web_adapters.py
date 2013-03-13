@@ -30,7 +30,11 @@ class Tests(TestWithEnv):
 
         adapter = GeoJsonParameter(None)
         self.assertTrue(
-            '{' in adapter.render(Parameter.first(), self.env['request']))
+            '{' in adapter.render(Parameter.get('no-domain'), self.env['request']))
+
+        self.set_request_properties(params=dict(domainelement='de'))
+        self.assertTrue(
+            '{' in adapter.render(Parameter.get('p'), self.env['request']))
 
     def test_GeoJsonLanguages(self):
         from clld.web.adapters import GeoJsonLanguages

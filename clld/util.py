@@ -103,16 +103,15 @@ LGR_ABBRS = {
 
 
 def slug(s):
+    """
+    :return: A condensed version of the string s, containing only lowercase alphanumeric \
+    characters.
+    """
     res = ''.join((c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn'))
     res = res.lower()
     for c in string.punctuation:
         res = res.replace(c, '')
     res = re.sub('\s+', '', res)
-    try:
-        assert re.match('[a-z0-9]+$', res)
-    except:
-        print(res)
-        raise
-
+    assert re.match('[a-z0-9]+$', res)
     return res
