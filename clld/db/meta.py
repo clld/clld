@@ -135,7 +135,7 @@ class Base(object):
         """
         if PY3:
             return self.__unicode__()  # pragma: no cover
-        return unicode(self).encode('utf-8')
+        return self.__unicode__().encode('utf-8')
 
 
 Base = declarative_base(cls=Base)

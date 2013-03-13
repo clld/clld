@@ -223,7 +223,7 @@ class DataTable(object):
                     if not isinstance(orders, (tuple, list)):
                         orders = [orders]
                     for order in orders:
-                        if self.req.params['sSortDir_%s' % index] == 'desc':
+                        if self.req.params.get('sSortDir_%s' % index) == 'desc':
                             order = desc(order)
                         query = query.order_by(order)
 

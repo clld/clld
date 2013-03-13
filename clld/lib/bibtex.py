@@ -1,3 +1,6 @@
+from six import PY3
+
+
 class Record(dict):
 
     def __init__(self, genre, id, **kwargs):
@@ -5,7 +8,7 @@ class Record(dict):
         self.id = id
         dict.__init__(self, kwargs)
 
-    def serialize(self):
+    def __unicode__(self):
         fields = []
         m = max([0] + list(map(len, self.keys())))
 
@@ -20,3 +23,11 @@ class Record(dict):
 %s
 }
 """ % (self.genre, self.id, "\n".join(fields)[:-1])
+
+    def __str__(self):
+        """
+        :return: a human readable label for the object, appropriately encoded (or not)
+        """
+        if PY3:
+            return self.__unicode__()  # pragma: no cover
+        return self.__unicode__().encode('utf-8')

@@ -88,7 +88,7 @@ class BibTex(Representation):
             url=req.resource_url(ctx),
             author=[c.name for c in
                     list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
-        return rec.serialize()
+        return rec.__unicode__()
 
 
 @implementer(interfaces.IRepresentation)
