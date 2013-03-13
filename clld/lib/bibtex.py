@@ -13,9 +13,10 @@ class Record(dict):
             values = self[k]
             if not isinstance(values, (tuple, list)):
                 values = [values]
-            fields.append("  %s = {%s}," % (k.ljust(m), " and ".join(filter(None, values))))
+            fields.append(
+                "  %s = {%s}," % (k.ljust(m), " and ".join(filter(None, values))))
 
         return """@%s{%s,
 %s
 }
-""" % (self.genre, self.id, "\n".join(fields)[:-1])  # remove the comma after the last field entry
+""" % (self.genre, self.id, "\n".join(fields)[:-1])

@@ -1,6 +1,4 @@
-from sqlalchemy import asc, desc
-
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
+from clld.web.datatables.base import DataTable, Col, LinkCol
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import external_link
 from clld.db.models.common import Contributor
@@ -9,7 +7,8 @@ from clld.db.models.common import Contributor
 class ContributionsCol(Col):
     def format(self, item):
         return HTML.ul(
-            *[HTML.li(HTML.a(c.contribution.name, href=self.dt.req.resource_url(c.contribution)))
+            *[HTML.li(HTML.a(c.contribution.name,
+                             href=self.dt.req.resource_url(c.contribution)))
               for c in item.contribution_assocs]
         )
 

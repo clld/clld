@@ -1,20 +1,12 @@
 """
 Adaption is used to derive appropriate representations from resources.
 """
-from itertools import groupby
 from string import Template as StringTemplate
-try:
-    from simplejson import dumps
-except ImportError:
-    from json import dumps
 import datetime
 
 from zope.interface import implementer, implementedBy
-from markupsafe import Markup
-from mako.template import Template
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
-from sqlalchemy.orm import object_mapper
 
 from clld import interfaces
 from clld.lib import bibtex
@@ -49,8 +41,10 @@ class Renderable(object):
 
     @property
     def charset(self):
-        return 'utf-8' if \
-            self.mimetype.startswith('text/') or 'xml' in self.mimetype or 'kml' in self.mimetype \
+        return 'utf-8' \
+            if self.mimetype.startswith('text/') \
+            or 'xml' in self.mimetype \
+            or 'kml' in self.mimetype \
             else None
 
     def render_to_response(self, ctx, req):
@@ -92,7 +86,8 @@ class BibTex(Representation):
             ctx.id,
             title=ctx.name,
             url=req.resource_url(ctx),
-            author=[c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
+            author=[c.name for c in
+                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
         return rec.serialize()
 
 
@@ -105,7 +100,9 @@ class TxtCitation(Representation):
 
     def render(self, ctx, req):
         md = {
-            'authors': ', '.join(c.name for c in list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
+            'authors': ', '.join(
+                c.name for c in
+                list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
             'title': ctx.name,
             'url': req.resource_url(ctx),
             'accessed': str(datetime.date.today()),
@@ -179,7 +176,8 @@ class GeoJsonParameter(GeoJson):
     def feature_iterator(self, ctx, req):
         de = req.params.get('domainelement')
         if de:
-            return [vs for vs in ctx.valuesets if vs.values and vs.values[0].domainelement.id == de]
+            return [vs for vs in ctx.valuesets
+                    if vs.values and vs.values[0].domainelement.id == de]
         return [vs for vs in ctx.valuesets if vs.values]
 
     def feature_coordinates(self, ctx, req, valueset):
@@ -225,31 +223,78 @@ def includeme(config):
         ('unit', interfaces.IUnit),
         ('unitparameter', interfaces.IUnitParameter),
     ]:
-        specs.append((interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
-        specs.append((interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
-        specs.append((interface, Representation, 'text/html', 'html', name + '/detail_html.mako', {}))
-        specs.append((interface, Representation, 'application/vnd.clld.snippet+xml', 'snippet.html', name + '/snippet_html.mako', {}))
+        specs.append(
+            (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
+        specs.append(
+            (interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
+        specs.append(
+            (interface, Representation, 'text/html', 'html', name + '/detail_html.mako',
+             {}))
+        specs.append(
+            (interface, Representation, 'application/vnd.clld.snippet+xml',
+             'snippet.html', name + '/snippet_html.mako', {}))
 
-    specs.append((interfaces.IContribution, Representation, 'application/vnd.clld.md+xml', 'md.html', 'contribution/md_html.mako', {}))
+    specs.append(
+        (interfaces.IContribution, Representation, 'application/vnd.clld.md+xml',
+         'md.html', 'contribution/md_html.mako', {}))
 
     specs.extend([
-        (interfaces.ILanguage, Index, 'application/vnd.google-earth.kml+xml', 'kml', 'clld:web/templates/language/kml.mako', {'send_mimetype': 'application/xml'}),
-        (interfaces.ILanguage, Representation, 'application/rdf+xml', 'rdf', 'clld:web/templates/language/rdf.pt', {}),
-        (interfaces.ILanguage, Representation, 'application/vnd.google-earth.kml+xml', 'kml', 'clld:web/templates/language/kml.pt', {'send_mimetype': 'application/xml'}),
-        (interfaces.IContribution, Index, 'text/html', 'html', 'contribution/index_html.mako', {}),
+        (
+            interfaces.ILanguage, Index,
+            'application/vnd.google-earth.kml+xml',
+            'kml',
+            'clld:web/templates/language/kml.mako',
+            {'send_mimetype': 'application/xml'}),
+        (
+            interfaces.ILanguage,
+            Representation,
+            'application/rdf+xml',
+            'rdf',
+            'clld:web/templates/language/rdf.pt',
+            {}),
+        (
+            interfaces.ILanguage,
+            Representation,
+            'application/vnd.google-earth.kml+xml',
+            'kml',
+            'clld:web/templates/language/kml.pt',
+            {'send_mimetype': 'application/xml'}),
+        (
+            interfaces.IContribution,
+            Index,
+            'text/html',
+            'html',
+            'contribution/index_html.mako',
+            {}),
     ])
 
     for i, spec in enumerate(specs):
         interface, base, mimetype, extension, template, extra = spec
         extra.update(mimetype=mimetype, extension=extension, template=template)
         cls = type('Renderer%s' % i, (base,), extra)
-        config.registry.registerAdapter(cls, (interface,), list(implementedBy(base))[0], name=mimetype)
+        config.registry.registerAdapter(
+            cls, (interface,), list(implementedBy(base))[0], name=mimetype)
 
-    config.registry.registerAdapter(BibTex, (interfaces.IContribution,), interfaces.IRepresentation, name=BibTex.mimetype)
-    config.registry.registerAdapter(TxtCitation, (interfaces.IContribution,), interfaces.IRepresentation, name=TxtCitation.mimetype)
-
-    config.registry.registerAdapter(GeoJsonLanguages, (interfaces.ILanguage,), interfaces.IIndex, name=GeoJson.mimetype)
-    config.registry.registerAdapter(GeoJsonParameter, (interfaces.IParameter,), interfaces.IRepresentation, name=GeoJson.mimetype)
+    config.registry.registerAdapter(
+        BibTex,
+        (interfaces.IContribution,),
+        interfaces.IRepresentation,
+        name=BibTex.mimetype)
+    config.registry.registerAdapter(
+        TxtCitation,
+        (interfaces.IContribution,),
+        interfaces.IRepresentation,
+        name=TxtCitation.mimetype)
+    config.registry.registerAdapter(
+        GeoJsonLanguages,
+        (interfaces.ILanguage,),
+        interfaces.IIndex,
+        name=GeoJson.mimetype)
+    config.registry.registerAdapter(
+        GeoJsonParameter,
+        (interfaces.IParameter,),
+        interfaces.IRepresentation,
+        name=GeoJson.mimetype)
 
 
 def get_adapter(interface, ctx, req, ext=None, name=None):

@@ -81,9 +81,13 @@ if __name__ == '__main__':
     for shapeName, shapePath in shapes.items():
         for colorTuple in colors(3):
             c = canvas.canvas()
-            c.draw(shapePath, [deco.stroked([linewidth]), deco.filled([pyxColor(colorTuple)])])
-            with open(output.joinpath("%s%s.png" % (shapeName, colorName(colorTuple))), 'wb') as fp:
+            c.draw(
+                shapePath,
+                [deco.stroked([linewidth]), deco.filled([pyxColor(colorTuple)])])
+            with open(output.joinpath("%s%s.png" % (shapeName, colorName(colorTuple))),
+                      'wb') as fp:
                 fp.write(c.pipeGS("pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20)).read())
 
     #c = canvas.canvas()
-    #c.pipeGS("trunk/wals/wals/static/images/icons/a000.png", device="pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20))
+    #c.pipeGS("trunk/wals/wals/static/images/icons/a000.png",
+    #         device="pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20))

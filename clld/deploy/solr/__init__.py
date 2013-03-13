@@ -1,7 +1,7 @@
 import os
 from tempfile import mktemp
 
-try:
+try:  # pragma: no cover
     from fabric.api import sudo, cd, run, get
     from fabric.contrib.files import exists
     import fabtools
@@ -97,7 +97,9 @@ def require_core(name, schema=None):  # pragma: no cover
     # TODO:
     # - require schema
     #
-    update_config(updater=lambda c: c.replace('</cores>', CORE_CONFIG_TEMPLATE.format(name) + '</cores>'))
+    update_config(
+        updater=lambda c: c.replace(
+            '</cores>', CORE_CONFIG_TEMPLATE.format(name) + '</cores>'))
     restart_tomcat(check_path='/%s/admin/ping' % name)
 
 

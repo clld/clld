@@ -1,14 +1,7 @@
-try:
-    from simplejson import dumps
-except ImportError:
-    from json import dumps
-
 from markupsafe import Markup
-from pyramid.response import Response
 from pyramid.renderers import render
 
 from clld.interfaces import IDataTable, IMapMarker
-from clld.web.util import htmllib
 from clld.web.util import helpers
 from clld.web.adapters import GeoJsonLanguages
 
@@ -78,7 +71,11 @@ class LanguageMap(Map):
         }]
 
     def options(self):
-        return {'center': [self.ctx.longitude, self.ctx.latitude], 'zoom': 3, 'no_popup': True, 'sidebar': True}
+        return {
+            'center': [self.ctx.longitude, self.ctx.latitude],
+            'zoom': 3,
+            'no_popup': True,
+            'sidebar': True}
 
 
 """
@@ -125,5 +122,6 @@ nav toolbar:
 
 info window:
 
-http://gis.stackexchange.com/questions/42401/how-can-i-add-an-infowindow-to-an-openlayers-geojson-layer
+http://gis.stackexchange.com/questions/42401/\
+how-can-i-add-an-infowindow-to-an-openlayers-geojson-layer
 """

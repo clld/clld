@@ -1,25 +1,20 @@
-from sqlalchemy import desc
-from sqlalchemy.orm import joinedload, joinedload_all, aliased
-
-from clld.db.meta import DBSession
 from clld.db.models import common
-from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
-)
-from clld.web.util.helpers import linked_references, map_marker_img
+from clld.web.datatables.base import DataTable, LinkCol
+from clld.web.util.helpers import map_marker_img
 from clld.web.util.htmllib import HTML, literal
 
 
 class UnitValueNameCol(LinkCol):
     def get_attrs(self, item):
-        label = item.unitdomainelement.name if item.unitdomainelement else (item.name or item.id)
+        label = item.__unicode__()
         title = label
         if self.dt.parameter:
             label = HTML.span(map_marker_img(self.dt.req, item), literal('&nbsp;'), label)
         return {'label': label, 'title': title}
 
     def order(self):
-        return common.UnitDomainElement.id if self.dt.parameter and self.dt.parameter.domain \
+        return common.UnitDomainElement.id \
+            if self.dt.parameter and self.dt.parameter.domain \
             else [common.UnitValue.name, common.UnitValue.id]
 
     def search(self, qs):
@@ -81,6 +76,7 @@ class Unitvalues(DataTable):
         opts = DataTable.get_options(self)
         for attr in ['parameter', 'contribution', 'unit']:
             if getattr(self, attr):
-                opts['sAjaxSource'] = self.req.route_url('unitvalues', _query={attr: getattr(self, attr).id})
+                opts['sAjaxSource'] = self.req.route_url(
+                    'unitvalues', _query={attr: getattr(self, attr).id})
 
         return opts

@@ -15,7 +15,8 @@ from collections import namedtuple
 
 # To minimise memory consumption, we use a namedtuple to store all instance
 # variables, as well as using the __slots__ attribute.
-_URLTuple = namedtuple("_URLTuple", "host username password scheme port path query fragment")
+_URLTuple = namedtuple(
+    "_URLTuple", "host username password scheme port path query fragment")
 
 
 def parse(url_str):
@@ -253,7 +254,8 @@ class URL(object):
 
         :param integer index:
         :param string value: the new segment value
-        :param string default: the default value to return if no path segment exists with the given index
+        :param string default: the default value to return if no path segment exists \
+        with the given index
         """
         if value is not None:
             segments = list(self.path_segments())

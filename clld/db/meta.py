@@ -74,7 +74,8 @@ class Base(object):
 
     pk = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated = Column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # The active flag is meant as an easy way to mark records as obsolete or inactive,
     # without actually deleting them. A custom Query class could then be used which
@@ -114,7 +115,8 @@ class Base(object):
         cols = []
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
-        return dict((col, getattr(self, col)) for col in set(cols) if col not in ['created', 'updated'])
+        return dict((col, getattr(self, col))
+            for col in set(cols) if col not in ['created', 'updated'])
 
     def __unicode__(self):
         """

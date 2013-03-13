@@ -41,7 +41,8 @@ def _history_mapper(local_mapper):
             col.unique = False
 
             if super_mapper and col_references_table(column, super_mapper.local_table):
-                super_fks.append((col.key, list(super_history_mapper.local_table.primary_key)[0]))
+                super_fks.append(
+                    (col.key, list(super_history_mapper.local_table.primary_key)[0]))
 
             cols.append(col)
 
@@ -49,7 +50,8 @@ def _history_mapper(local_mapper):
                 polymorphic_on = col
 
         if super_mapper:
-            super_fks.append(('version', super_history_mapper.base_mapper.local_table.c.version))
+            super_fks.append(
+                ('version', super_history_mapper.base_mapper.local_table.c.version))
             cols.append(Column('version', Integer, primary_key=True))
         else:
             cols.append(Column('version', Integer, primary_key=True))
@@ -57,8 +59,10 @@ def _history_mapper(local_mapper):
         if super_fks:
             cols.append(ForeignKeyConstraint(*zip(*super_fks)))
 
-        table = Table(local_mapper.local_table.name + '_history', local_mapper.local_table.metadata,
-           *cols
+        table = Table(
+            local_mapper.local_table.name + '_history',
+            local_mapper.local_table.metadata,
+            *cols
         )
     else:  # pragma: no cover
         # single table inheritance.  take any additional columns that may have

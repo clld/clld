@@ -1,7 +1,5 @@
-from sqlalchemy import desc
-from sqlalchemy.orm import joinedload, joinedload_all, aliased
+from sqlalchemy.orm import joinedload, joinedload_all
 
-from clld.db.meta import DBSession
 from clld.db.models.common import (
     Value, ValueSet, Parameter, DomainElement, Language, Contribution, ValueSetReference,
 )
@@ -17,14 +15,16 @@ class ValueNameCol(LinkCol):
         return item.valueset
 
     def get_attrs(self, item):
-        label = item.domainelement.name if item.domainelement else (item.description or item.name or item.id)
+        label = item.__unicode__()
         title = label
         if self.dt.parameter:
             label = HTML.span(map_marker_img(self.dt.req, item), literal('&nbsp;'), label)
         return {'label': label, 'title': title}
 
     def order(self):
-        return DomainElement.id if self.dt.parameter and self.dt.parameter.domain else Value.description
+        return DomainElement.id \
+            if self.dt.parameter and self.dt.parameter.domain \
+            else Value.description
 
     def search(self, qs):
         if self.dt.parameter and self.dt.parameter.domain:
@@ -102,7 +102,8 @@ class Values(DataTable):
 
         if self.parameter:
             query = query.join(ValueSet.language)
-            query = query.outerjoin(DomainElement).options(joinedload(Value.domainelement))
+            query = query.outerjoin(DomainElement).options(
+                joinedload(Value.domainelement))
             return query.filter(ValueSet.parameter_pk == self.parameter.pk)
 
         if self.contribution:
@@ -162,6 +163,7 @@ class Values(DataTable):
 
         for attr in ['parameter', 'contribution', 'language']:
             if getattr(self, attr):
-                opts['sAjaxSource'] = self.req.route_url('values', _query={attr: getattr(self, attr).id})
+                opts['sAjaxSource'] = self.req.route_url(
+                    'values', _query={attr: getattr(self, attr).id})
 
         return opts

@@ -2,11 +2,10 @@ from json import dumps
 import re
 
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound, HTTPNotAcceptable
+from pyramid.httpexceptions import HTTPNotAcceptable
 from pyramid.interfaces import IRoutesMapper
 
 from clld.interfaces import IRepresentation, IIndex
-from clld.db.meta import DBSession
 from clld import RESOURCES
 from clld.web.adapters import get_adapter
 
@@ -84,9 +83,11 @@ def _ping(req):
 
 
 def robots(req):
-    return Response("Sitemap: %s\n" % req.route_url('sitemapindex'), content_type="text/plain")
+    return Response(
+        "Sitemap: %s\n" % req.route_url('sitemapindex'), content_type="text/plain")
 
 
 def sitemapindex(req):
     req.response.content_type = 'application/xml'
-    return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml') for r in RESOURCES]}
+    return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml')
+                         for r in RESOURCES]}

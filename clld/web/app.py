@@ -15,7 +15,6 @@ from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
-from pyramid.asset import resolve_asset_spec
 #from purl import URL
 
 from clld.lib.purl import URL
@@ -24,7 +23,9 @@ from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld import Resource, RESOURCES
 from clld import interfaces
-from clld.web.views import index_view, resource_view, robots, sitemapindex, _raise, _ping, js
+from clld.web.views import (
+    index_view, resource_view, robots, sitemapindex, _raise, _ping, js,
+)
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -91,9 +92,11 @@ class CtxFactoryQuery(object):
             if model == common.Contribution:
                 query = query.options(
                     joinedload_all(
-                        common.Contribution.valuesets, common.ValueSet.parameter),
+                        common.Contribution.valuesets,
+                        common.ValueSet.parameter),
                     joinedload_all(
-                        common.Contribution.references, common.ContributionReference.source),
+                        common.Contribution.references,
+                        common.ContributionReference.source),
                     joinedload(common.Contribution.data),
                 )
             if model == common.ValueSet:
@@ -114,7 +117,8 @@ def ctx_factory(model, type_, req):
     of model instances.
     """
     if type_ == 'index':
-        datatable = req.registry.getUtility(interfaces.IDataTable, name=req.matched_route.name)
+        datatable = req.registry.getUtility(
+            interfaces.IDataTable, name=req.matched_route.name)
         return datatable(req, model)
 
     try:
@@ -206,7 +210,8 @@ def includeme(config):
     #
     # make it easy to register custom functionality
     #
-    config.add_directive('register_datatable', partial(register_cls, interfaces.IDataTable))
+    config.add_directive(
+        'register_datatable', partial(register_cls, interfaces.IDataTable))
     config.add_directive('register_map', partial(register_cls, interfaces.IMap))
 
     def add_menu_item(config, name, factory):
@@ -264,7 +269,8 @@ def includeme(config):
     config.add_route_and_view('_ping', '/_ping', _ping, renderer='json')
 
     config.add_route_and_view('robots', '/robots.txt', robots)
-    config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
+    config.add_route_and_view(
+        'sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
 
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model
@@ -272,7 +278,8 @@ def includeme(config):
         factory = partial(ctx_factory, model, 'index')
 
         config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
-        config.register_datatable(plural, getattr(datatables, plural.capitalize(), DataTable))
+        config.register_datatable(
+            plural, getattr(datatables, plural.capitalize(), DataTable))
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
 

@@ -1,6 +1,7 @@
 """
 Deployment utilities for clld apps
 """
+# flake8: noqa
 #
 # TODO: logrotate!
 #
@@ -10,7 +11,7 @@ import crypt
 import random
 from getpass import getpass
 
-try:
+try:  # pragma: no cover
     from fabric.api import sudo, run, local, put, env, cd
     from fabric.contrib.console import confirm
     from fabtools import require

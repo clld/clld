@@ -1,6 +1,4 @@
-from clld.db.models.common import Value
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
-from clld.web.datatables.value import Values
+from clld.web.datatables.base import DataTable, LinkCol, DetailsRowLinkCol
 
 
 class Parameters(DataTable):

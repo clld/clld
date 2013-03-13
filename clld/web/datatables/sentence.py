@@ -2,7 +2,7 @@ from sqlalchemy.orm import joinedload
 
 from clld.db.models.common import Language, Sentence
 from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IdCol, LanguageCol,
+    DataTable, LinkCol, DetailsRowLinkCol, LanguageCol,
 )
 
 

@@ -5,12 +5,9 @@ object. Server side they know how to provide the data to the client-side table.
 """
 from json import dumps
 import re
-from copy import copy
 
-from six import string_types
-from sqlalchemy import asc, desc, or_
+from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer
-from sqlalchemy.sql.expression import operator
 from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
@@ -59,7 +56,9 @@ class Col(object):
     def __init__(self, dt, name, **kw):
         self.dt = dt
         self.name = name
-        self.js_args = {'sName': name, 'sTitle': '' if not name else self.dt.req.translate(name.capitalize())}
+        self.js_args = {
+            'sName': name,
+            'sTitle': '' if not name else self.dt.req.translate(name.capitalize())}
 
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):

@@ -36,7 +36,9 @@ def compute_number_of_values(session=None):
     """
     session = session or DBSession
 
-    for valueset in session.query(common.ValueSet).options(joinedload(common.ValueSet.values)):
+    for valueset in session.query(common.ValueSet).options(
+        joinedload(common.ValueSet.values)
+    ):
         d = valueset.jsondata if valueset.jsondata else {}
         d['_number_of_values'] = len(valueset.values)
         valueset.jsondata = d

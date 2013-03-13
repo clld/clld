@@ -1,9 +1,7 @@
-from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
-from clld.db.meta import DBSession
 from clld.db.models.common import Unit, Language
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
+from clld.web.datatables.base import DataTable, LinkCol
 
 
 class LanguageLinkCol(LinkCol):
@@ -45,6 +43,7 @@ class Units(DataTable):
     def get_options(self):
         opts = DataTable.get_options(self)
         if self.language:
-            opts['sAjaxSource'] = self.req.route_url('units', _query={'language': self.language.id})
+            opts['sAjaxSource'] = self.req.route_url(
+                'units', _query={'language': self.language.id})
             #opts["aaSorting"] = [[ 2, "asc" ]]
         return opts

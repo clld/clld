@@ -156,15 +156,10 @@ abuse ``_closed=False`` to produce them.
 
 """
 from __future__ import unicode_literals
-import re
 try:
     from urllib import quote as url_escape
 except ImportError:  # pragma: no cover
     from urllib.parse import quote as url_escape
-try:
-    from UserDict import DictMixin
-except ImportError:  # pragma: no cover
-    from collections import MutableMapping as DictMixin
 
 import markupsafe
 try:
@@ -300,7 +295,7 @@ def _attr_decode(v):
 def make_tag(tag, *args, **kw):
     if "c" in kw:  # pragma: no cover
         assert not args, "The special 'c' keyword argument cannot be used "\
-"in conjunction with non-keyword arguments"
+                         "in conjunction with non-keyword arguments"
         args = kw.pop("c")
     closed = kw.pop("_closed", True)
     nl = kw.pop("_nl", False)
@@ -337,14 +332,16 @@ def format_attrs(**attrs):
     >>> format_attrs(p=None)
     literal('')
     """
-    strings = [' %s="%s"' % (_attr_decode(attr), escape(value))
+    strings = [
+        ' %s="%s"' % (_attr_decode(attr), escape(value))
         for attr, value in sorted(attrs.items())
         if value is not None]
     return literal("".join(strings))
 
 
-empty_tags = set(["area", "base", "basefont", "br", "col", "frame", "hr",
-    "img", "input", "isindex", "link", "meta", "param"])
+empty_tags = set([
+    "area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex",
+    "link", "meta", "param"])
 
 HTML = HTMLBuilder()
 

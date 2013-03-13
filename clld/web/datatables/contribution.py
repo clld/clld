@@ -1,5 +1,5 @@
-from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
-from clld.web.util.helpers import linked_contributors, button, dumps, JSModal
+from clld.web.datatables.base import DataTable, Col, LinkCol
+from clld.web.util.helpers import linked_contributors, button, JSModal
 
 
 class ContributorsCol(Col):

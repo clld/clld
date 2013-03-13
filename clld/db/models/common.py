@@ -35,7 +35,8 @@ from clld import interfaces
 # TODO: relations to data and files!
 #
 """
-http://chart.googleapis.com/chart?cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00
+http://chart.googleapis.com/chart?
+cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00
 
 note: deprecated; only works until april 2015!
 
@@ -84,10 +85,6 @@ class FilesMixin(object):
     @declared_attr
     def object_pk(cls):
         return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
-
-    #@declared_attr
-    #def object(cls):
-    #    return relationship(cls.owner_class(), backref=backref('files', order_by=cls.ord))
 
 
 class HasFilesMixin(object):
@@ -171,8 +168,10 @@ class Language(Base,
     to them to be able to put them on maps.
     """
     __table_args__ = (UniqueConstraint('name'),)
-    latitude = Column(Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
-    longitude = Column(Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
+    latitude = Column(
+        Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
+    longitude = Column(
+        Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
     identifiers = association_proxy('languageidentifier', 'identifier')
     sources = association_proxy('languagesource', 'source')
 
@@ -272,12 +271,14 @@ class Contribution(Base,
     @property
     def primary_contributors(self):
         return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: (a.ord, a.contributor.id)) if assoc.primary]
+                sorted(self.contributor_assocs,
+                       key=lambda a: (a.ord, a.contributor.id)) if assoc.primary]
 
     @property
     def secondary_contributors(self):
         return [assoc.contributor for assoc in
-                sorted(self.contributor_assocs, key=lambda a: (a.ord, a.contributor.id)) if not assoc.primary]
+                sorted(self.contributor_assocs,
+                       key=lambda a: (a.ord, a.contributor.id)) if not assoc.primary]
 
 
 class ValueSet_data(Base, Versioned, DataMixin):
@@ -353,7 +354,8 @@ class Value(Base,
 
     def __json__(self, req):
         res = Base.__json__(self, req)
-        res['domainelement'] = self.domainelement.__json__(req) if self.domainelement else None
+        res['domainelement'] = self.domainelement.__json__(req) \
+            if self.domainelement else None
         res['valueset'] = self.valueset.__json__(req)
         return res
 
@@ -412,7 +414,8 @@ class Sentence(Base,
 
     @declared_attr
     def language(cls):
-        return relationship('Language', backref=backref('sentences', order_by=cls.language_pk))
+        return relationship(
+            'Language', backref=backref('sentences', order_by=cls.language_pk))
 
 
 class Unit_data(Base, Versioned, DataMixin):
@@ -522,7 +525,8 @@ class UnitValue(Base,
         return unitparameter_pk
 
     def __unicode__(self):
-        return self.unitdomainelement.name if self.unitdomainelement else self.name or self.id
+        return self.unitdomainelement.name \
+            if self.unitdomainelement else self.name or self.id
 
 
 #-----------------------------------------------------------------------------

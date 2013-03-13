@@ -12,8 +12,6 @@ from clld.db.meta import DBSession
 from clld.db.models import common as models
 
 
-
-
 class JS(object):
     def __init__(self, name):
         self.name = name
@@ -88,7 +86,8 @@ def button(*content, **attrs):
 
 # regex to match standard abbreviations in gloss units:
 # We look for sequences of uppercase letters which are not followed by a lowercase letter.
-GLOSS_ABBR_PATTERN = re.compile('(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
+GLOSS_ABBR_PATTERN = re.compile(
+    '(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
 
 
 def rendered_sentence(sentence, abbrs=None):
@@ -122,14 +121,18 @@ def rendered_sentence(sentence, abbrs=None):
             if abbr in abbrs:
                 explanation = abbrs[abbr]
                 if match.group('personprefix'):
-                    explanation = '%s %s' % (person_map[match.group('personprefix')], explanation)
+                    explanation = '%s %s' % (
+                        person_map[match.group('personprefix')], explanation)
 
                 if match.group('personsuffix'):
-                    explanation = '%s %s' % (explanation, person_map[match.group('personsuffix')])
+                    explanation = '%s %s' % (
+                        explanation, person_map[match.group('personsuffix')])
 
                 res.append(HTML.span(
                     gloss[match.start():match.end()].lower(),
-                    **{'data-original-title': explanation, 'rel': 'tooltip', 'class': 'sc ttip'}))
+                    **{'data-original-title': explanation,
+                       'rel': 'tooltip',
+                       'class': 'sc ttip'}))
             else:
                 res.append(abbr)
 
@@ -149,9 +152,12 @@ def rendered_sentence(sentence, abbrs=None):
         HTML.div(
             HTML.div(sentence.name, class_='object-language'),
             HTML.div(*units, **{'class': 'gloss-box'}),
-            HTML.div(sentence.description, class_='translation') if sentence.description else '',
-            HTML.div(sentence.original_script, class_='original_script') if sentence.original_script else '',
-            HTML.blockquote(HTML.small(literal(sentence.comment)), class_='comment') if sentence.comment else '',
+            HTML.div(sentence.description, class_='translation')
+            if sentence.description else '',
+            HTML.div(sentence.original_script, class_='original_script')
+            if sentence.original_script else '',
+            HTML.blockquote(HTML.small(literal(sentence.comment)), class_='comment')
+            if sentence.comment else '',
             class_='body',
         ),
         class_="sentence",
@@ -211,9 +217,11 @@ def language_identifier(req, obj):
     label = obj.name or obj.id
 
     if obj.type == 'iso639-3':
-        label = external_link('http://www.sil.org/iso639-3/documentation.asp?id=%s' % obj.id, label=label)
+        label = external_link('http://www.sil.org/iso639-3/documentation.asp?id=%s'
+                              % obj.id, label=label)
     elif obj.type == 'ethnologue':
         if re.match('[a-z]{3}', obj.id):
-            label = external_link('http://www.ethnologue.com/language/%s' % obj.id, label=label)
+            label = external_link('http://www.ethnologue.com/language/%s'
+                                  % obj.id, label=label)
 
     return HTML.span(label, class_='language_identifier %s' % obj.type)
