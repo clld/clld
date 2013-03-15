@@ -72,8 +72,8 @@
 ##
 ## format an HTML table, enhanced via jQuery DataTables
 ##
-<%def name="table(items, eid='table')">
-    <table id="${eid}" class="table table-hover">
+<%def name="table(items, eid='table', class_='table-hover')">
+    <table id="${eid}" class="standard table ${class_}">
         <thead>
 	    <tr>${caller.head()}</tr>
         </thead>
@@ -82,10 +82,15 @@
 	    <tr>${caller.body(item=item)}</tr>
             % endfor
         </tbody>
+	% if hasattr(caller, 'foot'):
+	<tfoot>
+	    <tr>${caller.foot()}</tr>
+	</tfoot>
+	% endif
     </table>
     <script>
     $(document).ready(function() {
-        $('#${eid}').dataTable({bLengthChange: false, bPaginate: false, bInfo: false});
+        $('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false});
     });
     </script>
 </%def>
