@@ -68,6 +68,7 @@ APPS = dict((app.name, app) for app in [
     App('apics', 8886),
     App('cgj', 8884),
     App('wow', 8883),
+    App('glottolog2', 8882),
     App('solr', 8080),
 ])
 

@@ -79,6 +79,10 @@ div.olMap img {
     padding: 0;
 }
 
+#map-container .accordion-inner .dropdown-menu {
+    width: 250px;
+}
+
 #map-inner .nav-pills {
     margin-bottom: 0;
 }

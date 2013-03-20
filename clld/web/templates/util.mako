@@ -90,7 +90,7 @@
     </table>
     <script>
     $(document).ready(function() {
-        $('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false});
+        $('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false, sDom: 'fr<"toolbar">tip'});
     });
     </script>
 </%def>

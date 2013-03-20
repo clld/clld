@@ -89,7 +89,9 @@ def button(*content, **attrs):
 GLOSS_ABBR_PATTERN = re.compile(
     '(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
 
-
+#
+# TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU
+#
 def rendered_sentence(sentence, abbrs=None):
     assert sentence.xhtml or (sentence.analyzed and sentence.gloss)
 
