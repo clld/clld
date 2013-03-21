@@ -119,6 +119,7 @@ pyramid.includes =
 
 sqlalchemy.url = {app.sqlalchemy_url}
 exclog.extra_info = true
+clld.environment = production
 
 %s
 
@@ -242,6 +243,7 @@ def deploy(app, environment):
     with virtualenv(app.venv):
         require.python.package('gunicorn', use_sudo=True)
         install_repos('clld')
+        sudo('webassets -m clld.web.assets build')
         install_repos(app.name)
 
     #
@@ -260,6 +262,12 @@ def deploy(app, environment):
             require.postgres.database(app.name, app.name)
 
         sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
+    else:
+        #
+        # TODO: migrate database?
+        #sudo('sudo -u {0.name} alembic upgrade head'.format(app))
+        #
+        pass
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))

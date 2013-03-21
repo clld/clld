@@ -33,6 +33,9 @@ install_requires = [
     'zope.sqlalchemy',
     'WebTest',
     'six',
+    'alembic',
+    'webassets',
+    'yuicompressor',
 ]
 
 if not PY3:

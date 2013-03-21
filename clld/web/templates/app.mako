@@ -8,14 +8,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="author" content="">
-        <!-- Le styles -->
-        <link href="${request.static_url('clld:web/static/css/clld.css')}" rel="stylesheet">
-
-        ##
-        ## TODO: include project-specific bootstrap.css!
-        ##
-        <link href="${request.static_url('clld:web/static/css/bootstrap.css')}" rel="stylesheet">
-        <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
 
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
@@ -24,16 +16,22 @@
 
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
 
+        <script src="${request.static_url('clld:web/static/openlayers/OpenLayers.js')}"></script>
+
+        % if request.registry.settings.get('clld.environment') == 'production':
+        <link href="${request.static_url('clld:web/static/css/packed.css')}" rel="stylesheet">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="${request.static_url('clld:web/static/js/packed.js')}"></script>
+        % else:
+        <link href="${request.static_url('clld:web/static/css/clld.css')}" rel="stylesheet">
+        <link href="${request.static_url('clld:web/static/css/bootstrap.css')}" rel="stylesheet">
+        <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
         <script src="${request.static_url('clld:web/static/js/jquery-1.8.2.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/bootstrap.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/jquery.dataTables.min.js')}"></script>
-        <script src="${request.static_url('clld:web/static/openlayers/OpenLayers.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/clld.js')}"></script>
+        % endif
 
-        ##<!-- DataTables CSS -->
-        ##<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-        ##<!-- jQuery -->
-        ##<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         ##<!-- DataTables -->
         ##<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 
@@ -43,9 +41,6 @@
         <![endif]-->
 
         <script src="${request.route_url('_js')}"></script>
-        ##
-        ##    CLLD.base_url = ${h.dumps(request.application_url)|n};
-        ##</script>
         <%block name="head"> </%block>
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
