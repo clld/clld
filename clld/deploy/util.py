@@ -14,6 +14,7 @@ from getpass import getpass
 try:  # pragma: no cover
     from fabric.api import sudo, run, local, put, env, cd
     from fabric.contrib.console import confirm
+    from fabric.contrib.files import exists
     from fabtools import require
     from fabtools.python import virtualenv
     from fabtools import service
@@ -251,7 +252,9 @@ def deploy(app, environment):
     #
     if confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
-        require.files.file('/tmp/{0.name}.sql'.format(app), source="/tmp/{0.name}.sql".format(app))
+        require.files.file(
+            '/tmp/{0.name}.sql'.format(app),
+            source="/tmp/{0.name}.sql".format(app))
 
         if postgres.database_exists(app.name):
             supervisor(app, 'pause', template_variables)
@@ -263,11 +266,10 @@ def deploy(app, environment):
 
         sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
     else:
-        #
-        # TODO: migrate database?
-        #sudo('sudo -u {0.name} alembic upgrade head'.format(app))
-        #
-        pass
+        if exists(app.venv.joinpath('src', str(app.name), 'alembic.ini')):
+            if confirm('Upgrade database?', default=False):
+                with virtualenv(app.venv):
+                    sudo('sudo -u {0.name} alembic upgrade head'.format(app))
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
