@@ -15,6 +15,10 @@ class App(object):
             setattr(self, k, v)
 
     @property
+    def src(self):
+        return self.venv.joinpath('src', self.name)
+
+    @property
     def venv(self):
         return path('/usr/local/venvs').joinpath(self.name)
 

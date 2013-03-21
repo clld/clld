@@ -233,7 +233,7 @@ def deploy(app, environment):
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()
-    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor']:
+    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre']:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)
@@ -266,10 +266,12 @@ def deploy(app, environment):
 
         sudo('sudo -u {0.name} psql -f /tmp/{0.name}.sql -d {0.name}'.format(app))
     else:
-        if exists(app.venv.joinpath('src', str(app.name), 'alembic.ini')):
+        if exists(app.src.joinpath('alembic.ini')):
             if confirm('Upgrade database?', default=False):
                 with virtualenv(app.venv):
-                    sudo('sudo -u {0.name} alembic upgrade head'.format(app))
+                    with cd(app.src):
+                        sudo('sudo -u {0.name} {1} -n production upgrade head'.format(
+                            app, app.bin('alembic')))
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
