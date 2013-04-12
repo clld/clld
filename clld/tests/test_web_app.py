@@ -3,9 +3,9 @@ import unittest
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 from mock import Mock
+from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language
-from clld.lib.purl import URL
 from clld.tests.util import TestWithEnv, Route
 
 

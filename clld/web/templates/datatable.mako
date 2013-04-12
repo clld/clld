@@ -27,7 +27,11 @@
 		    <select class="control" name="${col.name}">
 			<option value="">--any--</option>
 			% for val in getattr(col, 'choices'):
-			<option value="${val}">${val}</option>
+			    % if isinstance(val, tuple) and len(val) == 2:
+			    <option value="${val[0]}">${val[1]}</option>
+			    % else:
+			    <option value="${val}">${val}</option>
+			    % endif
 			% endfor
 		    </select>
 		    % else:

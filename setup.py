@@ -27,7 +27,7 @@ install_requires = [
     'sqlalchemy>=0.7.9',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
-    #'purl',
+    'purl >= 0.5',
     'path.py',
     'pyramid-exclog',
     'zope.sqlalchemy',

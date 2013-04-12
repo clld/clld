@@ -3,7 +3,7 @@ import sys
 import transaction
 
 from clld.scripts.util import setup_session, Data
-from clld.db.meta import DBSession,
+from clld.db.meta import DBSession
 from clld.db.models import common
 
 from {{package}} import models

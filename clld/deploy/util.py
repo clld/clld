@@ -213,7 +213,17 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def supervisor(app, command, template_variables):
+def get_template_variables(app):
+    return dict(
+        app=app,
+        env=env,
+        config=config,
+        gunicorn=app.bin('gunicorn_paster'),
+        auth='')
+
+
+def supervisor(app, command, template_variables=None):
+    template_variables = template_variables or get_template_variables(app)
     assert command in SUPERVISOR_TEMPLATE
     sudo('/etc/init.d/supervisor stop')
     create_file_as_root(
@@ -223,13 +233,7 @@ def supervisor(app, command, template_variables):
 
 
 def deploy(app, environment):
-    template_variables = dict(
-        app=app,
-        env=env,
-        config=config,
-        gunicorn=app.bin('gunicorn_paster'),
-        auth='')
-
+    template_variables = get_template_variables(app)
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()

@@ -243,7 +243,19 @@ CLLD.DataTable = (function(){
         }
 
         if (dl) {
-        	$('#cdOpener').popover({html: true, content: '<dl>'+dl+'</dl>', title: 'Column Descriptions', trigger: 'click', placement: 'left'});
+	    $('#cdOpener').popover({
+		html: true,
+		content: '<dl>'+dl+'</dl>',
+		title: 'Column Descriptions',
+		placement: function (context, source) {
+		    var position = $(source).position();
+		    if (position.top < 110){
+			return "bottom";
+		    }
+		    return "left";
+		},
+		trigger: "click"
+	    });
         } else {
             $('#cdOpener').hide();
         }

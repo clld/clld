@@ -6,7 +6,6 @@ from mock import Mock
 
 from clld.interfaces import IIndex
 from clld.db.models.common import Contribution, Parameter, Language
-from clld.lib.purl import URL
 from clld.tests.util import TestWithEnv, Route
 
 

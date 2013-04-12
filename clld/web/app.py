@@ -15,9 +15,8 @@ from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
-#from purl import URL
+from purl import URL
 
-from clld.lib.purl import URL
 from clld.config import get_config
 from clld.db.meta import DBSession, Base
 from clld.db.models import common

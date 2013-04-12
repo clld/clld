@@ -1,18 +1,20 @@
+from collections import OrderedDict
+
 from six import PY3
 
 
-class Record(dict):
+class Record(OrderedDict):
 
-    def __init__(self, genre, id, **kwargs):
+    def __init__(self, genre, id, *args, **kwargs):
         self.genre = genre
         self.id = id
-        dict.__init__(self, kwargs)
+        super(Record, self).__init__(args, **kwargs)
 
     def __unicode__(self):
         fields = []
         m = max([0] + list(map(len, self.keys())))
 
-        for k in sorted(self.keys()):
+        for k in self.keys():
             values = self[k]
             if not isinstance(values, (tuple, list)):
                 values = [values]

@@ -70,8 +70,10 @@ def link(req, obj, **kw):
     return HTML.a(label, href=href, **kw)
 
 
-def external_link(url, label=None):
-    return HTML.a(icon('share'), ' ', label or url, href=url)
+def external_link(url, label=None, **kw):
+    kw.setdefault('title', label or url)
+    kw.setdefault('href', url)
+    return HTML.a(icon('share'), ' ', label or url, **kw)
 
 
 def button(*content, **attrs):
