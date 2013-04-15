@@ -1,21 +1,22 @@
 from __future__ import unicode_literals
 import unittest
 import warnings
-warnings.filterwarnings('ignore', message='At least one scoped session is already present.')
+warnings.filterwarnings(
+    'ignore', message='At least one scoped session is already present.')
 
 from mock import Mock
 from path import path
 from pyramid.paster import bootstrap
 from pyramid.config import Configurator
 import transaction
-from sqlalchemy import create_engine, Column, Integer, Unicode, ForeignKey
+from sqlalchemy import create_engine
 from webtest import TestApp
 from webob.request import environ_add_POST
 
 import clld
-from clld.db.meta import DBSession, VersionedDBSession, Base, CustomModelMixin
+from clld.db.meta import DBSession, VersionedDBSession, Base
 from clld.db.models import common
-from clld.db.versioned import Versioned
+from clld.web.adapters import Representation
 from clld import interfaces
 
 
@@ -34,6 +35,10 @@ def main(global_config, **settings):
     config.include('clld.web.app')
     config.register_app()
     config.registry.registerUtility(lambda *args: None, interfaces.IMapMarker)
+    config.register_resource('testresource', Mock(), Mock(), with_index=True)
+    config.register_resource('test2resource', Mock(), Mock(), with_index=False)
+    config.register_adapter(Representation, Mock, name='test')
+    config.add_menu_item('test', lambda c, r: ('http://example.org', 'label'))
     return config.make_wsgi_app()
 
 
@@ -41,8 +46,8 @@ class TestWithDb(unittest.TestCase):
     def setUp(self):
         from clld.tests.fixtures import CustomLanguage
 
-        engine = create_engine('sqlite://'#, echo=True
-                               )
+        assert CustomLanguage
+        engine = create_engine('sqlite://')
         DBSession.configure(bind=engine)
         VersionedDBSession.configure(bind=engine)
         Base.metadata.bind = engine
@@ -61,13 +66,13 @@ class TestWithDbAndData(TestWithDb):
             contributors[id_] = common.Contributor(id=id_, name=name)
 
         contribution = common.Contribution(id='c', name='Contribution')
-        assoc1 = common.ContributionContributor(
+        assert common.ContributionContributor(
             contribution=contribution, primary=True, contributor=contributors['a'])
-        assoc2 = common.ContributionContributor(
+        assert common.ContributionContributor(
             contribution=contribution, primary=False, contributor=contributors['b'])
-        assoc3 = common.ContributionContributor(
+        assert common.ContributionContributor(
             contribution=contribution, primary=True, contributor=contributors['c'])
-        assoc4 = common.ContributionContributor(
+        assert common.ContributionContributor(
             contribution=contribution, primary=False, contributor=contributors['d'])
 
         DBSession.add(contribution)
@@ -91,7 +96,10 @@ class TestWithDbAndData(TestWithDb):
         DBSession.add(common.Parameter(id='no-domain'))
 
         unit = common.Unit(id='u', name='Unit', language=language)
+        up = common.UnitParameter(id='up', name='UnitParameter')
         DBSession.add(unit)
+        DBSession.add(common.UnitValue(
+            id='uv', name='UnitValue', unit=unit, unitparameter=up))
 
         DBSession.add(common.Source(id='s'))
 
@@ -99,12 +107,13 @@ class TestWithDbAndData(TestWithDb):
             id='sentence',
             name='sentence name',
             description='sentence description',
-            analyzed='a\tmorpheme\tdoes',
-            gloss ='a\tmorpheme\t1SG',
+            analyzed='a\tmorpheme\tdoes\tdo',
+            gloss='a\tmorpheme\t1SG\tdo.SG2',
             source='own',
             comment='comment',
             original_script='a morpheme',
             language=language))
+        DBSession.add(common.Config(key='key', value='value'))
         DBSession.flush()
 
 
@@ -127,7 +136,8 @@ class TestWithEnv(TestWithDbAndData):
 
     def _set_request_property(self, k, v):
         if k == 'is_xhr':
-            self.env['request'].environ['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest' if v else ''
+            self.env['request'].environ['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'\
+                if v else ''
         elif k == 'params':
             environ_add_POST(self.env['request'].environ, v)
         else:  # pragma: no cover
@@ -142,9 +152,19 @@ class TestWithEnv(TestWithDbAndData):
             self._prop_cache[k] = getattr(self.env['request'], k, None)
             self._set_request_property(k, v)
 
+    def handle_dt(self, cls, model, **kw):
+        dt = cls(self.env['request'], model, **kw)
+        dt.render()
+        for item in dt.get_query():
+            for col in dt.cols:
+                col.format(item)
+        return dt
+
     def tearDown(self):
         for k, v in self._prop_cache.items():
             self._set_request_property(k, v)
+        self.env['request'].environ.pop('HTTP_X_REQUESTED_WITH', None)
+        environ_add_POST(self.env['request'].environ, {})
         if self.__setup_db__:
             TestWithDbAndData.tearDown(self)
 

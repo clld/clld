@@ -4,8 +4,6 @@ except ImportError:  # pragma: no cover
     from configparser import ConfigParser
 import codecs
 
-from path import path
-
 
 def get_config(p):
     """Reads a config file.

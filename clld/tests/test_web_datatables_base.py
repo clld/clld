@@ -1,6 +1,5 @@
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
-from clld.interfaces import IDataTable
 
 
 class Tests(TestWithEnv):
@@ -18,7 +17,7 @@ class Tests(TestWithEnv):
                     LinkCol(self, 'link')]
 
         dt = TestTable(self.env['request'], common.Contributor)
-        col = dt.cols[0]
+        assert dt.cols[0]
 
         dt.render()
         self.assertTrue(isinstance(dt.options, dict))

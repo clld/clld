@@ -1,6 +1,7 @@
 from json import dumps
-from itertools import groupby
 import re
+from itertools import groupby  # we just import this to have it available in templates!
+assert groupby  # appease pyflakes
 
 from sqlalchemy import or_
 from markupsafe import Markup
@@ -56,15 +57,18 @@ def map_marker_img(req, obj, marker=None, height='20', width='20'):
 
 
 def link(req, obj, **kw):
+    get_link_attrs = req.registry.queryUtility(interfaces.ILinkAttrs)
+    if get_link_attrs:
+        kw = get_link_attrs(req, obj, **kw)
+
     rsc = None
     for _rsc in RESOURCES:
         if _rsc.interface.providedBy(obj):
             rsc = _rsc
             break
-
     assert rsc
-    kw.setdefault('class', rsc.interface.__name__[1:])
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
+    kw.setdefault('class', rsc.interface.__name__[1:])
     label = kw.pop('label', obj.__unicode__())
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
@@ -90,6 +94,7 @@ def button(*content, **attrs):
 # We look for sequences of uppercase letters which are not followed by a lowercase letter.
 GLOSS_ABBR_PATTERN = re.compile(
     '(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
+
 
 #
 # TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU

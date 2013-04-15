@@ -6,9 +6,11 @@
 <h2>${_('Unit')} ${ctx.name}</h2>
 
 <dl>
-% for k, v in ctx.datadict().items():
-<dt>${k}</dt>
-<dd>${v}</dd>
+% for key, objs in h.groupby(ctx.data, lambda o: o.key):
+<dt>${key}</dt>
+    % for obj in sorted(objs, key=lambda o: o.ord):
+    <dd>${obj.value}</dd>
+    % endfor
 % endfor
 </dl>
 

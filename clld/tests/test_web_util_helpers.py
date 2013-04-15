@@ -1,3 +1,5 @@
+from mock import Mock, patch
+
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
 
@@ -24,6 +26,12 @@ class Tests(TestWithEnv):
 
         linked_contributors(self.env['request'], common.Contribution.first())
 
+    def test_linked_references(self):
+        from clld.web.util.helpers import linked_references
+
+        with patch('clld.web.util.helpers.link'):
+            linked_references(self.env['request'], Mock(references=[Mock(), Mock()]))
+
     def test_text2html(self):
         from clld.web.util.helpers import text2html
 
@@ -33,9 +41,17 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import format_frequency_and_confidence
 
         format_frequency_and_confidence(common.Value.first())
+        format_frequency_and_confidence(Mock(frequency=None, confidence=None))
 
     def test_rendered_sentence(self):
         from clld.web.util.helpers import rendered_sentence
 
         rendered_sentence(common.Sentence.first())
         rendered_sentence(common.Sentence.first(), abbrs=dict(SG='singular'))
+
+    def test_language_identifier(self):
+        from clld.web.util.helpers import language_identifier
+
+        language_identifier(self.env['request'], Mock(type='x', id='abc'))
+        language_identifier(self.env['request'], Mock(type='iso639-3', id='abc'))
+        language_identifier(self.env['request'], Mock(type='ethnologue', id='abc'))

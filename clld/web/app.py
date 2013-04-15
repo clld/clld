@@ -110,7 +110,7 @@ class CtxFactoryQuery(object):
                     joinedload(common.ValueSet.language),
                 )
         else:
-            query = custom_query
+            query = custom_query  # pragma: no cover
 
         return query.one()
 
@@ -157,7 +157,7 @@ def register_app(config, pkg=None):
         u = __import__(pkg.__name__ + '.util', fromlist=[pkg.__name__])
 
         def add_util(event):
-            event['u'] = u
+            event['u'] = u  # pragma: no cover
 
         config.add_subscriber(add_util, events.BeforeRender)
 
@@ -168,13 +168,13 @@ def register_app(config, pkg=None):
     if pkg_dir.joinpath('appconf.ini').exists():
         cfg = get_config(pkg_dir.joinpath('appconf.ini'))
         if 'mako.directories_list' in cfg:
-            cfg['mako.directories'] = cfg['mako.directories_list']
+            cfg['mako.directories'] = cfg['mako.directories_list']  # pragma: no cover
         config.add_settings(cfg)
 
     config.add_static_view('static', '%s:static' % name, cache_max_age=3600)
     config.add_route('home', '/')
     if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
-        config.scan('%s.views' % name)
+        config.scan('%s.views' % name)  # pragma: no cover
 
     menuitems = OrderedDict(home=partial(menu_item, 'home'))
     for plural in config.registry.settings.get(
@@ -199,7 +199,7 @@ def includeme(config):
     transaction.begin()
     session = DBSession()
     for kv in session.query(common.Config):
-        settings['clld.%s' % kv.key] = kv.value
+        settings['clld.%s' % kv.key] = kv.value  # pragma: no cover
     transaction.abort()
 
     config.add_settings(settings)
@@ -219,14 +219,21 @@ def includeme(config):
     config.add_directive('register_map', partial(register_cls, interfaces.IMap))
 
     def add_menu_item(config, name, factory):
+        """
+        :param factory: a callable that accepts the two parameters (ctx, req) and returns\
+        a pair (url, label) to use for the menu link.
+        """
+        # we retrieve the currently registered menuitems
         menuitems = config.registry.getUtility(interfaces.IMenuItems)
+        # add one
         menuitems[name] = factory
+        # and re-register.
         config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
     config.add_directive('add_menu_item', add_menu_item)
 
     def register_resource(config, name, model, interface, with_index=False):
-        RESOURCES.append(Resource(name, model, interface))
+        RESOURCES.append(Resource(name, model, interface, with_index=with_index))
         config.add_route_and_view(
             name,
             '/%ss/{id:[^/\.]+}' % name,

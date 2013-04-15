@@ -14,4 +14,3 @@ class Tests(unittest.TestCase):
 
         self.assertEqual(literal.escape('<div/>'), '&lt;div/&gt;')
         self.assertEqual(literal.escape(None), EMPTY)
-

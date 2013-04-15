@@ -2,7 +2,6 @@ import unittest
 
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
-from mock import Mock
 from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language
@@ -24,12 +23,14 @@ class Tests(TestWithEnv):
             (Language, 'languages'),
         ]:
             obj = model.first()
-            self.set_request_properties(matchdict={'id': obj.id}, matched_route=Route(route))
+            self.set_request_properties(
+                matchdict={'id': obj.id}, matched_route=Route(route))
             ctx_factory(model, 'index', self.env['request'])
             ctx_factory(model, 'rsc', self.env['request'])
 
         self.set_request_properties(matchdict={'id': 'xxx'})
-        self.assertRaises(HTTPNotFound, ctx_factory, Contribution, 'rsc', self.env['request'])
+        self.assertRaises(
+            HTTPNotFound, ctx_factory, Contribution, 'rsc', self.env['request'])
 
 
 class Tests2(unittest.TestCase):

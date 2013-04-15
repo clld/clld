@@ -13,7 +13,6 @@ from sqlalchemy import (
     CheckConstraint,
     UniqueConstraint,
     ForeignKey,
-    and_,
     desc,
 )
 from sqlalchemy.orm import (
@@ -133,7 +132,7 @@ class HasDataMixin(object):
 
     @declared_attr
     def data(cls):
-        return relationship(cls.__name__ + '_data')
+        return relationship(cls.__name__ + '_data', order_by=cls.__name__ + '_data.key')
 
 
 class IdNameDescriptionMixin(object):

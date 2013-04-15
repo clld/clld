@@ -90,4 +90,4 @@ def robots(req):
 def sitemapindex(req):
     req.response.content_type = 'application/xml'
     return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml')
-                         for r in RESOURCES]}
+                         for r in RESOURCES if r.with_index]}

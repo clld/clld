@@ -1,6 +1,5 @@
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
-from clld.interfaces import IDataTable
 
 
 class Tests(TestWithEnv):

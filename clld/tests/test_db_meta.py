@@ -1,8 +1,5 @@
 from __future__ import unicode_literals
 
-import transaction
-from sqlalchemy import Column, Integer, ForeignKey, Unicode
-
 from clld.tests.util import TestWithDb
 from clld.db.models.common import Language, File
 from clld.db.meta import DBSession, VersionedDBSession

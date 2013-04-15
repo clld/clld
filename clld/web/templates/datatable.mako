@@ -7,17 +7,7 @@
         </tr>
     </thead>
     <tbody>
-        % if not datatable.server_side:
-            % for item in datatable.get_query():
-            <tr>
-                % for col in datatable.cols:
-                <td>${col.format(item)}</td>
-                % endfor
-            </tr>
-            % endfor
-        % endif
     </tbody>
-    % if datatable.search:
     <tfoot>
 	<tr>
             % for col in datatable.cols:
@@ -44,7 +34,6 @@
             % endfor
 	</tr>
     </tfoot>
-    % endif
 </table>
 <script>
 $(document).ready(function() {

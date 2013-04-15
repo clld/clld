@@ -132,6 +132,15 @@ class IMapMarker(Interface):
         """
 
 
+class ILinkAttrs(Interface):
+    """utility to customize attributes for HTML links to objects.
+    """
+    def __call__(self, req, obj, **kw):
+        """
+        :return: dictionary of attributes for link creation.
+        """
+
+
 class ICtxFactoryQuery(Interface):
     """utility
     """

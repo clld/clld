@@ -99,7 +99,7 @@ CLLD.DataTable = (function(){
 
         $.extend($.fn.dataTable.defaults, {
             "fnServerParams": function (aoData) {
-		aoData.push({"name": "__eid__", "value": "${datatable.eid}"});
+		aoData.push({"name": "__eid__", "value": eid});
             },
             "fnInitComplete": function(oSettings) {
                 var i, ctrl;

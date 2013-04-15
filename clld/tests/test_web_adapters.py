@@ -1,12 +1,10 @@
 import unittest
 
-from pyramid.testing import Configurator
-from pyramid.httpexceptions import HTTPNotFound
 from mock import Mock
 
 from clld.interfaces import IIndex
 from clld.db.models.common import Contribution, Parameter, Language
-from clld.tests.util import TestWithEnv, Route
+from clld.tests.util import TestWithEnv
 
 
 class Tests(TestWithEnv):

@@ -1,10 +1,8 @@
 import sys
-import string
 
 from path import path as ospath
 
-from pyx import *
-from pyx import bbox
+from pyx import bbox, unit, style, path, color, canvas, deco
 
 # set the scale to 1/20th of an inch
 unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
@@ -12,23 +10,22 @@ unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
 
 linewidth = style.linewidth(1.2)
 
-shapes = {"c": path.circle(10, 10, 7.6),
-          "s": path.rect(2.8, 2.8, 14.4, 14.4),
-          "t": path.path(path.moveto(1, 2.5),
-                         path.lineto(19, 2.5),
-                         path.lineto(10, 18.5),
-                         path.closepath()),
 
-          "f": path.path(path.moveto(1, 17.5),
-                         path.lineto(19, 17.5),
-                         path.lineto(10, 1.5),
-                         path.closepath()),
+def polygon(*points):
+    args = []
+    for i, point in points:
+        args.append(path.moveto(*point) if i == 0 else path.lineto(*point))
+    args.append(path.closepath())
+    return path.path(*args)
 
-          "d": path.path(path.moveto(10, 1),
-                         path.lineto(19, 10),
-                         path.lineto(10, 19),
-                         path.lineto(1, 10),
-                         path.closepath())}
+
+shapes = {
+    "c": path.circle(10, 10, 7.6),
+    "s": path.rect(2.8, 2.8, 14.4, 14.4),
+    "t": polygon((1, 2.5), (19, 2.5), (10, 18.5)),
+    "f": polygon((1, 17.5), (19, 17.5), (10, 1.5)),
+    "d": polygon((10, 1), (19, 10), (10, 19), (1, 10)),
+}
 
 
 def colors(level=3):
@@ -86,7 +83,8 @@ if __name__ == '__main__':
                 [deco.stroked([linewidth]), deco.filled([pyxColor(colorTuple)])])
             with open(output.joinpath("%s%s.png" % (shapeName, colorName(colorTuple))),
                       'wb') as fp:
-                fp.write(c.pipeGS("pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20)).read())
+                fp.write(c.pipeGS(
+                    "pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20)).read())
 
     #c = canvas.canvas()
     #c.pipeGS("trunk/wals/wals/static/images/icons/a000.png",

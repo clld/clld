@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sqlalchemy import engine_from_config, create_engine
+from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings, setup_logging
 
 from clld.db.meta import DBSession, Base

@@ -4,7 +4,8 @@ from path import path
 import clld
 
 
-environment = Environment(path(clld.__file__).dirname().joinpath('web', 'static'), '/clld-static')
+environment = Environment(
+    path(clld.__file__).dirname().joinpath('web', 'static'), '/clld-static')
 
 environment.register(
     'js',
@@ -20,4 +21,3 @@ environment.register(
     'css/bootstrap.min.css',
     'css/bootstrap-responsive.min.css',
     output='css/packed.css')
-

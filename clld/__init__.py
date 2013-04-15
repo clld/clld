@@ -1,5 +1,3 @@
-import sys
-
 from clld.db.models import common
 from clld import interfaces
 
@@ -7,10 +5,11 @@ from clld import interfaces
 class Resource(object):
     """Resources are routable models, i.e. model instances with URL.
     """
-    def __init__(self, name, model, interface):
+    def __init__(self, name, model, interface, with_index=True):
         self.name = name
         self.model = model
         self.interface = interface
+        self.with_index = with_index
 
 
 RESOURCES = [

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import joinedload, joinedload_all
 
 from clld.db.models.common import (
-    ValueSet, Parameter, Language, Contribution, ValueSetReference, Value,
+    ValueSet, Parameter, Language, Contribution, ValueSetReference,
 )
 from clld.web.datatables.base import (
     DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
@@ -19,8 +19,6 @@ class _LinkToMapCol(LinkToMapCol):
         return item.language
 
     def get_layer(self, item):
-        if item.domainelement:
-            return item.domainelement.name
         return LinkToMapCol.get_layer(self, item)
 
 
@@ -62,15 +60,15 @@ class Valuesets(DataTable):
                 joinedload_all(ValueSet.references, ValueSetReference.source))
 
         if self.language:
-            query = query.join(Parameter).options(joinedload(Value.parameter))
-            return query.filter(Value.language_pk == self.language.pk)
+            query = query.join(Parameter).options(joinedload(ValueSet.parameter))
+            return query.filter(ValueSet.language_pk == self.language.pk)
 
         if self.parameter:
-            return query.filter(Value.parameter_pk == self.parameter.pk)
+            return query.filter(ValueSet.parameter_pk == self.parameter.pk)
 
         if self.contribution:
             query = query.join(Parameter)
-            return query.filter(Value.contribution_pk == self.contribution.pk)
+            return query.filter(ValueSet.contribution_pk == self.contribution.pk)
 
         return query
 

@@ -3,14 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to clld's documentation!
-================================
+Cross-Linguistic Linked Data
+============================
+
+Python library providing common functionality for the applications of the CLLD project.
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
+    interfaces
+    db
+    web
 
 
 Indices and tables
@@ -19,4 +24,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

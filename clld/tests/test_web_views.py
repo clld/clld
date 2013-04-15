@@ -12,11 +12,13 @@ class Tests(TestWithEnv):
 
         ctx = self.env['registry'].getUtility(IDataTable, name='contributors')
 
-        res = index_view(ctx(self.env['request'], common.Contributor), self.env['request'])
+        res = index_view(
+            ctx(self.env['request'], common.Contributor), self.env['request'])
         self.assertTrue(isinstance(res, Response))
 
         self.set_request_properties(is_xhr=True, params={'sEcho': 'a'})
-        res = index_view(ctx(self.env['request'], common.Contributor), self.env['request'])
+        res = index_view(
+            ctx(self.env['request'], common.Contributor), self.env['request'])
         self.assertEqual(res.content_type, 'application/json')
 
         class X(ctx):

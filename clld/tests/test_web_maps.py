@@ -2,7 +2,7 @@ from mock import Mock
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
-from clld.interfaces import IMap
+from clld.db.meta import DBSession
 
 
 class Tests(TestWithEnv):
@@ -26,6 +26,11 @@ class Tests(TestWithEnv):
         self.set_request_properties(matched_route=MockRoute())
 
         dt = ParameterMap(common.Parameter.first(), self.env['request'])
+        dt.render()
+
+        dt = ParameterMap(
+            DBSession.query(common.Parameter).filter_by(id='no-domain').one(),
+            self.env['request'])
         dt.render()
 
     def test_LanguageMap(self):

@@ -1,3 +1,5 @@
+from sqlalchemy.orm import joinedload
+
 from clld.db.models import common
 from clld.web.datatables.base import DataTable, LinkCol
 from clld.web.util.helpers import map_marker_img
@@ -21,6 +23,17 @@ class UnitValueNameCol(LinkCol):
         if self.dt.parameter and self.dt.parameter.domain:
             return common.UnitDomainElement.name.contains(qs)
         return common.UnitValue.name.contains(qs)
+
+
+class UnitCol(LinkCol):
+    def get_obj(self, item):
+        return item.unit
+
+    def order(self):
+        return common.Unit.name
+
+    def search(self, qs):
+        return common.Unit.name.contains(qs)
 
 
 class Unitvalues(DataTable):
@@ -47,18 +60,21 @@ class Unitvalues(DataTable):
         DataTable.__init__(self, req, model, **kw)
 
     def base_query(self, query):
-        query = query.outerjoin(common.UnitDomainElement)
+        query = query\
+            .join(common.Unit)\
+            .outerjoin(common.UnitDomainElement)\
+            .options(joinedload(common.UnitValue.unit))
 
         if self.unit:
-            query = query.join(common.UnitParameter, common.Contribution)
+            #query = query.join(common.UnitParameter, common.Contribution)
             return query.filter(common.UnitValue.unit_pk == self.unit.pk)
 
         if self.parameter:
-            query = query.join(common.Contribution, common.Unit)
+            #query = query.join(common.Contribution, common.Unit)
             return query.filter(common.UnitValue.unitparameter_pk == self.parameter.pk)
 
         if self.contribution:
-            query = query.join(common.Unit, common.UnitParameter)
+            #query = query.join(common.Unit, common.UnitParameter)
             return query.filter(common.UnitValue.contribution_pk == self.contribution.pk)
 
         return query
@@ -67,7 +83,10 @@ class Unitvalues(DataTable):
         name_col = UnitValueNameCol(self, 'value')
         if self.parameter and self.parameter.domain:
             name_col.choices = sorted([de.name for de in self.parameter.domain])
-        return [name_col]
+        return [
+            name_col,
+            UnitCol(self, 'unit'),
+        ]
 
     def toolbar(self):
         return ''

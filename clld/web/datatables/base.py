@@ -156,8 +156,6 @@ class DetailsRowLinkCol(Col):
 
 @implementer(IDataTable)
 class DataTable(object):
-    search = True
-
     def __init__(self, req, model, eid=None):
         self.model = model
         self.req = req
@@ -166,7 +164,6 @@ class DataTable(object):
         self._options = None
         self.count_all = None
         self.count_filtered = None
-        self.server_side = False
 
     def col_defs(self):
         return [LinkCol(self, 'name')]
@@ -181,11 +178,10 @@ class DataTable(object):
     def options(self):
         if not self._options:
             self._options = self.get_options()
-            if self._options.get('bServerSide'):
-                self.server_side = True
-                self._options['bProcessing'] = True
-                if 'sAjaxSource' not in self._options:
-                    self._options['sAjaxSource'] = self.req.url
+            self._options['bServerSide'] = True
+            self._options['bProcessing'] = True
+            if 'sAjaxSource' not in self._options:
+                self._options['sAjaxSource'] = self.req.url
         return self._options
 
     def base_query(self, query):
@@ -203,15 +199,14 @@ class DataTable(object):
         query = self.base_query(DBSession.query(self.model))
         self.count_all = query.count()
 
-        if self.search:
-            for name, val in self.req.params.items():
-                if val and name.startswith('sSearch_'):
-                    try:
-                        clause = self.cols[int(name.split('_')[1])].search(val)
-                    except ValueError:
-                        clause = None
-                    if clause is not None:
-                        query = query.filter(clause)
+        for name, val in self.req.params.items():
+            if val and name.startswith('sSearch_'):
+                try:
+                    clause = self.cols[int(name.split('_')[1])].search(val)
+                except ValueError:
+                    clause = None
+                if clause is not None:
+                    query = query.filter(clause)
 
         self.count_filtered = query.count()
 
@@ -259,10 +254,10 @@ class DataTable(object):
     def get_options(self):
         return {
             "bStateSave": True,
-            "sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t"
+            "<'row-fluid'<'span6'i><'span6'p>>",
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
-            "bServerSide": True,
             "aoColumns": [col.js_args for col in self.cols],
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],

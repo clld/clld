@@ -5,6 +5,7 @@ from mock import Mock, MagicMock, patch
                 time=Mock(),
                 getpass=Mock(return_value='password'),
                 confirm=Mock(return_value=True),
+                exists=Mock(return_value=True),
                 virtualenv=MagicMock(),
                 sudo=Mock(),
                 run=Mock(return_value='{"status": "ok"}'),
@@ -20,5 +21,8 @@ def test_deploy():
     from clld.deploy.util import deploy
     from clld.deploy.config import App
 
-    deploy(App('test', 9999), 'test')
-    deploy(App('test', 9999), 'production')
+    app = App('test', 9999)
+    assert app.src
+    deploy(app, 'test')
+    deploy(app, 'test', with_alembic=True)
+    deploy(app, 'production')

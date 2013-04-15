@@ -232,7 +232,7 @@ def supervisor(app, command, template_variables=None):
     sudo('/etc/init.d/supervisor start')
 
 
-def deploy(app, environment):
+def deploy(app, environment, with_alembic=False):
     template_variables = get_template_variables(app)
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
@@ -254,7 +254,7 @@ def deploy(app, environment):
     #
     # TODO: replace with initialization of db from data repos!
     #
-    if confirm('Recreate database?', default=False):
+    if not with_alembic and confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
         require.files.file(
             '/tmp/{0.name}.sql'.format(app),

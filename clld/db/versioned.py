@@ -81,12 +81,12 @@ def _history_mapper(local_mapper):
     versioned_cls = type.__new__(type, "%sHistory" % cls.__name__, bases, {})
 
     m = mapper(
-            versioned_cls,
-            table,
-            inherits=super_history_mapper,
-            polymorphic_on=polymorphic_on,
-            polymorphic_identity=local_mapper.polymorphic_identity
-            )
+        versioned_cls,
+        table,
+        inherits=super_history_mapper,
+        polymorphic_on=polymorphic_on,
+        polymorphic_identity=local_mapper.polymorphic_identity
+    )
     cls.__history_mapper__ = m
 
     if not super_history_mapper:
@@ -194,4 +194,3 @@ def versioned_session(session):
         for obj in versioned_objects(session.deleted):
             create_version(obj, session, deleted=True)
     return session
-

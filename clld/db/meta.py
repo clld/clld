@@ -115,7 +115,8 @@ class Base(object):
         cols = []
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
-        return dict((col, getattr(self, col))
+        return dict(
+            (col, getattr(self, col))
             for col in set(cols) if col not in ['created', 'updated'])
 
     def __unicode__(self):
@@ -151,10 +152,10 @@ class PolymorphicBaseMixin(object):
     @declared_attr
     def __mapper_args__(cls):
         return {
-        'polymorphic_on': cls.polymorphic_type,
-        'polymorphic_identity': 'base',
-        'with_polymorphic': '*',
-    }
+            'polymorphic_on': cls.polymorphic_type,
+            'polymorphic_identity': 'base',
+            'with_polymorphic': '*',
+        }
 
 
 class CustomModelMixin(object):

@@ -45,7 +45,7 @@ class ParameterCol(LinkCol):
         return item.valueset.parameter
 
 
-class _LanguageCol(LanguageCol):
+class ValueLanguageCol(LanguageCol):
     def get_obj(self, item):
         return item.valueset.language
 
@@ -126,7 +126,7 @@ class Values(DataTable):
 
         if self.parameter:
             return res + [
-                _LanguageCol(self, 'language', model_col=Language.name),
+                ValueLanguageCol(self, 'language', model_col=Language.name),
                 name_col,
                 refs_col,
                 _LinkToMapCol(self),
