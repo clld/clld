@@ -15,7 +15,10 @@ from sqlalchemy import (
     String,
     Boolean,
     desc,
+    exc,
+    event,
 )
+from sqlalchemy.pool import Pool
 from sqlalchemy.ext.declarative import (
     declarative_base,
     declared_attr,
@@ -30,6 +33,22 @@ from sqlalchemy.types import TypeDecorator, VARCHAR
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from clld.db.versioned import versioned_session
+
+
+@event.listens_for(Pool, "checkout")
+def ping_connection(dbapi_connection, connection_record, connection_proxy):
+    cursor = dbapi_connection.cursor()
+    try:
+        cursor.execute("SELECT 1")
+    except:  # pragma: no cover
+        # optional - dispose the whole pool
+        # instead of invalidating one at a time
+        connection_proxy._pool.dispose()
+
+        # raise DisconnectionError - pool will try
+        # connecting again up to three times before raising.
+        raise exc.DisconnectionError()
+    cursor.close()
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))

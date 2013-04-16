@@ -247,13 +247,13 @@ CLLD.DataTable = (function(){
 		html: true,
 		content: '<dl>'+dl+'</dl>',
 		title: 'Column Descriptions',
-		placement: function (context, source) {
+		placement: 'left',/*function (context, source) {
 		    var position = $(source).position();
-		    if (position.top < 110){
+		    if (position.top < 80){
 			return "bottom";
 		    }
 		    return "left";
-		},
+		},*/
 		trigger: "click"
 	    });
         } else {
@@ -355,8 +355,8 @@ CLLD.Map = (function(){
         var WGS84 = new OpenLayers.Projection("EPSG:4326");
 
         // WGS84 Google Mercator projection (meters)
-        //var WGS84_google_mercator = new OpenLayers.Projection("EPSG:900913");
-        var WGS84_google_mercator = new OpenLayers.Projection("EPSG:3857");
+        var WGS84_google_mercator = new OpenLayers.Projection("EPSG:900913");
+        //var WGS84_google_mercator = new OpenLayers.Projection("EPSG:3857");
 
         CLLD.Map.options = options == undefined ? {} : options;
 
@@ -369,22 +369,23 @@ CLLD.Map = (function(){
         map_options = {
             projection: WGS84_google_mercator,
             layers: [
+		new OpenLayers.Layer.OSM(
+		    "Open Street Map",
+		    null,
+                    {wrapDateLine: false}
+                ),
                 new OpenLayers.Layer.Google(
                     "Google Physical",
                     {type: google.maps.MapTypeId.TERRAIN, maxZoomLevel: 8, wrapDateLine: false}
-                )/*,
-                new OpenLayers.Layer.Google(
-                    "Google Streets", // the default
-                    {numZoomLevels: 20}
                 ),
                 new OpenLayers.Layer.Google(
                     "Google Hybrid",
-                    {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+                    {type: google.maps.MapTypeId.HYBRID, maxZoomLevel: 8, wrapDateLine: false}
                 ),
                 new OpenLayers.Layer.Google(
                     "Google Satellite",
-                    {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
-                )*/
+                    {type: google.maps.MapTypeId.SATELLITE, maxZoomLevel: 8, wrapDateLine: false}
+                )
             ],
             center: new OpenLayers.LonLat(center[0], center[1]).transform(WGS84, WGS84_google_mercator),
             maxExtent: new OpenLayers.Bounds(-180, -85.0511, 180, 85.0511).transform(WGS84, WGS84_google_mercator)

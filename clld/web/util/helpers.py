@@ -99,7 +99,7 @@ GLOSS_ABBR_PATTERN = re.compile(
 #
 # TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU
 #
-def rendered_sentence(sentence, abbrs=None):
+def rendered_sentence(sentence, abbrs=None, fmt='long'):
     assert sentence.xhtml or (sentence.analyzed and sentence.gloss)
 
     if sentence.xhtml:
@@ -165,8 +165,7 @@ def rendered_sentence(sentence, abbrs=None):
             if sentence.description else '',
             HTML.div(sentence.original_script, class_='original_script')
             if sentence.original_script else '',
-            HTML.blockquote(HTML.small(literal(sentence.comment)), class_='comment')
-            if sentence.comment else '',
+            HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
             class_='body',
         ),
         class_="sentence",

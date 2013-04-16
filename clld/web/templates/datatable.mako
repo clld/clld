@@ -14,7 +14,7 @@
 	    <th style="text-align: left;">
                 % if col.js_args.get('bSearchable', True):
 		    % if hasattr(col, 'choices'):
-		    <select class="control" name="${col.name}">
+		    <select class="control input-${getattr(col, 'input_size', 'small')}" name="${col.name}">
 			<option value="">--any--</option>
 			% for val in getattr(col, 'choices'):
 			    % if isinstance(val, tuple) and len(val) == 2:
@@ -25,7 +25,7 @@
 			% endfor
 		    </select>
 		    % else:
-		    <input type="text" name="${col.name}" value="" placeholder="Search ${col.js_args['sTitle']}" class="input-small control" />
+		    <input type="text" name="${col.name}" value="" placeholder="Search ${col.js_args['sTitle']}" class="input-${getattr(col, 'input_size', 'small')} control" />
 		    % endif
                 % else:
                     <input type="text" name="${col.name}" value="" class="search_init control" style="display: none;"/>

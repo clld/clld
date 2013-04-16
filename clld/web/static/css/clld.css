@@ -203,3 +203,5 @@ span.sc {
 .sentence .gloss-box + .translation {
   margin-top: -0.5em;
 }
+
+div.popover {z-index: 20000 !important;}

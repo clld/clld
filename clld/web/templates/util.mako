@@ -110,21 +110,22 @@
 ##
 ## format the sentences associated with a Value instance
 ##
-<%def name="sentences(obj=None)">
+<%def name="sentences(obj=None, fmt='long')">
     <% obj = obj or ctx %>
-    <ol id="sentences-${obj.pk}">
+    <dl id="sentences-${obj.pk}">
         % for a in obj.sentence_assocs:
-        <li>
-            % if a.description:
+	<dt>${h.link(request, a.sentence, label='%s %s:' % (_('Sentence'), a.sentence.id))}</dt>
+        <dd>
+            % if a.description and fmt == 'long':
             <p>${a.description}</p>
             % endif
-            ${h.rendered_sentence(a.sentence)}
-            % if a.sentence.references:
-            <p>See ${h.linked_references(request, a.sentence)|n}</p>
+            ${h.rendered_sentence(a.sentence, fmt=fmt)}
+            % if a.sentence.references and fmt == 'long':
+            <p>sources: ${h.linked_references(request, a.sentence)|n}</p>
             % endif
-        </li>
+        </dd>
         % endfor
-    </ol>
+    </dl>
     <script>
     $(document).ready(function() {
         $('#sentences-${obj.pk} .ttip').tooltip({placement: 'bottom', delay: {hide: 300}});

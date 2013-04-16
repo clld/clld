@@ -11,18 +11,20 @@
 
 <h3>${_('Values')} ${h.map_marker_img(request, ctx, height='25', width='25')|n}</h3>
 % for i, value in enumerate(ctx.values):
+<div style="clear: right;">
     <ul class="nav nav-pills pull-right">
         <li><a data-toggle="collapse" data-target="#s${i}">Show/hide details</a></li>
     </ul>
-<h4>
-    ${h.map_marker_img(request, value)}
-    ${value.domainelement.name if value.domainelement else (value.name or value.id)}
-</h4>
-<div id="s${i}" class="collapse in">
-    <p>
-        ${h.format_frequency_and_confidence(value)}
-    </p>
-    ${util.sentences(value)}
+    <h4>
+        ${h.map_marker_img(request, value)}
+        ${value.domainelement.name if value.domainelement else (value.name or value.id)}
+    </h4>
+    <div id="s${i}" class="collapse in">
+        <p>
+            ${h.format_frequency_and_confidence(value)}
+        </p>
+        ${util.sentences(value)}
+    </div>
 </div>
 % endfor
 <%def name="sidebar()">

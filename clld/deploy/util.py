@@ -251,6 +251,8 @@ def deploy(app, environment, with_alembic=False):
         sudo('webassets -m clld.web.assets build')
         install_repos(app.name)
 
+    supervisor(app, 'pause', template_variables)
+
     #
     # TODO: replace with initialization of db from data repos!
     #
@@ -261,8 +263,6 @@ def deploy(app, environment, with_alembic=False):
             source="/tmp/{0.name}.sql".format(app))
 
         if postgres.database_exists(app.name):
-            supervisor(app, 'pause', template_variables)
-
             with cd('/var/lib/postgresql'):
                 sudo('sudo -u postgres dropdb %s' % app.name)
 
@@ -280,6 +280,7 @@ def deploy(app, environment, with_alembic=False):
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
 
+    time.sleep(2)
     supervisor(app, 'run', template_variables)
 
     time.sleep(2)

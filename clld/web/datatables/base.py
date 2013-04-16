@@ -129,11 +129,13 @@ class LinkToMapCol(Col):
 
     def format(self, item):
         obj = self.get_obj(item)
-        return button(
+        return HTML.a(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),
-            onclick=JSMap.showInfoWindow('language_id', obj.id, self.get_layer(item))
+            href="#map",
+            onclick=JSMap.showInfoWindow('language_id', obj.id, self.get_layer(item)),
             #'CLLD.Map.showInfoWindow("id", "%s", "%s")' % obj.id,
+            class_='btn',
         )
 
 
@@ -147,7 +149,8 @@ class DetailsRowLinkCol(Col):
 
     def format(self, item):
         return button(
-            icon('info-sign', inverted=True),
+            #icon('info-sign', inverted=True),
+            'more',
             href=self.dt.req.resource_url(item, ext='snippet.html'),
             title="show details",
             class_="btn-info details",

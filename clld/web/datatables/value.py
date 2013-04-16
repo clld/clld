@@ -150,9 +150,6 @@ class Values(DataTable):
             #
         ]
 
-    def toolbar(self):
-        return ''
-
     def get_options(self):
         opts = DataTable.get_options(self)
         #opts["aaSorting"] = [[1, "asc"]]
