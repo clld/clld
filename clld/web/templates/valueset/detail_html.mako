@@ -10,25 +10,21 @@
 % endif
 
 <h3>${_('Values')} ${h.map_marker_img(request, ctx, height='25', width='25')|n}</h3>
-
-<div class="accordion" id="values-accordion">
-    % for value in ctx.values:
-    <%util:accordion_group eid="acc-${value.id}" parent="values-accordion" open="${False}">
-        <%def name="title()">
-            ${h.map_marker_img(request, value)}
-            <b>${value.domainelement.name if value.domainelement else (value.name or value.id)}</b>
-            ${h.format_frequency_and_confidence(value)}
-        </%def>
-        % if value.sentence_assocs:
-        <h4>${_('Sentences')}</h4>
-        ${util.sentences(value)}
-        % else:
-        no sentences
-        % endif
-    </%util:accordion_group>
-    % endfor
+% for i, value in enumerate(ctx.values):
+    <ul class="nav nav-pills pull-right">
+        <li><a data-toggle="collapse" data-target="#s${i}">Show/hide details</a></li>
+    </ul>
+<h4>
+    ${h.map_marker_img(request, value)}
+    ${value.domainelement.name if value.domainelement else (value.name or value.id)}
+</h4>
+<div id="s${i}" class="collapse in">
+    <p>
+        ${h.format_frequency_and_confidence(value)}
+    </p>
+    ${util.sentences(value)}
 </div>
-
+% endfor
 <%def name="sidebar()">
 <div class="well well-small">
 <dl>
