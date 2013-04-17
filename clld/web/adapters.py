@@ -103,7 +103,7 @@ class TxtCitation(Representation):
             'authors': ', '.join(
                 c.name for c in
                 list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
-            'title': ctx.name,
+            'title': getattr(ctx, 'citation_name', ctx.name),
             'url': req.resource_url(ctx),
             'accessed': str(datetime.date.today()),
         }

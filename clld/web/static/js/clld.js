@@ -347,7 +347,7 @@ CLLD.Map = (function(){
     }
 
     var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom, map_options,
+        var i, layer, layer_options, spec, center, zoom, map_options, controls,
             select_layers = [],
             styles = CLLD.Map.style_maps['default'];
 
@@ -462,6 +462,11 @@ CLLD.Map = (function(){
         selectCtrl = new OpenLayers.Control.SelectFeature(select_layers, select_options);
         CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
+
+	controls = CLLD.Map.map.getControlsByClass('OpenLayers.Control.Navigation');
+	for (i = 0; i < controls.length; ++i) {
+	    controls[i].disableZoomWheel();
+	}
 
         zoomToExtent();
     };

@@ -8,15 +8,16 @@
     <script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
 </div>
 % else:
-<div class="accordion" id="map-container">
-    <div class="accordion-group">
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map-container" href="#map-inner">
-                show/hide map
-            </a>
-        </div>
-        <div id="map-inner" class="accordion-body collapse in">
-            <div class="accordion-inner">
+##<div class="accordion" id="map-container">
+<div class="well well-small" id="map-container">
+    ##<div class="accordion-group">
+    ##    <div class="accordion-heading">
+    ##        <a class="accordion-toggle" data-toggle="collapse" data-parent="#map-container" href="#map-inner">
+    ##            show/hide map
+    ##        </a>
+    ##    </div>
+    ##    <div id="map-inner" class="accordion-body collapse in">
+    ##        <div class="accordion-inner">
 	        <ul class="nav nav-pills">
 		% if len(map.layers) > 1:
 		    <li class="dropdown">
@@ -45,8 +46,8 @@
 		</ul>
 		<div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
 		<script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
-            </div>
-        </div>
-    </div>
+    ##        </div>
+    ##    </div>
+    ##</div>
 </div>
 % endif

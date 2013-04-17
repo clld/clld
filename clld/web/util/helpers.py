@@ -33,7 +33,7 @@ JSDataTable = JS('CLLD.DataTable')
 
 def format_frequency_and_confidence(value):
     res = ''
-    if not (value.frequency or value.confidence):
+    if not (value.frequency or value.confidence) or value.frequency == 100:
         return res
 
     if value.frequency:
@@ -44,7 +44,7 @@ def format_frequency_and_confidence(value):
             res += ', '
         res += 'Confidence: %s' % value.confidence
 
-    return ' (%s)' % res
+    return ' %s' % res
 
 
 def map_marker_img(req, obj, marker=None, height='20', width='20'):
