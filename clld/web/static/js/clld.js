@@ -243,7 +243,7 @@ CLLD.DataTable = (function(){
         }
 
         if (dl) {
-	    $('#cdOpener').popover({
+	    $('#cdOpener').clickover({
 		html: true,
 		content: '<dl>'+dl+'</dl>',
 		title: 'Column Descriptions',
@@ -259,6 +259,14 @@ CLLD.DataTable = (function(){
         } else {
             $('#cdOpener').hide();
         }
+
+        for (i=0; i < options.aoColumns.length; i++) {
+            col = options.aoColumns[i];
+            if (col.sFilter) {
+                CLLD.DataTable.dt.fnFilter(col.sFilter, i);
+            }
+        }
+
     };
 
     return {

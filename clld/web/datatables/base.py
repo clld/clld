@@ -145,6 +145,7 @@ class DetailsRowLinkCol(Col):
         kw.setdefault('bSearchable', False)
         kw.setdefault('sClass', 'center')
         kw.setdefault('sType', 'html')
+        kw.setdefault('sTitle', 'Details')
         Col.__init__(self, dt, name or '', **kw)
 
     def format(self, item):
@@ -238,27 +239,28 @@ class DataTable(object):
         """
         """
         return HTML.div(
-            #HTML.a(
-            #    icon('download-alt'),
-            #    HTML.span(class_="caret"),
-            #    **{
-            #        'class_': "btn dropdown-toggle",
-            #        'data-toggle': "dropdown",
-            #        'href': "#",
-            #    }
-            #),
-            #HTML.ul(
-            #    HTML.li(HTML.a('csv', href="#")),
-            #    class_="dropdown-menu",
-            #),
+            HTML.a(
+                icon('download-alt'),
+                HTML.span(class_="caret"),
+                **{
+                    'class_': "btn dropdown-toggle",
+                    'data-toggle': "dropdown",
+                    'href': "#",
+                }
+            ),
+            HTML.ul(
+                HTML.li(HTML.a('csv', href="#")),
+                class_="dropdown-menu",
+            ),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
             class_='btn-group right')
 
     def get_options(self):
         return {
-            "bStateSave": True,
-            "sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t"
-            "<'row-fluid'<'span6'i><'span6'p>>",
+            #"bStateSave": True,
+            #"sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t"
+            #"<'row-fluid'<'span6'i><'span6'p>>",
+            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'dt-toolbar'>>r>t",
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
             "aoColumns": [col.js_args for col in self.cols],

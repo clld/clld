@@ -28,6 +28,7 @@
         <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
         <script src="${request.static_url('clld:web/static/js/jquery-1.8.2.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/bootstrap.js')}"></script>
+        <script src="${request.static_url('clld:web/static/js/bootstrapx-clickover.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/jquery.dataTables.min.js')}"></script>
         <script src="${request.static_url('clld:web/static/js/clld.js')}"></script>
         % endif

@@ -12,7 +12,7 @@ environment.register(
     # Note: in production jquery is loaded from CDN
     'js/bootstrap.min.js',
     'js/jquery.dataTables.min.js',
-    Bundle('js/tree.jquery.js', 'js/clld.js', filters='yui_js'),
+    Bundle('js/bootstrapx-clickover.js', 'js/tree.jquery.js', 'js/clld.js', filters='yui_js'),
     output='js/packed.js')
 
 environment.register(

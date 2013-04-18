@@ -4,9 +4,6 @@
 
 
 <h2>${_('Parameters')}</h2>
-<p>
-    ${_('Parameters under analysis for this project')}
-</p>
 <div>
     ${ctx.render()}
 </div>

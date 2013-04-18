@@ -204,4 +204,8 @@ span.sc {
   margin-top: -0.5em;
 }
 
-div.popover {z-index: 20000 !important;}
+div.popover {width: 500px !important;}
+div.popover-content {
+        height: 250px !important;
+        overflow-y: scroll;
+        overflow-x: hidden;}

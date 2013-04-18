@@ -214,7 +214,7 @@ def linked_references(req, obj):
         chunks.append(HTML.span(
             link(req, ref.source),
             HTML.span(
-                ' [%s]' % ref.description if ref.description else '',
+                ': %s' % ref.description if ref.description else '',
                 class_='pages'),
             class_='citation',
         ))

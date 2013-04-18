@@ -5,22 +5,8 @@
 
 <h2>${_('Sentence')} ${ctx.id}</h2>
 <dl>
-    <dt>Language:</dt>
+    <dt>${_('Language')}:</dt>
     <dd>${h.link(request, ctx.language)}</dd>
-##    <dt>Text:</dt>
-##    <dd>${ctx.name}</dd>
-##% if ctx.analyzed:
-##<dt>Analyzed text:</dt>
-##<dd>${ctx.analyzed}</dd>
-##% endif
-##% if ctx.gloss:
-##<dt>Gloss:</dt>
-##<dd>${ctx.gloss}</dd>
-##% endif
-##% if ctx.description:
-##<dt>Translation:</dt>
-##<dd>${ctx.description}</dd>
-##% endif
 </dl>
 
 ${h.rendered_sentence(ctx)|n}
@@ -31,11 +17,11 @@ ${h.rendered_sentence(ctx)|n}
 <dd>${ctx.comment}</dd>
 % endif
 % if ctx.source:
-<dt>Source:</dt>
+<dt>${_('Type')}:</dt>
 <dd>${ctx.source}</dd>
 % endif
 % if ctx.references:
-<dt>References</dt>
+<dt>${_('Source')}:</dt>
 <dd>
     ${h.linked_references(request, ctx)|n}
 </dd>

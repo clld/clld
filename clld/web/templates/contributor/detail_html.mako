@@ -3,7 +3,7 @@
 <%! active_menu_item = "contributors" %>
 
 
-<h2>${_('Contributor')} ${ctx.name}</h2>
+<h2>${ctx.name}</h2>
 
 % if ctx.description:
 <p>${ctx.description}</p>

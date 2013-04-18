@@ -98,12 +98,17 @@
 ##
 ## format a div of class well
 ##
-<%def name="well(title=None)">
+<%def name="well(title=None, paragraphs=None)">
     <div class="well well-small">
 	% if title:
 	<h3>${title}</h3>
 	% endif
-	${caller.body()}
+	% if hasattr(caller, 'body'):
+	    ${caller.body()}
+	% endif
+	% for p in (paragraphs or '').split('\n'):
+	    <p>${p}</p>
+	% endfor
     </div>
 </%def>
 

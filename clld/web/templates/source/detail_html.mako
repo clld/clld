@@ -3,7 +3,7 @@
 <%! active_menu_item = "sources" %>
 
 
-<h2>${_('Source')} ${ctx.name}</h2>
+<h2>${ctx.name}</h2>
 
 <ol>
 % for k, v in ctx.datadict().items():
