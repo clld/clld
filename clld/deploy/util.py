@@ -229,6 +229,7 @@ def supervisor(app, command, template_variables=None):
     create_file_as_root(
         app.supervisor,
         SUPERVISOR_TEMPLATE[command].format(**template_variables), mode='644')
+    time.sleep(1)
     sudo('/etc/init.d/supervisor start')
 
 
@@ -258,9 +259,11 @@ def deploy(app, environment, with_alembic=False):
     #
     if not with_alembic and confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
+        local('gzip /tmp/{0.name}.sql {0.name}'.format(app))
         require.files.file(
-            '/tmp/{0.name}.sql'.format(app),
-            source="/tmp/{0.name}.sql".format(app))
+            '/tmp/{0.name}.sql.gz'.format(app),
+            source="/tmp/{0.name}.sql.gz".format(app))
+        sudo('gunzip /tmp/{0.name}.sql.gz'.format(app))
 
         if postgres.database_exists(app.name):
             with cd('/var/lib/postgresql'):
@@ -280,10 +283,9 @@ def deploy(app, environment, with_alembic=False):
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
 
-    time.sleep(2)
     supervisor(app, 'run', template_variables)
 
-    time.sleep(2)
+    time.sleep(3)
     res = run('curl http://localhost:%s/_ping' % app.port)
     assert json.loads(res)['status'] == 'ok'
 
