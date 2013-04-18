@@ -238,19 +238,19 @@ class DataTable(object):
         """
         """
         return HTML.div(
-            HTML.a(
-                icon('download-alt'),
-                HTML.span(class_="caret"),
-                **{
-                    'class_': "btn dropdown-toggle",
-                    'data-toggle': "dropdown",
-                    'href': "#",
-                }
-            ),
-            HTML.ul(
-                HTML.li(HTML.a('csv', href="#")),
-                class_="dropdown-menu",
-            ),
+            #HTML.a(
+            #    icon('download-alt'),
+            #    HTML.span(class_="caret"),
+            #    **{
+            #        'class_': "btn dropdown-toggle",
+            #        'data-toggle': "dropdown",
+            #        'href': "#",
+            #    }
+            #),
+            #HTML.ul(
+            #    HTML.li(HTML.a('csv', href="#")),
+            #    class_="dropdown-menu",
+            #),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
             class_='btn-group right')
 
