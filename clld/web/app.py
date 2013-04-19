@@ -109,6 +109,11 @@ class CtxFactoryQuery(object):
                     joinedload(common.ValueSet.parameter),
                     joinedload(common.ValueSet.language),
                 )
+            if model == common.Source:
+                query = query.options(
+                    #joinedload(common.Source.valuesetreferences),
+                    #joinedload(common.Source.sentencereferences),
+                )
         else:
             query = custom_query  # pragma: no cover
 

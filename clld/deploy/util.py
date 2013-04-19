@@ -259,11 +259,11 @@ def deploy(app, environment, with_alembic=False):
     #
     if not with_alembic and confirm('Recreate database?', default=False):
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
-        local('gzip /tmp/{0.name}.sql'.format(app))
+        local('gzip -f /tmp/{0.name}.sql'.format(app))
         require.files.file(
             '/tmp/{0.name}.sql.gz'.format(app),
             source="/tmp/{0.name}.sql.gz".format(app))
-        sudo('gunzip /tmp/{0.name}.sql.gz'.format(app))
+        sudo('gunzip -f /tmp/{0.name}.sql.gz'.format(app))
 
         if postgres.database_exists(app.name):
             with cd('/var/lib/postgresql'):

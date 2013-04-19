@@ -120,7 +120,7 @@ class Values(DataTable):
         if self.parameter and self.parameter.domain:
             name_col.choices = [de.name for de in self.parameter.domain]
 
-        refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
+        refs_col = RefsCol(self, 'source', bSearchable=False, bSortable=False)
 
         res = [DetailsRowLinkCol(self)]
 

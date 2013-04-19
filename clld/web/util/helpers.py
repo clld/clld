@@ -100,8 +100,6 @@ GLOSS_ABBR_PATTERN = re.compile(
 # TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU
 #
 def rendered_sentence(sentence, abbrs=None, fmt='long'):
-    assert sentence.xhtml or (sentence.analyzed and sentence.gloss)
-
     if sentence.xhtml:
         return HTML.div(
             HTML.div(Markup(sentence.xhtml), class_='body'), class_="sentence")
@@ -151,16 +149,17 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         return filter(None, res)
 
     units = []
-    for morpheme, gloss in zip(sentence.analyzed.split('\t'), sentence.gloss.split('\t')):
-        units.append(HTML.div(
-            HTML.div(morpheme, class_='morpheme'),
-            HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
-            class_='gloss-unit'))
+    if sentence.analyzed and sentence.gloss:
+        for morpheme, gloss in zip(sentence.analyzed.split('\t'), sentence.gloss.split('\t')):
+            units.append(HTML.div(
+                HTML.div(morpheme, class_='morpheme'),
+                HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
+                class_='gloss-unit'))
 
     return HTML.div(
         HTML.div(
             HTML.div(sentence.name, class_='object-language'),
-            HTML.div(*units, **{'class': 'gloss-box'}),
+            HTML.div(*units, **{'class': 'gloss-box'}) if units else '',
             HTML.div(sentence.description, class_='translation')
             if sentence.description else '',
             HTML.div(sentence.original_script, class_='original_script')
