@@ -37,11 +37,11 @@ class Tests(TestWithEnv):
 
         self.assertTrue('<br' in text2html('abc\ndef'))
 
-    def test_format_frequency_and_confidence(self):
-        from clld.web.util.helpers import format_frequency_and_confidence
+    def test_format_frequency(self):
+        from clld.web.util.helpers import format_frequency
 
-        format_frequency_and_confidence(common.Value.first())
-        format_frequency_and_confidence(Mock(frequency=None, confidence=None))
+        format_frequency(self.env['request'], common.Value.first())
+        format_frequency(self.env['request'], Mock(frequency=None))
 
     def test_rendered_sentence(self):
         from clld.web.util.helpers import rendered_sentence

@@ -9,8 +9,9 @@
         <ul class='unstyled'>
             % for value in valueset.values:
             <li>
+                ${h.map_marker_img(request, value)}
                 ${h.link(request, valueset, label=value.__unicode__())}
-                ${h.format_frequency_and_confidence(value)}
+                ${h.format_frequency(request, value)}
             </li>
             % endfor
         </ul>

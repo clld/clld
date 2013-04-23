@@ -18,12 +18,15 @@ ${h.rendered_sentence(ctx)|n}
 % endif
 % if ctx.source:
 <dt>${_('Type')}:</dt>
+<dd>${ctx.type}</dd>
+% endif
+% if ctx.references or ctx.source:
+<dt>${_('Source')}:</dt>
+% if ctx.source:
 <dd>${ctx.source}</dd>
 % endif
 % if ctx.references:
-<dt>${_('Source')}:</dt>
-<dd>
-    ${h.linked_references(request, ctx)|n}
-</dd>
+<dd>${h.linked_references(request, ctx)|n}</dd>
+% endif
 % endif
 </dl>

@@ -12,17 +12,17 @@ class TypeCol(Col):
         kw.setdefault('sTitle', dt.req.translate('Type'))
         kw.setdefault(
             'choices',
-            [r[0] for r in DBSession.query(Sentence.source).distinct() if r[0]])
+            [r[0] for r in DBSession.query(Sentence.type).distinct() if r[0]])
         super(TypeCol, self).__init__(dt, name, **kw)
 
     def search(self, qs):
-        return Sentence.source == qs
+        return Sentence.type == qs
 
     def format(self, item):
-        return item.source
+        return item.type
 
     def order(self):
-        return Sentence.source
+        return Sentence.type
 
 
 class Sentences(DataTable):

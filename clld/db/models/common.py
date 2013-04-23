@@ -197,7 +197,12 @@ class DomainElement(Base,
         UniqueConstraint('number', 'parameter_pk'))
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+
+    # the number is used to sort domain elements within the domain of one parameter
     number = Column(Integer)
+
+    # abbreviated name, e.g. as label for map legends
+    abbr = Column(Unicode)
 
 
 class Parameter_data(Base, Versioned, DataMixin):
@@ -218,7 +223,8 @@ class Parameter(Base,
     """A measurable attribute of a language.
     """
     __table_args__ = (UniqueConstraint('name'),)
-    domain = relationship('DomainElement', backref='parameter', order_by=DomainElement.id)
+    domain = relationship(
+        'DomainElement', backref='parameter', order_by=DomainElement.number)
 
 
 class Source_data(Base, Versioned, DataMixin):
@@ -300,6 +306,7 @@ class ValueSet(Base,
     language_pk = Column(Integer, ForeignKey('language.pk'))
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
+    source = Column(Unicode)
 
     parameter = relationship('Parameter', backref='valuesets')
     contribution = relationship('Contribution', backref='valuesets')
@@ -404,6 +411,7 @@ class Sentence(Base,
     """
     analyzed = Column(Unicode)
     gloss = Column(Unicode)
+    type = Column(Unicode)
     source = Column(Unicode)
     comment = Column(Unicode)
     original_script = Column(Unicode)
@@ -519,7 +527,7 @@ class UnitValue(Base,
         """We have to make sure, the parameter a value is tied to and the parameter a
         possible domainelement is tied to stay in sync.
         """
-        if self.unitdomainelement:
+        if self.unitdomainelement and self.unitdomainelement.unitparameter_pk:
             assert self.unitdomainelement.unitparameter_pk == unitparameter_pk
         return unitparameter_pk
 

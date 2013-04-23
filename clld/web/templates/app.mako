@@ -69,18 +69,13 @@
                                 <a href="${href}" title="${title}">${title}</a>
                             </li>
                         % endfor
-                        % if hasattr(self, 'contextnav'):
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    More
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    ${self.contextnav()}
-                                </ul>
-                            </li>
-                            % endif
                         </ul>
+                        % if hasattr(self, 'contextnav'):
+                        <br>
+                        <ul class="nav pull-right">
+                            ${self.contextnav()}
+                        </ul>
+                        % endif
                     </div><!--/.nav-collapse -->
                 </div>
             </div>

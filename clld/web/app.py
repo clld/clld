@@ -109,11 +109,6 @@ class CtxFactoryQuery(object):
                     joinedload(common.ValueSet.parameter),
                     joinedload(common.ValueSet.language),
                 )
-            if model == common.Source:
-                query = query.options(
-                    #joinedload(common.Source.valuesetreferences),
-                    #joinedload(common.Source.sentencereferences),
-                )
         else:
             query = custom_query  # pragma: no cover
 
@@ -180,6 +175,7 @@ def register_app(config, pkg=None):
     config.add_route('home', '/')
     if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
         config.scan('%s.views' % name)  # pragma: no cover
+    config.add_route('legal', '/legal')
 
     menuitems = OrderedDict(home=partial(menu_item, 'home'))
     for plural in config.registry.settings.get(

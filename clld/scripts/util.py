@@ -24,7 +24,12 @@ class Data(defaultdict):
         super(Data, self).__init__(dict)
 
     def add(self, model, key, **kw):
-        new = model(**kw)
+        if kw.keys() == ['_obj']:
+            # if a single keyword parameter _obj is passed, we take it to be the object
+            # which should be added to the session.
+            new = kw['_obj']
+        else:
+            new = model(**kw)
         self[model.__mapper__.class_.__name__][key] = new
         DBSession.add(new)
         return new

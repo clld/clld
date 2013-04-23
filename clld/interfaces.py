@@ -132,6 +132,15 @@ class IMapMarker(Interface):
         """
 
 
+class IFrequencyMarker(Interface):
+    """utility
+    """
+    def __call__(self, ctx, req):
+        """
+        :return: URL for an icon to use as marker for frequency.
+        """
+
+
 class ILinkAttrs(Interface):
     """utility to customize attributes for HTML links to objects.
     """

@@ -81,11 +81,7 @@ class TestWithDbAndData(TestWithDb):
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
         valueset = common.ValueSet(
-            id='vs',
-            language=language,
-            parameter=param,
-            contribution=contribution)
-
+            id='vs', language=language, parameter=param, contribution=contribution)
         value = common.Value(
             id='v',
             domainelement=de,
@@ -93,13 +89,26 @@ class TestWithDbAndData(TestWithDb):
             frequency=50,
             confidence='high')
         DBSession.add(value)
-        DBSession.add(common.Parameter(id='no-domain'))
+        paramnd = common.Parameter(id='no-domain', name='Parameter without domain')
+        valueset = common.ValueSet(
+            id='vs2', language=language, parameter=paramnd, contribution=contribution)
+        value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
+        DBSession.add(value)
 
         unit = common.Unit(id='u', name='Unit', language=language)
         up = common.UnitParameter(id='up', name='UnitParameter')
         DBSession.add(unit)
         DBSession.add(common.UnitValue(
             id='uv', name='UnitValue', unit=unit, unitparameter=up))
+
+        up2 = common.UnitParameter(id='up2', name='UnitParameter with domain')
+        de = common.UnitDomainElement(id='de', name='de', parameter=up2)
+        DBSession.add(common.UnitValue(
+            id='uv2',
+            name='UnitValue2',
+            unit=unit,
+            unitparameter=up2,
+            unitdomainelement=de))
 
         DBSession.add(common.Source(id='s'))
 

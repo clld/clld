@@ -129,6 +129,8 @@ class LinkToMapCol(Col):
 
     def format(self, item):
         obj = self.get_obj(item)
+        if not obj:
+            return ''
         return HTML.a(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),

@@ -17,12 +17,10 @@
     </ul>
     <h4>
         ${h.map_marker_img(request, value)}
-        ${value.domainelement.name if value.domainelement else (value.name or value.id)}
+        ${value.__unicode__()}
+        ${h.format_frequency(request, value)}
     </h4>
     <div id="s${i}" class="collapse in">
-        <p>
-            ${h.format_frequency_and_confidence(value)}
-        </p>
         ${util.sentences(value)}
     </div>
 </div>
@@ -30,20 +28,20 @@
 <%def name="sidebar()">
 <div class="well well-small">
 <dl>
-    <dt>${_('Contribution')}:</dt>
-    <dd>
+    <dt class="contribution">${_('Contribution')}:</dt>
+    <dd class="contribution">
         ${h.link(request, ctx.contribution)}
         by
         ${h.linked_contributors(request, ctx.contribution)}
         ${h.button('cite', onclick=h.JSModal.show(ctx.contribution.name, request.resource_url(ctx.contribution, ext='md.html')))}
     </dd>
-    <dt>${_('Language')}:</dt>
-    <dd>${h.link(request, ctx.language)}</dd>
-    <dt>${_('Parameter')}:</dt>
-    <dd>${h.link(request, ctx.parameter)}</dd>
+    <dt class="language">${_('Language')}:</dt>
+    <dd class="language">${h.link(request, ctx.language)}</dd>
+    <dt class="parameter">${_('Parameter')}:</dt>
+    <dd class="parameter">${h.link(request, ctx.parameter)}</dd>
     % if ctx.references:
-    <dt>${_('References')}:</dt>
-    <dd>${h.linked_references(request, ctx)|n}</dd>
+    <dt class="source">${_('Source')}:</dt>
+    <dd class="source">${h.linked_references(request, ctx)|n}</dd>
     % endif
     ${util.data(ctx, with_dl=False)}
 </dl>

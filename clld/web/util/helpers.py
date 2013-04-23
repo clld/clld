@@ -31,20 +31,15 @@ JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
 
 
-def format_frequency_and_confidence(value):
-    res = ''
-    if not (value.frequency or value.confidence) or value.frequency == 100:
-        return res
-
-    if value.frequency:
-        res += 'Frequency: %s%%' % round(value.frequency, 1)
-
-    if value.confidence:
-        if res:
-            res += ', '
-        res += 'Confidence: %s' % value.confidence
-
-    return ' %s' % res
+def format_frequency(req, obj, marker=None, height='20', width='20'):
+    marker = marker or req.registry.queryUtility(interfaces.IFrequencyMarker)
+    if marker:
+        url = marker(obj, req)
+        if url:
+            return HTML.img(src=url, height=height, width=width)
+    if not obj.frequency or obj.frequency == 100:
+        return ''
+    return 'Frequency: %s%%' % round(obj.frequency, 1)
 
 
 def map_marker_img(req, obj, marker=None, height='20', width='20'):

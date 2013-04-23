@@ -1,4 +1,13 @@
 ##
+##
+##
+<%def name="contextnavitem(route, label=None)">
+    <li class="${'active' if request.matched_route.name == route else ''}">
+        <a href="${request.route_url(route)}">${label or route.capitalize()}</a>
+    </li>
+</%def>
+
+##
 ## format the key-value pairs from resources with data as dl items
 ##
 <%def name="data(obj=None, with_dl=True)">
@@ -7,13 +16,13 @@
     %if with_dl:
     <dl>
     % endif
-	% for key, items in h.groupby(sorted(obj.data, key=lambda o: (o.ord, o.key)), lambda x: x.key):
-	    % if not key.startswith('_'):  ## we respect a convention to mark "private" data
-	    <dt>${key}</dt>
-	        % for item in items:
-	        <dd>${item.value}</dd>
-	        % endfor
-	    % endif
+        % for key, items in h.groupby(sorted(obj.data, key=lambda o: (o.ord, o.key)), lambda x: x.key):
+            % if not key.startswith('_'):  ## we respect a convention to mark "private" data
+            <dt>${key}</dt>
+                % for item in items:
+                <dd>${item.value}</dd>
+                % endfor
+            % endif
         % endfor
     %if with_dl:
     </dl>
@@ -28,13 +37,13 @@
     <% obj = obj or ctx %>
     % if obj.files:
     <dl>
-	% for key, items in h.groupby(sorted(obj.files, key=lambda o: (o.ord, o.name)), lambda x: x.name):
-	    % if not key.startswith('_'):  ## we respect a convention to mark "private" data
-	    <dt>${key}</dt>
-	        % for item in items:
-	        <dd>${item.file.name}</dd>  ## TODO: link to associated file!
-	        % endfor
-	    % endif
+        % for key, items in h.groupby(sorted(obj.files, key=lambda o: (o.ord, o.name)), lambda x: x.name):
+            % if not key.startswith('_'):  ## we respect a convention to mark "private" data
+            <dt>${key}</dt>
+                % for item in items:
+                <dd>${item.file.name}</dd>  ## TODO: link to associated file!
+                % endfor
+            % endif
         % endfor
     </dl>
     % endif
@@ -46,8 +55,8 @@
 <%def name="tree_node_label(level, id, checked=True)">
     <input class="level${level} treeview" type="checkbox" id="${id}"${' checked="checked"' if checked else ''}>
     <label for="${id}">
-	<i class="icon-chevron-${'down' if checked else 'right'}"> </i>
-	${caller.body()}
+        <i class="icon-chevron-${'down' if checked else 'right'}"> </i>
+        ${caller.body()}
     </label>
 </%def>
 
@@ -75,18 +84,18 @@
 <%def name="table(items, eid='table', class_='table-hover')">
     <table id="${eid}" class="standard table ${class_}">
         <thead>
-	    <tr>${caller.head()}</tr>
+            <tr>${caller.head()}</tr>
         </thead>
         <tbody>
             % for item in items:
-	    <tr>${caller.body(item=item)}</tr>
+            <tr>${caller.body(item=item)}</tr>
             % endfor
         </tbody>
-	% if hasattr(caller, 'foot'):
-	<tfoot>
-	    <tr>${caller.foot()}</tr>
-	</tfoot>
-	% endif
+        % if hasattr(caller, 'foot'):
+        <tfoot>
+            <tr>${caller.foot()}</tr>
+        </tfoot>
+        % endif
     </table>
     <script>
     $(document).ready(function() {
@@ -100,15 +109,15 @@
 ##
 <%def name="well(title=None, paragraphs=None)">
     <div class="well well-small">
-	% if title:
-	<h3>${title}</h3>
-	% endif
-	% if hasattr(caller, 'body'):
-	    ${caller.body()}
-	% endif
-	% for p in (paragraphs or '').split('\n'):
-	    <p>${p}</p>
-	% endfor
+        % if title:
+        <h3>${title}</h3>
+        % endif
+        % if hasattr(caller, 'body'):
+            ${caller.body()}
+        % endif
+        % for p in (paragraphs or '').split('\n'):
+            <p>${p}</p>
+        % endfor
     </div>
 </%def>
 
@@ -119,7 +128,7 @@
     <% obj = obj or ctx %>
     <dl id="sentences-${obj.pk}">
         % for a in obj.sentence_assocs:
-	<dt>${h.link(request, a.sentence, label='%s %s:' % (_('Sentence'), a.sentence.id))}</dt>
+        <dt>${h.link(request, a.sentence, label='%s %s:' % (_('Sentence'), a.sentence.id))}</dt>
         <dd>
             % if a.description and fmt == 'long':
             <p>${a.description}</p>

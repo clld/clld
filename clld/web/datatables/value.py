@@ -22,7 +22,7 @@ class ValueNameCol(LinkCol):
         return {'label': label, 'title': title}
 
     def order(self):
-        return DomainElement.id \
+        return DomainElement.number \
             if self.dt.parameter and self.dt.parameter.domain \
             else Value.description
 

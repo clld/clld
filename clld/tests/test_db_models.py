@@ -38,7 +38,7 @@ class Tests(TestWithDb):
         p1 = UnitParameter()
         p2 = UnitParameter()
         v = UnitValue(
-            unitdomainelement=UnitDomainElement(unitparameter_pk=p1.pk, name='ude'))
+            unitdomainelement=UnitDomainElement(parameter=p1, name='ude'))
         self.assertEqual(str(v), 'ude')
         DBSession.add(v)
         DBSession.add(p2)
