@@ -8,6 +8,9 @@ from clld.web.adapters.base import Representation
 from clld.lib import bibtex
 
 
+#
+# TODO: refactor! distinguish BibTexContribution and BibTexSite
+#
 @implementer(interfaces.IRepresentation)
 class BibTex(Representation):
     """Render a resource's metadata as BibTex record.
@@ -20,10 +23,16 @@ class BibTex(Representation):
         rec = bibtex.Record(
             self.genre,
             ctx.id,
-            title=ctx.__unicode__(),
+            title=getattr(ctx, 'citation_name', ctx.__unicode__()),
             url=req.resource_url(ctx),
             author=[c.name for c in
-                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
+                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)],
+            editor=req.registry.settings.get('clld.publication.editors', ''),
+            booktitle=req.registry.settings.get('clld.publication.sitetitle', ''),
+            address=req.registry.settings.get('clld.publication.place', ''),
+            publisher=req.registry.settings.get('clld.publication.publisher', ''),
+            year=req.registry.settings.get('clld.publication.year', ''),
+        )
         return rec.__unicode__()
 
 
@@ -41,7 +50,7 @@ class TxtCitation(Representation):
                 authors=', '.join(
                     c.name for c in
                     list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
-                title=getattr(ctx, 'citation_name', ctx.name),
+                title=getattr(ctx, 'citation_name', ctx.__unicode__()),
                 path=req.resource_path(ctx))
             template = StringTemplate(md.get('template', """\
 $authors. $year. $title.
