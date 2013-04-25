@@ -35,24 +35,31 @@ class TxtCitation(Representation):
     mimetype = 'text/plain'
 
     def render(self, ctx, req):
-        md = {
-            'authors': ', '.join(
-                c.name for c in
-                list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
-            'title': getattr(ctx, 'citation_name', ctx.name),
-            'url': req.resource_url(ctx),
-            'accessed': str(datetime.date.today()),
-        }
-        for key, value in req.registry.settings.items():
-            if key.startswith('clld.publication.'):
-                md[key.split('clld.publication.', 1)[1]] = value
-
-        template = StringTemplate(md.get('template', """\
+        md = {'accessed': str(datetime.date.today())}
+        if ctx:
+            md.update(
+                authors=', '.join(
+                    c.name for c in
+                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
+                title=getattr(ctx, 'citation_name', ctx.name),
+                path=req.resource_path(ctx))
+            template = StringTemplate(md.get('template', """\
 $authors. $year. $title.
 In: $editors (eds.)
 $sitetitle.
 $place: $publisher.
-Available online at $url
-Accessed on $accessed.
+(Available online at http://$domain$path, Accessed on $accessed.)
 """))
+        else:
+            md['path'] = '/'
+            template = StringTemplate(md.get('template', """\
+$editors (eds.) $year.
+$sitetitle.
+$place: $publisher.
+(Available online at http://$domain$path, Accessed on $accessed.)
+"""))
+        for key, value in req.registry.settings.items():
+            if key.startswith('clld.publication.'):
+                md[key.split('clld.publication.', 1)[1]] = value
+
         return template.safe_substitute(**md)

@@ -33,3 +33,25 @@ class Record(OrderedDict):
         if PY3:
             return self.__unicode__()  # pragma: no cover
         return self.__unicode__().encode('utf-8')
+
+    def text(self):
+        res = ["%s (%s)" % (self.get('author', 'Anonymous'), self.get('year', 's.a.'))]
+        if self.get('title'):
+            res.append('"%s"' % self.get('title', ''))
+        if self.get('editor'):
+            res.append("in %s (ed)" % self.get('editor'))
+        if self.get('booktitle'):
+            res.append("%s" % self.get('booktitle'))
+        for attr in ['school', 'journal', 'volume']:
+            if self.get(attr):
+                res.append(self.get(attr))
+        if self.get('issue'):
+            res.append("(%s)" % self['issue'])
+        if self.get('pages'):
+            res[-1] += '.'
+            res.append("pp. %s" % self['pages'])
+        if self.get('publisher'):
+            res[-1] += '.'
+            res.append("%s: %s" % (self.get('address', ''), self['publisher']))
+        res[-1] += '.'
+        return ' '.join(res)

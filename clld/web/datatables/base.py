@@ -59,7 +59,7 @@ class Col(object):
         self.name = name
         self.js_args = {
             'sName': name,
-            'sTitle': '' if not name else self.dt.req.translate(name.capitalize())}
+            'sTitle': '' if not name else self.dt.req.translate(name.replace('_', ' ').capitalize())}
 
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):

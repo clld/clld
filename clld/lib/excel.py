@@ -1,23 +1,8 @@
-from cStringIO import StringIO
-
-import xlwt
-
-
-def excel(ctx, req):
-    wb = xlwt.Workbook()
-    ws = wb.add_sheet(ctx.__unicode__())
-
-    for i, col in enumerate(ctx.cols):
-        ws.write(0, i, col.js_args['sTitle'])
-
-    for j, item in enumerate(ctx.get_query(limit=1000)):
-        for i, col in enumerate(ctx.cols):
-            ws.write(j + 1, i, col.format(item))
-
-    out = StringIO()
-    wb.save(out)
-    out.seek(0)
-    return out.read()
+from six import PY3
+if not PY3:
+    import xlwt
+else:
+    xlwt = None
 
 
 def hyperlink(url, label=None):

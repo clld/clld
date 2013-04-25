@@ -49,13 +49,12 @@ class ClldRequest(Request):
         """
         return DBSession
 
-    def resource_url(self, obj, rsc=None, **kw):
+    def _route(self, obj, rsc, **kw):
         if rsc is None:
             for _rsc in RESOURCES:
                 if _rsc.interface.providedBy(obj):
                     rsc = _rsc
                     break
-
             assert rsc
 
         route = rsc.name
@@ -65,7 +64,15 @@ class ClldRequest(Request):
         # if rsc is passed explicitely, we allow the object id to be passed in as obj,
         # to make it possible to create resource URLs without having the "real" object.
         kw.setdefault('id', getattr(obj, 'id', obj))
+        return route, kw
+
+    def resource_url(self, obj, rsc=None, **kw):
+        route, kw = self._route(obj, rsc, **kw)
         return self.route_url(route, **kw)
+
+    def resource_path(self, obj, rsc=None, **kw):
+        route, kw = self._route(obj, rsc, **kw)
+        return self.route_path(route, **kw)
 
 
 def menu_item(resource, ctx, req):

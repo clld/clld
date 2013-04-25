@@ -174,13 +174,17 @@ def icon(class_, inverted=False):
     return HTML.i(class_=class_)
 
 
-def text2html(text):
+def newline2br(text):
     chunks = []
     for i, line in enumerate(text.split('\n')):
         if i > 0:
             chunks.append(HTML.br())
         chunks.append(line)
-    return HTML.p(*chunks)
+    return '\n'.join(chunks)
+
+
+def text2html(text):
+    return HTML.p(literal(newline2br(text)))
 
 
 def linked_contributors(req, contribution):

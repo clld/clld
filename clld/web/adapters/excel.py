@@ -1,6 +1,10 @@
 from cStringIO import StringIO
 
-import xlwt
+from six import PY3
+if not PY3:
+    import xlwt
+else:
+    xlwt = None
 
 from clld.web.adapters.base import Index
 from clld.lib.excel import hyperlink

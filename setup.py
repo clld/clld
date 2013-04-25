@@ -36,11 +36,10 @@ install_requires = [
     'alembic',
     'webassets',
     'yuicompressor',
-    'xlwt',
 ]
 
 if not PY3:
-    install_requires.extend('Babel fabric fabtools'.split())
+    install_requires.extend('xlwt Babel fabric fabtools'.split())
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
