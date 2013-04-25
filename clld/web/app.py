@@ -22,6 +22,7 @@ from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld import Resource, RESOURCES
 from clld import interfaces
+from clld.web.adapters import excel
 from clld.web.views import (
     index_view, resource_view, robots, sitemapindex, _raise, _ping, js,
 )
@@ -235,6 +236,7 @@ def includeme(config):
 
     def register_resource(config, name, model, interface, with_index=False):
         RESOURCES.append(Resource(name, model, interface, with_index=with_index))
+        config.register_adapter(excel.ExcelAdapter, interface)
         config.add_route_and_view(
             name,
             '/%ss/{id:[^/\.]+}' % name,
@@ -292,6 +294,7 @@ def includeme(config):
         config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
         config.register_datatable(
             plural, getattr(datatables, plural.capitalize(), DataTable))
+        config.register_adapter(getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
 

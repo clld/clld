@@ -4,7 +4,10 @@
     <%! active_menu_item = "a_home" %>
     <head>
         <meta charset="utf-8">
-        <title>   TODO  </title>
+        <title>
+            ${request.registry.settings.get('clld.publication.sitetitle_short', 'CLLD')}
+            <%block name="title"> </%block>
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="author" content="">

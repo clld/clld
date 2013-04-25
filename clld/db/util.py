@@ -42,3 +42,8 @@ def compute_number_of_values(session=None):
         d = valueset.jsondata if valueset.jsondata else {}
         d['_number_of_values'] = len(valueset.values)
         valueset.jsondata = d
+
+
+def get_distinct_values(col, session=None):
+    session = session or DBSession
+    return sorted([r[0] for r in session.query(col).distinct() if r[0]])

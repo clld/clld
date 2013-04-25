@@ -1,6 +1,7 @@
 """
 We provide some infrastructure to build extensible database models.
 """
+from copy import copy
 from datetime import datetime
 try:
     import simplejson as json
@@ -104,6 +105,11 @@ class Base(object):
     # To allow storage of key,value pairs with typed values:
     jsondata = Column(JSONEncodedDict)
 
+    def update_jsondata(self, **kw):
+        d = copy(self.jsondata) or {}
+        d.update(**kw)
+        self.jsondata = d
+
     @classmethod
     def get(cls, value, key=None):
         """A convenience method.
@@ -156,6 +162,10 @@ class Base(object):
         if PY3:
             return self.__unicode__()  # pragma: no cover
         return self.__unicode__().encode('utf-8')
+
+    def __repr__(self):
+        return '%s-%s' % (
+            object_mapper(self).class_.__name__, getattr(self, 'id', self.pk))
 
 
 Base = declarative_base(cls=Base)

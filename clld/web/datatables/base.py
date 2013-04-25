@@ -8,6 +8,7 @@ import re
 
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer
+from sqlalchemy.inspection import inspect
 from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
@@ -171,6 +172,12 @@ class DataTable(object):
         self.count_all = None
         self.count_filtered = None
 
+    def __unicode__(self):
+        return '%ss' % inspect(self.model).class_.__name__
+
+    def __repr__(self):
+        return '%ss' % inspect(self.model).class_.__name__
+
     def col_defs(self):
         return [LinkCol(self, 'name')]
 
@@ -240,7 +247,11 @@ class DataTable(object):
     def toolbar(self):
         """
         """
+        #
+        # TODO: construct available download formats dynamically?
+        #
         return HTML.div(
+            #button('!', onclick="CLLD.DataTable.current_url('xls')"),
             HTML.a(
                 icon('download-alt'),
                 HTML.span(class_="caret"),
@@ -251,7 +262,8 @@ class DataTable(object):
                 }
             ),
             HTML.ul(
-                HTML.li(HTML.a('csv', href="#")),
+                #HTML.li(HTML.a('csv', href="#")),
+                HTML.li(HTML.a('xls', href="#", onclick="document.location.href = CLLD.DataTable.current_url('xls'); return false;")),
                 class_="dropdown-menu",
             ),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),

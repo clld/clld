@@ -99,17 +99,17 @@ CLLD.DataTable = (function(){
 
         $.extend($.fn.dataTable.defaults, {
             "fnServerParams": function (aoData) {
-		aoData.push({"name": "__eid__", "value": eid});
+                aoData.push({"name": "__eid__", "value": eid});
             },
             "fnInitComplete": function(oSettings) {
                 var i, ctrl;
                 for (i=0 ; i<oSettings.aoPreSearchCols.length ; i++) {
                     if(oSettings.aoPreSearchCols[i].sSearch.length > 0) {
-			ctrl = $("tfoot .control")[i];
-			ctrl = $(ctrl);
-			if (ctrl.length) {
-			    ctrl.val(oSettings.aoPreSearchCols[i].sSearch);
-			}
+                        ctrl = $("tfoot .control")[i];
+                        ctrl = $(ctrl);
+                        if (ctrl.length) {
+                            ctrl.val(oSettings.aoPreSearchCols[i].sSearch);
+                        }
                     }
                 }
             }
@@ -122,88 +122,88 @@ CLLD.DataTable = (function(){
         /* API method to get paging information */
         $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings) {
             return {
-		"iStart":         oSettings._iDisplayStart,
-		"iEnd":           oSettings.fnDisplayEnd(),
-		"iLength":        oSettings._iDisplayLength,
-		"iTotal":         oSettings.fnRecordsTotal(),
-		"iFilteredTotal": oSettings.fnRecordsDisplay(),
-		"iPage":          Math.ceil( oSettings._iDisplayStart / oSettings._iDisplayLength ),
-		"iTotalPages":    Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
+                "iStart":         oSettings._iDisplayStart,
+                "iEnd":           oSettings.fnDisplayEnd(),
+                "iLength":        oSettings._iDisplayLength,
+                "iTotal":         oSettings.fnRecordsTotal(),
+                "iFilteredTotal": oSettings.fnRecordsDisplay(),
+                "iPage":          Math.ceil( oSettings._iDisplayStart / oSettings._iDisplayLength ),
+                "iTotalPages":    Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
             };
         };
 
         /* Bootstrap style pagination control */
         $.extend($.fn.dataTableExt.oPagination, {
             "bootstrap": {
-		"fnInit": function(oSettings, nPaging, fnDraw) {
-		    var oLang = oSettings.oLanguage.oPaginate;
+                "fnInit": function(oSettings, nPaging, fnDraw) {
+                    var oLang = oSettings.oLanguage.oPaginate;
                     var fnClickHandler = function ( e ) {
-			e.preventDefault();
-			if ( oSettings.oApi._fnPageChange(oSettings, e.data.action) ) {
-			    fnDraw( oSettings );
-			}
-		    };
+                        e.preventDefault();
+                        if ( oSettings.oApi._fnPageChange(oSettings, e.data.action) ) {
+                            fnDraw( oSettings );
+                        }
+                    };
 
-		    $(nPaging).addClass('pagination').append(
-			'<ul>'+
-			    '<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
-			    '<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
-			'</ul>'
-		    );
-		    var els = $('a', nPaging);
-		    $(els[0]).bind( 'click.DT', { action: "previous" }, fnClickHandler );
-		    $(els[1]).bind( 'click.DT', { action: "next" }, fnClickHandler );
-		},
-		"fnUpdate": function ( oSettings, fnDraw ) {
-		    var iListLength = 5;
-		    var oPaging = oSettings.oInstance.fnPagingInfo();
-		    var an = oSettings.aanFeatures.p;
-		    var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
+                    $(nPaging).addClass('pagination').append(
+                        '<ul>'+
+                            '<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
+                            '<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
+                        '</ul>'
+                    );
+                    var els = $('a', nPaging);
+                    $(els[0]).bind( 'click.DT', { action: "previous" }, fnClickHandler );
+                    $(els[1]).bind( 'click.DT', { action: "next" }, fnClickHandler );
+                },
+                "fnUpdate": function ( oSettings, fnDraw ) {
+                    var iListLength = 5;
+                    var oPaging = oSettings.oInstance.fnPagingInfo();
+                    var an = oSettings.aanFeatures.p;
+                    var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
 
-		    if ( oPaging.iTotalPages < iListLength) {
-			iStart = 1;
-			iEnd = oPaging.iTotalPages;
-		    } else if ( oPaging.iPage <= iHalf ) {
-			iStart = 1;
-			iEnd = iListLength;
-		    } else if ( oPaging.iPage >= (oPaging.iTotalPages-iHalf) ) {
-			iStart = oPaging.iTotalPages - iListLength + 1;
+                    if ( oPaging.iTotalPages < iListLength) {
+                        iStart = 1;
                         iEnd = oPaging.iTotalPages;
-		    } else {
-			iStart = oPaging.iPage - iHalf + 1;
-			iEnd = iStart + iListLength - 1;
-		    }
+                    } else if ( oPaging.iPage <= iHalf ) {
+                        iStart = 1;
+                        iEnd = iListLength;
+                    } else if ( oPaging.iPage >= (oPaging.iTotalPages-iHalf) ) {
+                        iStart = oPaging.iTotalPages - iListLength + 1;
+                        iEnd = oPaging.iTotalPages;
+                    } else {
+                        iStart = oPaging.iPage - iHalf + 1;
+                        iEnd = iStart + iListLength - 1;
+                    }
 
-		    for ( i=0, iLen=an.length ; i<iLen ; i++ ) {
-			// Remove the middle elements
-			$('li:gt(0)', an[i]).filter(':not(:last)').remove();
+                    for ( i=0, iLen=an.length ; i<iLen ; i++ ) {
+                        // Remove the middle elements
+                        $('li:gt(0)', an[i]).filter(':not(:last)').remove();
 
-			// Add the new list items and their event handlers
-			for ( j=iStart ; j<=iEnd ; j++ ) {
-			    sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
-			    $('<li '+sClass+'><a href="#">'+j+'</a></li>')
-			    .insertBefore( $('li:last', an[i])[0] )
-			    .bind('click', function (e) {
-				e.preventDefault();
-				oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
-				fnDraw( oSettings );
-			    } );
-			}
+                        // Add the new list items and their event handlers
+                        for ( j=iStart ; j<=iEnd ; j++ ) {
+                            sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
+                            $('<li '+sClass+'><a href="#">'+j+'</a></li>')
+                            .insertBefore( $('li:last', an[i])[0] )
+                            .bind('click', function (e) {
+                                e.preventDefault();
+                                oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
+                                fnDraw( oSettings );
+                            } );
+                        }
 
-			// Add / remove disabled classes from the static elements
-			if ( oPaging.iPage === 0 ) {
-			    $('li:first', an[i]).addClass('disabled');
-			} else {
-			    $('li:first', an[i]).removeClass('disabled');
-		    	}
+                        // Add / remove disabled classes from the static elements
+                        if ( oPaging.iPage === 0 ) {
+                            $('li:first', an[i]).addClass('disabled');
+                        } else {
+                            $('li:first', an[i]).removeClass('disabled');
+                        }
 
-			if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-			    $('li:last', an[i]).addClass('disabled');
-			} else {
-			    $('li:last', an[i]).removeClass('disabled');
-			}
-		    }
-		}
+                        if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
+                            $('li:last', an[i]).addClass('disabled');
+                        } else {
+                            $('li:last', an[i]).removeClass('disabled');
+                        }
+                    }
+                }
             }
         } );
 
@@ -229,7 +229,7 @@ CLLD.DataTable = (function(){
             CLLD.DataTable.dt.fnFilter(this.value, $("tfoot .control").index(this));
         });
 
-	$("tfoot select").change( function () {
+        $("tfoot select").change( function () {
             /* Filter on the column (the index) of this element */
             CLLD.DataTable.dt.fnFilter($(this).val(), $("tfoot .control").index(this));
         });
@@ -243,19 +243,19 @@ CLLD.DataTable = (function(){
         }
 
         if (dl) {
-	    $('#cdOpener').clickover({
-		html: true,
-		content: '<dl>'+dl+'</dl>',
-		title: 'Column Descriptions',
-		placement: 'left',/*function (context, source) {
-		    var position = $(source).position();
-		    if (position.top < 80){
-			return "bottom";
-		    }
-		    return "left";
-		},*/
-		trigger: "click"
-	    });
+            $('#cdOpener').clickover({
+                html: true,
+                content: '<dl>'+dl+'</dl>',
+                title: 'Column Descriptions',
+                placement: 'left',/*function (context, source) {
+                    var position = $(source).position();
+                    if (position.top < 80){
+                        return "bottom";
+                    }
+                    return "left";
+                },*/
+                trigger: "click"
+            });
         } else {
             $('#cdOpener').hide();
         }
@@ -271,7 +271,29 @@ CLLD.DataTable = (function(){
 
     return {
         dt: undefined,
-        init: _init
+        init: _init,
+        current_url: function(fmt) {
+            var url, parts,
+                query = {'sEcho': 1},
+                oSettings = CLLD.DataTable.dt.fnSettings();
+            query.iSortingCols = oSettings.aaSorting.length;
+            for (i=0; i < oSettings.aaSorting.length; i++) {
+                query['iSortCol_' + i] = oSettings.aaSorting[i][0];
+                query['sSortDir_' + i] = oSettings.aaSorting[i][1];
+            }
+            for (i=0; i < oSettings.aoPreSearchCols.length; i++) {
+                if (oSettings.aoPreSearchCols[i].sSearch) {
+                    query['sSearch_' + i] = oSettings.aoPreSearchCols[i].sSearch;
+                }
+            }
+            parts = oSettings.sAjaxSource.split('?', 2);
+            if (parts.length == 1) {
+                url = oSettings.sAjaxSource + '.' + fmt + '?'
+            } else {
+                url = parts[0] + '.' + fmt + '?' + parts[1] + '&'
+            }
+            return url + $.param(query);
+        }
     }
 })();
 
@@ -377,9 +399,9 @@ CLLD.Map = (function(){
         map_options = {
             projection: WGS84_google_mercator,
             layers: [
-		new OpenLayers.Layer.OSM(
-		    "Open Street Map",
-		    null,
+                new OpenLayers.Layer.OSM(
+                    "Open Street Map",
+                    null,
                     {wrapDateLine: false}
                 ),
                 new OpenLayers.Layer.Google(
@@ -471,10 +493,10 @@ CLLD.Map = (function(){
         CLLD.Map.map.addControl(selectCtrl);
         selectCtrl.activate();
 
-	controls = CLLD.Map.map.getControlsByClass('OpenLayers.Control.Navigation');
-	for (i = 0; i < controls.length; ++i) {
-	    controls[i].disableZoomWheel();
-	}
+        controls = CLLD.Map.map.getControlsByClass('OpenLayers.Control.Navigation');
+        for (i = 0; i < controls.length; ++i) {
+            controls[i].disableZoomWheel();
+        }
 
         zoomToExtent();
     };

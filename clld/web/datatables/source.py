@@ -6,7 +6,7 @@ class Sources(DataTable):
         return [
             DetailsRowLinkCol(self),
             LinkCol(self, 'name'),
-            Col(self, 'description'),
+            Col(self, 'description', sTitle='Title'),
             Col(self, 'year'),
             Col(self, 'authors'),
         ]

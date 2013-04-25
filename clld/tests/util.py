@@ -12,6 +12,7 @@ import transaction
 from sqlalchemy import create_engine
 from webtest import TestApp
 from webob.request import environ_add_POST
+from zope.interface import Interface
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -30,13 +31,16 @@ class Route(Mock):
 
 
 def main(global_config, **settings):
+    class IF(Interface):
+        """" """""
+
     settings['mako.directories'] = ['clld:web/templates']
     config = Configurator(settings=settings)
     config.include('clld.web.app')
     config.register_app()
     config.registry.registerUtility(lambda *args: None, interfaces.IMapMarker)
-    config.register_resource('testresource', Mock(), Mock(), with_index=True)
-    config.register_resource('test2resource', Mock(), Mock(), with_index=False)
+    config.register_resource('testresource', Mock(), IF, with_index=True)
+    config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')
     config.add_menu_item('test', lambda c, r: ('http://example.org', 'label'))
     return config.make_wsgi_app()
