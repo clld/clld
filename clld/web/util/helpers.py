@@ -32,14 +32,17 @@ JSDataTable = JS('CLLD.DataTable')
 
 
 def format_frequency(req, obj, marker=None, height='20', width='20'):
+    if not obj.frequency:
+        return ''
+    res = 'Frequency: %s%%' % round(obj.frequency, 1)
     marker = marker or req.registry.queryUtility(interfaces.IFrequencyMarker)
     if marker:
         url = marker(obj, req)
         if url:
-            return HTML.img(src=url, height=height, width=width)
+            return HTML.img(src=url, height=height, width=width, alt=res, title=res)
     if not obj.frequency or obj.frequency == 100:
         return ''
-    return 'Frequency: %s%%' % round(obj.frequency, 1)
+    return res
 
 
 def map_marker_img(req, obj, marker=None, height='20', width='20'):
