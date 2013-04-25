@@ -20,6 +20,8 @@ class ExcelAdapter(Index):
         return [item.id, hyperlink(req.resource_url(item), item.__unicode__())]
 
     def render(self, ctx, req):
+        if not xlwt:
+            return ''
         wb = xlwt.Workbook()
         ws = wb.add_sheet(ctx.__unicode__())
 
