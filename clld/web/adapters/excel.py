@@ -1,5 +1,4 @@
-from cStringIO import StringIO
-
+from six.moves import cStringIO as StringIO
 from six import PY3
 if not PY3:
     import xlwt
