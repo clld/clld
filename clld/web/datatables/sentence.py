@@ -1,4 +1,6 @@
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import cast
+from sqlalchemy.types import Integer
 
 from clld.db.meta import DBSession
 from clld.db.util import get_distinct_values
@@ -24,17 +26,29 @@ class TypeCol(Col):
         return Sentence.type
 
 
+class IdCol(Col):
+    def __init__(self, dt, name='id', **kw):
+        kw.setdefault('sTitle', dt.req.translate('No.'))
+        kw.setdefault('sClass', 'right')
+        kw.setdefault('input_size', 'mini')
+        super(IdCol, self).__init__(dt, name, **kw)
+
+    def order(self):
+        return cast(self.dt.model.id, Integer)
+
+
 class Sentences(DataTable):
     def base_query(self, query):
         return query.join(Language).options(joinedload(Sentence.language))
 
     def col_defs(self):
         return [
-            DetailsRowLinkCol(self),
+            IdCol(self),
             LinkCol(self, 'name'),
             Col(self, 'analyzed'),
             Col(self, 'gloss'),
             Col(self, 'description', sTitle=self.req.translate('Translation')),
             TypeCol(self),
             LanguageCol(self, 'language'),
+            DetailsRowLinkCol(self),
         ]
