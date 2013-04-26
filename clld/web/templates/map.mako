@@ -49,7 +49,12 @@
                 % endif
                 </ul>
                 <div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
-                <script>$(window).load(function() {${h.JSMap.init(map.layers, options)|n};});</script>
+                <script>
+                $(window).load(function() {${h.JSMap.init(map.layers, options)|n};});
+                $('.dropdown-menu .stay-open').click(function(e) {
+                    e.stopPropagation();
+                });
+                </script>
     ##        </div>
     ##    </div>
     ##</div>
