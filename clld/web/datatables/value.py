@@ -3,6 +3,7 @@ from sqlalchemy.orm import joinedload, joinedload_all
 from clld.db.models.common import (
     Value, ValueSet, Parameter, DomainElement, Language, Contribution, ValueSetReference,
 )
+from clld.db.util import icontains
 from clld.web.datatables.base import (
     DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
 )
@@ -28,8 +29,8 @@ class ValueNameCol(LinkCol):
 
     def search(self, qs):
         if self.dt.parameter and self.dt.parameter.domain:
-            return DomainElement.name.contains(qs)
-        return Value.description.contains(qs)
+            return icontains(DomainElement.name, qs)
+        return icontains(Value.description, qs)
 
 
 class ValueSetCol(LinkCol):

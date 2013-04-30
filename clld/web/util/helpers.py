@@ -162,7 +162,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             if sentence.description else '',
             HTML.div(sentence.original_script, class_='original_script')
             if sentence.original_script else '',
-            HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
+            #HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
             class_='body',
         ),
         class_="sentence",

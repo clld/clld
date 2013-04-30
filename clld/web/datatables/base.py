@@ -15,6 +15,7 @@ from zope.interface import implementer
 
 from clld.db.meta import DBSession
 from clld.db.models.common import Language
+from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JSMap
 from clld.interfaces import IDataTable
@@ -79,7 +80,7 @@ class Col(object):
     def search(self, qs):
         if self.model_col:
             if isinstance(self.model_col.property.columns[0].type, (String, Unicode)):
-                return self.model_col.contains(qs)
+                return icontains(self.model_col, qs)
             if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
                 return filter_number(self.model_col, qs)
 
@@ -108,7 +109,7 @@ class LanguageCol(LinkCol):
         return Language.name
 
     def search(self, qs):
-        return Language.name.contains(qs)
+        return icontains(Language.name, qs)
 
 
 class IdCol(LinkCol):

@@ -4,6 +4,10 @@ from clld.db.meta import DBSession
 from clld.db.models import common
 
 
+def icontains(col, qs):
+    return col.ilike('%' + qs + '%')
+
+
 def compute_language_sources(session=None):
     """compute relations between languages and sources by going through the more specific
     relations.
