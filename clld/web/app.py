@@ -3,6 +3,7 @@ Common functionality of CLLD Apps is cobbled together here.
 """
 from functools import partial
 from collections import OrderedDict
+import re
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload
@@ -79,10 +80,15 @@ class ClldRequest(Request):
 
     def ctx_for_url(self, url):
         mapper = self.registry.getUtility(IRoutesMapper)
-        info = mapper(WebobRequest({'PATH_INFO': URL(url).path()}))
-        for rsc in RESOURCES:
-            if rsc.name == info['route'].name:
-                return rsc.model.get(info['match']['id'], default=None)
+        _path = URL(url).path()
+        info = mapper(WebobRequest({'PATH_INFO': _path}))
+        if not info['route']:
+            # FIXME: hack to cater to deployments under a path prefix
+            info = mapper(WebobRequest({'PATH_INFO': re.sub('^\/[a-z]+', '', _path)}))
+        if info['route'] and info['match']:
+            for rsc in RESOURCES:
+                if rsc.name == info['route'].name:
+                    return rsc.model.get(info['match']['id'], default=None)
 
     def resource_url(self, obj, rsc=None, **kw):
         route, kw = self._route(obj, rsc, **kw)
@@ -153,7 +159,7 @@ def ctx_factory(model, type_, req):
 
     try:
         ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
-        ctx.md = get_adapters(interfaces.IMetadata, ctx, req)
+        ctx.metadata = get_adapters(interfaces.IMetadata, ctx, req)
         return ctx
     except NoResultFound:
         raise HTTPNotFound()

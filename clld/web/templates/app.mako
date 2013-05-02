@@ -86,7 +86,7 @@
         </div>
 
         <div class="container-fluid">
-            % if ctx and getattr(ctx, 'md', None):
+            % if ctx and getattr(ctx, 'metadata', None):
             <abbr class="unapi-id" title="${h.urlescape(request.resource_url(ctx))}"></abbr>
             % endif
             ##
