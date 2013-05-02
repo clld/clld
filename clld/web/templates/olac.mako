@@ -11,7 +11,7 @@
                              http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 <%def name="header(lang)">
   <oai:header>
-    <oai:identifier>${cfg.format_identifier(request, lang.id)}</oai:identifier>
+    <oai:identifier>${cfg.format_identifier(request, lang)}</oai:identifier>
     <oai:datestamp>${date(lang.updated)}</oai:datestamp>
   </oai:header>
 </%def>
@@ -47,7 +47,7 @@
           <oai:scheme>${cfg.scheme}</oai:scheme>
           <oai:repositoryIdentifier>${request.pub.get('domain', 'clld')}</oai:repositoryIdentifier>
           <oai:delimiter>${cfg.delimiter}</oai:delimiter>
-          <oai:sampleIdentifier>${cfg.format_identifier(request, earliest.id)}</oai:sampleIdentifier>
+          <oai:sampleIdentifier>${cfg.format_identifier(request, earliest)}</oai:sampleIdentifier>
         </oai:oai-identifier>
       </oai:description>
       <oai:description>

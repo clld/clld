@@ -136,10 +136,10 @@ class OlacConfig(object):
         return [li.identifier.id for li in item.languageidentifier
                 if li.identifier.type == IdentifierType.iso.value]
 
-    def format_identifier(self, req, id_):
+    def format_identifier(self, req, item):
         """
         """
-        return self.delimiter.join([self.scheme, req.pub.get('domain', 'clld'), id_])
+        return self.delimiter.join([self.scheme, req.pub.get('domain', 'clld'), item.id])
 
     def parse_identifier(self, req, id_):
         """
