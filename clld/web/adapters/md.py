@@ -8,39 +8,49 @@ from clld.web.adapters.base import Representation
 from clld.lib import bibtex
 
 
+class Metadata(Representation):
+    @property
+    def unapi_name(self):
+        return getattr(self, 'unapi', self.extension)
+
+
 #
 # TODO: refactor! distinguish BibTexContribution and BibTexSite
 #
-@implementer(interfaces.IRepresentation)
-class BibTex(Representation):
+@implementer(interfaces.IRepresentation, interfaces.IMetadata)
+class BibTex(Metadata):
     """Render a resource's metadata as BibTex record.
     """
-    extension = 'bib'
+    unapi = 'bibtex'
+    extension = 'md.bib'
     mimetype = 'text/x-bibtex'
     genre = 'incollection'
 
-    def render(self, ctx, req):
-        rec = bibtex.Record(
+    def rec(self, ctx, req):
+        return bibtex.Record(
             self.genre,
             ctx.id,
             title=getattr(ctx, 'citation_name', ctx.__unicode__()),
             url=req.resource_url(ctx),
-            author=[c.name for c in
-                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)],
-            editor=req.registry.settings.get('clld.publication.editors', ''),
-            booktitle=req.registry.settings.get('clld.publication.sitetitle', ''),
-            address=req.registry.settings.get('clld.publication.place', ''),
-            publisher=req.registry.settings.get('clld.publication.publisher', ''),
-            year=req.registry.settings.get('clld.publication.year', ''),
+            author=' and '.join([
+                c.name for c in
+                list(ctx.primary_contributors) + list(ctx.secondary_contributors)]),
+            editor=req.pub.get('editors', ''),
+            booktitle=req.pub.get('sitetitle', ''),
+            address=req.pub.get('place', ''),
+            publisher=req.pub.get('publisher', ''),
+            year=req.pub.get('year', ''),
         )
-        return rec.__unicode__()
+
+    def render(self, ctx, req):
+        return self.rec(ctx, req).__unicode__()
 
 
-@implementer(interfaces.IRepresentation)
-class TxtCitation(Representation):
+@implementer(interfaces.IRepresentation, interfaces.IMetadata)
+class TxtCitation(Metadata):
     """Render a resource's metadata as plain text string.
     """
-    extension = 'txt'
+    extension = 'md.txt'
     mimetype = 'text/plain'
 
     def render(self, ctx, req):
@@ -67,8 +77,5 @@ $sitetitle.
 $place: $publisher.
 (Available online at http://$domain$path, Accessed on $accessed.)
 """))
-        for key, value in req.registry.settings.items():
-            if key.startswith('clld.publication.'):
-                md[key.split('clld.publication.', 1)[1]] = value
-
+        md.update(req.pub)
         return template.safe_substitute(**md)

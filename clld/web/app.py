@@ -10,11 +10,12 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
 import transaction
-
+from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
+from pyramid.interfaces import IRoutesMapper
 from purl import URL
 
 from clld.config import get_config
@@ -22,10 +23,12 @@ from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld import Resource, RESOURCES
 from clld import interfaces
+from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.views import (
-    index_view, resource_view, robots, sitemapindex, _raise, _ping, js,
+    index_view, resource_view, robots, sitemapindex, _raise, _ping, js, unapi,
 )
+from clld.web.views.olac import olac, OlacConfig
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -49,6 +52,14 @@ class ClldRequest(Request):
         """
         return DBSession
 
+    @reify
+    def pub(self):
+        md = {}
+        for key, value in self.registry.settings.items():
+            if key.startswith('clld.publication.'):
+                md[key.split('clld.publication.', 1)[1]] = value
+        return md
+
     def _route(self, obj, rsc, **kw):
         if rsc is None:
             for _rsc in RESOURCES:
@@ -65,6 +76,13 @@ class ClldRequest(Request):
         # to make it possible to create resource URLs without having the "real" object.
         kw.setdefault('id', getattr(obj, 'id', obj))
         return route, kw
+
+    def ctx_for_url(self, url):
+        mapper = self.registry.getUtility(IRoutesMapper)
+        info = mapper(WebobRequest({'PATH_INFO': URL(url).path()}))
+        for rsc in RESOURCES:
+            if rsc.name == info['route'].name:
+                return rsc.model.get(info['match']['id'], default=None)
 
     def resource_url(self, obj, rsc=None, **kw):
         route, kw = self._route(obj, rsc, **kw)
@@ -134,7 +152,9 @@ def ctx_factory(model, type_, req):
         return datatable(req, model)
 
     try:
-        return req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
+        ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
+        ctx.md = get_adapters(interfaces.IMetadata, ctx, req)
+        return ctx
     except NoResultFound:
         raise HTTPNotFound()
 
@@ -198,6 +218,7 @@ def includeme(config):
     config.set_request_factory(ClldRequest)
 
     config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)
+    config.registry.registerUtility(OlacConfig(), interfaces.IOlacConfig)
 
     # initialize the db connection
     engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
@@ -292,6 +313,8 @@ def includeme(config):
     config.add_route_and_view('robots', '/robots.txt', robots)
     config.add_route_and_view(
         'sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
+    config.add_route_and_view('unapi', '/unapi', unapi)
+    config.add_route_and_view('olac', '/olac', olac, renderer='olac.mako')
 
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model

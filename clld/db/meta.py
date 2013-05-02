@@ -30,10 +30,12 @@ from sqlalchemy.orm import (
     object_mapper,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from clld.db.versioned import versioned_session
+from clld.util import NO_DEFAULT, UnicodeMixin
 
 
 @event.listens_for(Pool, "checkout")
@@ -77,7 +79,7 @@ class JSONEncodedDict(TypeDecorator):
         return value
 
 
-class Base(object):
+class Base(UnicodeMixin):
     """All our models have an integer primary key which has nothing to do with
     the kind of data stored in a table. 'Natural' candidates for primary keys
     should be marked with unique constraints instead. This adds flexibility
@@ -111,12 +113,17 @@ class Base(object):
         self.jsondata = d
 
     @classmethod
-    def get(cls, value, key=None):
+    def get(cls, value, key=None, default=NO_DEFAULT):
         """A convenience method.
         """
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
-        return DBSession.query(cls).filter_by(**{key: value}).one()
+        try:
+            return DBSession.query(cls).filter_by(**{key: value}).one()
+        except (NoResultFound, MultipleResultsFound):
+            if default is NO_DEFAULT:
+                raise
+            return default
 
     @classmethod
     def first(cls):
@@ -154,14 +161,6 @@ class Base(object):
         if not r:
             r = repr(self)[1:].split('object')[0] + ('%s' % self.pk)
         return r
-
-    def __str__(self):
-        """
-        :return: a human readable label for the object, appropriately encoded (or not)
-        """
-        if PY3:
-            return self.__unicode__()  # pragma: no cover
-        return self.__unicode__().encode('utf-8')
 
     def __repr__(self):
         return '%s-%s' % (

@@ -3,6 +3,12 @@ import re
 from itertools import groupby  # we just import this to have it available in templates!
 assert groupby  # appease pyflakes
 
+from six import PY3
+if PY3:
+    from urllib.parse import quote
+else:
+    from urllib import quote
+
 from sqlalchemy import or_
 from markupsafe import Markup
 
@@ -11,6 +17,13 @@ from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
 from clld.db.meta import DBSession
 from clld.db.models import common as models
+from clld.web.adapters import get_adapter
+from clld.lib.coins import ContextObject
+from clld.lib import bibtex
+
+
+def urlescape(string):
+    return quote(string, safe='')
 
 
 class JS(object):
@@ -29,6 +42,16 @@ JSFeed = JS('CLLD.Feed')
 JSMap = JS('CLLD.Map')
 JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
+
+
+def coins(req, obj, label=''):
+    if not isinstance(obj, bibtex.Record):
+        adapter = get_adapter(interfaces.IMetadata, obj, req, ext='md.bib')
+        if not adapter:
+            return label
+        obj = adapter.rec(obj, req)
+    co = ContextObject.from_bibtex('clld', obj)
+    return HTML.span(label, **co.span_attrs())
 
 
 def format_frequency(req, obj, marker=None, height='20', width='20'):

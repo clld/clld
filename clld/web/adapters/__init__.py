@@ -75,16 +75,13 @@ def includeme(config):
         config.registry.registerAdapter(
             cls, (interface,), list(implementedBy(base))[0], name=mimetype)
 
-    config.registry.registerAdapter(
-        BibTex,
-        (interfaces.IContribution,),
-        interfaces.IRepresentation,
-        name=BibTex.mimetype)
-    config.registry.registerAdapter(
-        TxtCitation,
-        (interfaces.IContribution,),
-        interfaces.IRepresentation,
-        name=TxtCitation.mimetype)
+    for cls in [BibTex, TxtCitation]:
+        for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
+            config.registry.registerAdapter(
+                cls,
+                (interfaces.IContribution,),
+                if_,
+                name=cls.mimetype)
     config.registry.registerAdapter(
         GeoJsonLanguages,
         (interfaces.ILanguage,),
@@ -97,13 +94,17 @@ def includeme(config):
         name=GeoJson.mimetype)
 
 
-def get_adapter(interface, ctx, req, ext=None, name=None):
-    """
-    """
+def get_adapters(interface, ctx, req):
     # ctx can be a DataTable instance. In this case we create a resource by instantiating
     # the model class associated with the DataTable
     resource = ctx.model() if hasattr(ctx, 'model') else ctx
-    adapters = dict(req.registry.getAdapters([resource], interface))
+    return req.registry.getAdapters([resource], interface)
+
+
+def get_adapter(interface, ctx, req, ext=None, name=None):
+    """
+    """
+    adapters = dict(get_adapters(interface, ctx, req))
 
     if ext:
         # find adapter by requested file extension
@@ -115,4 +116,8 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
         # or by content negotiation
         adapter = adapters.get(req.accept.best_match(adapters.keys()))
 
-    return adapter[0] if isinstance(adapter, list) and adapter else adapter
+    if isinstance(adapter, list):
+        if adapter:
+            return adapter[0]
+        return None
+    return adapter

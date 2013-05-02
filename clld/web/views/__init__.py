@@ -2,12 +2,17 @@ from json import dumps
 import re
 
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotAcceptable
+from pyramid.httpexceptions import (
+    HTTPNotAcceptable, HTTPFound, HTTPNotFound, HTTPMultipleChoices,
+)
 from pyramid.interfaces import IRoutesMapper
+from pyramid.renderers import render
 
-from clld.interfaces import IRepresentation, IIndex
+from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld import RESOURCES
-from clld.web.adapters import get_adapter
+from clld.web.adapters import get_adapter, get_adapters
+from clld.lib.olac import OaiContext
+from clld.db.models.common import Language
 
 
 def view(interface, ctx, req):
@@ -91,3 +96,88 @@ def sitemapindex(req):
     req.response.content_type = 'application/xml'
     return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml')
                          for r in RESOURCES if r.with_index]}
+
+
+def unapi(req):
+    """implements the server side of the unAPI spec.
+    """
+    id_ = req.params.get('id')
+    if id_:
+        obj = req.ctx_for_url(id_)
+        if not obj:
+            return HTTPNotFound()
+
+    format_ = req.params.get('format')
+    if not format_:
+        kw = {'content_type': 'application/xml'}
+        if id_:
+            formats = [a for n, a in get_adapters(IMetadata, obj, req)]
+            kw['status'] = '300 Multiple Choices'
+        else:
+            formats = []
+        body = render(
+            'unapiformats.mako',
+            {'formats': formats, 'identifier': id_},
+            request=req)
+        return Response(body, **kw)
+
+    adapter = None
+    for _n, _a in get_adapters(IMetadata, obj, req):
+        if _a.unapi_name == format_:
+            adapter = _a
+            break
+    if not adapter:
+        return HTTPNotAcceptable()
+    return HTTPFound(location=req.resource_url(obj, ext=adapter.extension))
+
+
+def olac(req):
+    req.response.content_type = 'application/xml'
+    res = {'oai': OaiContext.from_request(req)}
+
+    #c.contribs = config.get('wals.editors.names').split(" and ")
+
+    def exit(error=None):
+        if error:
+            res['oai'].error = error
+        return res
+
+    if res['oai'].error:
+        return exit()
+
+    #
+    # TODO:
+    # - the db query must be configurable! -> IOlacResourceQuery
+    # - the oai identifier pattern must be configurable?
+    # - the way, iso codes are associated with the objects must be configurable?
+    # --> register a class OlacConfig as utility, to bundle all configurable stuff
+    #
+
+    if res['oai'].verb == 'GetRecord':
+        if ':' not in res['oai'].params['identifier']:
+            return exit("idDoesNotExist")
+
+        l = Language.get(res['oai'].params['identifier'].split(':')[-1], default=None)
+        if not l:
+            return exit("idDoesNotExist")
+        res['language'] = l
+
+    if res['oai'].verb in ['ListIdentifiers', 'ListRecords']:
+        rt = res['oai'].resumptionToken
+        q = req.db.query(Language).order_by(Language.pk)
+        if rt.from_:
+            q = q.filter(Language.updated >= rt.from_)
+        elif rt.until:
+            q = q.filter(Language.updated < rt.until)
+
+        res['languages'] = q.offset(rt.offset).limit(rt.limit).all()
+        if not res['languages']:
+            return exit('noRecordsMatch')
+
+        if len(res['languages']) < rt.limit:
+            res['oai'].resumptionToken = None
+        else:
+            rt.offset += rt.limit
+            res['oai'].resumptionToken = rt
+
+    return res

@@ -1,9 +1,71 @@
 from collections import OrderedDict
 
-from six import PY3
+from clld.util import UnicodeMixin
+
+"""
+article
+    An article from a journal or magazine.
+    Required fields: author, title, journal, year
+    Optional fields: volume, number, pages, month, note, key
+book
+    A book with an explicit publisher.
+    Required fields: author/editor, title, publisher, year
+    Optional fields: volume/number, series, address, edition, month, note, key
+booklet
+    A work that is printed and bound, but without a named publisher or sponsoring
+    institution.
+    Required fields: title
+    Optional fields: author, howpublished, address, month, year, note, key
+conference
+    The same as inproceedings, included for Scribe compatibility.
+inbook
+    A part of a book, usually untitled. May be a chapter (or section or whatever) and/or
+    a range of pages.
+    Required fields: author/editor, title, chapter/pages, publisher, year
+    Optional fields: volume/number, series, type, address, edition, month, note, key
+incollection
+    A part of a book having its own title.
+    Required fields: author, title, booktitle, publisher, year
+    Optional fields: editor, volume/number, series, type, chapter, pages, address,
+    edition, month, note, key
+inproceedings
+    An article in a conference proceedings.
+    Required fields: author, title, booktitle, year
+    Optional fields: editor, volume/number, series, pages, address, month, organization,
+    publisher, note, key
+manual
+    Technical documentation.
+    Required fields: title
+    Optional fields: author, organization, address, edition, month, year, note, key
+mastersthesis
+    A Master's thesis.
+    Required fields: author, title, school, year
+    Optional fields: type, address, month, note, key
+misc
+    For use when nothing else fits.
+    Required fields: none
+    Optional fields: author, title, howpublished, month, year, note, key
+phdthesis
+    A Ph.D. thesis.
+    Required fields: author, title, school, year
+    Optional fields: type, address, month, note, key
+proceedings
+    The proceedings of a conference.
+    Required fields: title, year
+    Optional fields: editor, volume/number, series, address, month, publisher,
+    organization, note, key
+techreport
+    A report published by a school or other institution, usually numbered within a series.
+    Required fields: author, title, institution, year
+    Optional fields: type, number, address, month, note, key
+unpublished
+    A document having an author and title, but not formally published.
+    Required fields: author, title, note
+    Optional fields: month, year, key
+"""
 
 
-class Record(OrderedDict):
+class Record(OrderedDict, UnicodeMixin):
 
     def __init__(self, genre, id, *args, **kwargs):
         self.genre = genre
@@ -25,14 +87,6 @@ class Record(OrderedDict):
 %s
 }
 """ % (self.genre, self.id, "\n".join(fields)[:-1])
-
-    def __str__(self):
-        """
-        :return: a human readable label for the object, appropriately encoded (or not)
-        """
-        if PY3:
-            return self.__unicode__()  # pragma: no cover
-        return self.__unicode__().encode('utf-8')
 
     def text(self):
         res = ["%s (%s)" % (self.get('author', 'Anonymous'), self.get('year', 's.a.'))]

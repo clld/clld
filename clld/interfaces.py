@@ -108,6 +108,11 @@ class IIndex(Interface):
         """
 
 
+class IMetadata(Interface):
+    """
+    """
+
+
 class IDataTable(Interface):
     """marker
     """
@@ -156,4 +161,31 @@ class ICtxFactoryQuery(Interface):
     def __call__(self, model, req):
         """
         :return: URL for a marker to use in maps.
+        """
+
+
+class IOlacConfig(Interface):
+    """utility class bundling all configurable aspects of an applications OLAC repository
+    """
+    scheme = Attribute('oai-pmh identifier scheme')
+    delimiter = Attribute('oai-pmh identifier delimiter')
+
+    def get_earliest_record(self, req):
+        """
+        """
+
+    def get_record(self, req, identifier):
+        """
+        """
+
+    def query_records(self, req, from_=None, until=None):
+        """
+        """
+
+    def format_identifier(self, req, id_):
+        """
+        """
+
+    def parse_identifier(self, req, id_):
+        """
         """

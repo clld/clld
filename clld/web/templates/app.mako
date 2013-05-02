@@ -44,6 +44,7 @@
         ##  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
 
+        <link rel="unapi-server" type="application/xml" title="unAPI" href="${request.route_url('unapi')}">
         <script src="${request.route_url('_js')}"></script>
         <%block name="head"> </%block>
     </head>
@@ -67,7 +68,7 @@
                         ##</p>
                         <ul class="nav">
                         % for name, item in request.registry.getUtility(IMenuItems).items():
-                        <% href, title = item(context, request) %>
+                        <% href, title = item(context.get('ctx'), request) %>
                             <li id="menuitem_${name}" class="${'active' if name == self.attr.active_menu_item else ''}">
                                 <a href="${href}" title="${title}">${title}</a>
                             </li>
@@ -85,6 +86,9 @@
         </div>
 
         <div class="container-fluid">
+            % if ctx and getattr(ctx, 'md', None):
+            <abbr class="unapi-id" title="${h.urlescape(request.resource_url(ctx))}"></abbr>
+            % endif
             ##
             ## TODO: loop over sidebar boxes registered for the current page
             ##

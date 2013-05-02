@@ -28,6 +28,7 @@ from zope.interface import implementer
 from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
+from clld.util import DeclEnum
 
 
 #
@@ -544,6 +545,12 @@ class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
 
     language_pk = Column(Integer, ForeignKey('language.pk'))
     language = relationship(Language, backref="gloss_abbreviations")
+
+
+class IdentifierType(DeclEnum):
+    iso = 'iso639-3', 'ISO 639-3'
+    wals = 'wals', 'WALS Code'
+    glottolog = 'glottolog', 'Glottocode'
 
 
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
