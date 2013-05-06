@@ -55,12 +55,14 @@ class TxtCitation(Metadata):
 
     def render(self, ctx, req):
         md = {'accessed': str(datetime.date.today())}
+        md.update(req.pub)
         if ctx:
             md.update(
                 authors=', '.join(
                     c.name for c in
                     list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
                 title=getattr(ctx, 'citation_name', ctx.__unicode__()),
+                year=str(ctx.updated.year),
                 path=req.resource_path(ctx))
             template = StringTemplate(md.get('template', """\
 $authors. $year. $title.
@@ -77,5 +79,4 @@ $sitetitle.
 $place: $publisher.
 (Available online at http://$domain$path, Accessed on $accessed.)
 """))
-        md.update(req.pub)
         return template.safe_substitute(**md)

@@ -13,6 +13,7 @@ class Resource(object):
 
 
 RESOURCES = [
+    Resource('file', common.File, interfaces.IFile),
     Resource('contribution', common.Contribution, interfaces.IContribution),
     Resource('parameter', common.Parameter, interfaces.IParameter),
     Resource('language', common.Language, interfaces.ILanguage),

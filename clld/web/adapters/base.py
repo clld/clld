@@ -45,6 +45,17 @@ class Representation(Renderable):
     pass
 
 
+@implementer(interfaces.IRepresentation)
+class OctetStream(Renderable):
+    """
+    """
+    mimetype = 'application/octet-stream'
+
+    def render(self, ctx, req):
+        self.send_mimetype = str(ctx.mime_type)
+        return ctx.content
+
+
 @implementer(interfaces.IIndex)
 class Index(Renderable):
     """Base class for adapters implementing IIndex

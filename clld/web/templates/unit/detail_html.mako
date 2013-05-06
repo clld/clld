@@ -5,6 +5,10 @@
 
 <h2>${_('Unit')} ${ctx.name}</h2>
 
+<p>
+    ${ctx.description}
+</p>
+
 <dl>
 % for key, objs in h.groupby(ctx.data, lambda o: o.key):
 <dt>${key}</dt>

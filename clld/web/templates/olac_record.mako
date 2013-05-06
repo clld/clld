@@ -17,7 +17,7 @@
     <dc:subject xsi:type="olac:language" olac:code="${code}"/>
     % endfor
     <dc:type xsi:type="olac:linguistic-type" olac:code="language_description"/>
-    <dc:date>${date(lang.updated)}</dc:date>
+    <dc:date xsi:type="dcterms:W3CDTF">${date(lang.updated)}</dc:date>
     <dc:identifier xsi:type="dcterms:URI">${request.resource_url(lang)}</dc:identifier>
     <dc:type xsi:type="dcterms:DCMIType">Text</dc:type>
     <dc:format xsi:type="dcterms:IMT">text/html</dc:format>

@@ -1,6 +1,8 @@
 """
 Common models for all clld apps
 """
+from base64 import b64encode
+
 from sqlalchemy import (
     Column,
     Float,
@@ -22,6 +24,7 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from zope.interface import implementer
 
@@ -56,12 +59,20 @@ class Config(Base):
     value = Column(Unicode)
 
 
+@implementer(interfaces.IFile)
 class File(Base):
     """Model for storage of files in the database.
     """
     name = Column(Unicode)
     mime_type = Column(String)
     content = Column(LargeBinary)
+
+    @hybrid_property
+    def id(self):
+        return self.pk
+
+    def data_uri(self):
+        return 'data:%s;base64,%s' % (self.mime_type, b64encode(self.content))
 
 
 class FilesMixin(object):
@@ -653,7 +664,7 @@ class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
     description = Column(Unicode())
 
     value = relationship(Value, backref='sentence_assocs')
-    sentence = relationship(Sentence, backref='value_assocs')
+    sentence = relationship(Sentence, backref='value_assocs', order_by=Sentence.id)
 
 
 class UnitParameterUnit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):

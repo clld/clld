@@ -7,6 +7,11 @@ from zope.interface import (
 #----------------------------------------------------------------------------
 # Interfaces for model classes
 #----------------------------------------------------------------------------
+class IFile(Interface):
+    """
+    """
+
+
 class ILanguage(Interface):
     name = Attribute('')
     latitude = Attribute('')

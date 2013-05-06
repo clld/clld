@@ -224,5 +224,6 @@ def slug(s):
     for c in string.punctuation:
         res = res.replace(c, '')
     res = re.sub('\s+', '', res)
-    assert re.match('[a-z0-9]+$', res)
+    res = res.encode('ascii', 'ignore')
+    assert re.match('[a-z0-9]*$', res)
     return res

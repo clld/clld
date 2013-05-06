@@ -5,6 +5,8 @@ body {
         padding-right: 5px;
       }
 
+h2 {font-size: 28px !important;}
+
 .dt-toolbar {float: right; text-align: right;}
 
 #contextnav ul {margin-top: 10px; margin-bottom: 10px;}

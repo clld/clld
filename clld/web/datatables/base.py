@@ -85,6 +85,8 @@ class Col(object):
                 return filter_number(self.model_col, qs)
 
     def format(self, item):
+        if self.model_col:
+            return getattr(item, self.model_col.name, None) or ''
         return getattr(item, self.name, None) or ''
 
 
