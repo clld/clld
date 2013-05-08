@@ -52,3 +52,18 @@ class Values(ExcelAdapter):
         for obj in [item.valueset.parameter, item.valueset.language]:
             res.append(hyperlink(req.resource_url(obj), obj.__unicode__()))
         return res
+
+
+class Sentences(ExcelAdapter):
+    def header(self, ctx, req):
+        return ['ID', 'Text', 'Analyzed', 'Gloss', 'Translation', 'Language']
+
+    def row(self, ctx, req, item):
+        return [
+            hyperlink(req.resource_url(item), item.id),
+            item.name,
+            item.analyzed,
+            item.gloss,
+            item.description,
+            hyperlink(req.resource_url(item.language), item.language.name),
+        ]
