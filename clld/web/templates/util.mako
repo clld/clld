@@ -38,10 +38,10 @@
     % if obj.files:
     <dl>
         % for key, items in h.groupby(sorted(obj.files, key=lambda o: (o.ord, o.name)), lambda x: x.name):
-            % if not key.startswith('_'):  ## we respect a convention to mark "private" data
+            % if not key.startswith('_'):
             <dt>${key}</dt>
                 % for item in items:
-                <dd>${item.file.name}</dd>  ## TODO: link to associated file!
+                <dd>${h.link(request, item.file)}</dd>
                 % endfor
             % endif
         % endfor
