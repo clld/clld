@@ -115,6 +115,11 @@ class LanguageCol(LinkCol):
 
 
 class IdCol(LinkCol):
+    def __init__(self, dt, name='ID', **kw):
+        kw.setdefault('sClass', 'right')
+        kw.setdefault('input_size', 'mini')
+        super(IdCol, self).__init__(dt, name, **kw)
+
     def get_attrs(self, item):
         return {'label': item.id}
 
