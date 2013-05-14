@@ -298,248 +298,148 @@ CLLD.DataTable = (function(){
 })();
 
 
+/*
+ * Manager for a leaflet map
+ */
 CLLD.Map = (function(){
-    var styles = new OpenLayers.StyleMap({
-        "default": {
-            pointRadius: 8,
-            strokeColor: "black",
-            strokeWidth: 1,
-            fillColor: "#f89117",
-            fillOpacity: 0.8//,
-            //graphicXOffset: 50,
-            //graphicYOffset: 50,
-            //graphicZIndex: 20
-        },
-        "temporary": {
-            pointRadius: 12,
-            fillOpacity: 1,
-            label : "${language_name}",
-            fontColor: "black",
-            fontSize: "12px",
-            fontFamily: "Courier New, monospace",
-            fontWeight: "bold",
-            labelAlign: "cm",
-            labelOutlineColor: "white",
-            labelOutlineWidth: 3
-        },
-        "select": {
-            //externalGraphic: "http://chart.googleapis.com/chart?cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00",
-            label: "",
-            //pointRadius: 25,
-            graphicWidth: 38,
-            graphicHeight: 38
+    function _openPopup(layer, html) {
+        if (!CLLD.Map.popup) {
+            CLLD.Map.popup = L.popup();
         }
-    });
-
-    var selectedFeature;
-    var selectCtrl;
-
-    function onFeatureSelectCallback(data) {
-        popup = new OpenLayers.Popup.FramedCloud("chicken",
-                selectedFeature.geometry.getBounds().getCenterLonLat(),
-                null,
-                data,
-                null, false, null);
-        selectedFeature.popup = popup;
-        CLLD.Map.map.addPopup(popup);
+        CLLD.Map.popup.setLatLng(layer.getLatLng());
+        CLLD.Map.popup.setContent(html);
+        CLLD.Map.map.openPopup(CLLD.Map.popup);
     }
 
-    function onFeatureSelect(feature) {
+    function _showInfoWindow(layer) {
         var route = CLLD.Map.options.info_route == undefined ? 'language_alt' : CLLD.Map.options.info_route;
 
-        selectedFeature = feature;
+        if (CLLD.Map.marker_map.hasOwnProperty(layer)) {
+            // allow opening the info window by language id
+            layer = CLLD.Map.marker_map[layer];
+        }
         $.get(
-            CLLD.route_url(route, {'id': feature.data.language_id, 'ext': 'snippet.html'}, CLLD.Map.options.info_query),
+            CLLD.route_url(
+                route,
+                {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
+                CLLD.Map.options.info_query),
             CLLD.Map.options.info_query == undefined ? {} : CLLD.Map.options.info_query,
             function(data, textStatus, jqXHR) {
-                onFeatureSelectCallback(data);
+                _openPopup(layer, data);
             },
             'html'
         );
     }
 
-    function onFeatureUnselect(feature) {
-        CLLD.Map.map.removePopup(feature.popup);
-        feature.popup.destroy();
-        feature.popup = null;
-    }
-
-    var bounds = new OpenLayers.Bounds();
-
-    function zoomToExtent() {
-        if (CLLD.Map.options.center === undefined) {
-            CLLD.Map.map.zoomToExtent(bounds, true);
-            zoom = CLLD.Map.map.getZoomForExtent(bounds);
-            if (zoom) {
-                CLLD.Map.map.zoomTo(Math.min(zoom, 4));
-            }
-        }
-    }
-
-    var _init = function (data_layers, options) {  // TODO: per-layer options! in particular style map
-        var i, layer, layer_options, spec, center, zoom, map_options, controls,
-            select_layers = [],
-            styles = CLLD.Map.style_maps['default'];
-
-        // World Geodetic System 1984 projection (lon/lat)
-        var WGS84 = new OpenLayers.Projection("EPSG:4326");
-
-        // WGS84 Google Mercator projection (meters)
-        var WGS84_google_mercator = new OpenLayers.Projection("EPSG:900913");
-        //var WGS84_google_mercator = new OpenLayers.Projection("EPSG:3857");
-
-        CLLD.Map.options = options == undefined ? {} : options;
-
-        center = CLLD.Map.options.center == undefined ? (0, 0) : CLLD.Map.options.center;
-
-        if (CLLD.Map.options.style_map) {
-            styles = CLLD.Map.style_maps[CLLD.Map.options.style_map];
-        }
-
-        map_options = {
-            projection: WGS84_google_mercator,
-            layers: [
-                new OpenLayers.Layer.OSM(
-                    "Open Street Map",
-                    null,
-                    {wrapDateLine: false}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Physical",
-                    {type: google.maps.MapTypeId.TERRAIN, maxZoomLevel: 8, wrapDateLine: false}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Hybrid",
-                    {type: google.maps.MapTypeId.HYBRID, maxZoomLevel: 8, wrapDateLine: false}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Satellite",
-                    {type: google.maps.MapTypeId.SATELLITE, maxZoomLevel: 8, wrapDateLine: false}
-                )
-            ],
-            center: new OpenLayers.LonLat(center[0], center[1]).transform(WGS84, WGS84_google_mercator),
-            maxExtent: new OpenLayers.Bounds(-180, -85.0511, 180, 85.0511).transform(WGS84, WGS84_google_mercator)
-        }
-        if (CLLD.Map.options.zoom) {
-            map_options.zoom = CLLD.Map.options.zoom;
-        }
-
-        CLLD.Map.map = new OpenLayers.Map('map', map_options);
-
-        CLLD.Map.map.addControl(new OpenLayers.Control.LayerSwitcher());
-
-        var geojsonParser = new OpenLayers.Format.GeoJSON({
-            'internalProjection': WGS84_google_mercator,
-            'externalProjection': WGS84
-        });
-
-        for (i=0; i<data_layers.length; i++) {
-            spec = data_layers[i];
-
-            layer_options = {
-                styleMap: spec.style_map === undefined ? styles : CLLD.Map.style_maps[spec.style_map],
-                displayInLayerSwitcher: false,
-                rendererOptions: {zIndexing: true},
-                projection: WGS84
-            }
-
-            if (spec.url && !spec.data) {
-                layer_options.strategies = [new OpenLayers.Strategy.Fixed()];
-                layer_options.protocol = new OpenLayers.Protocol.HTTP({
-                    url: spec.url,
-                    format: new OpenLayers.Format.GeoJSON()
-                });
-            }
-
-            layer = new OpenLayers.Layer.Vector(spec.name, layer_options);
-
-            if (spec.data) {
-                layer.addFeatures(geojsonParser.read(spec.data));
-                bounds.extend(layer.getDataExtent());
-            } else {
-                layer.events.register("loadend", layer, function() {
-                    bounds.extend(this.getDataExtent());
-                    zoomToExtent();
-                });
-            }
-
-            CLLD.Map.layers.push(layer);
-            CLLD.Map.map.addLayer(layer);
-            if (spec.no_select == undefined || !spec.no_select) {
-                select_layers.push(layer);
-            }
-        }
-
-        var highlightCtrl = new OpenLayers.Control.SelectFeature(
-            CLLD.Map.layers,
-            {
-                hover: true,
-                highlightOnly: true,
-                renderIntent: "temporary"
-            }
-        );
-        CLLD.Map.map.addControl(highlightCtrl);
-        highlightCtrl.activate();
-
-        var select_options = {
-            onUnselect: onFeatureUnselect,
-            onSelect: onFeatureSelect
-        };
-        if (CLLD.Map.options.no_popup) {
-            select_options = {};
-        }
-
-        selectCtrl = new OpenLayers.Control.SelectFeature(select_layers, select_options);
-        CLLD.Map.map.addControl(selectCtrl);
-        selectCtrl.activate();
-
-        controls = CLLD.Map.map.getControlsByClass('OpenLayers.Control.Navigation');
-        for (i = 0; i < controls.length; ++i) {
-            controls[i].disableZoomWheel();
-        }
-
-        zoomToExtent();
+    var _onEachFeature = function(feature, layer) {
+        layer.setIcon(L.icon({
+            iconUrl: feature.properties.icon,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, 0]
+        }));
+        CLLD.Map.oms.addMarker(layer);
+        CLLD.Map.marker_map[feature.properties.language.id] = layer;
+        layer.bindLabel(feature.properties.language.name);
     };
 
-    return {
-        map: undefined,
-        layers: [],
-        init: _init,
-        url: function() {
-        },
-        getLayer: function(spec) {
-            var i, layer;
-            spec = spec == undefined || spec == null ? 0 : spec;
-
-            if (typeof spec == 'string') {
-                for (i=0; i<CLLD.Map.layers.length; i++) {
-                    if (CLLD.Map.layers[i].name == spec) {
-                        return CLLD.Map.layers[i];
+    var _zoomToExtent = function() {
+        if (CLLD.Map.options.center) {
+            return;
+        }
+        var i, pbounds, bounds;
+        for (name in CLLD.Map.layer_map) {
+            if (CLLD.Map.layer_map.hasOwnProperty(name)) {
+                pbounds = CLLD.Map.layer_map[name].getBounds();
+                if (pbounds.isValid()) {
+                    if (bounds) {
+                        bounds.extend(pbounds);
+                    } else {
+                        bounds = L.latLngBounds(pbounds)
                     }
                 }
-            } else {
-                if (spec == -1) {
-                    return CLLD.Map.layers[CLLD.Map.layers.length - 1];
+            }
+        }
+        if (bounds) {
+            CLLD.Map.map.fitBounds(bounds);
+        } else {
+            CLLD.Map.map.fitWorld();
+        }
+    };
+
+    var _init = function (eid, layers, options) {
+        var i, hash, layer, baseLayers = [
+            "OpenStreetMap.Mapnik",
+            "OpenStreetMap.BlackAndWhite",
+            "Thunderforest.Transport",
+            "Thunderforest.Landscape",
+            "MapQuestOpen.OSM",
+            "MapQuestOpen.Aerial",
+            "Stamen.Watercolor",
+            "Esri.WorldStreetMap",
+            "Esri.DeLorme",
+            "Esri.WorldTopoMap",
+            "Esri.WorldImagery",
+            "Esri.WorldTerrain",
+            "Esri.WorldShadedRelief",
+            "Esri.WorldPhysical"];
+        CLLD.Map.options = options == undefined ? {} : options;
+        CLLD.Map.map = L.map(eid, {scrollWheelZoom: false, maxZoom: 8, fullscreenControl: true});
+        CLLD.Map.oms = new OverlappingMarkerSpiderfier(CLLD.Map.map);
+        CLLD.Map.oms.addListener('click', _showInfoWindow);
+
+        if (CLLD.Map.options.hash) {
+            hash = new L.Hash(CLLD.Map.map);
+        }
+
+        L.control.layers.provided(baseLayers, []).addTo(CLLD.Map.map);
+
+        for (name in layers) {
+            if (layers.hasOwnProperty(name)) {
+                CLLD.Map.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(CLLD.Map.map);
+
+                if ($.type(layers[name]) === 'string') {
+                    $.getJSON(layers[name], {layer: name}, function(data) {
+                        CLLD.Map.layer_map[data.properties.layer].addData(data);
+                        _zoomToExtent();
+                    });
+                } else {
+                    CLLD.Map.layer_map[name].addData(layers[name]);
+                    _zoomToExtent();
                 }
-                return CLLD.Map.layers[spec];
             }
-            return undefined;
+        }
+        if (CLLD.Map.options.center) {
+            CLLD.Map.map.setView(
+                CLLD.Map.options.center,
+                CLLD.Map.options.zoom == undefined ? 5 : CLLD.Map.options.zoom);
+        }
+    }
+
+    return {
+        toggleLabels: function(ctrl){
+            var display = $(ctrl).prop('checked');
+            for (id in CLLD.Map.marker_map) {
+                if (CLLD.Map.marker_map.hasOwnProperty(id)) {
+                    if (display) {
+                        CLLD.Map.marker_map[id].showLabel();
+                    } else {
+                        CLLD.Map.marker_map[id].hideLabel();
+                    }
+                }
+            }
         },
-        showInfoWindow: function(property, value, layer) {
-            if (selectedFeature && selectedFeature.popup) {
-                selectCtrl.unselect(selectedFeature);
-            }
-            var features;
-            layer = CLLD.Map.getLayer(layer);
-            features = layer.getFeaturesByAttribute(property, value)
-            if (features) {
-                selectCtrl.select(features[0]);
-            }
-        },
+        marker_map: {},
+        layer_map: {},
+        oms: undefined,
+        popup: undefined,
+        map: undefined,
+        init: _init,
+        showInfoWindow: _showInfoWindow,
         toggleLayer: function(layer, ctrl) {
-            layer = CLLD.Map.getLayer(layer);
-            layer.display($(ctrl).prop('checked'));
-        },
-        style_maps: {'default': styles}
+            CLLD.Map.layer_map[layer].eachLayer(function(l){
+                l._icon.style.display = $(ctrl).prop('checked') ? 'block' : 'none';
+            });
+        }
     }
 })();

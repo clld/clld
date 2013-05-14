@@ -142,6 +142,17 @@ class IMapMarker(Interface):
         """
 
 
+class IIcon(Interface):
+    """utility to map icon names to URLs
+    """
+    name = Attribute('name of the icon')
+
+    def url(self, req):
+        """
+        :return: URL for the marker
+        """
+
+
 class IFrequencyMarker(Interface):
     """utility
     """

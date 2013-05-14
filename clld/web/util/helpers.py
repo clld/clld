@@ -1,4 +1,3 @@
-from json import dumps
 import re
 from itertools import groupby  # we just import this to have it available in templates!
 assert groupby  # appease pyflakes
@@ -11,6 +10,8 @@ else:
 
 from sqlalchemy import or_
 from markupsafe import Markup
+from pyramid.renderers import render as pyramid_render
+from pyramid.threadlocal import get_current_request
 
 from clld import interfaces
 from clld import RESOURCES
@@ -24,6 +25,10 @@ from clld.lib import bibtex
 
 def urlescape(string):
     return quote(string, safe='')
+
+
+def dumps(obj):
+    return pyramid_render('json', obj, request=get_current_request())
 
 
 class JS(object):
@@ -69,11 +74,10 @@ def format_frequency(req, obj, marker=None, height='20', width='20'):
 
 
 def map_marker_img(req, obj, marker=None, height='20', width='20'):
-    marker = marker or req.registry.queryUtility(interfaces.IMapMarker)
-    if marker:
-        url = marker(obj, req)
-        if url:
-            return HTML.img(src=url, height=height, width=width)
+    marker = marker or req.registry.getUtility(interfaces.IMapMarker)
+    url = marker(obj, req)
+    if url:
+        return HTML.img(src=url, height=height, width=width)
     return ''
 
 

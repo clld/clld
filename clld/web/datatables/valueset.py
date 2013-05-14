@@ -18,9 +18,6 @@ class _LinkToMapCol(LinkToMapCol):
     def get_obj(self, item):
         return item.language
 
-    def get_layer(self, item):
-        return LinkToMapCol.get_layer(self, item)
-
 
 class RefsCol(Col):
     def format(self, item):

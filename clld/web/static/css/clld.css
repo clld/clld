@@ -93,6 +93,14 @@ div.olMap img {
     margin-bottom: 0;
 }
 
+#map {
+    position: relative;
+    height: 400px;
+}
+
+.leaflet-control-zoom-fullscreen { background-image: url(../images/icon-fullscreen.png); }
+.leaflet-container:-webkit-full-screen { width: 100% !important; height: 100% !important; }
+
 .dt-full-cell {
     width: 100%;
     margin-top: -4px !important;

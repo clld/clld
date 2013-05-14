@@ -6,20 +6,33 @@ from clld.web.util import helpers
 from clld.web.adapters import GeoJsonLanguages
 
 
-class Map(object):
-    style_map = None
+class Layer(object):
+    """A layer in our terminology is a FeatureCollection in geojson and a FeatureGroup
+    in leaflet, i.e. a bunch of points on the map.
+    """
+    def __init__(self, id_, name, data, **kw):
+        self.id = id_
+        self.name = name
+        self.data = data
+        for k, v in kw.items():
+            setattr(self, k, v)
 
-    def __init__(self, ctx, req, eid=None):
+
+class Map(object):
+    """Map objects bridge the technology divide between server side python code and
+    client side leaflet maps.
+    """
+    def __init__(self, ctx, req, eid='map'):
         self.req = req
         self.ctx = ctx
-        self.eid = eid or 'map'
+        self.eid = eid
         self._layers = None
-        self.map_marker = req.registry.queryUtility(IMapMarker)
+        self.map_marker = req.registry.getUtility(IMapMarker)
 
     @property
     def layers(self):
         if self._layers is None:
-            self._layers = self.get_layers()
+            self._layers = list(self.get_layers())
         return self._layers
 
     def get_layers(self):
@@ -29,9 +42,10 @@ class Map(object):
         route_name = self.req.matched_route.name
         if not route_name.endswith('_alt'):
             route_name += '_alt'
-        return [{
-            'name': getattr(self.ctx, 'name', 'GeoJSON layer'),
-            'url': self.req.route_url(route_name, **route_params)}]
+        yield Layer(
+            getattr(self.ctx, 'id', 'id'),
+            '%s' % self.ctx,
+            self.req.route_url(route_name, **route_params))
 
     def options(self):
         return {}
@@ -44,17 +58,20 @@ class Map(object):
 class ParameterMap(Map):
     def get_layers(self):
         if self.ctx.domain:
-            return [{
-                'name': de.name,
-                'marker': helpers.map_marker_img(self.req, de, marker=self.map_marker),
-                'url': self.req.resource_url(
-                    self.ctx, ext='geojson', _query=dict(domainelement=str(de.id))),
-            } for de in self.ctx.domain]
-        return [{
-            'name': self.ctx.name, 'url': self.req.resource_url(self.ctx, ext='geojson')}]
+            for de in self.ctx.domain:
+                yield Layer(
+                    de.id,
+                    de.name,
+                    self.req.resource_url(
+                        self.ctx, ext='geojson', _query=dict(domainelement=str(de.id))
+                    ),
+                    marker=helpers.map_marker_img(self.req, de, marker=self.map_marker))
+        else:
+            yield Layer(
+                self.ctx.id, self.ctx.name, self.req.resource_url(self.ctx, ext='geojson'))
 
     def options(self):
-        return {'info_query': {'parameter': self.ctx.pk}}
+        return {'info_query': {'parameter': self.ctx.pk}, 'hash': True}
 
 
 class _GeoJson(GeoJsonLanguages):
@@ -65,63 +82,12 @@ class _GeoJson(GeoJsonLanguages):
 class LanguageMap(Map):
     def get_layers(self):
         geojson = _GeoJson(self.ctx)
-        return [{
-            'name': self.ctx.name,
-            'data': geojson.render(self.ctx, self.req, dump=False),
-        }]
+        yield Layer(
+            self.ctx.id, self.ctx.name, geojson.render(self.ctx, self.req, dump=False))
 
     def options(self):
         return {
-            'center': [self.ctx.longitude, self.ctx.latitude],
+            'center': [self.ctx.latitude, self.ctx.longitude],
             'zoom': 3,
             'no_popup': True,
             'sidebar': True}
-
-
-"""
-resize marker:
-
-    <script type="text/javascript">
-        var map, layer;
-        var size, icon;
-
-        function init(){
-            map = new OpenLayers.Map('map');
-            layer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
-                "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic'} );
-
-            map.addLayer(layer);
-            var markers = new OpenLayers.Layer.Markers( "Markers" );
-            map.addLayer(markers);
-
-            size = new OpenLayers.Size(21, 25);
-            calculateOffset = function(size) {
-                        return new OpenLayers.Pixel(-(size.w/2), -size.h); };
-            icon = new OpenLayers.Icon(
-                'http://www.openlayers.org/dev/img/marker.png',
-                size, null, calculateOffset);
-            markers.addMarker(
-                new OpenLayers.Marker(new OpenLayers.LonLat(-71,40), icon));
-
-            map.addControl(new OpenLayers.Control.LayerSwitcher());
-            map.zoomToMaxExtent();
-        }
-
-        function resize() {
-
-            size = new OpenLayers.Size(size.w + 10, size.h + 10);
-            icon.setSize(size);
-
-        }
-    </script>
-
-nav toolbar:
-
-            var panel = new OpenLayers.Control.NavToolbar();
-            map.addControl(panel);
-
-info window:
-
-http://gis.stackexchange.com/questions/42401/\
-how-can-i-add-an-infowindow-to-an-openlayers-geojson-layer
-"""

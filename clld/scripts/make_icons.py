@@ -1,91 +1,58 @@
 import sys
 
-from path import path as ospath
-
 from pyx import bbox, unit, style, path, color, canvas, deco
+from pyramid.path import AssetResolver
+
+from clld.web.icon import ICONS
 
 # set the scale to 1/20th of an inch
 unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
 
 
-linewidth = style.linewidth(1.2)
+#linewidth = style.linewidth(1.2)
+linewidth = style.linewidth(1.0)
 
 
 def polygon(*points):
     args = []
-    for i, point in points:
+    for i, point in enumerate(points):
         args.append(path.moveto(*point) if i == 0 else path.lineto(*point))
     args.append(path.closepath())
     return path.path(*args)
 
 
 shapes = {
-    "c": path.circle(10, 10, 7.6),
-    "s": path.rect(2.8, 2.8, 14.4, 14.4),
-    "t": polygon((1, 2.5), (19, 2.5), (10, 18.5)),
-    "f": polygon((1, 17.5), (19, 17.5), (10, 1.5)),
-    "d": polygon((10, 1), (19, 10), (10, 19), (1, 10)),
+    #"c": path.circle(10, 10, 7.6),  # circle
+    #"s": path.rect(2.8, 2.8, 14.4, 14.4),  # square
+    #"t": polygon((1, 2.5), (19, 2.5), (10, 18.5)),  # triangle (pyramid)
+    #"f": polygon((1, 17.5), (19, 17.5), (10, 1.5)),  # inverted pyramid
+    #"d": polygon((10, 1), (19, 10), (10, 19), (1, 10)),  # diamond
+    "c": path.circle(20, 20, 13.6),  # circle
+    "s": path.rect(8, 8, 24, 24),  # square
+    "t": polygon((2, 4), (38, 4), (20, 35)),  # triangle (pyramid)
+    "f": polygon((2, 36), (38, 36), (20, 5)),  # inverted pyramid
+    "d": polygon((20, 2), (38, 20), (20, 38), (2, 20)),  # diamond
 }
 
 
-def colors(level=3):
+def pyxColor(string):
     """
-            'A': {fillColor: '#fe3856'},
-            'B': {fillColor: '#ed9c07'},
-            'C': {fillColor: '#efe305'},
-            'D': {fillColor: '#f3ffb0'},
-            'X': {fillColor: '#e8e8e8'},
-            '?': {fillColor: '#ffffff'}
+    :param string: RGB color name like 'ffffff'
+    :return: pyx color.
     """
-    return [
-        (0xfe, 0x38, 0x56),
-        (0xed, 0x9c, 0x7),
-        (0xef, 0xe3, 0x5),
-        (0xf3, 0xff, 0xb0),
-        (0xe8, 0xe8, 0xe8),
-        (0xff, 0xff, 0xff),
-    ]
-    return [(0, 0, 0),
-            (0, 0, 13),
-            (0, 9, 0),
-            (6, 15, 3),
-            (9, 0, 9),
-            (9, 9, 15),
-            (9, 15, 15),
-            (10, 0, 0),
-            (12, 12, 12),
-            (13, 0, 0),
-            (15, 4, 0),
-            (15, 6, 0),
-            (15, 6, 15),
-            (15, 12, 0),
-            (15, 15, 0),
-            (15, 15, 12),
-            (15, 15, 15)]
-
-
-def colorName(colorTuple):
-    return "".join(hex(i).split('x')[1].rjust(2, '0') for i in colorTuple)
-
-
-def pyxColor(colorTuple):
+    assert len(string) == 6
+    colorTuple = tuple(int('0x' + c, 16) for c in [string[i:i+2] for i in range(0, 6, 2)])
     return color.rgb(*[i / 255.0 for i in colorTuple])
-    #return color.rgb(*[i / 15.0 for i in colorTuple])
 
 
 if __name__ == '__main__':
-    output = ospath(sys.argv[1])
-    for shapeName, shapePath in shapes.items():
-        for colorTuple in colors(3):
-            c = canvas.canvas()
-            c.draw(
-                shapePath,
-                [deco.stroked([linewidth]), deco.filled([pyxColor(colorTuple)])])
-            with open(output.joinpath("%s%s.png" % (shapeName, colorName(colorTuple))),
-                      'wb') as fp:
-                fp.write(c.pipeGS(
-                    "pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20)).read())
-
-    #c = canvas.canvas()
-    #c.pipeGS("trunk/wals/wals/static/images/icons/a000.png",
-    #         device="pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 20, 20))
+    asset_resolver = AssetResolver()
+    for icon in ICONS:
+        c = canvas.canvas()
+        c.draw(
+            shapes[icon.name[0]],
+            [deco.stroked([linewidth]), deco.filled([pyxColor(icon.name[1:])])])
+        stream = c.pipeGS("pngalpha", resolution=20, bbox=bbox.bbox(0, 0, 40, 40))
+        with open(asset_resolver.resolve(icon.asset_spec).abspath(), 'wb') as fp:
+            fp.write(stream.read())
+    sys.exit(0)

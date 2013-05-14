@@ -34,6 +34,7 @@ from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap
+from clld.web.icon import ICONS, MapMarker
 
 
 class ClldRequest(Request):
@@ -342,3 +343,7 @@ def includeme(config):
     config.register_map('parameter', ParameterMap)
 
     config.include('clld.web.adapters')
+
+    for icon in ICONS:
+        config.registry.registerUtility(icon, interfaces.IIcon, name=icon.name)
+    config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
