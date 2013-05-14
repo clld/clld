@@ -331,13 +331,21 @@ CLLD.Map = (function(){
         );
     }
 
-    var _onEachFeature = function(feature, layer) {
-        layer.setIcon(L.icon({
+    var _icon = function(feature, size) {
+        return L.icon({
             iconUrl: feature.properties.icon,
-            iconSize: [30, 30],
-            iconAnchor: [15, 15],
+            iconSize: [size, size],
+            iconAnchor: [Math.floor(size/2), Math.floor(size/2)],
             popupAnchor: [0, 0]
-        }));
+        });
+    }
+
+    var _onEachFeature = function(feature, layer) {
+        var size = 30;
+        if (CLLD.Map.options.sidebar) {
+            size = 20;
+        }
+        layer.setIcon(_icon(feature, size));
         CLLD.Map.oms.addMarker(layer);
         CLLD.Map.marker_map[feature.properties.language.id] = layer;
         layer.bindLabel(feature.properties.language.name);
@@ -417,17 +425,37 @@ CLLD.Map = (function(){
     }
 
     return {
-        toggleLabels: function(ctrl){
-            var display = $(ctrl).prop('checked');
+        eachMarker: function(func) {
             for (id in CLLD.Map.marker_map) {
                 if (CLLD.Map.marker_map.hasOwnProperty(id)) {
-                    if (display) {
-                        CLLD.Map.marker_map[id].showLabel();
-                    } else {
-                        CLLD.Map.marker_map[id].hideLabel();
-                    }
+                    func(CLLD.Map.marker_map[id]);
                 }
             }
+        },
+        resizeIcons: function(size) {
+            size = size === undefined ? $('input[name=iconsize]:checked').val(): size;
+            CLLD.Map.eachMarker(function(marker){
+                marker.setIcon(_icon(marker.feature, parseInt(size)));
+            });
+        },
+        toggleLabels: function(ctrl){
+            var display = $(ctrl).prop('checked');
+            CLLD.Map.eachMarker(function(marker){
+                if (display) {
+                    marker.showLabel();
+                } else {
+                    marker.hideLabel();
+                }
+            });
+        },
+        filterMarkers: function(show){
+            CLLD.Map.eachMarker(function(marker){
+                if (show(marker)) {
+                    marker._icon.style.display = 'block';
+                } else {
+                    marker._icon.style.display = 'none';
+                }
+            });
         },
         marker_map: {},
         layer_map: {},

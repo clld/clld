@@ -38,11 +38,27 @@
             ${l}
         % endfor
     % endif
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Icon size
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            % for size in [15, 20, 30, 40]:
+                <li>
+                    <label class="radio" style="margin-left: 5px; margin-right: 5px;">
+                        <input name="iconsize"${' checked="checked"' if size == 30 else ''|n} value="${size}" type="radio" onclick='${h.JSMap.resizeIcons()|n}'>
+                        <img height="${size}" width="${size}" src="${request.registry.getUtility(h.interfaces.IIcon, 'cff6600').url(request)}">
+                    </label>
+                </li>
+            % endfor
+            </ul>
+        </li>
         <li>
-            <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
-                <input type="checkbox" onclick='${h.JSMap.toggleLabels(h.JS("this"))|n}'>
-                Show/hide Labels
-            </label>
+                <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
+                    <input type="checkbox" class="inline" onclick='${h.JSMap.toggleLabels(h.JS("this"))|n}'>
+                    Show/hide Labels
+                </label>
         </li>
     </ul>
     <div id="${map.eid}" style="width: 100%; height: 500px;"> </div>
