@@ -1,10 +1,22 @@
 from collections import defaultdict
 
+from six import PY3
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 from clld import interfaces
 from clld.web.util import helpers
-from clld.web.assets import environment
+
+if PY3:
+    class Environment(dict):
+        debug = False
+
+    class Bundle(object):
+        def urls(self):
+            return []
+
+    environment = Environment(js=Bundle(), css=Bundle())
+else:
+    from clld.web.assets import environment
 
 
 def add_renderer_globals(event):
