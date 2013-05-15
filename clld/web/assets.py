@@ -10,7 +10,10 @@ def skip(_in, out, **kw):
     out.write('')
 
 environment = Environment(
-    path(clld.__file__).dirname().joinpath('web', 'static'), '', manifest='json:')
+    path(clld.__file__).dirname().joinpath('web', 'static'),
+    '',
+    manifest='json:',
+    auto_build=False)
 
 environment.register(
     'js',
