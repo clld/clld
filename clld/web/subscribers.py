@@ -5,7 +5,10 @@ from clld.web.util import helpers
 
 
 def add_renderer_globals(event):
-    event['_'] = event['request'].translate
+    if event['request']:
+        event['_'] = event['request'].translate
+    else:
+        event['_'] = lambda s, **kw: s
     event['h'] = helpers
 
 

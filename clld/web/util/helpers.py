@@ -28,7 +28,7 @@ def urlescape(string):
 
 
 def dumps(obj):
-    return pyramid_render('json', obj, request=get_current_request())
+    return pyramid_render('json', obj)
 
 
 class JS(object):

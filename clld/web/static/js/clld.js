@@ -392,7 +392,9 @@ CLLD.Map = (function(){
             "Esri.WorldShadedRelief",
             "Esri.WorldPhysical"];
         CLLD.Map.options = options == undefined ? {} : options;
-        CLLD.Map.map = L.map(eid, {scrollWheelZoom: false, maxZoom: 8, fullscreenControl: true});
+        CLLD.Map.map = L.map(
+            eid,
+            {center: [5.5, 152.58], scrollWheelZoom: false, maxZoom: 12, fullscreenControl: true});
         CLLD.Map.oms = new OverlappingMarkerSpiderfier(CLLD.Map.map);
         CLLD.Map.oms.addListener('click', _showInfoWindow);
 
@@ -421,6 +423,10 @@ CLLD.Map = (function(){
             CLLD.Map.map.setView(
                 CLLD.Map.options.center,
                 CLLD.Map.options.zoom == undefined ? 5 : CLLD.Map.options.zoom);
+        } else {
+            if (CLLD.Map.map.getZoom() > 5) {
+                CLLD.Map.map.setZoom(5);
+            }
         }
     }
 
