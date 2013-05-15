@@ -17,37 +17,23 @@
             google.load("feeds", "1");
         </script>
 
-        ##<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
-        ##<script src="${request.static_url('clld:web/static/openlayers/OpenLayers.js')}"></script>
-
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
         <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
         <![endif]-->
 
+        % for asset in assets['css'].urls():
+        <link href="${request.static_url('clld:web/static' + asset)}" rel="stylesheet">
+        % endfor
 
         % if request.registry.settings.get('clld.environment') == 'production':
-        <link href="${request.static_url('clld:web/static/css/packed.css')}" rel="stylesheet">
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-        <script src="${request.static_url('clld:web/static/js/packed.js')}"></script>
-        % else:
-        <link href="${request.static_url('clld:web/static/css/clld.css')}" rel="stylesheet">
-        <link href="${request.static_url('clld:web/static/css/bootstrap.css')}" rel="stylesheet">
-        <link href="${request.static_url('clld:web/static/css/bootstrap-responsive.css')}" rel="stylesheet">
-        <script src="${request.static_url('clld:web/static/js/jquery-1.8.2.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/bootstrap.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/bootstrapx-clickover.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/jquery.dataTables.min.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/leaflet-src.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/leaflet-providers.js')}"></script>
-        <link href="${request.static_url('clld:web/static/css/leaflet.label.css')}" rel="stylesheet">
-        <script src="${request.static_url('clld:web/static/js/leaflet.label.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/Control.FullScreen.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/leaflet-hash.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/oms.min.js')}"></script>
-        <script src="${request.static_url('clld:web/static/js/clld.js')}"></script>
         % endif
+
+        % for asset in assets['js'].urls():
+        <script src="${request.static_url('clld:web/static' + asset)}"></script>
+        % endfor
 
         ##<!-- DataTables -->
         ##<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>

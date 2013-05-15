@@ -1,14 +1,20 @@
+from collections import defaultdict
+
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 from clld import interfaces
 from clld.web.util import helpers
+from clld.web.assets import environment
 
 
 def add_renderer_globals(event):
     if event['request']:
         event['_'] = event['request'].translate
+        prod = event['request'].registry.settings.get('clld.environment') == 'production'
+        environment.debug = not prod
     else:
         event['_'] = lambda s, **kw: s
+    event['assets'] = environment
     event['h'] = helpers
 
 

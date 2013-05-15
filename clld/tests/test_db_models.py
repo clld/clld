@@ -18,7 +18,10 @@ class Tests(TestWithDb):
         DBSession.add(l)
         DBSession.flush()
         DBSession.refresh(l)
-        self.assertEqual(l.filesdict()['abstract'].content, 'c')
+        f = l.filesdict()['abstract']
+        self.assertEqual(f.content, 'c')
+        self.assertEqual(f.id, f.pk)
+        self.assertTrue(f.data_uri().startswith('data:'))
 
     def test_Data(self):
         from clld.db.meta import DBSession
@@ -61,3 +64,8 @@ class MoreTests(TestWithDbAndData):
         c = DBSession.query(Contribution).first()
         self.assertTrue(c.primary_contributors)
         self.assertTrue(c.secondary_contributors)
+
+    def test_Value(self):
+        from clld.db.models.common import Value
+
+        self.assertTrue('valueset' in Value.first().__json__(None))
