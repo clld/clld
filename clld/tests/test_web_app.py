@@ -6,6 +6,7 @@ from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language
 from clld.tests.util import TestWithEnv, Route
+from clld.interfaces import IMapMarker
 
 
 class Tests(TestWithEnv):
@@ -31,6 +32,10 @@ class Tests(TestWithEnv):
         self.set_request_properties(matchdict={'id': 'xxx'})
         self.assertRaises(
             HTTPNotFound, ctx_factory, Contribution, 'rsc', self.env['request'])
+
+    def test_MapMarker(self):
+        marker = self.env['request'].registry.getUtility(IMapMarker)
+        self.assertTrue(marker(None, self.env['request']))
 
 
 class Tests2(unittest.TestCase):

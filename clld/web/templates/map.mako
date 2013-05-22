@@ -56,7 +56,7 @@
         </li>
         <li>
                 <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
-                    <input type="checkbox" class="inline" onclick='${h.JSMap.toggleLabels(h.JS("this"))|n}'>
+                    <input id="map-label-visiblity" type="checkbox" class="inline" onclick='${h.JSMap.toggleLabels(h.JS("this"))|n}'>
                     Show/hide Labels
                 </label>
         </li>

@@ -21,6 +21,12 @@
         ${h.format_frequency(request, value)}
     </h4>
     <div id="s${i}" class="collapse in">
+        % if value.confidence:
+        <dl>
+            <dt>${_('Confidence')}:</dt>
+            <dd>${value.confidence}</dd>
+        </dl>
+        % endif
         ${util.sentences(value)}
     </div>
 </div>
@@ -39,9 +45,14 @@
     <dd class="language">${h.link(request, ctx.language)}</dd>
     <dt class="parameter">${_('Parameter')}:</dt>
     <dd class="parameter">${h.link(request, ctx.parameter)}</dd>
-    % if ctx.references:
+    % if ctx.references or ctx.source:
     <dt class="source">${_('Source')}:</dt>
-    <dd class="source">${h.linked_references(request, ctx)|n}</dd>
+        % if ctx.source:
+        <dd>${ctx.source}</dd>
+        % endif
+        % if ctx.references:
+        <dd class="source">${h.linked_references(request, ctx)|n}</dd>
+        % endif
     % endif
     ${util.data(ctx, with_dl=False)}
 </dl>

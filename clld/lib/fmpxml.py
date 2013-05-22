@@ -3,8 +3,6 @@
 
 see http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
-from time import time
-from json import dump
 from logging import getLogger
 log = getLogger(__name__)
 
@@ -50,7 +48,8 @@ class Result(object):
 
     def _find(self, localname, e=None, path=''):
         e = e or self._root
-        return e.findall(path + '{http://www.filemaker.com/fmpxmlresult}' + localname.upper())
+        return e.findall(
+            path + '{http://www.filemaker.com/fmpxmlresult}' + localname.upper())
 
 
 class Client(object):

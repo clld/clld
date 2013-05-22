@@ -380,10 +380,10 @@ CLLD.Map = (function(){
 
     var _init = function (eid, layers, options) {
         var i, hash, layer, baseLayers = [
+            "Thunderforest.Landscape",
+            "Thunderforest.Transport",
             "OpenStreetMap.Mapnik",
             "OpenStreetMap.BlackAndWhite",
-            "Thunderforest.Transport",
-            "Thunderforest.Landscape",
             "MapQuestOpen.OSM",
             "MapQuestOpen.Aerial",
             "Stamen.Watercolor",
@@ -450,7 +450,7 @@ CLLD.Map = (function(){
         toggleLabels: function(ctrl){
             var display = $(ctrl).prop('checked');
             CLLD.Map.eachMarker(function(marker){
-                if (display) {
+                if (display && marker._icon.style.display != 'none') {
                     marker.showLabel();
                 } else {
                     marker.hideLabel();
@@ -458,11 +458,16 @@ CLLD.Map = (function(){
             });
         },
         filterMarkers: function(show){
+            var show_label = $('#map-label-visiblity').prop('checked');
             CLLD.Map.eachMarker(function(marker){
                 if (show(marker)) {
                     marker._icon.style.display = 'block';
+                    if (show_label) {
+                        marker.showLabel();
+                    }
                 } else {
                     marker._icon.style.display = 'none';
+                    marker.hideLabel();
                 }
             });
         },

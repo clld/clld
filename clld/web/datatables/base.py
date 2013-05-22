@@ -281,7 +281,7 @@ class DataTable(object):
             #"bStateSave": True,
             #"sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t"
             #"<'row-fluid'<'span6'i><'span6'p>>",
-            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'dt-toolbar'>>r>t",
+            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'dt-toolbar'>>r>t<'span4'i><'span6'p>",
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
             "aoColumns": [col.js_args for col in self.cols],

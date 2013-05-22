@@ -18,6 +18,7 @@ import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
 from clld.db.models import common
 from clld.web.adapters import Representation
+from clld.web.icon import MapMarker
 from clld import interfaces
 
 
@@ -38,7 +39,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('clld.web.app')
     config.register_app()
-    config.registry.registerUtility(lambda *args: None, interfaces.IMapMarker)
+    config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
     config.register_resource('testresource', Mock(), IF, with_index=True)
     config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')

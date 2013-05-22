@@ -8,3 +8,4 @@ class Tests(unittest.TestCase):
         rec = Record('book', '1', title='The Title')
         self.assertTrue('@book' in rec.__unicode__())
         self.assertTrue('@book' in rec.__str__())
+        self.assertTrue('The Title' in rec.text())

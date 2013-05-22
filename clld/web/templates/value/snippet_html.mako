@@ -4,6 +4,13 @@
 <p>${h.text2html(ctx.valueset.description)}</p>
 % endif
 
+% if ctx.confidence:
+<dl>
+    <dt>${_('Confidence')}:</dt>
+    <dd>${ctx.confidence}</dd>
+</dl>
+% endif
+
 % if ctx.sentence_assocs:
 ${util.sentences(ctx, fmt='short')}
 % endif

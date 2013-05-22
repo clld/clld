@@ -11,10 +11,9 @@
 
 <dl>
     % if ctx.address:
-    <dt>${_('Address:')}</dt>
+    <dt>${_('Address')}:</dt>
     <dd>
         <address>
-            <strong>${ctx.name}</strong><br>
             ${h.text2html(ctx.address)|n}
         </address>
     </dd>

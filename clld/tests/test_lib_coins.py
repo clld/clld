@@ -10,3 +10,8 @@ class Tests(unittest.TestCase):
         bib = Record('book', '1', title='The Title')
         co = ContextObject('sid', 'book', ('btitle', 'the title'))
         co = ContextObject.from_bibtex('sid', bib)
+        bib = Record('article', '1', title='The Title', author='The One and The Other')
+        co = ContextObject.from_bibtex('sid', bib)
+        bib = Record('phdthesis', '1', title='The Title')
+        co = ContextObject.from_bibtex('sid', bib)
+        self.assertTrue(isinstance(co.span_attrs(), dict))
