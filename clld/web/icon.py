@@ -33,6 +33,7 @@ COLORS = [
     'ff00ff',
     'ff4400',
     'ff6600',
+    'ff66ff',
     'ffcc00',
     'ffff00',
     'ffffcc',
