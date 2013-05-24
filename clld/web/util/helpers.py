@@ -44,9 +44,19 @@ class JS(object):
 
 
 JSFeed = JS('CLLD.Feed')
-JSMap = JS('CLLD.Map')
+JSMap = JS('CLLD.map')
 JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
+
+
+class JSNamespace(object):
+    def __init__(self, prefix):
+        self.prefix = prefix
+
+    def __getattr__(self, name):
+        return JS(self.prefix + '.' + name)
+
+JS_CLLD = JSNamespace('CLLD')
 
 
 def coins(req, obj, label=''):

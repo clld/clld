@@ -7,16 +7,9 @@ CLLD = {
 };
 
 
-CLLD.route_url = function(route, data, query) {
-    var key,
-        url = CLLD.base_url + CLLD.routes[route],
+CLLD.url = function(path, query) {
+    var url = CLLD.base_url + path,
         sep = '?';
-
-    for (key in data) {
-        if (data.hasOwnProperty(key)) {
-            url = url.replace('{'+key+'}', data[key]);
-        }
-    }
 
     if (/\?/.test(url)) {
         sep = '&';
@@ -27,6 +20,20 @@ CLLD.route_url = function(route, data, query) {
     }
 
     return url;
+}
+
+
+CLLD.route_url = function(route, data, query) {
+    var key,
+        path = CLLD.routes[route];
+
+    for (key in data) {
+        if (data.hasOwnProperty(key)) {
+            path = path.replace('{'+key+'}', data[key]);
+        }
+    }
+
+    return CLLD.url(path, query);
 }
 
 
@@ -301,40 +308,70 @@ CLLD.DataTable = (function(){
 })();
 
 
+CLLD.Maps = {}
+
 /*
  * Manager for a leaflet map
  */
-CLLD.Map = (function(){
+CLLD.Map = function(eid, layers, options) {
+    CLLD.Maps[eid] = this;
+    this.options = options == undefined ? {} : options;
+    this.map = L.map(
+        eid,
+        {center: [5.5, 152.58], scrollWheelZoom: false, maxZoom: 12, fullscreenControl: true});
+
+    var i, hash, layer, baseLayers = [
+        "Thunderforest.Landscape",
+        "Thunderforest.Transport",
+        "OpenStreetMap.Mapnik",
+        "OpenStreetMap.BlackAndWhite",
+        "MapQuestOpen.OSM",
+        "MapQuestOpen.Aerial",
+        "Stamen.Watercolor",
+        "Esri.WorldStreetMap",
+        "Esri.DeLorme",
+        "Esri.WorldTopoMap",
+        "Esri.WorldImagery",
+        "Esri.WorldTerrain",
+        "Esri.WorldShadedRelief",
+        "Esri.WorldPhysical"];
+
     function _openPopup(layer, html) {
-        if (!CLLD.Map.popup) {
-            CLLD.Map.popup = L.popup();
+        var map = CLLD.Maps[eid];
+        if (!map.popup) {
+            map.popup = L.popup();
         }
-        CLLD.Map.popup.setLatLng(layer.getLatLng());
-        CLLD.Map.popup.setContent(html);
-        CLLD.Map.map.openPopup(CLLD.Map.popup);
+        map.popup.setLatLng(layer.getLatLng());
+        map.popup.setContent(html);
+        map.map.openPopup(map.popup);
     }
 
-    function _showInfoWindow(layer) {
-        var route = CLLD.Map.options.info_route == undefined ? 'language_alt' : CLLD.Map.options.info_route;
+    this.showInfoWindow = function(layer) {
+        var map = CLLD.Maps[eid];
+        var route = map.options.info_route == undefined ? 'language_alt' : map.options.info_route;
 
-        if (CLLD.Map.marker_map.hasOwnProperty(layer)) {
+        if (map.marker_map.hasOwnProperty(layer)) {
             // allow opening the info window by language id
-            layer = CLLD.Map.marker_map[layer];
+            layer = map.marker_map[layer];
         }
-        $.get(
-            CLLD.route_url(
-                route,
-                {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
-                CLLD.Map.options.info_query),
-            CLLD.Map.options.info_query == undefined ? {} : CLLD.Map.options.info_query,
-            function(data, textStatus, jqXHR) {
-                _openPopup(layer, data);
-            },
-            'html'
-        );
+        if (layer.feature.properties.popup) {
+            _openPopup(layer, layer.feature.properties.popup);
+        } else {
+            $.get(
+                CLLD.route_url(
+                    route,
+                    {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
+                    map.options.info_query),
+                map.options.info_query == undefined ? {} : map.options.info_query,
+                function(data, textStatus, jqXHR) {
+                    _openPopup(layer, data);
+                },
+                'html'
+            );
+        }
     }
 
-    var _icon = function(feature, size) {
+    this.icon = function(feature, size) {
         return L.icon({
             iconUrl: feature.properties.icon,
             iconSize: [size, size],
@@ -344,24 +381,26 @@ CLLD.Map = (function(){
     }
 
     var _onEachFeature = function(feature, layer) {
-        var size = 30;
-        if (CLLD.Map.options.sidebar) {
+        var size = 30,
+            map = CLLD.Maps[eid];
+        if (map.options.sidebar) {
             size = 20;
         }
-        layer.setIcon(_icon(feature, size));
-        CLLD.Map.oms.addMarker(layer);
-        CLLD.Map.marker_map[feature.properties.language.id] = layer;
+        layer.setIcon(map.icon(feature, size));
+        map.oms.addMarker(layer);
+        map.marker_map[feature.properties.language.id] = layer;
         layer.bindLabel(feature.properties.language.name);
     };
 
     var _zoomToExtent = function() {
-        if (CLLD.Map.options.center) {
+        var map = CLLD.Maps[eid];
+        if (map.options.center) {
             return;
         }
         var i, pbounds, bounds;
-        for (name in CLLD.Map.layer_map) {
-            if (CLLD.Map.layer_map.hasOwnProperty(name)) {
-                pbounds = CLLD.Map.layer_map[name].getBounds();
+        for (name in map.layer_map) {
+            if (map.layer_map.hasOwnProperty(name)) {
+                pbounds = map.layer_map[name].getBounds();
                 if (pbounds.isValid()) {
                     if (bounds) {
                         bounds.extend(pbounds);
@@ -372,116 +411,102 @@ CLLD.Map = (function(){
             }
         }
         if (bounds) {
-            CLLD.Map.map.fitBounds(bounds);
+            map.map.fitBounds(bounds);
         } else {
-            CLLD.Map.map.fitWorld();
+            map.map.fitWorld();
         }
     };
 
-    var _init = function (eid, layers, options) {
-        var i, hash, layer, baseLayers = [
-            "Thunderforest.Landscape",
-            "Thunderforest.Transport",
-            "OpenStreetMap.Mapnik",
-            "OpenStreetMap.BlackAndWhite",
-            "MapQuestOpen.OSM",
-            "MapQuestOpen.Aerial",
-            "Stamen.Watercolor",
-            "Esri.WorldStreetMap",
-            "Esri.DeLorme",
-            "Esri.WorldTopoMap",
-            "Esri.WorldImagery",
-            "Esri.WorldTerrain",
-            "Esri.WorldShadedRelief",
-            "Esri.WorldPhysical"];
-        CLLD.Map.options = options == undefined ? {} : options;
-        CLLD.Map.map = L.map(
-            eid,
-            {center: [5.5, 152.58], scrollWheelZoom: false, maxZoom: 12, fullscreenControl: true});
-        CLLD.Map.oms = new OverlappingMarkerSpiderfier(CLLD.Map.map);
-        CLLD.Map.oms.addListener('click', _showInfoWindow);
+    this.oms = new OverlappingMarkerSpiderfier(this.map);
+    this.oms.addListener('click', this.showInfoWindow);
 
-        if (CLLD.Map.options.hash) {
-            hash = new L.Hash(CLLD.Map.map);
-        }
+    if (this.options.hash) {
+        hash = new L.Hash(this.map);
+    }
 
-        L.control.layers.provided(baseLayers, []).addTo(CLLD.Map.map);
+    L.control.layers.provided(baseLayers, []).addTo(this.map);
 
-        for (name in layers) {
-            if (layers.hasOwnProperty(name)) {
-                CLLD.Map.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(CLLD.Map.map);
+    this.marker_map = {};
+    this.layer_map = {};
 
-                if ($.type(layers[name]) === 'string') {
-                    $.getJSON(layers[name], {layer: name}, function(data) {
-                        CLLD.Map.layer_map[data.properties.layer].addData(data);
-                        _zoomToExtent();
-                    });
-                } else {
-                    CLLD.Map.layer_map[name].addData(layers[name]);
+    for (name in layers) {
+        if (layers.hasOwnProperty(name)) {
+            this.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(this.map);
+
+            if ($.type(layers[name]) === 'string') {
+                $.getJSON(layers[name], {layer: name}, function(data) {
+                    var map = CLLD.Maps[eid];
+                    map.layer_map[data.properties.layer].addData(data);
                     _zoomToExtent();
-                }
+                });
+            } else {
+                this.layer_map[name].addData(layers[name]);
+                _zoomToExtent();
             }
         }
-        if (CLLD.Map.options.center) {
-            CLLD.Map.map.setView(
-                CLLD.Map.options.center,
-                CLLD.Map.options.zoom == undefined ? 5 : CLLD.Map.options.zoom);
-        } else {
-            if (CLLD.Map.map.getZoom() > 5) {
-                CLLD.Map.map.setZoom(5);
-            }
+    }
+    if (this.options.center) {
+        this.map.setView(
+            this.options.center,
+            this.options.zoom == undefined ? 5 : this.options.zoom);
+    } else {
+        if (this.map.getZoom() > 5) {
+            this.map.setZoom(5);
         }
     }
 
-    return {
-        eachMarker: function(func) {
-            for (id in CLLD.Map.marker_map) {
-                if (CLLD.Map.marker_map.hasOwnProperty(id)) {
-                    func(CLLD.Map.marker_map[id]);
-                }
+    this.eachMarker = function(func) {
+        for (id in this.marker_map) {
+            if (this.marker_map.hasOwnProperty(id)) {
+                func(this.marker_map[id]);
             }
-        },
-        resizeIcons: function(size) {
-            size = size === undefined ? $('input[name=iconsize]:checked').val(): size;
-            CLLD.Map.eachMarker(function(marker){
-                marker.setIcon(_icon(marker.feature, parseInt(size)));
-            });
-        },
-        toggleLabels: function(ctrl){
-            var display = $(ctrl).prop('checked');
-            CLLD.Map.eachMarker(function(marker){
-                if (display && marker._icon.style.display != 'none') {
-                    marker.showLabel();
-                } else {
-                    marker.hideLabel();
-                }
-            });
-        },
-        filterMarkers: function(show){
-            var show_label = $('#map-label-visiblity').prop('checked');
-            CLLD.Map.eachMarker(function(marker){
-                if (show(marker)) {
-                    marker._icon.style.display = 'block';
-                    if (show_label) {
-                        marker.showLabel();
-                    }
-                } else {
-                    marker._icon.style.display = 'none';
-                    marker.hideLabel();
-                }
-            });
-        },
-        marker_map: {},
-        layer_map: {},
-        oms: undefined,
-        popup: undefined,
-        map: undefined,
-        init: _init,
-        showInfoWindow: _showInfoWindow,
-        toggleLayer: function(layer, ctrl) {
-            CLLD.Map.layer_map[layer].eachLayer(function(l){
-                l._icon.style.display = $(ctrl).prop('checked') ? 'block' : 'none';
-            });
         }
-    }
-})();
+    };
+}
+
+CLLD.map = function(eid, layers, options) {
+    return new CLLD.Map(eid, layers, options);
+}
+
+CLLD.mapToggleLabels = function(eid, ctrl){
+    var display = $(ctrl).prop('checked'),
+        map = CLLD.Maps[eid];
+    map.eachMarker(function(marker){
+        if (display && marker._icon.style.display != 'none') {
+            marker.showLabel();
+        } else {
+            marker.hideLabel();
+        }
+    });
+};
+
+CLLD.mapResizeIcons = function(eid, size) {
+    var map = CLLD.Maps[eid];
+    size = size === undefined ? $('input[name=iconsize]:checked').val(): size;
+    map.eachMarker(function(marker){
+        marker.setIcon(map.icon(marker.feature, parseInt(size)));
+    });
+};
+
+CLLD.mapFilterMarkers = function(eid, show){
+    var map = CLLD.Maps[eid],
+        show_label = $('#map-label-visiblity').prop('checked');
+    map.eachMarker(function(marker){
+        if (show(marker)) {
+            marker._icon.style.display = 'block';
+            if (show_label) {
+                marker.showLabel();
+            }
+        } else {
+            marker._icon.style.display = 'none';
+            marker.hideLabel();
+        }
+    });
+};
+
+CLLD.mapToggleLayer = function(eid, layer, ctrl) {
+    var map = CLLD.Maps[eid];
+    map.layer_map[layer].eachLayer(function(l){
+        l._icon.style.display = $(ctrl).prop('checked') ? 'block' : 'none';
+    });
+};
