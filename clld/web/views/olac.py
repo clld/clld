@@ -106,7 +106,7 @@ class OlacConfig(object):
         return req.db.query(Language)\
             .join(LanguageIdentifier)\
             .join(Identifier)\
-            .filter(Identifier.type == IdentifierType.iso.value)\
+            .filter(Identifier.type == 'iso639-3')\
             .options(joinedload_all(
                 Language.languageidentifier, LanguageIdentifier.identifier))\
             .distinct()
