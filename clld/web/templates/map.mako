@@ -17,6 +17,7 @@
                 <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
+            <% representation = 0 %>
             % for layer in map.layers:
                 <li>
                     <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
@@ -27,10 +28,16 @@
                         ${layer.name}
                     </label>
                     % if hasattr(layer, 'representation'):
+                    <% representation += layer.representation %>
                     <span class="pull-right" style="padding-right: 10px;">${layer.representation}</span>
                     % endif
                 </li>
             % endfor
+            % if representation:
+                <li style="clear: right">
+                    <span class="pull-right" style="padding-right: 10px;"><b>${representation}</b></span>
+                </li>
+            % endif
             </ul>
         </li>
     % endif
@@ -50,7 +57,7 @@
             % for size in [15, 20, 30, 40]:
                 <li>
                     <label class="radio" style="margin-left: 5px; margin-right: 5px;">
-                        <input name="iconsize"${' checked="checked"' if size == 30 else ''|n} value="${size}" type="radio" onclick='${h.JS_CLLD.mapResizeIcons(map.eid)|n}'>
+                        <input name="iconsize"${' checked="checked"' if size == options.get('icon_size', 30) else ''|n} value="${size}" type="radio" onclick='${h.JS_CLLD.mapResizeIcons(map.eid)|n}'>
                         <img height="${size}" width="${size}" src="${request.registry.getUtility(h.interfaces.IIcon, 'cff6600').url(request)}">
                     </label>
                 </li>

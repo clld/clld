@@ -385,6 +385,8 @@ CLLD.Map = function(eid, layers, options) {
             map = CLLD.Maps[eid];
         if (map.options.sidebar) {
             size = 20;
+        } else if (map.options.icon_size) {
+            size = map.options.icon_size;
         }
         layer.setIcon(map.icon(feature, size));
         map.oms.addMarker(layer);
