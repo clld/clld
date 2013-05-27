@@ -1,5 +1,3 @@
-<%namespace name="olac_record" file="olac_record.mako"/>
-<%namespace name="olac_archive" file="olac_archive.mako"/>
 <?xml version="1.0" encoding="utf-8"?>
 <OAI-PMH xmlns:atom="http://www.w3.org/2005/Atom"
          xmlns="http://www.openarchives.org/OAI/2.0/"
@@ -9,6 +7,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
                              http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<%namespace name="olac_record" file="olac_record.mako"/>
+<%namespace name="olac_archive" file="olac_archive.mako"/>
 <%def name="header(lang)">
   <oai:header>
     <oai:identifier>${cfg.format_identifier(request, lang)}</oai:identifier>
