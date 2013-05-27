@@ -44,10 +44,10 @@ class Sentences(DataTable):
     def col_defs(self):
         return [
             IdCol(self),
-            LinkCol(self, 'name'),
+            LinkCol(self, 'name', sClass="object-language"),
             Col(self, 'analyzed'),
-            Col(self, 'gloss'),
-            Col(self, 'description', sTitle=self.req.translate('Translation')),
+            Col(self, 'gloss', sClass="gloss"),
+            Col(self, 'description', sTitle=self.req.translate('Translation'), sClass="translation"),
             TypeCol(self),
             LanguageCol(self, 'language'),
             DetailsRowLinkCol(self),

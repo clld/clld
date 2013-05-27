@@ -28,5 +28,6 @@ class Contributors(DataTable):
         return [
             NameCol(self, 'name'),
             ContributionsCol(self, 'Contributions', bSortable=False, bSearchable=False),
+            Col(self, 'address'),
             UrlCol(self, 'Homepage', bSortable=False, bSearchable=False),
         ]

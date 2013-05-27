@@ -1,12 +1,6 @@
 /*
  *
  */
-body {
-        padding-top: 5px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-        padding-right: 5px;
-      }
 
 h2 {font-size: 28px !important;}
 
@@ -204,11 +198,11 @@ span.sc {
   margin-right: 0.5em;
 }
 /* line 47, ../../app/assets/stylesheets/examples.scss */
-.sentence .gloss-unit .gloss {
+.gloss {
   font-size: 90%;
 }
 /* line 49, ../../app/assets/stylesheets/examples.scss */
-.sentence .gloss-unit .gloss .sc {
+.gloss .sc {
   font-size: 120%;
   line-height: 1.1em;
 }

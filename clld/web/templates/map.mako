@@ -16,12 +16,12 @@
                 Layers
                 <b class="caret"></b>
             </a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu stay-open">
             <% representation = 0 %>
             % for layer in map.layers:
-                <li>
-                    <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
-                        <input type="checkbox" checked="checked" onclick='${h.JS_CLLD.mapToggleLayer(map.eid, layer.id, h.JS("this"))|n}'>
+                <li class="stay-open" style="clear: right">
+                    <label class="checkbox inline stay-open" style="margin-left: 5px; margin-right: 5px;">
+                        <input class="stay-open" type="checkbox" checked="checked" onclick='${h.JS_CLLD.mapToggleLayer(map.eid, layer.id, h.JS("this"))|n}'>
                         % if hasattr(layer, 'marker'):
                         ${layer.marker}
                         % endif
@@ -34,8 +34,8 @@
                 </li>
             % endfor
             % if representation:
-                <li style="clear: right">
-                    <span class="pull-right" style="padding-right: 10px;"><b>${representation}</b></span>
+                <li class="stay-open" style="clear: right">
+                    <span class="pull-right stay-open" style="padding-right: 10px;"><b>${representation}</b></span>
                 </li>
             % endif
             </ul>
