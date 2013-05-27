@@ -13,7 +13,7 @@
     % if len(map.layers) > 1:
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                Layers
+                Legend
                 <b class="caret"></b>
             </a>
             <ul class="dropdown-menu stay-open">
