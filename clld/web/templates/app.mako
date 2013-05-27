@@ -129,9 +129,6 @@
         </div>
 
         <script>
-$(document).ready(function() {
-    $('.ttip').tooltip({placement: 'bottom', delay: {hide: 300}});
-});
             <%block name="javascript"> </%block>
         </script>
     </body>

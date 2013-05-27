@@ -154,7 +154,7 @@ span.sc {
 .translation:before { content: "\2018"; }
 .translation:after { content: "\2019"; }
 
-.ttip {
+.hint--bottom {
     border-bottom: 1px dotted #333333;
 }
 

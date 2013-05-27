@@ -37,7 +37,12 @@ environment.register(
 
 environment.register(
     'css',
-    Bundle('css/clld.css', 'css/jqtree.css', 'css/leaflet.label.css', filters='yui_css'),
+    Bundle(
+        'css/clld.css',
+        'css/jqtree.css',
+        'css/leaflet.label.css',
+        'css/hint.css',
+        filters='yui_css'),
     'css/bootstrap.min.css',
     'css/bootstrap-responsive.min.css',
     output='css/packed.%(version)s.css')

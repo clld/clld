@@ -171,10 +171,8 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
                         explanation, person_map[match.group('personsuffix')])
 
                 res.append(HTML.span(
-                    gloss[match.start():match.end()].lower(),
-                    **{'data-original-title': explanation,
-                       'rel': 'tooltip',
-                       'class': 'sc ttip'}))
+                    HTML.span(gloss[match.start():match.end()].lower(), class_='sc'),
+                    **{'data-hint': explanation, 'class': 'hint--bottom'}))
             else:
                 res.append(abbr)
 
