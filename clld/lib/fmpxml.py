@@ -21,13 +21,7 @@ def normalize_markup(s):
     """
     if not s:
         return
-    soup = bs(s.strip())
-
-    # replace br tags with line breaks:
-    for br in soup.find_all('br'):
-        br.replace_with('\n')
-
-    soup = bs(unicode(soup))
+    soup = bs(s.strip().replace('<BR>', '\n'))
     # remove empty, i.e. unstyled span tags
     for span in soup.find_all('span'):
         style = span.attrs.get('style', '').strip()
@@ -35,7 +29,7 @@ def normalize_markup(s):
         if not style:
             span.replace_with(span.string)
 
-    return re.sub('\n+', '\n', unicode(soup)).strip()
+    return re.sub('\n+', '\n', unicode(soup).strip())
 
 
 class Result(object):

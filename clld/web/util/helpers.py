@@ -219,13 +219,11 @@ def newline2br(text):
     for i, line in enumerate(text.split('\n')):
         if i > 0:
             chunks.append(HTML.br())
-        chunks.append(line)
+        chunks.append(literal(line))
     return '\n'.join(chunks)
 
 
 def text2html(text):
-    if isinstance(text, Markup):
-        return HTML.p(text)
     return HTML.p(literal(newline2br(text)))
 
 

@@ -36,6 +36,7 @@ install_requires = [
     'alembic',
     'webassets',
     'yuicompressor',
+    'markupsafe',
 ]
 
 if not PY3:
