@@ -14,7 +14,7 @@ ${h.rendered_sentence(ctx)|n}
 <dl>
 % if ctx.comment:
 <dt>Comment:</dt>
-<dd>${ctx.comment}</dd>
+<dd>${ctx.markup_comment or ctx.comment|n}</dd>
 % endif
 % if ctx.source:
 <dt>${_('Type')}:</dt>

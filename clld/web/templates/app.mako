@@ -48,6 +48,7 @@
         <%block name="head"> </%block>
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
+    <div id="content">
         <div id="header" class="container-fluid">
             <%block name="header"></%block>
         </div>
@@ -131,5 +132,6 @@
         <script>
             <%block name="javascript"> </%block>
         </script>
+    </div>
     </body>
 </html>

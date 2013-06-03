@@ -319,6 +319,7 @@ class ValueSet(Base,
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     source = Column(Unicode)
+    markup_description = Column(Unicode)
 
     parameter = relationship('Parameter', backref='valuesets')
     contribution = relationship('Contribution', backref='valuesets')
@@ -428,6 +429,11 @@ class Sentence(Base,
     comment = Column(Unicode)
     original_script = Column(Unicode)
     xhtml = Column(Unicode)
+
+    markup_text = Column(Unicode)
+    markup_analyzed = Column(Unicode)
+    markup_gloss = Column(Unicode)
+    markup_comment = Column(Unicode)
 
     language_pk = Column(Integer, ForeignKey('language.pk'))
 

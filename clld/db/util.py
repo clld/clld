@@ -48,6 +48,6 @@ def compute_number_of_values(session=None):
         valueset.jsondata = d
 
 
-def get_distinct_values(col, session=None):
+def get_distinct_values(col, session=None, key=None):
     session = session or DBSession
-    return sorted([r[0] for r in session.query(col).distinct() if r[0]])
+    return sorted([r[0] for r in session.query(col).distinct() if r[0]], key=key)

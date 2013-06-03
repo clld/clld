@@ -3,12 +3,39 @@
 
 see http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
+import re
+from bs4 import BeautifulSoup as bs
 from logging import getLogger
 log = getLogger(__name__)
 
 from xml.etree import cElementTree as et
 
 import requests
+
+
+FF = re.compile("font-family:\s*\'[^\']+\';\s*")
+
+
+def normalize_markup(s):
+    """normalize markup in filemaker data
+    """
+    if not s:
+        return
+    soup = bs(s.strip())
+
+    # replace br tags with line breaks:
+    for br in soup.find_all('br'):
+        br.replace_with('\n')
+
+    soup = bs(unicode(soup))
+    # remove empty, i.e. unstyled span tags
+    for span in soup.find_all('span'):
+        style = span.attrs.get('style', '').strip()
+        style = FF.sub('', style)
+        if not style:
+            span.replace_with(span.string)
+
+    return re.sub('\n+', '\n', unicode(soup)).strip()
 
 
 class Result(object):

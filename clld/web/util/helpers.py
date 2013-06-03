@@ -157,7 +157,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         end = 0
         for match in GLOSS_ABBR_PATTERN.finditer(gloss):
             if match.start() > end:
-                res.append(gloss[end:match.start()])
+                res.append(literal(gloss[end:match.start()]))
 
             abbr = match.group('abbr')
             if abbr in abbrs:
@@ -178,20 +178,22 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
 
             end = match.end()
 
-        res.append(gloss[end:])
+        res.append(literal(gloss[end:]))
         return filter(None, res)
 
     units = []
     if sentence.analyzed and sentence.gloss:
-        for morpheme, gloss in zip(sentence.analyzed.split('\t'), sentence.gloss.split('\t')):
+        analyzed = sentence.analyzed
+        glossed = sentence.gloss
+        for morpheme, gloss in zip(analyzed.split('\t'), glossed.split('\t')):
             units.append(HTML.div(
-                HTML.div(morpheme, class_='morpheme'),
+                HTML.div(literal(morpheme), class_='morpheme'),
                 HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
                 class_='gloss-unit'))
 
     return HTML.div(
         HTML.div(
-            HTML.div(sentence.name, class_='object-language'),
+            HTML.div(literal(sentence.markup_text or sentence.name), class_='object-language'),
             HTML.div(*units, **{'class': 'gloss-box'}) if units else '',
             HTML.div(sentence.description, class_='translation')
             if sentence.description else '',
