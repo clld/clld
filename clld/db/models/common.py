@@ -154,6 +154,7 @@ class IdNameDescriptionMixin(object):
     id = Column(String, unique=True)
     name = Column(Unicode)
     description = Column(Unicode)
+    markup_description = Column(Unicode)
 
 
 #-----------------------------------------------------------------------------
@@ -319,7 +320,6 @@ class ValueSet(Base,
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     source = Column(Unicode)
-    markup_description = Column(Unicode)
 
     parameter = relationship('Parameter', backref='valuesets')
     contribution = relationship('Contribution', backref='valuesets')

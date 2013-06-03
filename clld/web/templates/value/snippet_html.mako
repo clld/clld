@@ -1,7 +1,7 @@
 <%namespace name="util" file="../util.mako"/>
 
 % if ctx.valueset.description:
-<p>${h.text2html(ctx.valueset.description)}</p>
+<p>${h.text2html(h.Markup(ctx.valueset.markup_description) if ctx.valueset.markup_description else ctx.valueset.description)}</p>
 % endif
 
 % if ctx.confidence:

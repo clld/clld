@@ -6,7 +6,7 @@
 <h2>${_('Value Set')} ${h.link(request, ctx.language)}/${h.link(request, ctx.parameter)}</h2>
 
 % if ctx.description:
-<p>${h.text2html(ctx.description)}</p>
+<p>${h.text2html(h.Markup(ctx.markup_description) if ctx.markup_description else ctx.description)}</p>
 % endif
 
 <h3>${_('Values')} ${h.map_marker_img(request, ctx, height='25', width='25')|n}</h3>
