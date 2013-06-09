@@ -1,16 +1,20 @@
 import sys
 
-from pyx import bbox, unit, style, path, color, canvas, deco
+from six import PY3
+if not pY3:
+    import pyx
+    from pyx import bbox, unit, style, path, color, canvas, deco
+    # set the scale to 1/20th of an inch
+    unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
+
+    #linewidth = style.linewidth(1.2)
+    linewidth = style.linewidth(1.1)
+else:
+    pyx = False
+
 from pyramid.path import AssetResolver
 
 from clld.web.icon import ICONS
-
-# set the scale to 1/20th of an inch
-unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
-
-
-#linewidth = style.linewidth(1.2)
-linewidth = style.linewidth(1.1)
 
 
 def polygon(*points):
@@ -46,6 +50,8 @@ def pyxColor(string):
 
 
 if __name__ == '__main__':
+    if not pyx:
+        sys.exit(1)
     asset_resolver = AssetResolver()
     for icon in ICONS:
         c = canvas.canvas()
