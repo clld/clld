@@ -73,7 +73,7 @@ class ResumptionToken(UnicodeMixin):
 
     def __init__(self, url_arg=None, offset=None, from_=None, until=None):
         datetime_from_iso = lambda s: datetime(*map(int, s.split('-')))
-        self.offset = offset
+        self.offset = offset or 0
         self.from_ = from_
         self.until = until
 
@@ -93,6 +93,7 @@ class ResumptionToken(UnicodeMixin):
             res += "f%s" % date(self.from_)
         if self.until:
             res += "u%s" % date(self.until)
+        assert self.PATTERN.match(res)
         return res
 
 
@@ -125,7 +126,7 @@ class OlacConfig(object):
         q = self._query(req).order_by(Language.pk)
         if from_:
             q = q.filter(Language.updated >= from_)
-        elif until:
+        if until:
             q = q.filter(Language.updated < until)
         return q
 
@@ -149,7 +150,7 @@ class OlacConfig(object):
 
     def description(self, req):
         return {
-            'archiveURL': 'http://%s/' % req.pub['domain'],
+            'archiveURL': 'http://%s/' % req.pub.get('domain', 'clld'),
             'participants': [
                 Participant("Admin", 'Robert Forkel', 'robert_forkel@eva.mpg.de'),
             ],
@@ -196,9 +197,6 @@ def olac(req):
 
         if args['metadataPrefix'] != MD_PREFIX:
             return error("cannotDisseminateFormat")
-
-        if ':' not in res['oai'].params['identifier']:
-            return error("idDoesNotExist")
 
         try:
             res['language'] = res['cfg'].get_record(req, args['identifier'])

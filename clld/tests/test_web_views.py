@@ -1,5 +1,5 @@
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotAcceptable
+from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
@@ -12,9 +12,14 @@ class Tests(TestWithEnv):
 
         ctx = self.env['registry'].getUtility(IDataTable, name='contributors')
 
+        # note: this invocation of the index view does also exercise the ExcelAdapter
         res = index_view(
             ctx(self.env['request'], common.Contributor), self.env['request'])
         self.assertTrue(isinstance(res, Response))
+        res = index_view(
+            ctx(self.env['request'], common.Sentence), self.env['request'])
+        res = index_view(
+            ctx(self.env['request'], common.Value), self.env['request'])
 
         self.set_request_properties(is_xhr=True, params={'sEcho': 'a'})
         res = index_view(
@@ -52,3 +57,14 @@ class Tests(TestWithEnv):
         from clld.web.views import js
 
         js(self.env['request'])
+
+    def test_unapi(self):
+        from clld.web.views import unapi
+
+        unapi(self.env['request'])
+        self.set_request_properties(params={'format': 'bib'})
+        self.assertTrue(isinstance(unapi(self.env['request']), HTTPNotFound))
+        self.set_request_properties(params={'format': 'bib', 'id': '/languages/l1'})
+        unapi(self.env['request'])
+        self.set_request_properties(params={'format': 'bibtex', 'id': '/contributions/c'})
+        unapi(self.env['request'])

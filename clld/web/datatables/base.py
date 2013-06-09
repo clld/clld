@@ -46,8 +46,9 @@ def filter_number(col, qs, type_=None):
             if isinstance(col.property.columns[0].type, Integer):
                 qs = int(qs.strip())
         return op(qs)
-    except ValueError:
-        pass
+    except ValueError:  # pragma: no cover
+        # if we cannot form a proper filter argument, we return None
+        return
 
 
 class Col(object):
@@ -186,7 +187,7 @@ class DataTable(object):
         return '%ss' % inspect(self.model).class_.__name__
 
     def col_defs(self):
-        return [LinkCol(self, 'name')]
+        raise NotImplementedError  # pragma: no cover
 
     @property
     def cols(self):
@@ -223,7 +224,7 @@ class DataTable(object):
             if val and name.startswith('sSearch_'):
                 try:
                     clause = self.cols[int(name.split('_')[1])].search(val)
-                except ValueError:
+                except ValueError:  # pragma: no cover
                     clause = None
                 if clause is not None:
                     query = query.filter(clause)

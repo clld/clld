@@ -6,7 +6,7 @@ from pyramid.i18n import get_localizer, TranslationStringFactory
 from clld import interfaces
 from clld.web.util import helpers
 
-if PY3:
+if PY3:  # pragma: no cover
     class Environment(dict):
         debug = False
 

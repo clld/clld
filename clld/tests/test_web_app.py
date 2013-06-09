@@ -14,6 +14,7 @@ class Tests(TestWithEnv):
         self.assertTrue(isinstance(self.env['request'].purl, URL))
         c = self.env['request'].db.query(Contribution).first()
         self.env['request'].resource_url(c, ext='geojson')
+        self.assertEqual(None, self.env['request'].ctx_for_url('/some/path/to/nowhere'))
 
     def test_ctx_factory(self):
         from clld.web.app import ctx_factory

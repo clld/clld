@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import re
 import unicodedata
-import collections
 import string
 
 from six import PY3
@@ -28,7 +27,7 @@ class EnumSymbol(object):
 
     def __reduce__(self):
         """Allow unpickling to return the symbol linked to the DeclEnum class."""
-        return getattr, (self.cls_, self.name)
+        return getattr, (self.cls_, self.name)  # pragma: no cover
 
     def __iter__(self):
         return iter([self.value, self.description])
@@ -83,10 +82,10 @@ class DeclEnumType(SchemaType, TypeDecorator):
                 '([A-Z])', lambda m: "_" + m.group(1).lower(), enum.__name__))
 
     def _set_table(self, table, column):
-        self.impl._set_table(table, column)
+        self.impl._set_table(table, column)  # pragma: no cover
 
     def copy(self):
-        return DeclEnumType(self.enum)
+        return DeclEnumType(self.enum)  # pragma: no cover
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -104,7 +103,7 @@ class UnicodeMixin(object):
         """
         :return: a human readable label for the object
         """
-        return '%s' % self
+        return '%s' % self  # pragma: no cover
 
     def __str__(self):
         """

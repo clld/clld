@@ -1,7 +1,7 @@
 from six import PY3
 if not PY3:
     import xlwt
-else:
+else:  # pragma: no cover
     xlwt = None
 
 

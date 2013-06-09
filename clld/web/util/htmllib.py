@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 """HTML/XHTML tag builder
 
 HTML Builder provides:
@@ -325,12 +326,9 @@ def format_attrs(**attrs):
     attribute is suppressed.
 
     Usage:
-    >>> format_attrs(p=2, q=3)
-    literal(' p="2" q="3"')
-    >>> format_attrs(p=2, q=None)
-    literal(' p="2"')
-    >>> format_attrs(p=None)
-    literal('')
+    >>> assert format_attrs(p=2, q=3) == literal(' p="2" q="3"')
+    >>> assert format_attrs(p=2, q=None) == literal(' p="2"')
+    >>> assert format_attrs(p=None) == literal('')
     """
     strings = [
         ' %s="%s"' % (_attr_decode(attr), escape(value))

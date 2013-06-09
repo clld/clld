@@ -56,7 +56,7 @@ class GeoJson(Renderable):
         for feature in self.feature_iterator(ctx, req):
             language = self.get_language(ctx, req, feature)
             if language.longitude is None or language.latitude is None:
-                continue
+                continue  # pragma: no cover
 
             features.append({
                 "type": "Feature",

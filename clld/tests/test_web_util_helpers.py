@@ -26,6 +26,16 @@ class Tests(TestWithEnv):
 
         linked_contributors(self.env['request'], common.Contribution.first())
 
+    def test_urlescape(self):
+        from clld.web.util.helpers import urlescape
+
+        urlescape('a b c\\/ab')
+
+    def test_coins(self):
+        from clld.web.util.helpers import coins
+
+        coins(self.env['request'], common.Contribution.first())
+
     def test_linked_references(self):
         from clld.web.util.helpers import linked_references
 

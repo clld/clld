@@ -5,7 +5,7 @@ http://ocoins.info/
 import re
 
 from six import PY3
-if PY3:
+if PY3:  # pragma: no cover
     from urllib.parse import urlencode
 else:
     from urllib import urlencode

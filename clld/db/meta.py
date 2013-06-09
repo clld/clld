@@ -8,7 +8,6 @@ try:
 except ImportError:
     import json
 
-from six import PY3
 from sqlalchemy import (
     Column,
     Integer,

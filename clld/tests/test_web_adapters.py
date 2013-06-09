@@ -3,11 +3,17 @@ import unittest
 from mock import Mock
 
 from clld.interfaces import IIndex
-from clld.db.models.common import Contribution, Parameter, Language
+from clld.db.models.common import Contribution, Parameter, Language, File
 from clld.tests.util import TestWithEnv
 
 
 class Tests(TestWithEnv):
+    def test_OctetStream(self):
+        from clld.web.adapters import OctetStream
+
+        adapter = OctetStream(None)
+        adapter.render(File.first(), None)
+
     def test_BibTex(self):
         from clld.web.adapters import BibTex
 
@@ -21,6 +27,7 @@ class Tests(TestWithEnv):
         adapter = TxtCitation(None)
         self.assertTrue(
             '.' in adapter.render(Contribution.first(), self.env['request']))
+        adapter.render(None, self.env['request'])
 
     def test_GeoJsonParameter(self):
         from clld.web.adapters import GeoJsonParameter

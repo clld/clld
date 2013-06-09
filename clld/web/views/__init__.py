@@ -120,6 +120,9 @@ def unapi(req):
             request=req)
         return Response(body, **kw)
 
+    if not id_:
+        return HTTPNotFound()
+
     adapter = None
     for _n, _a in get_adapters(IMetadata, obj, req):
         if _a.unapi_name == format_:

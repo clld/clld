@@ -3,7 +3,7 @@ from itertools import groupby  # we just import this to have it available in tem
 assert groupby  # appease pyflakes
 
 from six import PY3
-if PY3:
+if PY3:  # pragma: no cover
     from urllib.parse import quote
 else:
     from urllib import quote

@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import re
 
 from clld.util import UnicodeMixin
 
@@ -67,10 +68,58 @@ unpublished
 
 class Record(OrderedDict, UnicodeMixin):
 
-    def __init__(self, genre, id, *args, **kwargs):
+    def __init__(self, genre, id_, *args, **kwargs):
         self.genre = genre
-        self.id = id
+        self.id = id_
         super(Record, self).__init__(args, **kwargs)
+
+    @classmethod
+    def from_string(cls, bibtexString):
+        id_, genre, data = None, None, {}
+
+        # the following patterns are designed to match preprocessed input lines.
+        # i.e. the configuration values given in the bibtool resource file used to
+        # generate the bib-file have to correspond to these patterns.
+
+        # in particular, we assume all key-value-pairs to fit on one line,
+        # because we don't want to deal with nested curly braces!
+        lines = bibtexString.strip().split('\n')
+
+        # genre and key are parsed from the @-line:
+        atLine = re.compile("^@(?P<genre>[a-zA-Z_]+)\s*{\s*(?P<key>[^,]*)\s*,\s*")
+
+        # since all key-value pairs fit on one line, it's easy to determine the
+        # end of the value: right before the last closing brace!
+        fieldLine = re.compile('\s*(?P<field>[a-zA-Z_]+)\s*=\s*(\{|")(?P<value>.+)')
+
+        endLine = re.compile("}\s*")
+
+        # flag to signal, whether the @-line - starting each bibtex record - was
+        # already encountered:
+        inRecord = False
+
+        while lines:
+            line = lines.pop(0)
+            if not inRecord:
+                m = atLine.match(line)
+                if m:
+                    id_ = m.group('key').strip()
+                    genre = m.group('genre').strip().lower()
+                    inRecord = True
+            else:
+                m = fieldLine.match(line)
+                if m:
+                    value = m.group('value').strip()
+                    if value.endswith(','):
+                        value = value[:-1].strip()
+                    if value.endswith('}') or value.endswith('"'):
+                        data[m.group('field')] = value[:-1].strip()
+                else:
+                    m = endLine.match(line)
+                    if m:
+                        break
+
+        return cls(genre, id_, **data)
 
     def __unicode__(self):
         fields = []

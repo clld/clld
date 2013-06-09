@@ -66,11 +66,15 @@ class TestWithDbAndData(TestWithDb):
     def setUp(self):
         TestWithDb.setUp(self)
 
+        file_ = common.File(mime_type='text/plain', content='text')
+        DBSession.add(file_)
+        source = common.Source(id='src')
         contributors = {'a': 'A Name', 'b': 'b Name', 'c': 'c Name', 'd': 'd Name'}
         for id_, name in contributors.items():
             contributors[id_] = common.Contributor(id=id_, name=name)
 
         contribution = common.Contribution(id='c', name='Contribution')
+        cr = common.ContributionReference(contribution=contribution, source=source)
         assert common.ContributionContributor(
             contribution=contribution, primary=True, contributor=contributors['a'])
         assert common.ContributionContributor(
@@ -82,7 +86,11 @@ class TestWithDbAndData(TestWithDb):
 
         DBSession.add(contribution)
 
-        language = common.Language(id='l1', name='Language 1')
+        language = common.Language(
+            id='l1', name='Language 1', latitude=10.5, longitude=0.3)
+        identifier = common.Identifier(type='iso639-3', id='iso')
+        ls = common.LanguageSource(language=language, source=source)
+        li = common.LanguageIdentifier(language=language, identifier=identifier)
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
         valueset = common.ValueSet(
@@ -97,6 +105,7 @@ class TestWithDbAndData(TestWithDb):
         paramnd = common.Parameter(id='no-domain', name='Parameter without domain')
         valueset = common.ValueSet(
             id='vs2', language=language, parameter=paramnd, contribution=contribution)
+        vr = common.ValueSetReference(valueset=valueset, source=source)
         value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
         DBSession.add(value)
 
@@ -117,7 +126,7 @@ class TestWithDbAndData(TestWithDb):
 
         DBSession.add(common.Source(id='s'))
 
-        DBSession.add(common.Sentence(
+        sentence = common.Sentence(
             id='sentence',
             name='sentence name',
             description='sentence description',
@@ -126,7 +135,8 @@ class TestWithDbAndData(TestWithDb):
             source='own',
             comment='comment',
             original_script='a morpheme',
-            language=language))
+            language=language)
+        sr = common.SentenceReference(sentence=sentence, source=source)
         DBSession.add(common.Config(key='key', value='value'))
         DBSession.flush()
 

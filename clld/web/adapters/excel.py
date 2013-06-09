@@ -2,7 +2,7 @@ from six.moves import cStringIO as StringIO
 from six import PY3
 if not PY3:
     import xlwt
-else:
+else:  # pragma: no cover
     xlwt = None
 
 from clld.web.adapters.base import Index
@@ -21,7 +21,7 @@ class ExcelAdapter(Index):
 
     def render(self, ctx, req):
         if not xlwt:
-            return ''
+            return ''  # pragma: no cover
         wb = xlwt.Workbook()
         ws = wb.add_sheet(ctx.__unicode__())
 
