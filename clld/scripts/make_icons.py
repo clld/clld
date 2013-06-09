@@ -1,7 +1,6 @@
 import sys
 
-from six import PY3
-if not pY3:
+try:
     import pyx
     from pyx import bbox, unit, style, path, color, canvas, deco
     # set the scale to 1/20th of an inch
@@ -9,7 +8,7 @@ if not pY3:
 
     #linewidth = style.linewidth(1.2)
     linewidth = style.linewidth(1.1)
-else:
+except ImportError:
     pyx = False
 
 from pyramid.path import AssetResolver
