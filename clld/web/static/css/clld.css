@@ -147,12 +147,12 @@ span.sc {
   font-variant: small-caps;
 }
 
-.object-language {
+td.object-language, div.object-language {
     font-style: italic;
 }
 
-.translation:before { content: "\2018"; }
-.translation:after { content: "\2019"; }
+td.translation:before, div.translation:before { content: "\2018"; }
+td.translation:after, div.translation:before { content: "\2019"; }
 
 .hint--bottom {
     border-bottom: 1px dotted #333333;
@@ -198,7 +198,7 @@ span.sc {
   margin-right: 0.5em;
 }
 /* line 47, ../../app/assets/stylesheets/examples.scss */
-.gloss {
+td.gloss, div.gloss {
   font-size: 90%;
 }
 /* line 49, ../../app/assets/stylesheets/examples.scss */

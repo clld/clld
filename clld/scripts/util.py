@@ -6,12 +6,14 @@ from pyramid.paster import get_appsettings, setup_logging
 from clld.db.meta import DBSession, Base
 
 
-def setup_session(config_uri):
+def setup_session(config_uri, session=None, base=None):
+    session = session or DBSession
+    base = base or Base
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
     engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    Base.metadata.create_all(engine)
+    session.configure(bind=engine)
+    base.metadata.create_all(engine)
 
 
 class Data(defaultdict):

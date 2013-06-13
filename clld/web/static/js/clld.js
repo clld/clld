@@ -42,13 +42,16 @@ CLLD.TreeView = (function(){
         init: function() {
             $('input.treeview').change(function () {
                 var icon = $('label[for="'+this.getAttribute('id')+'"]').children('i');
-                if ($(this).prop('checked')) {
-                    icon.addClass('icon-chevron-down');
-                    icon.removeClass('icon-chevron-right');
-                } else {
-                    icon.addClass('icon-chevron-right');
-                    icon.removeClass('icon-chevron-down');
+                if (icon && icon.hasClass && icon.hasClass('icon-treeview')) {
+                    if ($(this).prop('checked')) {
+                        icon.first().addClass('icon-chevron-down');
+                        icon.first().removeClass('icon-chevron-right');
+                    } else {
+                        icon.first().addClass('icon-chevron-right');
+                        icon.first().removeClass('icon-chevron-down');
+                    }
                 }
+                return true;
             });
         },
         show: function(level) {

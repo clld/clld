@@ -55,7 +55,7 @@
 <%def name="tree_node_label(level, id, checked=True)">
     <input class="level${level} treeview" type="checkbox" id="${id}"${' checked="checked"' if checked else ''}>
     <label for="${id}">
-        <i class="icon-chevron-${'down' if checked else 'right'}"> </i>
+        <i class="icon-treeview icon-chevron-${'down' if checked else 'right'}"> </i>
         ${caller.body()}
     </label>
 </%def>

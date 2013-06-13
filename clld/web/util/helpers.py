@@ -223,7 +223,9 @@ def newline2br(text):
     return '\n'.join(chunks)
 
 
-def text2html(text):
+def text2html(text, mode='br'):
+    if mode == 'p':
+        return HTML.div(*[HTML.p(literal(line)) for line in text.split('\n')])
     return HTML.p(literal(newline2br(text)))
 
 

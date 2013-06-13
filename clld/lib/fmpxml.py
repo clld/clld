@@ -14,6 +14,8 @@ import requests
 
 
 FF = re.compile("font-family:\s*\'[^\']+\';\s*")
+BOLD = re.compile("font-weight:\*bold")
+ITALIC = re.compile("font-style:\*italic")
 
 
 def normalize_markup(s):
@@ -24,9 +26,15 @@ def normalize_markup(s):
     soup = bs(s.strip().replace('<BR>', '\n'))
     # remove empty, i.e. unstyled span tags
     for span in soup.find_all('span'):
+        new_style = []
         style = span.attrs.get('style', '').strip()
-        style = FF.sub('', style)
-        if not style:
+        if BOLD.search(style):
+            new_style.append('font-weight: bold')
+        if ITALIC.search(style):
+            new_style.append('font-style: italic')
+        if new_style:
+            span['style'] = new_style
+        else:
             span.replace_with(span.string)
 
     return re.sub('\n+', '\n', unicode(soup).strip())
