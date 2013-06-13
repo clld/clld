@@ -14,8 +14,9 @@ import requests
 
 
 FF = re.compile("font-family:\s*\'[^\']+\';\s*")
-BOLD = re.compile("font-weight:\*bold")
-ITALIC = re.compile("font-style:\*italic")
+BOLD = re.compile("font-weight:\s*bold")
+ITALIC = re.compile("font-style:\s*italic")
+SC = re.compile("font-variant:\s*small\-caps")
 
 
 def normalize_markup(s):
@@ -29,15 +30,17 @@ def normalize_markup(s):
         new_style = []
         style = span.attrs.get('style', '').strip()
         if BOLD.search(style):
-            new_style.append('font-weight: bold')
+            new_style.append('font-weight: bold;')
         if ITALIC.search(style):
-            new_style.append('font-style: italic')
+            new_style.append('font-style: italic;')
+        if SC.search(style):
+            new_style.append('font-variant: small-caps;')
         if new_style:
-            span['style'] = new_style
+            span['style'] = ' '.join(new_style)
         else:
             span.replace_with(span.string)
 
-    return re.sub('\n+', '\n', unicode(soup).strip())
+    return unicode(soup).strip()
 
 
 class Result(object):

@@ -135,16 +135,11 @@
             % endif
             ${h.rendered_sentence(a.sentence, fmt=fmt)}
             % if a.sentence.references and fmt == 'long':
-            <p>sources: ${h.linked_references(request, a.sentence)|n}</p>
+            <p>Source: ${h.linked_references(request, a.sentence)|n}</p>
             % endif
         </dd>
         % endfor
     </dl>
-    <script>
-    $(document).ready(function() {
-        $('#sentences-${obj.pk} .ttip').tooltip({placement: 'bottom', delay: {hide: 300}});
-    });
-    </script>
 </%def>
 
 ##

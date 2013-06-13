@@ -43,7 +43,7 @@ class Sentences(DataTable):
 
     def col_defs(self):
         return [
-            IdCol(self),
+            #IdCol(self),
             LinkCol(self, 'name', sClass="object-language"),
             Col(self, 'analyzed'),
             Col(self, 'gloss', sClass="gloss"),
@@ -52,3 +52,8 @@ class Sentences(DataTable):
             LanguageCol(self, 'language'),
             DetailsRowLinkCol(self),
         ]
+
+    def get_options(self):
+        opts = super(Sentences, self).get_options()
+        opts['aaSorting'] = []
+        return opts
