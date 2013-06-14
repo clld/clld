@@ -152,7 +152,7 @@ td.object-language, div.object-language {
 }
 
 td.translation:before, div.translation:before { content: "\2018"; }
-td.translation:after, div.translation:before { content: "\2019"; }
+td.translation:after, div.translation:after { content: "\2019"; }
 
 .hint--bottom {
     border-bottom: 1px dotted #333333;
@@ -164,7 +164,7 @@ td.translation:after, div.translation:before { content: "\2019"; }
 }
 
 /* line 14, ../../app/assets/stylesheets/examples.scss */
-.sentence {
+div.sentence {
   display: table-row;
 }
 /* line 16, ../../app/assets/stylesheets/examples.scss */

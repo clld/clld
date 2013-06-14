@@ -321,7 +321,13 @@ CLLD.Map = function(eid, layers, options) {
     this.options = options == undefined ? {} : options;
     this.map = L.map(
         eid,
-        {center: [5.5, 152.58], scrollWheelZoom: false, maxZoom: 12, fullscreenControl: true});
+        {
+            center: [5.5, 152.58],
+            scrollWheelZoom: false,
+            maxZoom: options.max_zoom == undefined ? 10 : options.max_zoom,
+            fullscreenControl: true
+        }
+    );
 
     var i, hash, layer, baseLayers = [
         "Thunderforest.Landscape",
@@ -454,10 +460,6 @@ CLLD.Map = function(eid, layers, options) {
         this.map.setView(
             this.options.center,
             this.options.zoom == undefined ? 5 : this.options.zoom);
-    } else {
-        if (this.map.getZoom() > 5) {
-            this.map.setZoom(5);
-        }
     }
 
     this.eachMarker = function(func) {

@@ -25,7 +25,7 @@
 			% endfor
 		    </select>
 		    % else:
-		    <input type="text" name="${col.name}" id="dt-filter-${col.name}" value="" placeholder="Search ${col.js_args['sTitle']}" class="input-${getattr(col, 'input_size', 'small')} control" />
+		    <input type="text" name="${col.name}" id="dt-filter-${col.name}" value="" placeholder="Search" class="input-${getattr(col, 'input_size', 'small')} control" />
 		    % endif
                 % else:
                     <input type="text" name="${col.name}" id="dt-filter-${col.name}" value="" class="search_init control" style="display: none;"/>

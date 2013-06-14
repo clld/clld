@@ -21,13 +21,13 @@ ${h.text2html(h.Markup(ctx.markup_description) if ctx.markup_description else ct
         ${h.format_frequency(request, value)}
     </h4>
     <div id="s${i}" class="collapse in">
+        ${util.sentences(value)}
         % if value.confidence:
         <dl>
             <dt>${_('Confidence')}:</dt>
             <dd>${value.confidence}</dd>
         </dl>
         % endif
-        ${util.sentences(value)}
     </div>
 </div>
 % endfor
