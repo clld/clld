@@ -187,7 +187,7 @@ class ContextObject(list, UnicodeMixin):
             if 'title' in rec:
                 data.append(('atitle', rec['title']))
             if 'journal' in rec:
-                data.append(('jtitle', rec['title']))
+                data.append(('jtitle', rec['journal']))
         elif mtx == 'book':
             if 'title' in rec:
                 data.append(('btitle' if genre == 'book' else 'atitle', rec['title']))

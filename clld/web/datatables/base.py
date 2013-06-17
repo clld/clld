@@ -7,7 +7,7 @@ from json import dumps
 import re
 
 from sqlalchemy import desc
-from sqlalchemy.types import String, Unicode, Float, Integer
+from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from sqlalchemy.inspection import inspect
 from pyramid.renderers import render
 from markupsafe import Markup
@@ -75,6 +75,10 @@ class Col(object):
             if model_col and hasattr(model_col.property, 'columns'):
                 self.model_col = model_col
 
+        if self.model_col and isinstance(self.model_col.property.columns[0].type, Boolean):
+            if not hasattr(self, 'choices'):
+                self.choices = ['True', 'False']
+
     def order(self):
         return self.model_col
 
@@ -84,9 +88,13 @@ class Col(object):
                 return icontains(self.model_col, qs)
             if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
                 return filter_number(self.model_col, qs)
+            if isinstance(self.model_col.property.columns[0].type, Boolean):
+                return self.model_col.__eq__(qs == 'True')
 
     def format(self, item):
         if self.model_col:
+            if isinstance(self.model_col.property.columns[0].type, Boolean):
+                return '%s' % getattr(item, self.model_col.name, '')
             return getattr(item, self.model_col.name, None) or ''
         return getattr(item, self.name, None) or ''
 
