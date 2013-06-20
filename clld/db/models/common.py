@@ -267,7 +267,7 @@ class Source(Base,
 
     @property
     def gbs_identifier(self):
-        if not self.jsondata or 'gbs' not in self.jsondata:
+        if not self.jsondata or not self.jsondata.get('gbs'):
             return
         if not self.jsondata['gbs']['volumeInfo'].get('industryIdentifiers'):
             return
