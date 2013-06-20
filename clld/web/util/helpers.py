@@ -69,6 +69,10 @@ def coins(req, obj, label=''):
     return HTML.span(label, **co.span_attrs())
 
 
+def format_gbs_identifier(source):
+    return source.gbs_identifier.replace(':', '-') if source.gbs_identifier else source.pk
+
+
 def format_frequency(req, obj, marker=None, height='20', width='20'):
     if not obj.frequency:
         return ''

@@ -212,7 +212,7 @@ LGR_ABBRS = {
 }
 
 
-def slug(s):
+def slug(s, remove_whitespace=True):
     """
     :return: A condensed version of the string s, containing only lowercase alphanumeric \
     characters.
@@ -222,7 +222,7 @@ def slug(s):
     res = res.lower()
     for c in string.punctuation:
         res = res.replace(c, '')
-    res = re.sub('\s+', '', res)
+    res = re.sub('\s+', '' if remove_whitespace else ' ', res)
     res = res.encode('ascii', 'ignore').decode('ascii')
-    assert re.match('[a-z0-9]*$', res)
+    assert re.match('[ a-z0-9]*$', res)
     return res
