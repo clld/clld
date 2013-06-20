@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from mock import Mock, patch, MagicMock
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
@@ -40,7 +40,9 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import linked_references
 
         with patch('clld.web.util.helpers.link'):
-            linked_references(self.env['request'], Mock(references=[Mock(), Mock()]))
+            linked_references(
+                self.env['request'], Mock(
+                    references=[MagicMock(description=''), MagicMock(description='')]))
 
     def test_text2html(self):
         from clld.web.util.helpers import text2html

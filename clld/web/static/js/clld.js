@@ -517,3 +517,21 @@ CLLD.mapToggleLayer = function(eid, layer, ctrl) {
         l._icon.style.display = $(ctrl).prop('checked') ? 'block' : 'none';
     });
 };
+
+CLLD.process_gbs_info = function(booksInfo) {
+    var target, info;
+
+    for (id in booksInfo) {
+        target = $('#' + id.replace(':', '-'));
+        info = booksInfo[id];
+
+        if (info.preview == "full" || info.preview == "partial") {
+            target.after('<dd><a title="preview at Google Books" href="' + info.preview_url + '"><img src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/></a></dd>');
+        } else if (info.thumbnail_url) {
+            target.before('<div style="float: right;"><a title="info at Google Books" href="' + info.info_url + '"><img style="border: 1px solid black;" src="' + info.thumbnail_url + '"/></a></div>');
+        } else {
+            target.after('<dd><a href="' + info.info_url + '"><i class="icon-share"> </i> info at Google Books</a></dd>');
+        }
+        target.show();
+    }
+}

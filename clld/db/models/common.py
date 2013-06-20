@@ -265,6 +265,24 @@ class Source(Base,
 
     languages = association_proxy('languagesource', 'language')
 
+    @property
+    def gbs_identifier(self):
+        if not self.jsondata or 'gbs' not in self.jsondata:
+            return
+        if not self.jsondata['gbs']['volumeInfo'].get('industryIdentifiers'):
+            return
+        id_ = None
+        for identifier in self.jsondata['gbs']['volumeInfo']['industryIdentifiers']:
+            # prefer ISBN_13 over ISBN_10 over anything else
+            if identifier['type'] == 'ISBN_13':
+                id_ = 'ISBN:' + identifier['identifier']
+            if identifier['type'] == 'ISBN_10' and not id_:
+                id_ = 'ISBN:' + identifier['identifier']
+        if not id_:
+            # grab the last one in the list (most probably the only one!)
+            id_ = identifier['identifier']
+        return id_
+
 
 class Contribution_data(Base, Versioned, DataMixin):
     pass

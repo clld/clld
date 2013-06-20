@@ -115,6 +115,23 @@ def external_link(url, label=None, inverted=False, **kw):
     return HTML.a(icon('share', inverted=inverted), ' ', label or url, **kw)
 
 
+def gbs_link(source, pages=None):
+    if not source.google_book_search_id or not source.jsondata or not source.jsondata.get('gbs'):
+        return ''
+    if source.jsondata['gbs']['accessInfo']['viewability'] in ['NO_PAGES']:
+        return ''
+    pg = 'PP1'
+    if pages:
+        match = re.search('(?P<startpage>[0-9]+)', pages)
+        if match:
+            pg = 'PA' + match.group('startpage')
+    return HTML.a(
+        HTML.img(src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"),
+        href="http://books.google.com/books?id=%s&lpg=PP1&pg=%s" % (
+            source.google_book_search_id, pg)
+    )
+
+
 def button(*content, **attrs):
     tag = attrs.pop('tag', HTML.a if 'href' in attrs else HTML.button)
     attrs.setdefault('type', 'button')
@@ -252,6 +269,7 @@ def linked_contributors(req, contribution):
 def linked_references(req, obj):
     chunks = []
     for i, ref in enumerate(getattr(obj, 'references', [])):
+        gbs = gbs_link(ref.source, pages=ref.description)
         if i > 0:
             chunks.append('; ')
         chunks.append(HTML.span(
@@ -259,6 +277,8 @@ def linked_references(req, obj):
             HTML.span(
                 ': %s' % ref.description if ref.description else '',
                 class_='pages'),
+            ' ' if gbs else '',
+            gbs,
             class_='citation',
         ))
     return HTML.span(*chunks)
