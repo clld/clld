@@ -487,6 +487,22 @@ CLLD.mapToggleLabels = function(eid, ctrl){
     });
 };
 
+CLLD.mapGetMap = function(eid) {
+    if (!eid) {
+        for (eid in CLLD.Maps) {
+            return CLLD.Maps[eid];
+        }
+    } else {
+        return CLLD.Maps[eid];
+    }
+    return undefined;
+}
+
+CLLD.mapShowInfoWindow = function(eid, layer) {
+    var map = CLLD.mapGetMap(eid);
+    map.showInfoWindow(layer);
+};
+
 CLLD.mapResizeIcons = function(eid, size) {
     var map = CLLD.Maps[eid];
     size = size === undefined ? $('input[name=iconsize]:checked').val(): size;

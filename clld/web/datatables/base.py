@@ -17,7 +17,7 @@ from clld.db.meta import DBSession
 from clld.db.models.common import Language
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import link, button, icon, JSMap
+from clld.web.util.helpers import link, button, icon, JSMap, JS_CLLD
 from clld.interfaces import IDataTable
 
 
@@ -147,13 +147,13 @@ class LinkToMapCol(Col):
 
     def format(self, item):
         obj = self.get_obj(item)
-        if not obj:
+        if not obj or obj.latitude is None:
             return ''
         return HTML.a(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),
             href="#map",
-            onclick=JSMap.showInfoWindow(obj.id),
+            onclick=JS_CLLD.mapShowInfoWindow(None, obj.id),
             class_='btn',
         )
 
