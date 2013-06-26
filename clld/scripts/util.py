@@ -92,7 +92,7 @@ def parsed_args(*arg_specs, **kw):
     args.module = __import__(args.module or module)
     args.log = logging.getLogger(args.module.__name__)
     if engine:
-        log.info('using bind %s' % engine)
+        args.log.info('using bind %s' % engine)
     args.data_file = partial(data_file, args.module)
     return args
 
@@ -106,11 +106,10 @@ def initializedb(create=None, prime_cache=None, **kw):
         prime_cache()
 
 
-def gbs(module, **kw):
+def gbs(**kw):
     def words(s):
         return set(slug(s.strip(), remove_whitespace=False).split())
 
-    log = logging.getLogger(module.__name__)
     api_url = "https://www.googleapis.com/books/v1/volumes?"
 
     args = parsed_args(
@@ -120,15 +119,16 @@ def gbs(module, **kw):
     if args.command == 'download' and not args.api_key:
         raise argparse.ArgumentError(None, 'no API key found for download')
 
-    data_dir = path(module.__file__).dirname().joinpath('..', 'data', 'gbs')
+    log = args.log
     count = 0
 
     with transaction.manager:
-        for i, source in enumerate(DBSession.query(common.Source)\
+        for i, source in enumerate(
+            DBSession.query(common.Source)\
             .order_by(cast(common.Source.id, Integer))\
             .options(joinedload(common.Source.data))
         ):
-            filepath = data_dir.joinpath('source%s.json' % source.id)
+            filepath = args.data_file('gbs', 'source%s.json' % source.id)
 
             if args.command == 'update':
                 source.google_book_search_id = None

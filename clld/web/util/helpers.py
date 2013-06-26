@@ -1,6 +1,8 @@
 import re
 from itertools import groupby  # we just import this to have it available in templates!
 assert groupby  # appease pyflakes
+import datetime  # we just import this to have it available in templates!
+assert datetime
 
 from six import PY3
 if PY3:  # pragma: no cover

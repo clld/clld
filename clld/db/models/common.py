@@ -32,22 +32,7 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
-
-
-#
-# TODO: relations to data and files!
-#
-"""
-http://chart.googleapis.com/chart?
-cht=p&chs=38x38&chd=t:60,40&chco=FF0000|00FF00&chf=bg,s,FFFFFF00
-
-note: deprecated; only works until april 2015!
-
-chs: 38px charts result in the pie having a diameter of about 17px
-chd: series of numbers
-chco: colors per slice
-chf: make sure backgroud is transparent (the 00 added to the color spec)
-"""
+from clld.lib import bibtex
 
 
 #-----------------------------------------------------------------------------
@@ -179,7 +164,7 @@ class Language(Base,
     """Languages are the main objects of discourse. We attach a geo-coordinate
     to them to be able to put them on maps.
     """
-    __table_args__ = (UniqueConstraint('name'),)
+    #__table_args__ = (UniqueConstraint('name'),)
     latitude = Column(
         Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
     longitude = Column(
@@ -257,11 +242,38 @@ class Source(Base,
              HasFilesMixin):
     """A bibliographic record, cited as source for some statement.
     """
-    authors = Column(Unicode)
-    year = Column(Unicode)
-
     glottolog_id = Column(String)
     google_book_search_id = Column(String)
+
+    #
+    # BibTeX fields:
+    #
+    bibtex_type = bibtex.EntryType.db_type()
+    author = Column(Unicode)
+    year = Column(Unicode)
+    title = Column(Unicode)
+    type = Column(Unicode)
+    booktitle = Column(Unicode)
+    editor = Column(Unicode)
+    pages = Column(Unicode)
+    edition = Column(Unicode)
+    journal = Column(Unicode)
+    school = Column(Unicode)
+    address = Column(Unicode)
+    url = Column(Unicode)
+    note = Column(Unicode)
+    number = Column(Unicode)
+    series = Column(Unicode)
+    volume = Column(Unicode)
+    publisher = Column(Unicode)
+    organization = Column(Unicode)
+    chapter = Column(Unicode)
+    howpublished = Column(Unicode)
+
+    # typed information we might want to use for searching or sorting:
+    year_int = Column(Integer)
+    startpage_int = Column(Integer)
+    pages_int = Column(Integer)
 
     languages = association_proxy('languagesource', 'language')
 
@@ -282,6 +294,9 @@ class Source(Base,
             # grab the last one in the list (most probably the only one!)
             id_ = identifier['identifier']
         return id_
+
+    def bibtex(self):
+        return bibtex.Record.from_object(self)
 
 
 class Contribution_data(Base, Versioned, DataMixin):
@@ -613,6 +628,7 @@ class LanguageIdentifier(Base, Versioned):
 
 
 class LanguageSource(Base, Versioned):
+    __table_args__ = (UniqueConstraint('language_pk', 'source_pk'),)
     language_pk = Column(Integer, ForeignKey('language.pk'))
     source_pk = Column(Integer, ForeignKey('source.pk'))
     source = relationship(
