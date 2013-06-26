@@ -6,6 +6,7 @@ import argparse
 from urllib import quote_plus
 import json
 import logging
+from functools import partial
 
 import transaction
 from sqlalchemy import engine_from_config, create_engine, Integer
@@ -37,6 +38,10 @@ def confirm(question, default=False):
                 "Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
+def data_file(module, *comps):
+    return path(module.__file__).dirname().joinpath('..', 'data', *comps)
+
+
 def setup_session(config_uri, session=None, base=None, engine=None):
     session = session or DBSession
     base = base or Base
@@ -45,13 +50,24 @@ def setup_session(config_uri, session=None, base=None, engine=None):
     engine = engine or engine_from_config(settings, 'sqlalchemy.')
     session.configure(bind=engine)
     base.metadata.create_all(engine)
+    return path(config_uri.split('#')[0]).abspath().dirname().basename()
+
+
+class ExistingDir(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        path_ = path(values)
+        if not path_.exists():
+            raise argparse.ArgumentError(self, 'path does not exist')
+        if not path_.isdir():
+            raise argparse.ArgumentError(self, 'path is no directory')
+        setattr(namespace, self.dest, path_)
 
 
 class ExistingConfig(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         path_ = path(values.split('#')[0])
         if not path_.exists():
-            raise argparse.ArgumentError(values, 'file does not exist')
+            raise argparse.ArgumentError(self, 'file does not exist')
         setattr(namespace, self.dest, values)
 
 
@@ -64,16 +80,20 @@ def parsed_args(*arg_specs, **kw):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config_uri", action=ExistingConfig, help="ini file providing app config")
+    parser.add_argument("--module", default=None)
     parser.add_argument(
         "--sqlite", nargs=1, action=SqliteDb, help="sqlite db file")
-    for args, kw in arg_specs:
-        parser.add_argument(*args, **kw)
+    for args, _kw in arg_specs:
+        parser.add_argument(*args, **_kw)
     args = parser.parse_args()
     engine = getattr(args, 'engine', kw.get('engine', None))
+    module = setup_session(
+        args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
+    args.module = __import__(args.module or module)
+    args.log = logging.getLogger(args.module.__name__)
     if engine:
         log.info('using bind %s' % engine)
-    setup_session(
-        args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
+    args.data_file = partial(data_file, args.module)
     return args
 
 
