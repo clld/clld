@@ -1,7 +1,7 @@
 """Functionality to retrieve data from a FileMaker server using the
 'Custom Web Publishing with XML' protocol.
 
-see http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
+.. seealso:: http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
 import re
 from bs4 import BeautifulSoup as bs

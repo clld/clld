@@ -16,6 +16,7 @@ Contents:
     interfaces
     db
     web
+    lib
 
 
 Indices and tables

@@ -1,5 +1,7 @@
 """
-http://en.wikipedia.org/wiki/BibTeX
+Functionality to handle bibligraphical data in the BibTeX format.
+
+.. seealso:: http://en.wikipedia.org/wiki/BibTeX
 """
 from collections import OrderedDict
 import re
@@ -117,7 +119,9 @@ FIELDS = [
 
 
 class Record(OrderedDict, UnicodeMixin):
-
+    """A BibTeX record is basically an ordered dict with two special properties - id and
+    genre.
+    """
     def __init__(self, genre, id_, *args, **kwargs):
         self.genre = genre
         self.id = id_

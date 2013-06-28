@@ -1,6 +1,6 @@
 # coding: utf8
 """
-http://ocoins.info/
+.. seealso:: http://ocoins.info/
 """
 import re
 

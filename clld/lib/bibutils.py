@@ -1,6 +1,7 @@
 """
 python interface to bibutils
-http://sourceforge.net/p/bibutils/home/Bibutils/
+
+.. seealso:: http://sourceforge.net/p/bibutils/home/Bibutils/
 """
 from subprocess import Popen, PIPE
 
