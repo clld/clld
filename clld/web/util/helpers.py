@@ -25,6 +25,13 @@ from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 
 
+def xmlchars(text):
+    invalid = range(0x9)
+    invalid.extend([0xb, 0xc])
+    invalid.extend(range(0xe, 0x20))
+    return re.sub('|'.join('\\x%0.2X' % i for i in invalid), '', text)
+
+
 def urlescape(string):
     return quote(string, safe='')
 
