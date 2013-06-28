@@ -38,6 +38,7 @@ install_requires = [
     'yuicompressor',
     'markupsafe',
     'requests',
+    'rdflib',
 ]
 
 if not PY3:

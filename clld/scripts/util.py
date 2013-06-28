@@ -13,7 +13,7 @@ from sqlalchemy import engine_from_config, create_engine, Integer
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.orm import joinedload
 from path import path
-from pyramid.paster import get_appsettings, setup_logging
+from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
 
 from clld.db.meta import DBSession, Base
@@ -87,6 +87,7 @@ def parsed_args(*arg_specs, **kw):
         parser.add_argument(*args, **_kw)
     args = parser.parse_args()
     engine = getattr(args, 'engine', kw.get('engine', None))
+    args.env = bootstrap(args.config_uri) if kw.get('bootstrap', False) else {}
     module = setup_session(
         args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
     args.module = __import__(args.module or module)
@@ -94,6 +95,7 @@ def parsed_args(*arg_specs, **kw):
     if engine:
         args.log.info('using bind %s' % engine)
     args.data_file = partial(data_file, args.module)
+    args.module_dir = path(args.module.__file__).dirname()
     return args
 
 
@@ -122,12 +124,16 @@ def gbs(**kw):
     log = args.log
     count = 0
 
-    with transaction.manager:
-        for i, source in enumerate(
-            DBSession.query(common.Source)\
+    sources = kw.get('sources')
+    if not sources:
+        sources = DBSession.query(common.Source)\
             .order_by(cast(common.Source.id, Integer))\
             .options(joinedload(common.Source.data))
-        ):
+    if callable(sources):
+        sources = sources()
+
+    with transaction.manager:
+        for i, source in enumerate(sources):
             filepath = args.data_file('gbs', 'source%s.json' % source.id)
 
             if args.command == 'update':
@@ -149,11 +155,12 @@ def gbs(**kw):
                     continue
 
             if args.command == 'verify':
+                stitle = source.title or source.booktitle
                 needs_check = False
                 year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
                 if not year or year != str(source.year):
                     needs_check = True
-                twords = words(source.description)
+                twords = words(stitle)
                 iwords = words(
                     item['volumeInfo']['title'] + ' '
                     + item['volumeInfo'].get('subtitle', ''))
@@ -162,18 +169,18 @@ def gbs(**kw):
                         or (len(twords) > 2 and twords.issubset(iwords)):
                     needs_check = False
                 if int(source.id) == 241:
-                    log.info('%s' % sorted(list(words(source.description))))
+                    log.info('%s' % sorted(list(words(stitle))))
                     log.info('%s' % sorted(list(iwords)))
                 if needs_check:
                     log.info('------- %s -> %s' % (source.id, item['volumeInfo'].get('industryIdentifiers')))
                     log.info('%s %s' % (item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
-                    log.info(source.description)
+                    log.info(stitle)
                     log.info(item['volumeInfo'].get('publishedDate'))
                     log.info(source.year)
                     log.info(item['volumeInfo'].get('authors'))
-                    log.info(source.authors)
+                    log.info(source.author)
                     log.info(item['volumeInfo'].get('publisher'))
-                    log.info(source.datadict().get('Publisher'))
+                    log.info(source.publisher)
                     if not confirm('Are the records the same?'):
                         log.warn('---- removing ----')
                         with open(filepath, 'w') as fp:
@@ -186,16 +193,17 @@ def gbs(**kw):
                 if count > 990:
                     break
 
-                if source.authors and source.description:
+                if source.author and (source.title or source.booktitle):
+                    title = source.title or source.booktitle
                     if filepath.exists():
                         continue
                     q = [
-                        'inauthor:' + quote_plus(source.authors.encode('utf8')),
-                        'intitle:' + quote_plus(source.description.encode('utf8')),
+                        'inauthor:' + quote_plus(source.author.encode('utf8')),
+                        'intitle:' + quote_plus(title.encode('utf8')),
                     ]
-                    if source.datadict().get('Publisher'):
+                    if source.publisher:
                         q.append('inpublisher:' + quote_plus(
-                            source.datadict().get('Publisher').encode('utf8')))
+                            source.publisher.encode('utf8')))
                     url = api_url + 'q=%s&key=%s' % ('+'.join(q), args.api_key)
                     count += 1
                     r = requests.get(url, headers={'accept': 'application/json'})

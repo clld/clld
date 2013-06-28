@@ -5,6 +5,7 @@ from collections import OrderedDict
 import re
 
 from clld.util import UnicodeMixin, DeclEnum
+from clld.lib.bibutils import convert
 
 
 class EntryType(DeclEnum):
@@ -69,20 +70,20 @@ unpublished
     Required fields: author, title, note
     Optional fields: month, year, key
     """
-    article = 'article', 'article'
-    book = 'book', 'book'
+    article = 'article', 'article'  # Article
+    book = 'book', 'book'  # Book
     booklet = 'booklet', 'booklet'
-    conference = 'conference', 'conference'
-    inbook = 'inbook', 'inbook'
+    conference = 'conference', 'conference'  # Conference
+    inbook = 'inbook', 'inbook'  # BookSection
     incollection = 'incollection', 'incollection'
     inproceedings = 'inproceedings', 'inproceedings'
-    manual = 'manual', 'manual'
-    mastersthesis = 'mastersthesis', 'mastersthesis'
+    manual = 'manual', 'manual'  # Manual
+    mastersthesis = 'mastersthesis', 'mastersthesis'  # Thesis
     misc = 'misc', 'misc'
-    phdthesis = 'phdthesis', 'phdthesis'
-    proceedings = 'proceedings', 'proceedings'
-    techreport = 'techreport', 'techreport'
-    unpublished = 'unpublished', 'unpublished'
+    phdthesis = 'phdthesis', 'phdthesis'  # Thesis
+    proceedings = 'proceedings', 'proceedings'  # Proceedings
+    techreport = 'techreport', 'techreport'  # Report
+    unpublished = 'unpublished', 'unpublished'  # Manuscript
 
 
 FIELDS = [
@@ -217,3 +218,13 @@ class Record(OrderedDict, UnicodeMixin):
             res.append("%s: %s" % (self.get('address', ''), self['publisher']))
         res[-1] += '.'
         return ' '.join(res)
+
+    def format(self, fmt):
+        if fmt == 'txt':
+            return self.text()
+        if fmt == 'en':
+            return convert(self.__unicode__(), 'bib', 'end')
+        if fmt == 'ris':
+            return convert(self.__unicode__(), 'bib', 'ris')
+        if fmt == 'mods':
+            return convert(self.__unicode__(), 'bib')

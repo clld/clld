@@ -226,3 +226,8 @@ def slug(s, remove_whitespace=True):
     res = res.encode('ascii', 'ignore').decode('ascii')
     assert re.match('[ a-z0-9]*$', res)
     return res
+
+
+def encoded(string, encoding='utf8'):
+    assert isinstance(string, basestring)
+    return string.encode(encoding) if isinstance(string, unicode) else string
