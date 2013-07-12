@@ -66,6 +66,9 @@ class TestWithDbAndData(TestWithDb):
     def setUp(self):
         TestWithDb.setUp(self)
 
+        DBSession.add(common.Dataset(
+            id='d', name='dataset', description='desc', domain='clld'))
+
         file_ = common.File(mime_type='text/plain', content='text')
         DBSession.add(file_)
         source = common.Source(id='src')

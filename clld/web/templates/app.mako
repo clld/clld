@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <% from clld.interfaces import IMenuItems %>
-    <%! active_menu_item = "a_home" %>
+    <%! active_menu_item = "dataset" %>
     <head>
         <meta charset="utf-8">
         <title>
-            ${request.registry.settings.get('clld.publication.sitetitle_short', 'CLLD')}
+            ${request.dataset.name}
             <%block name="title"> </%block>
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,7 +53,7 @@
             <%block name="header"></%block>
         </div>
 
-        <div class="navbar navbar-static-top">
+        <div class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
             <div class="navbar-inner">
                 <div class="container-fluid">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -61,11 +61,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    ##<a class="brand" href="#">Project name</a>
                     <div class="nav-collapse collapse">
-                        ##<p class="navbar-text pull-right">
-                        ##  Logged in as <a href="#" class="navbar-link">Username</a>
-                        ##</p>
                         <ul class="nav">
                         % for name, item in request.registry.getUtility(IMenuItems).items():
                         <% href, title = item(context.get('ctx'), request) %>

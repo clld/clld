@@ -2,6 +2,8 @@
 Common models for all clld apps
 """
 from base64 import b64encode
+from collections import OrderedDict
+from datetime import date
 
 from sqlalchemy import (
     Column,
@@ -28,7 +30,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from zope.interface import implementer
 
-from clld.db.meta import Base, PolymorphicBaseMixin
+from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
 from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
@@ -146,6 +148,47 @@ class IdNameDescriptionMixin(object):
 # The mapper classes for basic objects of the clld db model are marked as
 # implementers of the related interface.
 #-----------------------------------------------------------------------------
+class Dataset_data(Base, Versioned, DataMixin):
+    pass
+
+
+class Dataset_files(Base, Versioned, FilesMixin):
+    pass
+
+
+@implementer(interfaces.IDataset)
+class Dataset(Base,
+              PolymorphicBaseMixin,
+              Versioned,
+              IdNameDescriptionMixin,
+              HasDataMixin,
+              HasFilesMixin):
+    """Each project (e.g. WALS, APiCS) is regarded as one dataset; thus, each app will
+    have exactly one Dataset object.
+    """
+    published = Column(Date, default=date.today)
+    publisher_name = Column(
+        Unicode, default=u"Max Planck Institute for Evolutionary Anthropology")
+    publisher_place = Column(Unicode, default=u"Leipzig")
+    publisher_url = Column(String, default="http://www.eva.mpg.de")
+    license = Column(
+        String, default="http://creativecommons.org/licenses/by-sa/3.0/")
+    domain = Column(String, nullable=False)
+    contact = Column(String)
+
+    def get_stats(self, resources, **filters):
+        res = OrderedDict()
+        for rsc in resources:
+            query = DBSession.query(rsc.model)
+            if rsc.name in filters:
+                query = query.filter(filters[rsc.name])
+            res[rsc.name] = query.count()
+        return res
+
+    def formatted_editors(self):
+        return ' & '.join(ed.contributor.last_first() for ed in self.editors)
+
+
 class Language_data(Base, Versioned, DataMixin):
     pass
 
@@ -437,6 +480,12 @@ class Contributor(Base,
     email = Column(String)
     address = Column(Unicode)
 
+    def last_first(self):
+        """ad hoc - possibly incorrect - way of formatting the name as "last, first"
+        """
+        parts = self.name.split()
+        return ', '.join([parts[-1], ' '.join(parts[:-1])])
+
 
 class Sentence_data(Base, Versioned, DataMixin):
     pass
@@ -608,9 +657,10 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
     we store identifiers of various types like 'wals', 'iso639-3', 'glottolog'.
     But we might as well just store alternative names for languages.
     """
-    __table_args__ = (UniqueConstraint('id', 'name', 'type'),)
+    __table_args__ = (UniqueConstraint('name', 'type', 'description'),)
     id = Column(String)
     type = Column(String)
+    lang = Column(String(3), default='en')
 
 
 class LanguageIdentifier(Base, Versioned):
@@ -692,7 +742,28 @@ class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
     primary = Column(Boolean, default=True)
 
     contribution = relationship(Contribution, backref='contributor_assocs')
-    contributor = relationship(Contributor, backref='contribution_assocs')
+    contributor = relationship(Contributor, lazy=False, backref='contribution_assocs')
+
+
+class Editor(Base, PolymorphicBaseMixin, Versioned):
+    """Many-to-many association between contributors and dataset
+    """
+    dataset_pk = Column(Integer, ForeignKey('dataset.pk'))
+    contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
+
+    # contributors are ordered.
+    ord = Column(Integer, default=1)
+
+    # we distinguish between primary and secondary (a.k.a. 'with ...') contributors.
+    primary = Column(Boolean, default=True)
+
+    contributor = relationship(Contributor, lazy=False)
+
+    @declared_attr
+    def dataset(cls):
+        return relationship(
+            Dataset, backref=backref(
+                'editors', order_by=[cls.primary, cls.ord], lazy=False))
 
 
 class ValueSentence(Base, PolymorphicBaseMixin, Versioned):

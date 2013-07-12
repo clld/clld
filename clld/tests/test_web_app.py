@@ -41,7 +41,8 @@ class Tests(TestWithEnv):
 
 class Tests2(unittest.TestCase):
     def test_register_app(self):
-        from clld.web.app import register_app
+        from clld.web.app import register_app, includeme
 
-        config = Configurator(settings={})
+        config = Configurator(settings={'sqlalchemy.url': 'sqlite://'})
+        includeme(config)
         register_app(config, 'clld')

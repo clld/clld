@@ -1,7 +1,7 @@
 import datetime
 from string import Template as StringTemplate
 
-from zope.interface import implementer, implementedBy
+from zope.interface import implementer, implementedBy, providedBy
 
 from clld import interfaces
 from clld.web.adapters.base import Representation
@@ -14,9 +14,6 @@ class Metadata(Representation):
         return getattr(self, 'unapi', self.extension)
 
 
-#
-# TODO: refactor! distinguish BibTexContribution and BibTexSite
-#
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class BibTex(Metadata):
     """Render a resource's metadata as BibTex record.
@@ -24,22 +21,27 @@ class BibTex(Metadata):
     unapi = 'bibtex'
     extension = 'md.bib'
     mimetype = 'text/x-bibtex'
-    genre = 'incollection'
 
     def rec(self, ctx, req):
+        data = {}
+        if interfaces.IContribution.providedBy(ctx):
+            genre = 'incollection'
+            data['author'] = ' and '.join([
+                c.name for c in
+                list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
+            data['booktitle'] = req.dataset.description
+        else:
+            genre = 'collection'
+            data['editor'] = ' and '.join([c.contributor.name for c in list(ctx.editors)])
+
         return bibtex.Record(
-            self.genre,
+            genre,
             ctx.id,
             title=getattr(ctx, 'citation_name', ctx.__unicode__()),
             url=req.resource_url(ctx),
-            author=' and '.join([
-                c.name for c in
-                list(ctx.primary_contributors) + list(ctx.secondary_contributors)]),
-            editor=req.pub.get('editors', ''),
-            booktitle=req.pub.get('sitetitle', ''),
-            address=req.pub.get('place', ''),
-            publisher=req.pub.get('publisher', ''),
-            year=req.pub.get('year', ''),
+            address=req.dataset.publisher_place,
+            publisher=req.dataset.publisher_name,
+            year=str(req.dataset.published.year),
         )
 
     def render(self, ctx, req):
@@ -54,29 +56,8 @@ class TxtCitation(Metadata):
     mimetype = 'text/plain'
 
     def render(self, ctx, req):
-        md = {'accessed': str(datetime.date.today())}
-        md.update(req.pub)
-        if ctx:
-            md.update(
-                authors=', '.join(
-                    c.name for c in
-                    list(ctx.primary_contributors) + list(ctx.secondary_contributors)),
-                title=getattr(ctx, 'citation_name', ctx.__unicode__()),
-                year=str(ctx.updated.year),
-                path=req.resource_path(ctx))
-            template = StringTemplate(md.get('template', """\
-$authors. $year. $title.
-In: $editors (eds.)
-$sitetitle.
-$place: $publisher.
-(Available online at http://$domain$path, Accessed on $accessed.)
-"""))
-        else:
-            md['path'] = '/'
-            template = StringTemplate(md.get('template', """\
-$editors (eds.) $year.
-$sitetitle.
-$place: $publisher.
-(Available online at http://$domain$path, Accessed on $accessed.)
-"""))
-        return template.safe_substitute(**md)
+        if interfaces.IContribution.providedBy(ctx):
+            self.template = 'contribution/md_txt.mako'
+        else:  # if interfaces.IDataset.providedBy(ctx):
+            self.template = 'dataset/md_txt.mako'
+        return super(TxtCitation, self).render(ctx, req)

@@ -140,7 +140,7 @@ class OlacConfig(object):
     def format_identifier(self, req, item):
         """
         """
-        return self.delimiter.join([self.scheme, req.pub.get('domain', 'clld'), item.id])
+        return self.delimiter.join([self.scheme, req.dataset.domain, item.id])
 
     def parse_identifier(self, req, id_):
         """
@@ -150,14 +150,14 @@ class OlacConfig(object):
 
     def description(self, req):
         return {
-            'archiveURL': 'http://%s/' % req.pub.get('domain', 'clld'),
+            'archiveURL': 'http://%s/' % req.dataset.domain,
             'participants': [
                 Participant("Admin", 'Robert Forkel', 'robert_forkel@eva.mpg.de'),
             ],
             'institution': Institution(
-                req.pub.get('publisher', 'Max Planck Institute for Evolutionary Anthropology'),
-                req.pub.get('publisher_url', 'http://www.eva.mpg.de'),
-                '%s, Germany' % req.pub.get('place', 'Leipzig'),
+                req.dataset.publisher_name,
+                req.dataset.publisher_url,
+                '%s, Germany' % req.dataset.publisher_place,
             ),
             'synopsis': '',
         }

@@ -1,38 +1,44 @@
 from zope.interface import implementer, implementedBy
 
+from clld import RESOURCES
 from clld import interfaces
 from clld.web.adapters.base import Index, Representation, OctetStream
 from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation
+from clld.web.adapters.rdf import Rdf
+from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 
 
 def includeme(config):
     """register adapters
     """
     specs = []
-    for name, interface in [
-        ('language', interfaces.ILanguage),
-        ('value', interfaces.IValue),
-        ('valueset', interfaces.IValueSet),
-        ('contribution', interfaces.IContribution),
-        ('contributor', interfaces.IContributor),
-        ('parameter', interfaces.IParameter),
-        ('sentence', interfaces.ISentence),
-        ('source', interfaces.ISource),
-        ('unit', interfaces.IUnit),
-        ('unitparameter', interfaces.IUnitParameter),
-    ]:
-        specs.append(
-            (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
-        specs.append(
-            (interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
+    for rsc in RESOURCES:
+        name, interface = rsc.name, rsc.interface
+
+        if not rsc.with_adapters:
+            continue
+
+        if rsc.with_index:
+            specs.append(
+                (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
+            specs.append(
+                (interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
+
         specs.append(
             (interface, Representation, 'text/html', 'html', name + '/detail_html.mako',
              {}))
         specs.append(
             (interface, Representation, 'application/vnd.clld.snippet+xml',
              'snippet.html', name + '/snippet_html.mako', {}))
+        for notation in RDF_NOTATIONS.values():
+            specs.append((
+                interface,
+                Rdf,
+                notation.mimetype,
+                notation.extension,
+                name + '/rdf.mako', {'rdflibname': notation.name}))
 
     specs.append(
         (interfaces.IContribution, Representation, 'application/vnd.clld.md+xml',
@@ -45,13 +51,6 @@ def includeme(config):
             'kml',
             'clld:web/templates/language/kml.mako',
             {'send_mimetype': 'application/xml'}),
-        (
-            interfaces.ILanguage,
-            Representation,
-            'application/rdf+xml',
-            'rdf',
-            'clld:web/templates/language/rdf.pt',
-            {}),
         (
             interfaces.ILanguage,
             Representation,
@@ -77,11 +76,12 @@ def includeme(config):
 
     for cls in [BibTex, TxtCitation]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
-            config.registry.registerAdapter(
-                cls,
-                (interfaces.IContribution,),
-                if_,
-                name=cls.mimetype)
+            for adapts in [interfaces.IContribution, interfaces.IDataset]:
+                config.registry.registerAdapter(
+                    cls,
+                    (adapts,),
+                    if_,
+                    name=cls.mimetype)
     config.registry.registerAdapter(
         GeoJsonLanguages,
         (interfaces.ILanguage,),

@@ -7,6 +7,11 @@ from zope.interface import (
 #----------------------------------------------------------------------------
 # Interfaces for model classes
 #----------------------------------------------------------------------------
+class IDataset(Interface):
+    """
+    """
+
+
 class IFile(Interface):
     """
     """

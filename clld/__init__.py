@@ -1,19 +1,19 @@
+from collections import namedtuple
+
 from clld.db.models import common
 from clld import interfaces
 
 
-class Resource(object):
-    """Resources are routable models, i.e. model instances with URL.
-    """
-    def __init__(self, name, model, interface, with_index=True):
-        self.name = name
-        self.model = model
-        self.interface = interface
-        self.with_index = with_index
+_Resource = namedtuple('Resource', 'name model interface with_index with_adapters')
+
+
+def Resource(name, model, interface, with_index=True, with_adapters=True):
+    return _Resource(name, model, interface, with_index, with_adapters)
 
 
 RESOURCES = [
-    Resource('file', common.File, interfaces.IFile),
+    Resource('dataset', common.Dataset, interfaces.IDataset, with_index=False),
+    Resource('file', common.File, interfaces.IFile, with_adapters=False),
     Resource('contribution', common.Contribution, interfaces.IContribution),
     Resource('parameter', common.Parameter, interfaces.IParameter),
     Resource('language', common.Language, interfaces.ILanguage),

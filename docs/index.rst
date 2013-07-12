@@ -17,6 +17,7 @@ Contents:
     db
     web
     lib
+    linkeddata
 
 
 Indices and tables

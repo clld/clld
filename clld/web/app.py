@@ -55,12 +55,8 @@ class ClldRequest(Request):
         return DBSession
 
     @reify
-    def pub(self):
-        md = {}
-        for key, value in self.registry.settings.items():
-            if key.startswith('clld.publication.'):
-                md[key.split('clld.publication.', 1)[1]] = value
-        return md
+    def dataset(self):
+        return self.db.query(common.Dataset).first()
 
     def _route(self, obj, rsc, **kw):
         if rsc is None:
@@ -100,11 +96,11 @@ class ClldRequest(Request):
         return self.route_path(route, **kw)
 
 
-def menu_item(resource, ctx, req):
+def menu_item(resource, ctx, req, label=None):
     """
     :return: A pair (URL, label) to create a menu item.
     """
-    return req.route_url(resource), req.translate(resource.capitalize())
+    return req.route_url(resource), label or req.translate(resource.capitalize())
 
 
 @implementer(interfaces.ICtxFactoryQuery)
@@ -159,7 +155,10 @@ def ctx_factory(model, type_, req):
         return datatable(req, model)
 
     try:
-        ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
+        if model == common.Dataset:
+            ctx = req.db.query(model).one()
+        else:
+            ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
         ctx.metadata = get_adapters(interfaces.IMetadata, ctx, req)
         return ctx
     except NoResultFound:
@@ -178,8 +177,7 @@ def register_app(config, pkg=None):
     """
     if pkg is None:
         config.add_translation_dirs('clld:locale')
-        config.add_route('home', '/')
-        menuitems = OrderedDict(home=partial(menu_item, 'home'))
+        menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
         config.registry.registerUtility(menuitems, interfaces.IMenuItems)
         return
 
@@ -207,12 +205,11 @@ def register_app(config, pkg=None):
         config.add_settings(cfg)
 
     config.add_static_view('static', '%s:static' % name, cache_max_age=3600)
-    config.add_route('home', '/')
     if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
         config.scan('%s.views' % name)  # pragma: no cover
-    config.add_route('legal', '/legal')
+    config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
 
-    menuitems = OrderedDict(home=partial(menu_item, 'home'))
+    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
     for plural in config.registry.settings.get(
         'clld.menuitems_list',
         ['contributions', 'parameters', 'languages', 'contributors']
@@ -232,14 +229,7 @@ def includeme(config):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
-    settings = {'pyramid.default_locale_name': 'en'}
-    transaction.begin()
-    session = DBSession()
-    for kv in session.query(common.Config):
-        settings['clld.%s' % kv.key] = kv.value  # pragma: no cover
-    transaction.abort()
-
-    config.add_settings(settings)
+    config.add_settings({'pyramid.default_locale_name': 'en'})
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
@@ -269,6 +259,10 @@ def includeme(config):
 
     config.add_directive('add_menu_item', add_menu_item)
 
+    # TODO:
+    # register utility route_pattern_map to allow for custom route patterns!
+    # maps route names to route patterns
+
     def register_resource(config, name, model, interface, with_index=False):
         RESOURCES.append(Resource(name, model, interface, with_index=with_index))
         config.register_adapter(excel.ExcelAdapter, interface)
@@ -294,6 +288,9 @@ def includeme(config):
     config.add_directive('register_adapter', register_adapter)
 
     def add_route_and_view(config, route_name, route_pattern, view, **kw):
+        route_patterns = config.registry.settings.get('route_patterns', {})
+        route_pattern = route_patterns.get(route_name, route_pattern)
+        alt_route_pattern = kw.pop('alt_route_pattern', route_pattern + '.{ext}')
         route_kw = {}
         factory = kw.pop('factory', None)
         if factory:
@@ -301,7 +298,7 @@ def includeme(config):
         config.add_route(route_name, route_pattern, **route_kw)
         config.add_view(view, route_name=route_name, **kw)
 
-        config.add_route(route_name + '_alt', route_pattern + '.{ext}', **route_kw)
+        config.add_route(route_name + '_alt', alt_route_pattern, **route_kw)
         config.add_view(view, route_name=route_name + '_alt', **kw)
 
     config.add_directive('add_route_and_view', add_route_and_view)
@@ -326,16 +323,26 @@ def includeme(config):
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model
         plural = name + 's'
-        factory = partial(ctx_factory, model, 'index')
+        if rsc.with_index:
+            factory = partial(ctx_factory, model, 'index')
 
-        config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
-        config.register_datatable(
-            plural, getattr(datatables, plural.capitalize(), DataTable))
-        config.register_adapter(getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
+            # lookup route pattern!
+
+            config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
+            config.register_datatable(
+                plural, getattr(datatables, plural.capitalize(), DataTable))
+            config.register_adapter(getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
+        if model == common.Dataset:
+            pattern = '/'
+            kw['alt_route_pattern'] = '/void.{ext}'
+        else:
+            pattern = '/%s/{id:[^/\.]+}' % plural
 
-        config.add_route_and_view(name, '/%s/{id:[^/\.]+}' % plural, resource_view, **kw)
+        # lookup route pattern!
+
+        config.add_route_and_view(name, pattern, resource_view, **kw)
 
     # maps
     config.register_map('languages', Map)

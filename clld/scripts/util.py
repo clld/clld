@@ -85,11 +85,13 @@ def parsed_args(*arg_specs, **kw):
         "--sqlite", nargs=1, action=SqliteDb, help="sqlite db file")
     for args, _kw in arg_specs:
         parser.add_argument(*args, **_kw)
-    args = parser.parse_args()
+    args = parser.parse_args(args=kw.pop('args', None))
     engine = getattr(args, 'engine', kw.get('engine', None))
     args.env = bootstrap(args.config_uri) if kw.get('bootstrap', False) else {}
     module = setup_session(
         args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
+    if module == 'tests':
+        module = 'clld'
     args.module = __import__(args.module or module)
     args.log = logging.getLogger(args.module.__name__)
     if engine:
@@ -103,9 +105,11 @@ def initializedb(create=None, prime_cache=None, **kw):
     args = parsed_args((("--prime-cache-only",), dict(action="store_true")), **kw)
     if not args.prime_cache_only:
         if create:
-            create()
+            with transaction.manager:
+                create(args)
     if prime_cache:
-        prime_cache()
+        with transaction.manager:
+            prime_cache(args)
 
 
 def gbs(**kw):
@@ -190,9 +194,6 @@ def gbs(**kw):
                 source.update_jsondata(gbs=item)
                 count += 1
             elif args.command == 'download':
-                if count > 990:
-                    break
-
                 if source.author and (source.title or source.booktitle):
                     title = source.title or source.booktitle
                     if filepath.exists():
