@@ -23,7 +23,7 @@
         <![endif]-->
 
         % for asset in assets['css'].urls():
-        <link href="${request.static_url('clld:web/static' + asset)}" rel="stylesheet">
+        <link href="${request.static_url(asset[1:])}" rel="stylesheet">
         % endfor
 
         % if request.registry.settings.get('clld.environment') == 'production':
@@ -32,7 +32,7 @@
         % endif
 
         % for asset in assets['js'].urls():
-        <script src="${request.static_url('clld:web/static' + asset)}"></script>
+        <script src="${request.static_url(asset[1:])}"></script>
         % endfor
 
         ##<!-- DataTables -->

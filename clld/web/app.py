@@ -4,6 +4,7 @@ Common functionality of CLLD Apps is cobbled together here.
 from functools import partial
 from collections import OrderedDict
 import re
+import importlib
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload
@@ -35,6 +36,7 @@ from clld.web.datatables.base import DataTable
 from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap
 from clld.web.icon import ICONS, MapMarker
+from clld.web import assets
 
 
 class ClldRequest(Request):
@@ -186,8 +188,11 @@ def register_app(config, pkg=None):
     name = pkg.__name__
     pkg_dir = path(pkg.__file__).dirname().abspath()
 
+    if pkg_dir.joinpath('assets.py').exists():
+        importlib.import_module('%s.assets' % name)
+
     if pkg_dir.joinpath('util.py').exists():
-        u = __import__(pkg.__name__ + '.util', fromlist=[pkg.__name__])
+        u = importlib.import_module('%s.util' % name)
 
         def add_util(event):
             event['u'] = u  # pragma: no cover

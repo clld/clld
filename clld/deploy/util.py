@@ -249,7 +249,7 @@ def deploy(app, environment, with_alembic=False):
     with virtualenv(app.venv):
         require.python.package('gunicorn', use_sudo=True)
         install_repos('clld')
-        sudo('webassets -m clld.web.assets build')
+        sudo('webassets -m %s.assets build' % app.name)
         install_repos(app.name)
 
     supervisor(app, 'pause', template_variables)

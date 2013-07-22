@@ -4,7 +4,7 @@
 
 <p>
     Below is the information required by law about the web site of
-    ${request.registry.settings['clld.publication.sitetitle']}
+    ${request.dataset.name}
     (${request.host_url}), an electronic resource published by the
     Max Planck Institute for Evolutionary Anthropology (http://www.eva.mpg.de/)
     as well as important legal points.
