@@ -86,17 +86,6 @@ def _ping(req):
     return {'status': 'ok'}
 
 
-def robots(req):
-    return Response(
-        "Sitemap: %s\n" % req.route_url('sitemapindex'), content_type="text/plain")
-
-
-def sitemapindex(req):
-    req.response.content_type = 'application/xml'
-    return {'sitemaps': [req.route_url(r.name + 's_alt', ext='sitemap.xml')
-                         for r in RESOURCES if r.with_index]}
-
-
 def unapi(req):
     """implements the server side of the unAPI spec.
     """

@@ -23,8 +23,6 @@ def includeme(config):
         if rsc.with_index:
             specs.append(
                 (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
-            specs.append(
-                (interface, Index, 'application/xml', 'sitemap.xml', 'sitemap.mako', {}))
 
         specs.append(
             (interface, Representation, 'text/html', 'html', name + '/detail_html.mako',

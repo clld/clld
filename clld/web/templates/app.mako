@@ -12,6 +12,10 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
+        <link rel="shortcut icon"
+              href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
+              type="image/x-icon" />
+
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
             google.load("feeds", "1");
@@ -109,7 +113,38 @@
             </div>
             % endif
             <footer>
-                <%block name="footer">clld</%block>
+                <%block name="footer">
+                    <div class="row-fluid" style="padding-top: 15px; border-top: 1px solid black;">
+                        <div class="span3">
+                        </div>
+                        <div class="span6" style="text-align: center;">
+                            % if 'license_icon' in request.dataset.jsondatadict:
+                            <a rel="license" href="${request.dataset.license}">
+                                <img alt="License" style="border-width:0" src="${request.dataset.jsondata['license_icon']}" />
+                            </a>
+                            <br />
+                            % endif
+                            <em xmlns:dct="http://purl.org/dc/terms/"
+                                href="http://purl.org/dc/dcmitype/Dataset"
+                                property="dct:title"
+                                rel="dct:type">${request.dataset.name}</em>
+                            edited by
+                            <span xmlns:cc="http://creativecommons.org/ns#"
+                                  property="cc:attributionName"
+                                  rel="cc:attributionURL">
+                                ${request.dataset.formatted_editors()}
+                           </span>
+                            <br />
+                            is licensed under a
+                            <a rel="license" href="${request.dataset.license}">
+                                ${request.dataset.jsondatadict.get('license_name', request.dataset.license)}
+                            </a>.
+                        </div>
+                        <div class="span3" style="text-align: right;">
+                            <a href="${request.route_url('legal')}">disclaimer</a>
+                        </div>
+                    </div>
+                </%block>
             </footer>
         </div>
 

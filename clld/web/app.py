@@ -5,6 +5,7 @@ from functools import partial
 from collections import OrderedDict
 import re
 import importlib
+from hashlib import md5
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload
@@ -18,8 +19,10 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.interfaces import IRoutesMapper
+from pyramid.asset import abspath_from_asset_spec
 from purl import URL
 
+import clld
 from clld.config import get_config
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
@@ -27,10 +30,9 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
-from clld.web.views import (
-    index_view, resource_view, robots, sitemapindex, _raise, _ping, js, unapi,
-)
+from clld.web.views import index_view, resource_view, _raise, _ping, js, unapi
 from clld.web.views.olac import olac, OlacConfig
+from clld.web.views.sitemap import robots, sitemapindex, sitemap
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -212,7 +214,6 @@ def register_app(config, pkg=None):
     config.add_static_view('static', '%s:static' % name, cache_max_age=3600)
     if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
         config.scan('%s.views' % name)  # pragma: no cover
-    config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
 
     menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
     for plural in config.registry.settings.get(
@@ -235,6 +236,12 @@ def includeme(config):
     Base.metadata.bind = engine
 
     config.add_settings({'pyramid.default_locale_name': 'en'})
+    if 'clld.favicon' not in config.registry.settings:
+        config.add_settings({'clld.favicon': 'clld:web/static/images/favicon.ico'})
+    fh = md5()
+    fh.update(
+        open(abspath_from_asset_spec(config.registry.settings['clld.favicon'])).read())
+    config.add_settings({'clld.favicon_hash': fh.hexdigest()})
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
@@ -313,15 +320,18 @@ def includeme(config):
     #
     # routes and views
     #
+    config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
     config.add_route_and_view('_js', '/_js', js, http_cache=3600)
 
     # add some maintenance hatches
     config.add_route_and_view('_raise', '/_raise', _raise)
     config.add_route_and_view('_ping', '/_ping', _ping, renderer='json')
 
+    # sitemap support:
     config.add_route_and_view('robots', '/robots.txt', robots)
-    config.add_route_and_view(
-        'sitemapindex', '/sitemap.xml', sitemapindex, renderer='sitemapindex.mako')
+    config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex)
+    config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
+
     config.add_route_and_view('unapi', '/unapi', unapi)
     config.add_route_and_view('olac', '/olac', olac, renderer='olac.mako')
 

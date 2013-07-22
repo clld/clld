@@ -111,6 +111,10 @@ class Base(UnicodeMixin):
         d.update(**kw)
         self.jsondata = d
 
+    @property
+    def jsondatadict(self):
+        return self.jsondata or {}
+
     @classmethod
     def get(cls, value, key=None, default=NO_DEFAULT):
         """A convenience method.
