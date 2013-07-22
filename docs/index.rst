@@ -18,6 +18,7 @@ Contents:
     web
     lib
     linkeddata
+    protocols
 
 
 Indices and tables
