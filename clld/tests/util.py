@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
 
-from mock import Mock
+from mock import Mock, MagicMock
 from path import path
 from pyramid.paster import bootstrap
 from pyramid.config import Configurator
@@ -40,7 +40,7 @@ def main(global_config, **settings):
     config.include('clld.web.app')
     config.register_app()
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
-    config.register_resource('testresource', Mock(), IF, with_index=True)
+    config.register_resource('testresource', common.Language, IF, with_index=True)
     config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')
     config.add_menu_item('test', lambda c, r: ('http://example.org', 'label'))
