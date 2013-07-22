@@ -13,7 +13,6 @@ environment = Environment(
     path(clld.__file__).dirname().joinpath('web', 'static'),
     '/clld:web/static/',
     manifest='json:',
-    #load_path=[path(clld.__file__).dirname().joinpath('web', 'static')],
     auto_build=False)
 
 environment.append_path(
@@ -41,7 +40,6 @@ bundles = {
     ],
     'css': [
         Bundle(
-            'project.css',
             'css/clld.css',
             'css/jqtree.css',
             'css/leaflet.label.css',
@@ -49,6 +47,9 @@ bundles = {
             filters='yui_css'),
         'css/bootstrap.min.css',
         'css/bootstrap-responsive.min.css',
+        Bundle(
+            'project.css',
+            filters='yui_css'),
     ],
 }
 
