@@ -37,12 +37,3 @@ class Tests(TestWithEnv):
     def test_MapMarker(self):
         marker = self.env['request'].registry.getUtility(IMapMarker)
         self.assertTrue(marker(None, self.env['request']))
-
-
-class Tests2(unittest.TestCase):
-    def test_register_app(self):
-        from clld.web.app import register_app, includeme
-
-        config = Configurator(settings={'sqlalchemy.url': 'sqlite://'})
-        includeme(config)
-        register_app(config, 'clld')

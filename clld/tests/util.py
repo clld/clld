@@ -32,18 +32,19 @@ class Route(Mock):
 
 
 def main(global_config, **settings):
+    """called when bootstrapping a pyramid app using clld/tests/test.ini
+    """
+    from clld.web.app import get_configurator
+
     class IF(Interface):
         """" """""
 
     settings['mako.directories'] = ['clld:web/templates']
-    config = Configurator(settings=settings)
-    config.include('clld.web.app')
-    config.register_app()
-    config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
+    config = get_configurator(
+        None, (MapMarker(), interfaces.IMapMarker), settings=settings)
     config.register_resource('testresource', common.Language, IF, with_index=True)
     config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')
-    config.add_menu_item('test', lambda c, r: ('http://example.org', 'label'))
     return config.make_wsgi_app()
 
 

@@ -116,13 +116,18 @@ def gbs(**kw):
     def words(s):
         return set(slug(s.strip(), remove_whitespace=False).split())
 
+    command = kw.pop('command', None)
+    add_args = []
+    if not command:
+        add_args.append((("command",), dict(help="download|verify|update")))
+    add_args.append(
+        (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))))
+
     api_url = "https://www.googleapis.com/books/v1/volumes?"
 
-    args = parsed_args(
-        (("command",), dict()),
-        (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
-        **kw)
-    if args.command == 'download' and not args.api_key:
+    args = parsed_args(*add_args, **kw)
+    command = command or args.command
+    if command == 'download' and not args.api_key:
         raise argparse.ArgumentError(None, 'no API key found for download')
 
     log = args.log
@@ -140,11 +145,11 @@ def gbs(**kw):
         for i, source in enumerate(sources):
             filepath = args.data_file('gbs', 'source%s.json' % source.id)
 
-            if args.command == 'update':
+            if command == 'update':
                 source.google_book_search_id = None
                 source.update_jsondata(gbs={})
 
-            if args.command in ['verify', 'update']:
+            if command in ['verify', 'update']:
                 if filepath.exists():
                     with open(filepath) as fp:
                         try:
@@ -158,7 +163,7 @@ def gbs(**kw):
                 else:
                     continue
 
-            if args.command == 'verify':
+            if command == 'verify':
                 stitle = source.title or source.booktitle
                 needs_check = False
                 year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
@@ -189,11 +194,11 @@ def gbs(**kw):
                         log.warn('---- removing ----')
                         with open(filepath, 'w') as fp:
                             json.dump({"totalItems": 0}, fp)
-            elif args.command == 'update':
+            elif command == 'update':
                 source.google_book_search_id = item['id']
                 source.update_jsondata(gbs=item)
                 count += 1
-            elif args.command == 'download':
+            elif command == 'download':
                 if source.author and (source.title or source.booktitle):
                     title = source.title or source.booktitle
                     if filepath.exists():
@@ -215,9 +220,9 @@ def gbs(**kw):
                     elif r.status_code == 403:
                         log.warn("limit reached")
                         break
-    if args.command == 'update':
+    if command == 'update':
         log.info('assigned gbs ids for %s out of %s sources' % (count, i))
-    elif args.command == 'download':
+    elif command == 'download':
         log.info('queried gbs for %s sources' % count)
 
 

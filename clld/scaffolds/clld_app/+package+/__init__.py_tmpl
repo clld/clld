@@ -1,15 +1,8 @@
-from pyramid.config import Configurator
-
-from {{package}} import views
-from {{package}} import models
+from clld.web.app import get_configurator
 
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    config = Configurator(settings=settings)
-    config.add_translation_dirs('{{package}}:locale')
-    config.include('clld.web.app')
-    config.register_app('{{package}}')
-
+    config = get_configurator('{{package}}', settings=settings)
     return config.make_wsgi_app()

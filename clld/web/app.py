@@ -20,6 +20,7 @@ from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
+from pyramid.config import Configurator
 from purl import URL
 
 import clld
@@ -60,9 +61,18 @@ class ClldRequest(Request):
 
     @reify
     def dataset(self):
+        """Properties of the dataset an application serves are used in various places,
+        so we want to have a reference to it.
+        """
         return self.db.query(common.Dataset).first()
 
     def _route(self, obj, rsc, **kw):
+        """Determines the name of the canonical route for a resource instance. The
+        resource may be specified as object or as mapper class and id.
+
+        :return: pair (route_name, kw) suitable as arguments for the Request.route_url \
+        method.
+        """
         if rsc is None:
             for _rsc in RESOURCES:
                 if _rsc.interface.providedBy(obj):
@@ -80,6 +90,11 @@ class ClldRequest(Request):
         return route, kw
 
     def ctx_for_url(self, url):
+        """Method to reverse URL generation for resources, i.e. given a URL, tries to
+        determine the associated resource.
+
+        :return: model instance or None
+        """
         mapper = self.registry.getUtility(IRoutesMapper)
         _path = URL(url).path()
         info = mapper(WebobRequest({'PATH_INFO': _path}))
@@ -109,6 +124,13 @@ def menu_item(resource, ctx, req, label=None):
 
 @implementer(interfaces.ICtxFactoryQuery)
 class CtxFactoryQuery(object):
+    """Implements reasonable default queries to be used in context factories.
+
+    By reasonable we mean providing good performance for typical data sizes. Applications
+    with a-typical numbers of any resource class may have to implement a custom class
+    for the ICtxFactoryQuery interface. Usually this will be a class derived from
+    CtxFactoryQuery.
+    """
     def refined_query(self, query, model, req):
         """Derived classes may override this method to add model-specific query
         refinements of their own.
@@ -169,64 +191,81 @@ def ctx_factory(model, type_, req):
         raise HTTPNotFound()
 
 
+def maybe_import(name):
+    try:
+        return importlib.import_module(name)
+    except ImportError:
+        return None
+
+
+#
+# configurator directives:
+#
 def register_cls(interface, config, route, cls):
     config.registry.registerUtility(cls, provided=interface, name=route)
     if not route.endswith('_alt'):
         config.registry.registerUtility(cls, provided=interface, name=route + '_alt')
 
 
-def register_app(config, pkg=None):
-    """This hook can be used by apps to have some conventional locations for resources
-    within the package be exploited automatically to update the registry.
+def register_adapter(config, cls, from_, to_=None, name=None):
+    to_ = to_ or list(implementedBy(cls))[0]
+    name = name or cls.mimetype
+    config.registry.registerAdapter(cls, (from_,), to_, name=name)
+
+
+def register_menu(config, *items):
     """
-    if pkg is None:
-        config.add_translation_dirs('clld:locale')
-        menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
-        config.registry.registerUtility(menuitems, interfaces.IMenuItems)
-        return
-
-    if not hasattr(pkg, '__file__'):
-        pkg = __import__(pkg)
-    name = pkg.__name__
-    pkg_dir = path(pkg.__file__).dirname().abspath()
-
-    if pkg_dir.joinpath('assets.py').exists():
-        importlib.import_module('%s.assets' % name)
-
-    if pkg_dir.joinpath('util.py').exists():
-        u = importlib.import_module('%s.util' % name)
-
-        def add_util(event):
-            event['u'] = u  # pragma: no cover
-
-        config.add_subscriber(add_util, events.BeforeRender)
-
-    if pkg_dir.joinpath('locale').exists():
-        config.add_translation_dirs('%s:locale' % name)
-        config.add_translation_dirs('clld:locale')
-
-    if pkg_dir.joinpath('appconf.ini').exists():
-        cfg = get_config(pkg_dir.joinpath('appconf.ini'))
-        if 'mako.directories_list' in cfg:
-            cfg['mako.directories'] = cfg['mako.directories_list']  # pragma: no cover
-        config.add_settings(cfg)
-
-    config.add_static_view('static', '%s:static' % name, cache_max_age=3600)
-    if pkg_dir.joinpath('views.py').exists() or pkg_dir.joinpath('views').exists():
-        config.scan('%s.views' % name)  # pragma: no cover
-
-    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
-    for plural in config.registry.settings.get(
-        'clld.menuitems_list',
-        ['contributions', 'parameters', 'languages', 'contributors']
-    ):
-        menuitems[plural] = partial(menu_item, plural)
+    :param factory: a callable that accepts the two parameters (ctx, req) and returns\
+    a pair (url, label) to use for the menu link.
+    """
+    menuitems = OrderedDict()
+    for name, factory in items:
+        menuitems[name] = factory
     config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
 
-def includeme(config):
-    config.set_request_factory(ClldRequest)
+def add_route_and_view(config, route_name, route_pattern, view, **kw):
+    """
+    .. note:: To allow custom route patterns we look them up in a dict in settings.
+    """
+    route_patterns = config.registry.settings.get('route_patterns', {})
+    route_pattern = route_patterns.get(route_name, route_pattern)
+    alt_route_pattern = kw.pop('alt_route_pattern', route_pattern + '.{ext}')
+    route_kw = {}
+    factory = kw.pop('factory', None)
+    if factory:
+        route_kw['factory'] = factory
+    config.add_route(route_name, route_pattern, **route_kw)
+    config.add_view(view, route_name=route_name, **kw)
 
+    config.add_route(route_name + '_alt', alt_route_pattern, **route_kw)
+    config.add_view(view, route_name=route_name + '_alt', **kw)
+
+
+def register_resource(config, name, model, interface, with_index=False):
+    RESOURCES.append(Resource(name, model, interface, with_index=with_index))
+    config.register_adapter(excel.ExcelAdapter, interface)
+    config.add_route_and_view(
+        name,
+        '/%ss/{id:[^/\.]+}' % name,
+        resource_view,
+        factory=partial(ctx_factory, model, 'rsc'))
+    if with_index:
+        config.add_route_and_view(
+            name + 's',
+            '/%ss' % name,
+            index_view,
+            factory=partial(ctx_factory, model, 'index'))
+
+
+def get_configurator(pkg, *utilities, **kw):
+    """
+    .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
+    """
+    kw.setdefault('package', pkg)
+    config = Configurator(**kw)
+
+    config.set_request_factory(ClldRequest)
     config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)
     config.registry.registerUtility(OlacConfig(), interfaces.IOlacConfig)
 
@@ -236,90 +275,33 @@ def includeme(config):
     Base.metadata.bind = engine
 
     config.add_settings({'pyramid.default_locale_name': 'en'})
-    if 'clld.favicon' not in config.registry.settings:
-        config.add_settings({'clld.favicon': 'clld:web/static/images/favicon.ico'})
-    fh = md5()
-    fh.update(
-        open(abspath_from_asset_spec(config.registry.settings['clld.favicon'])).read())
-    config.add_settings({'clld.favicon_hash': fh.hexdigest()})
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
-    config.add_subscriber(add_renderer_globals, events.BeforeRender)
     config.add_subscriber(init_map, events.ContextFound)
-
-    config.add_static_view(name='clld-static', path='clld:web/static')
+    config.add_subscriber(
+        partial(add_renderer_globals, maybe_import('%s.util' % config.package_name)),
+        events.BeforeRender)
 
     #
     # make it easy to register custom functionality
     #
-    config.add_directive(
-        'register_datatable', partial(register_cls, interfaces.IDataTable))
-    config.add_directive('register_map', partial(register_cls, interfaces.IMap))
-
-    def add_menu_item(config, name, factory):
-        """
-        :param factory: a callable that accepts the two parameters (ctx, req) and returns\
-        a pair (url, label) to use for the menu link.
-        """
-        # we retrieve the currently registered menuitems
-        menuitems = config.registry.getUtility(interfaces.IMenuItems)
-        # add one
-        menuitems[name] = factory
-        # and re-register.
-        config.registry.registerUtility(menuitems, interfaces.IMenuItems)
-
-    config.add_directive('add_menu_item', add_menu_item)
-
-    # TODO:
-    # register utility route_pattern_map to allow for custom route patterns!
-    # maps route names to route patterns
-
-    def register_resource(config, name, model, interface, with_index=False):
-        RESOURCES.append(Resource(name, model, interface, with_index=with_index))
-        config.register_adapter(excel.ExcelAdapter, interface)
-        config.add_route_and_view(
-            name,
-            '/%ss/{id:[^/\.]+}' % name,
-            resource_view,
-            factory=partial(ctx_factory, model, 'rsc'))
-        if with_index:
-            config.add_route_and_view(
-                name + 's',
-                '/%ss' % name,
-                index_view,
-                factory=partial(ctx_factory, model, 'index'))
-
-    config.add_directive('register_resource', register_resource)
-
-    def register_adapter(config, cls, from_, to_=None, name=None):
-        to_ = to_ or list(implementedBy(cls))[0]
-        name = name or cls.mimetype
-        config.registry.registerAdapter(cls, (from_,), to_, name=name)
-
-    config.add_directive('register_adapter', register_adapter)
-
-    def add_route_and_view(config, route_name, route_pattern, view, **kw):
-        route_patterns = config.registry.settings.get('route_patterns', {})
-        route_pattern = route_patterns.get(route_name, route_pattern)
-        alt_route_pattern = kw.pop('alt_route_pattern', route_pattern + '.{ext}')
-        route_kw = {}
-        factory = kw.pop('factory', None)
-        if factory:
-            route_kw['factory'] = factory
-        config.add_route(route_name, route_pattern, **route_kw)
-        config.add_view(view, route_name=route_name, **kw)
-
-        config.add_route(route_name + '_alt', alt_route_pattern, **route_kw)
-        config.add_view(view, route_name=route_name + '_alt', **kw)
-
-    config.add_directive('add_route_and_view', add_route_and_view)
-
-    config.add_directive('register_app', register_app)
+    for name, func in {
+        'register_datatable': partial(register_cls, interfaces.IDataTable),
+        'register_map': partial(register_cls, interfaces.IMap),
+        'register_menu': register_menu,
+        'register_resource': register_resource,
+        'register_adapter': register_adapter,
+        'add_route_and_view': add_route_and_view,
+    }.items():
+        config.add_directive(name, func)
 
     #
     # routes and views
     #
+    config.add_static_view(name='clld-static', path='clld:web/static')
+    config.add_static_view('static', '%s:static' % config.package_name, cache_max_age=3600)
+
     config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
     config.add_route_and_view('_js', '/_js', js, http_cache=3600)
 
@@ -340,13 +322,11 @@ def includeme(config):
         plural = name + 's'
         if rsc.with_index:
             factory = partial(ctx_factory, model, 'index')
-
-            # lookup route pattern!
-
             config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
             config.register_datatable(
                 plural, getattr(datatables, plural.capitalize(), DataTable))
-            config.register_adapter(getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
+            config.register_adapter(
+                getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         if model == common.Dataset:
@@ -354,8 +334,6 @@ def includeme(config):
             kw['alt_route_pattern'] = '/void.{ext}'
         else:
             pattern = '/%s/{id:[^/\.]+}' % plural
-
-        # lookup route pattern!
 
         config.add_route_and_view(name, pattern, resource_view, **kw)
 
@@ -369,3 +347,49 @@ def includeme(config):
     for icon in ICONS:
         config.registry.registerUtility(icon, interfaces.IIcon, name=icon.name)
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
+
+    #
+    # now we exploit the default package layout as created via the CLLD scaffold:
+    #
+    # note: the following exploits the import time side effect of modifying the webassets
+    # environment!
+    maybe_import('%s.assets' % config.package_name)
+
+    pkg_dir = path(config.package.__file__).dirname().abspath()
+
+    if 'clld.favicon' not in config.registry.settings:
+        favicon = {'clld.favicon': 'clld:web/static/images/favicon.ico'}
+        if pkg_dir.joinpath('static', 'favicon.ico').exists():
+            favicon['clld.favicon'] = config.package_name + ':static/favicon.ico'
+        config.add_settings(favicon)
+
+    with open(abspath_from_asset_spec(config.registry.settings['clld.favicon'])) as fp:
+        fh = md5()
+        fh.update(fp.read())
+        config.add_settings({'clld.favicon_hash': fh.hexdigest()})
+
+    if pkg_dir.joinpath('locale').exists():
+        config.add_translation_dirs('%s:locale' % config.package_name)
+        config.add_translation_dirs('clld:locale')
+
+    if pkg_dir.joinpath('appconf.ini').exists():
+        cfg = get_config(pkg_dir.joinpath('appconf.ini'))
+        if 'mako.directories_list' in cfg:
+            cfg['mako.directories'] = cfg['mako.directories_list']  # pragma: no cover
+        config.add_settings(cfg)
+
+    v = maybe_import('%s.views' % config.package_name)
+    if v:
+        config.scan(v)  # pragma: no cover
+
+    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
+    for plural in config.registry.settings.get(
+        'clld.menuitems_list',
+        ['contributions', 'parameters', 'languages', 'contributors']
+    ):
+        menuitems[plural] = partial(menu_item, plural)
+    config.registry.registerUtility(menuitems, interfaces.IMenuItems)
+
+    for utility, interface in utilities:
+        config.registry.registerUtility(utility, interface)
+    return config

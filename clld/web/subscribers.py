@@ -19,7 +19,7 @@ else:
     from clld.web.assets import environment
 
 
-def add_renderer_globals(event):
+def add_renderer_globals(module, event):
     if event['request']:
         event['_'] = event['request'].translate
         prod = event['request'].registry.settings.get('clld.environment') == 'production'
@@ -28,6 +28,14 @@ def add_renderer_globals(event):
         event['_'] = lambda s, **kw: s
     event['assets'] = environment
     event['h'] = helpers
+    event['u'] = module  # pragma: no cover
+    if module:
+        _renderer = event.get('renderer_name', '')
+        if _renderer.endswith('.mako'):
+            func = getattr(module, _renderer[:-5].replace('/', '_').replace('.', '_'), 0)
+            if func:
+                for k, v in func(**event).items():
+                    event[k] = v
 
 
 tsf = TranslationStringFactory('clld')

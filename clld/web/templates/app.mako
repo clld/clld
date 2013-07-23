@@ -91,28 +91,34 @@
             ##
             ## TODO: loop over sidebar boxes registered for the current page
             ##
-            <div class="row-fluid">
-            % if hasattr(self, 'sidebar'):
-                <div class="span8">
-                ${next.body()}
+            % if not getattr(self.attr, 'multirow', False):
+                <div class="row-fluid">
+                % if hasattr(self, 'sidebar'):
+                    <div class="span8">
+                    ${next.body()}
+                    </div>
+                    <div id="sidebar" class="span4">
+                        ${self.sidebar()}
+                    </div>
+                % else:
+                    <div class="span12">
+                    ${next.body()}
+                    </div>
+                % endif
                 </div>
-                <div id="sidebar" class="span4">
-                    ${self.sidebar()}
+                % if hasattr(self, 'below_sidebar'):
+                <div class="row-fluid">
+                    <div class="span12">
+                    ${self.below_sidebar()}
+                    </div>
                 </div>
+                % endif
             % else:
-                <div class="span12">
                 ${next.body()}
-                </div>
             % endif
-            </div>
-            % if hasattr(self, 'below_sidebar'):
             <div class="row-fluid">
                 <div class="span12">
-                ${self.below_sidebar()}
-                </div>
-            </div>
-            % endif
-            <footer>
+                <footer>
                 <%block name="footer">
                     <div class="row-fluid" style="padding-top: 15px; border-top: 1px solid black;">
                         <div class="span3">
@@ -145,7 +151,9 @@
                         </div>
                     </div>
                 </%block>
-            </footer>
+                </footer>
+                </div>
+            </div>
         </div>
 
         <div id="Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
