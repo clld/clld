@@ -35,6 +35,9 @@ class EnumSymbol(object):
     def __repr__(self):
         return "<%s>" % self.name
 
+    def __json__(self, request):
+        return self.value
+
 
 class EnumMeta(type):
     """Generate new DeclEnum classes."""

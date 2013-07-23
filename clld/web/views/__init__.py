@@ -6,7 +6,7 @@ from pyramid.httpexceptions import (
     HTTPNotAcceptable, HTTPFound, HTTPNotFound, HTTPMultipleChoices,
 )
 from pyramid.interfaces import IRoutesMapper
-from pyramid.renderers import render
+from pyramid.renderers import render, render_to_response
 
 from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld import RESOURCES
@@ -65,7 +65,7 @@ def datatable_xhr_view(ctx, req):
         "iTotalRecords": ctx.count_all,
         "iTotalDisplayRecords": ctx.count_filtered,
     }
-    return Response(dumps(res), content_type='application/json')
+    return render_to_response('json', res, request=req)
 
 
 def js(req):
