@@ -31,6 +31,7 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
+from clld.web.adapters import misc
 from clld.web.views import index_view, resource_view, _raise, _ping, js, unapi
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap
@@ -65,6 +66,10 @@ class ClldRequest(Request):
         so we want to have a reference to it.
         """
         return self.db.query(common.Dataset).first()
+
+    def get_datatable(self, name, model, **kw):
+        dt = self.registry.getUtility(interfaces.IDataTable, name)
+        return dt(self, model, **kw)
 
     def _route(self, obj, rsc, **kw):
         """Determines the name of the canonical route for a resource instance. The
@@ -327,6 +332,8 @@ def get_configurator(pkg, *utilities, **kw):
                 plural, getattr(datatables, plural.capitalize(), DataTable))
             config.register_adapter(
                 getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
+            if name == 'source':
+                config.register_adapter(misc.BibtexAdapter, rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         if model == common.Dataset:

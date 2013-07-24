@@ -291,7 +291,7 @@ class Source(Base,
     #
     # BibTeX fields:
     #
-    bibtex_type = bibtex.EntryType.db_type()
+    #bibtex_type = Column(bibtex.EntryType.db_type())
     author = Column(Unicode)
     year = Column(Unicode)
     title = Column(Unicode)

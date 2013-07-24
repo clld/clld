@@ -110,14 +110,15 @@ def link(req, obj, **kw):
         kw = get_link_attrs(req, obj, **kw)
 
     rsc = None
+    rsc_name = kw.pop('rsc', None)
     for _rsc in RESOURCES:
-        if _rsc.interface.providedBy(obj):
+        if _rsc.interface.providedBy(obj) or _rsc.name == rsc_name:
             rsc = _rsc
             break
     assert rsc
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
     kw.setdefault('class', rsc.interface.__name__[1:])
-    label = kw.pop('label', obj.__unicode__())
+    label = kw.pop('label', unicode(obj))
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
 

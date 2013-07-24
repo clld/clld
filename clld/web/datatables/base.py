@@ -187,6 +187,7 @@ class DataTable(object):
         self._options = None
         self.count_all = None
         self.count_filtered = None
+        self.download_formats = ['xls']
 
     def __unicode__(self):
         return '%ss' % inspect(self.model).class_.__name__
@@ -279,9 +280,9 @@ class DataTable(object):
             ),
             HTML.ul(
                 #HTML.li(HTML.a('csv', href="#")),
-                HTML.li(HTML.a('xls', href="#", onclick="document.location.href = CLLD.DataTable.current_url('xls'); return false;")),
-                class_="dropdown-menu",
-            ),
+                *[HTML.li(HTML.a(fmt, href="#", onclick="document.location.href = CLLD.DataTable.current_url('%s'); return false;" % fmt))
+                  for fmt in self.download_formats],
+                **dict(class_="dropdown-menu")),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
             class_='btn-group right')
 

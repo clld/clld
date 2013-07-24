@@ -61,3 +61,15 @@ class Index(Renderable):
     """Base class for adapters implementing IIndex
     """
     pass
+
+
+ADAPTER_COUNTER = 0
+
+
+def adapter_factory(template, mimetype='text/html', extension='html', base=None):
+    global ADAPTER_COUNTER
+    base = base or Representation
+    extra = dict(mimetype=mimetype, extension=extension, template=template)
+    cls = type('AdapterFromFactory%s' % ADAPTER_COUNTER, (base,), extra)
+    ADAPTER_COUNTER += 1
+    return cls

@@ -1,3 +1,4 @@
+<%! from json import dumps %>
 ##
 ##
 ##
@@ -81,7 +82,9 @@
 ##
 ## format an HTML table, enhanced via jQuery DataTables
 ##
-<%def name="table(items, eid='table', class_='table-hover')">
+<%def name="table(items, eid='table', class_='table-hover', options=None)">
+    <% _options = {'aaSorting': [], 'bLengthChange': False, 'bPaginate': False, 'bInfo': False, 'sDom': 'fr<"toolbar">tip'} %>
+    <% _options.update(options or {}) %>
     <table id="${eid}" class="standard table ${class_}">
         <thead>
             <tr>${caller.head()}</tr>
@@ -99,7 +102,8 @@
     </table>
     <script>
     $(document).ready(function() {
-        $('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false, sDom: 'fr<"toolbar">tip'});
+        ##$('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false, sDom: 'fr<"toolbar">tip'});
+        $('#${eid}').dataTable(${dumps(_options)|n});
     });
     </script>
 </%def>
