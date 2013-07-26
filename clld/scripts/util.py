@@ -118,22 +118,19 @@ def gbs(**kw):
     def words(s):
         return set(slug(s.strip(), remove_whitespace=False).split())
 
-    command = kw.pop('command', None)
-    add_args = []
-    if not command:
-        add_args.append((("command",), dict(help="download|verify|update")))
-    add_args.append(
-        (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))))
+    add_args = [
+        (("command",), dict(help="download|verify|update")),
+        (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
+    ]
 
     api_url = "https://www.googleapis.com/books/v1/volumes?"
 
     args = parsed_args(*add_args, **kw)
-    command = command or args.command
-    if command == 'download' and not args.api_key:
+    if args.command == 'download' and not args.api_key:
         raise argparse.ArgumentError(None, 'no API key found for download')
 
     with transaction.manager:
-        gbs_func(args.log, kw.get('sources'))
+        gbs_func(args.command, args, kw.get('sources'))
 
 
 def gbs_func(command, args, sources=None):

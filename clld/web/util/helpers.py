@@ -23,6 +23,11 @@ from clld.db.models import common as models
 from clld.web.adapters import get_adapter
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
+from clld.lib import rdf
+
+
+def rdf_namespace_attrs():
+    return '\n'.join('xmlns:%s="%s"' % item for item in rdf.NAMESPACES.items())
 
 
 def xmlchars(text):

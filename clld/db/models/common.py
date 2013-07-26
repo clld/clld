@@ -227,6 +227,15 @@ class Language(Base,
     identifiers = association_proxy('languageidentifier', 'identifier')
     sources = association_proxy('languagesource', 'source')
 
+    def get_identifier(self, type_):
+        for i in self.identifiers:
+            if i.type == getattr(type_, 'value', type_):
+                return i.name
+
+    @property
+    def iso_code(self):
+        return self.get_identifier(IdentifierType.iso)
+
 
 class DomainElement_data(Base, Versioned, DataMixin):
     pass
@@ -334,6 +343,13 @@ class Source(Base,
 
     @property
     def gbs_identifier(self):
+        #
+        # TODO: remove hack after successful data import of glottolog 2
+        #
+        import json
+        if isinstance(self.jsondata, basestring):
+            self.jsondata = json.loads(self.jsondata)
+
         if not self.jsondata or not self.jsondata.get('gbs'):
             return
         if not self.jsondata['gbs']['volumeInfo'].get('industryIdentifiers'):

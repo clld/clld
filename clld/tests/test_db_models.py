@@ -14,6 +14,7 @@ class Tests(TestWithDb):
             return  # pragma: no cover
 
         l = Language(id='abc', name='Name')
+        assert l.iso_code is None
         l.files.append(Language_files(name='abstract', file=File(content='c')))
         DBSession.add(l)
         DBSession.flush()

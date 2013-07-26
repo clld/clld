@@ -233,3 +233,4 @@ class Record(OrderedDict, UnicodeMixin):
             return convert(self.__unicode__(), 'bib', 'ris')
         if fmt == 'mods':
             return convert(self.__unicode__(), 'bib')
+        return self.__unicode__()
