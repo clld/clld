@@ -35,6 +35,7 @@ from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
 from clld.lib import bibtex
+from clld.web.util.htmllib import HTML
 
 
 #-----------------------------------------------------------------------------
@@ -188,6 +189,17 @@ class Dataset(Base,
     def formatted_editors(self):
         return ' & '.join(ed.contributor.last_first() for ed in self.editors)
 
+    def formatted_name(self):
+        return HTML.span(
+            self.name,
+            **{
+                'xmlns:dct': "http://purl.org/dc/terms/",
+                'href': "http://purl.org/dc/dcmitype/Dataset",
+                'property': "dct:title",
+                'rel': "dct:type",
+                'class': 'Dataset'}
+        )
+
 
 class Language_data(Base, Versioned, DataMixin):
     pass
@@ -291,7 +303,7 @@ class Source(Base,
     #
     # BibTeX fields:
     #
-    #bibtex_type = Column(bibtex.EntryType.db_type())
+    bibtex_type = Column(bibtex.EntryType.db_type())
     author = Column(Unicode)
     year = Column(Unicode)
     title = Column(Unicode)
@@ -483,8 +495,8 @@ class Contributor(Base,
     def last_first(self):
         """ad hoc - possibly incorrect - way of formatting the name as "last, first"
         """
-        parts = self.name.split()
-        return ', '.join([parts[-1], ' '.join(parts[:-1])])
+        parts = (self.name or '').split()
+        return '' if not parts else ', '.join([parts[-1], ' '.join(parts[:-1])])
 
 
 class Sentence_data(Base, Versioned, DataMixin):

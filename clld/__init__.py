@@ -7,8 +7,14 @@ from clld import interfaces
 _Resource = namedtuple('Resource', 'name model interface with_index with_adapters')
 
 
+class _ExtendedResource(_Resource):
+    @property
+    def plural(self):
+        return self.name + 's'
+
+
 def Resource(name, model, interface, with_index=True, with_adapters=True):
-    return _Resource(name, model, interface, with_index, with_adapters)
+    return _ExtendedResource(name, model, interface, with_index, with_adapters)
 
 
 RESOURCES = [

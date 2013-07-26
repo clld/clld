@@ -197,7 +197,27 @@ class TestWithEnv(TestWithDbAndData):
             TestWithDbAndData.tearDown(self)
 
 
+def _add_header(headers, name, value):
+    if isinstance(headers, dict):
+        headers[name] = value
+    else:
+        headers.append((name, value))
+    return headers
+
+
+class ExtendedTestApp(TestApp):
+    def get(self, *args, **kw):
+        if kw.pop('xhr', False):
+            kw['headers'] = _add_header(
+                kw.pop('headers', {}), 'x-requested-with', str('XMLHttpRequest'))
+        accept = kw.pop('accept', False)
+        if accept:
+            kw['headers'] = _add_header(
+                kw.pop('headers', {}), 'accept', str(accept))
+        return super(ExtendedTestApp, self).get(*args, **kw)
+
+
 class TestWithApp(TestWithEnv):
     def setUp(self):
         TestWithEnv.setUp(self)
-        self.app = TestApp(self.env['app'])
+        self.app = ExtendedTestApp(self.env['app'])

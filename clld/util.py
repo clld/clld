@@ -13,10 +13,26 @@ class NoDefault(object):
 NO_DEFAULT = NoDefault()
 
 
+class UnicodeMixin(object):
+    def __unicode__(self):
+        """
+        :return: a human readable label for the object
+        """
+        return '%s' % self  # pragma: no cover
+
+    def __str__(self):
+        """
+        :return: a human readable label for the object, appropriately encoded (or not)
+        """
+        if PY3:
+            return self.__unicode__()  # pragma: no cover
+        return self.__unicode__().encode('utf-8')
+
+
 #
 # From "The Enum Recipe": http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/
 #
-class EnumSymbol(object):
+class EnumSymbol(UnicodeMixin):
     """Define a fixed symbol tied to a parent class."""
 
     def __init__(self, cls_, name, value, description):
@@ -34,6 +50,9 @@ class EnumSymbol(object):
 
     def __repr__(self):
         return "<%s>" % self.name
+
+    def __unicode__(self):
+        return self.value
 
     def __json__(self, request):
         return self.value
@@ -99,22 +118,6 @@ class DeclEnumType(SchemaType, TypeDecorator):
         if value is None:
             return None
         return self.enum.from_string(value.strip())
-
-
-class UnicodeMixin(object):
-    def __unicode__(self):
-        """
-        :return: a human readable label for the object
-        """
-        return '%s' % self  # pragma: no cover
-
-    def __str__(self):
-        """
-        :return: a human readable label for the object, appropriately encoded (or not)
-        """
-        if PY3:
-            return self.__unicode__()  # pragma: no cover
-        return self.__unicode__().encode('utf-8')
 
 
 #def flatten_dict(d, parent_key='', sep='_'):

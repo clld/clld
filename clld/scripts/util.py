@@ -77,6 +77,8 @@ class SqliteDb(argparse.Action):
 
 
 def parsed_args(*arg_specs, **kw):
+    """pass a truthy value as keyword parameter bootstrap to bootstrap the app.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config_uri", action=ExistingConfig, help="ini file providing app config")
@@ -130,10 +132,14 @@ def gbs(**kw):
     if command == 'download' and not args.api_key:
         raise argparse.ArgumentError(None, 'no API key found for download')
 
+    with transaction.manager:
+        gbs_func(args.log, kw.get('sources'))
+
+
+def gbs_func(command, args, sources=None):
     log = args.log
     count = 0
 
-    sources = kw.get('sources')
     if not sources:
         sources = DBSession.query(common.Source)\
             .order_by(cast(common.Source.id, Integer))\
@@ -141,85 +147,84 @@ def gbs(**kw):
     if callable(sources):
         sources = sources()
 
-    with transaction.manager:
-        for i, source in enumerate(sources):
-            filepath = args.data_file('gbs', 'source%s.json' % source.id)
+    for i, source in enumerate(sources):
+        filepath = args.data_file('gbs', 'source%s.json' % source.id)
 
-            if command == 'update':
-                source.google_book_search_id = None
-                source.update_jsondata(gbs={})
+        if command == 'update':
+            source.google_book_search_id = None
+            source.update_jsondata(gbs={})
 
-            if command in ['verify', 'update']:
-                if filepath.exists():
-                    with open(filepath) as fp:
-                        try:
-                            data = json.load(fp)
-                        except ValueError:
-                            log.warn('no JSON object found in: %s' % filepath)
-                            continue
-                    if not data['totalItems']:
+        if command in ['verify', 'update']:
+            if filepath.exists():
+                with open(filepath) as fp:
+                    try:
+                        data = json.load(fp)
+                    except ValueError:
+                        log.warn('no JSON object found in: %s' % filepath)
                         continue
-                    item = data['items'][0]
-                else:
+                if not data['totalItems']:
                     continue
+                item = data['items'][0]
+            else:
+                continue
 
-            if command == 'verify':
-                stitle = source.title or source.booktitle
+        if command == 'verify':
+            stitle = source.title or source.booktitle
+            needs_check = False
+            year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
+            if not year or year != str(source.year):
+                needs_check = True
+            twords = words(stitle)
+            iwords = words(
+                item['volumeInfo']['title'] + ' '
+                + item['volumeInfo'].get('subtitle', ''))
+            if twords == iwords \
+                    or (len(iwords) > 2 and iwords.issubset(twords))\
+                    or (len(twords) > 2 and twords.issubset(iwords)):
                 needs_check = False
-                year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
-                if not year or year != str(source.year):
-                    needs_check = True
-                twords = words(stitle)
-                iwords = words(
-                    item['volumeInfo']['title'] + ' '
-                    + item['volumeInfo'].get('subtitle', ''))
-                if twords == iwords \
-                        or (len(iwords) > 2 and iwords.issubset(twords))\
-                        or (len(twords) > 2 and twords.issubset(iwords)):
-                    needs_check = False
-                if int(source.id) == 241:
-                    log.info('%s' % sorted(list(words(stitle))))
-                    log.info('%s' % sorted(list(iwords)))
-                if needs_check:
-                    log.info('------- %s -> %s' % (source.id, item['volumeInfo'].get('industryIdentifiers')))
-                    log.info('%s %s' % (item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
-                    log.info(stitle)
-                    log.info(item['volumeInfo'].get('publishedDate'))
-                    log.info(source.year)
-                    log.info(item['volumeInfo'].get('authors'))
-                    log.info(source.author)
-                    log.info(item['volumeInfo'].get('publisher'))
-                    log.info(source.publisher)
-                    if not confirm('Are the records the same?'):
-                        log.warn('---- removing ----')
-                        with open(filepath, 'w') as fp:
-                            json.dump({"totalItems": 0}, fp)
-            elif command == 'update':
-                source.google_book_search_id = item['id']
-                source.update_jsondata(gbs=item)
+            if int(source.id) == 241:
+                log.info('%s' % sorted(list(words(stitle))))
+                log.info('%s' % sorted(list(iwords)))
+            if needs_check:
+                log.info('------- %s -> %s' % (source.id, item['volumeInfo'].get('industryIdentifiers')))
+                log.info('%s %s' % (item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
+                log.info(stitle)
+                log.info(item['volumeInfo'].get('publishedDate'))
+                log.info(source.year)
+                log.info(item['volumeInfo'].get('authors'))
+                log.info(source.author)
+                log.info(item['volumeInfo'].get('publisher'))
+                log.info(source.publisher)
+                if not confirm('Are the records the same?'):
+                    log.warn('---- removing ----')
+                    with open(filepath, 'w') as fp:
+                        json.dump({"totalItems": 0}, fp)
+        elif command == 'update':
+            source.google_book_search_id = item['id']
+            source.update_jsondata(gbs=item)
+            count += 1
+        elif command == 'download':
+            if source.author and (source.title or source.booktitle):
+                title = source.title or source.booktitle
+                if filepath.exists():
+                    continue
+                q = [
+                    'inauthor:' + quote_plus(source.author.encode('utf8')),
+                    'intitle:' + quote_plus(title.encode('utf8')),
+                ]
+                if source.publisher:
+                    q.append('inpublisher:' + quote_plus(
+                        source.publisher.encode('utf8')))
+                url = api_url + 'q=%s&key=%s' % ('+'.join(q), args.api_key)
                 count += 1
-            elif command == 'download':
-                if source.author and (source.title or source.booktitle):
-                    title = source.title or source.booktitle
-                    if filepath.exists():
-                        continue
-                    q = [
-                        'inauthor:' + quote_plus(source.author.encode('utf8')),
-                        'intitle:' + quote_plus(title.encode('utf8')),
-                    ]
-                    if source.publisher:
-                        q.append('inpublisher:' + quote_plus(
-                            source.publisher.encode('utf8')))
-                    url = api_url + 'q=%s&key=%s' % ('+'.join(q), args.api_key)
-                    count += 1
-                    r = requests.get(url, headers={'accept': 'application/json'})
-                    log.info('%s - %s' % (r.status_code, url))
-                    if r.status_code == 200:
-                        with open(filepath, 'w') as fp:
-                            fp.write(r.text.encode('utf8'))
-                    elif r.status_code == 403:
-                        log.warn("limit reached")
-                        break
+                r = requests.get(url, headers={'accept': 'application/json'})
+                log.info('%s - %s' % (r.status_code, url))
+                if r.status_code == 200:
+                    with open(filepath, 'w') as fp:
+                        fp.write(r.text.encode('utf8'))
+                elif r.status_code == 403:
+                    log.warn("limit reached")
+                    break
     if command == 'update':
         log.info('assigned gbs ids for %s out of %s sources' % (count, i))
     elif command == 'download':

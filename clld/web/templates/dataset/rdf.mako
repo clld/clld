@@ -14,39 +14,46 @@
          xmlns:bibo="http://purl.org/ontology/bibo/"
          xmlns:owl="http://www.w3.org/2002/07/owl#">
     <%! from clld.lib.rdf import FORMATS %>
+    <%! from clld import RESOURCES %>
+    <% TxtCitation = h.get_adapter(h.interfaces.IRepresentation, ctx, request, ext='md.txt') %>
     <void:Dataset rdf:about="${request.route_url('dataset')}">
         ##
         ## TODO: license, publisher, subject, ...
         ##
+        <rdfs:label xml:lang="en">${request.dataset.name}</rdfs:label>
+        <skos:prefLabel xml:lang="en">${request.dataset.name}</skos:prefLabel>
+        <dcterms:title xml:lang="en">${request.dataset.name}</dcterms:title>
+        % if request.dataset.description:
+        <dcterms:description xml:lang="en">${request.dataset.description}</dcterms:description>
+        % endif
         <foaf:homepage>${request.route_url('dataset')}</foaf:homepage>
         <dcterms:license rdf:resource="${request.dataset.license}"/>
-        <dcterms:rightsHolder rdf:resource="http://www.eva.mpg.de${request.dataset.publisher_url}"/>
-        <dcterms:publisher rdf:resource="http://www.eva.mpg.de${request.dataset.publisher_url}"/>
+        <dcterms:rightsHolder rdf:resource="${request.dataset.publisher_url}"/>
+        <dcterms:publisher rdf:resource="${request.dataset.publisher_url}"/>
         % for format in FORMATS.values():
         <void:feature rdf:resource="${format.uri}"/>
         % endfor
-        ##% for rsc in resources:
-        ##<void:subset rdf:resource="${request.route_url('...')}">
-        ##% endfor
+        % for rsc in RESOURCES:
+        <void:subset rdf:resource="${request.route_url(rsc.name + 's')}"/>
+        % endfor
         ##<dcterms:creator>Glottolog 2.0</dcterms:creator>
-        ##<dcterms:contributor rdf:parseType="Resource">
-        ##    <rdf:type rdf:resource="foaf:Person"/>
-        ##    <foaf:firstName>Sebastian</foaf:firstName>
-        ##    <foaf:lastName>Nordhoff</foaf:lastName>
-        ##</dcterms:contributor>
+        % for ed in request.dataset.editors:
+        <dcterms:contributor rdf:parseType="Resource">
+            <rdf:type rdf:resource="foaf:Person"/>
+            <foaf:name>${ed.contributor}</foaf:name>
+        </dcterms:contributor>
+        % endfor
         <dcterms:bibliographicCitation>
-            ##
-            ## TODO
-            ##
+${TxtCitation.render(request.dataset, request)}
         </dcterms:bibliographicCitation>
         <dcterms:subject rdf:resource="http://dbpedia.org/resource/Linguistics"/>
     </void:Dataset>
-    ##% for rsc in resources:
-    ##<void:Dataset rdf:about="">
-    ##    <void:dataDump rdf:resource=""/>
-    ##    <void:entities>${count}</void:entities>
-    ##</void:Dataset>
-    ##% endfor
+    % for rsc in RESOURCES:
+    <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
+        <void:dataDump rdf:resource="${request.route_url(rsc.name + 's_alt', ext='rdf')}"/>
+        ##<void:entities>${count}</void:entities>'
+    </void:Dataset>
+    % endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
         <skos:prefLabel xml:lang="en">${request.dataset.publisher_name}</skos:prefLabel>
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>

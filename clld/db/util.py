@@ -8,39 +8,32 @@ def icontains(col, qs):
     return col.ilike('%' + qs + '%')
 
 
-def compute_language_sources(session=None):
-    """compute relations between languages and sources by going through the more specific
-    relations.
+def compute_language_sources(*references):
+    """compute relations between languages and sources by going through the relevant
+    models derived from the HasSource mixin.
     """
-    session = session or DBSession
-
     old_sl = {}
-    for pair in session.query(common.LanguageSource):
+    for pair in DBSession.query(common.LanguageSource):
         old_sl[(pair.source_pk, pair.language_pk)] = True
 
+    references = list(references)
+    references.extend([
+        (common.ValueSetReference, 'valueset'),
+        (common.SentenceReference, 'sentence')])
     sl = {}
-
-    for ref in session.query(common.ValueSetReference):
-        sl[(ref.source_pk, ref.valueset.language_pk)] = True
-
-    for ref in session.query(common.SentenceReference):
-        sl[(ref.source_pk, ref.sentence.language_pk)] = True
-
-    for ref in session.query(common.ContributionReference):
-        if hasattr(ref.contribution, 'language_pk'):
-            sl[(ref.source_pk, ref.contribution.language_pk)] = True
+    for model, attr in references:
+        for ref in DBSession.query(model):
+            sl[(ref.source_pk, getattr(ref, attr).language_pk)] = True
 
     for s, l in sl:
         if (s, l) not in old_sl:
-            session.add(common.LanguageSource(language_pk=l, source_pk=s))
+            DBSession.add(common.LanguageSource(language_pk=l, source_pk=s))
 
 
-def compute_number_of_values(session=None):
+def compute_number_of_values():
     """compute number of values per valueset and store it in valueset's jsondata.
     """
-    session = session or DBSession
-
-    for valueset in session.query(common.ValueSet).options(
+    for valueset in DBSession.query(common.ValueSet).options(
         joinedload(common.ValueSet.values)
     ):
         d = valueset.jsondata if valueset.jsondata else {}
@@ -48,6 +41,5 @@ def compute_number_of_values(session=None):
         valueset.jsondata = d
 
 
-def get_distinct_values(col, session=None, key=None):
-    session = session or DBSession
-    return sorted([r[0] for r in session.query(col).distinct() if r[0]], key=key)
+def get_distinct_values(col, key=None):
+    return sorted([r[0] for r in DBSession.query(col).distinct() if r[0]], key=key)

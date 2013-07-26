@@ -135,6 +135,7 @@ class Record(OrderedDict, UnicodeMixin):
             if value:
                 data[field] = value
         data.update(kw)
+        data.setdefault('title', obj.description)
         return cls(obj.bibtex_type, obj.id, **data)
 
     @classmethod

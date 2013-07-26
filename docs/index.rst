@@ -19,6 +19,7 @@ Contents:
     lib
     linkeddata
     protocols
+    extending
 
 
 Indices and tables

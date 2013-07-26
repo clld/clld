@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 from six import PY3
 
 from clld.tests.util import TestWithDb, TestWithDbAndData
+from clld.db.meta import DBSession
 
 
 class Tests(TestWithDb):
     def test_Files(self):
-        from clld.db.meta import DBSession
         from clld.db.models.common import Language, Language_files, File
 
         if PY3:
@@ -23,8 +23,54 @@ class Tests(TestWithDb):
         self.assertEqual(f.id, f.pk)
         self.assertTrue(f.data_uri().startswith('data:'))
 
+    def test_Dataset(self):
+        from clld import RESOURCES
+        from clld.db.models.common import Dataset, Source
+
+        d = Dataset(id='abc', domain='test')
+        DBSession.add(d)
+        DBSession.flush()
+        d.get_stats(RESOURCES, source=Source.id == None)
+
+    def test_Contributor(self):
+        from clld.db.models.common import Contributor
+
+        d = Contributor(id='abc')
+        d.last_first()
+        d = Contributor(id='abc', name='Robert Forkel')
+        self.assertTrue(d.last_first().startswith('Forkel'))
+
+    def test_Source(self):
+        from clld.db.models.common import Source
+
+        d = Source(id='abc')
+        d.gbs_identifier
+        d = Source(id='abc', jsondata={'gbs': {'volumeInfo': {}}})
+        d.gbs_identifier
+        d = Source(
+            id='abc',
+            jsondata={
+                'gbs': {
+                    'volumeInfo': {
+                        'industryIdentifiers': [{'type': 'x', 'identifier': 'y'}]}}})
+        d.gbs_identifier
+        d = Source(
+            id='abc',
+            jsondata={
+                'gbs': {
+                    'volumeInfo': {
+                        'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': ''}]}}})
+        d.gbs_identifier
+        d = Source(
+            id='abc',
+            jsondata={
+                'gbs': {
+                    'volumeInfo': {
+                        'industryIdentifiers': [{'type': 'ISBN_13', 'identifier': ''}]}}})
+        d.gbs_identifier
+        d.bibtex()
+
     def test_Data(self):
-        from clld.db.meta import DBSession
         from clld.db.models.common import Language, Language_data
 
         l = Language(id='abc', name='Name')
@@ -35,7 +81,6 @@ class Tests(TestWithDb):
         self.assertEqual(l.datadict()['abstract'], 'c')
 
     def test_UnitValue(self):
-        from clld.db.meta import DBSession
         from clld.db.models.common import UnitParameter, UnitValue, UnitDomainElement
 
         p1 = UnitParameter()
@@ -58,7 +103,6 @@ class Tests(TestWithDb):
 
 class MoreTests(TestWithDbAndData):
     def test_Contribution(self):
-        from clld.db.meta import DBSession
         from clld.db.models.common import Contribution
 
         c = DBSession.query(Contribution).first()

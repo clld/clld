@@ -15,4 +15,6 @@ class Tests(unittest.TestCase):
         co = ContextObject.from_bibtex('sid', bib)
         bib = Record('phdthesis', '1', title='The Title')
         co = ContextObject.from_bibtex('sid', bib)
+        bib = Record('conference', '1', title='The Title', booktitle='something')
+        co = ContextObject.from_bibtex('sid', bib)
         self.assertTrue(isinstance(co.span_attrs(), dict))

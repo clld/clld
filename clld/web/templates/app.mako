@@ -53,9 +53,7 @@
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
     ##<div id="content">
-        <div id="header" class="container-fluid">
-            <%block name="header"></%block>
-        </div>
+        <%block name="header"></%block>
 
         <div class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
             <div class="navbar-inner">
@@ -130,10 +128,7 @@
                             </a>
                             <br />
                             % endif
-                            <em xmlns:dct="http://purl.org/dc/terms/"
-                                href="http://purl.org/dc/dcmitype/Dataset"
-                                property="dct:title"
-                                rel="dct:type">${request.dataset.name}</em>
+                            ${request.dataset.formatted_name()}
                             edited by
                             <span xmlns:cc="http://creativecommons.org/ns#"
                                   property="cc:attributionName"

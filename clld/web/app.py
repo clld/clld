@@ -304,7 +304,7 @@ def get_configurator(pkg, *utilities, **kw):
     #
     # routes and views
     #
-    config.add_static_view(name='clld-static', path='clld:web/static')
+    config.add_static_view('clld-static', 'clld:web/static')
     config.add_static_view('static', '%s:static' % config.package_name, cache_max_age=3600)
 
     config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
@@ -324,23 +324,21 @@ def get_configurator(pkg, *utilities, **kw):
 
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model
-        plural = name + 's'
-        if rsc.with_index:
-            factory = partial(ctx_factory, model, 'index')
-            config.add_route_and_view(plural, '/%s' % plural, index_view, factory=factory)
-            config.register_datatable(
-                plural, getattr(datatables, plural.capitalize(), DataTable))
-            config.register_adapter(
-                getattr(excel, plural.capitalize(), excel.ExcelAdapter), rsc.interface)
-            if name == 'source':
-                config.register_adapter(misc.BibtexAdapter, rsc.interface)
+        factory = partial(ctx_factory, model, 'index')
+        config.add_route_and_view(rsc.plural, '/%s' % rsc.plural, index_view, factory=factory)
+        config.register_datatable(
+            rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
+        config.register_adapter(
+            getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), rsc.interface)
+        if name == 'source':
+            config.register_adapter(misc.BibtexAdapter, rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         if model == common.Dataset:
             pattern = '/'
             kw['alt_route_pattern'] = '/void.{ext}'
         else:
-            pattern = '/%s/{id:[^/\.]+}' % plural
+            pattern = '/%s/{id:[^/\.]+}' % rsc.plural
 
         config.add_route_and_view(name, pattern, resource_view, **kw)
 
