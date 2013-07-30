@@ -54,6 +54,9 @@ class EnumSymbol(UnicodeMixin):
     def __unicode__(self):
         return self.value
 
+    def __cmp__(self, other):
+        return cmp(self.value, other.value)
+
     def __json__(self, request):
         return self.value
 
@@ -70,7 +73,7 @@ class EnumMeta(type):
         return type.__init__(cls, classname, bases, dict_)
 
     def __iter__(cls):
-        return iter(cls._reg.values())
+        return iter(sorted(cls._reg.values()))
 
 
 class DeclEnum(object):
