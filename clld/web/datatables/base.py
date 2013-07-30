@@ -179,7 +179,7 @@ class DetailsRowLinkCol(Col):
 
 @implementer(IDataTable)
 class DataTable(object):
-    def __init__(self, req, model, eid=None):
+    def __init__(self, req, model, eid=None, **kw):
         self.model = model
         self.req = req
         self.eid = eid or self.__class__.__name__
