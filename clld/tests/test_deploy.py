@@ -23,7 +23,7 @@ if not PY3:
         from clld.deploy.util import deploy
         from clld.deploy.config import App
 
-        app = App('test', 9999)
+        app = App('test', 9999, domain='d')
         assert app.src
         deploy(app, 'test')
         deploy(app, 'test', with_alembic=True)

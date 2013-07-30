@@ -20,7 +20,7 @@ class App(object):
 
     @property
     def venv(self):
-        return path('/usr/local/venvs').joinpath(self.name)
+        return path('/usr/venvs').joinpath(self.name)
 
     @property
     def home(self):
@@ -73,6 +73,7 @@ APPS = dict((app.name, app) for app in [
     App('cgj', 8884),
     App('wow', 8883),
     App('glottolog2', 8882),
+    App('glottolog3', 8881, domain='glottolog.org'),
     App('solr', 8080),
 ])
 

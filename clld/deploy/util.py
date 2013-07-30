@@ -16,6 +16,7 @@ try:  # pragma: no cover
     from fabric.contrib.console import confirm
     from fabric.contrib.files import exists
     from fabtools import require
+    require.python.DEFAULT_PIP_VERSION = None
     from fabtools.python import virtualenv
     from fabtools import service
     from fabtools import postgres
@@ -68,8 +69,8 @@ location /{app.name}/static/ {{
 
 SITE_TEMPLATE = """\
 server {{
-    server_name {app.host};
-    access_log /var/logs/{app.name}/access.log main;
+    server_name {app.domain};
+    access_log /var/log/{app.name}/access.log;
 
     root {app.www};
 
@@ -247,10 +248,11 @@ def deploy(app, environment, with_alembic=False):
     require.files.directory(app.logs, use_sudo=True)
 
     with virtualenv(app.venv):
+        sudo('pip install -U pip')
         require.python.package('gunicorn', use_sudo=True)
         install_repos('clld')
-        sudo('webassets -m %s.assets build' % app.name)
         install_repos(app.name)
+        sudo('webassets -m %s.assets build' % app.name)
 
     supervisor(app, 'pause', template_variables)
 
