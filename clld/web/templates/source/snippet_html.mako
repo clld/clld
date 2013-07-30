@@ -22,4 +22,3 @@ $(document).ready(function() {
     ${ctx.datadict().get('Additional_information')}
 </p>
 % endif
-${util.gbs_links(filter(None, [ctx.gbs_identifier]))}

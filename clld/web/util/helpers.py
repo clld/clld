@@ -42,10 +42,13 @@ def urlescape(string):
 
 
 def dumps(obj):
-    return pyramid_render('json', obj)
+    return JS.sub(pyramid_render('json', obj))
 
 
 class JS(object):
+    delimiter = '|'
+    pattern = re.compile('\"\{0}(?P<name>[^\{0}]+)\{0}\"'.format(delimiter))
+
     def __init__(self, name):
         self.name = name
 
@@ -55,6 +58,13 @@ class JS(object):
 
     def __getattr__(self, attr):
         return JS('%s.%s' % (self.name, attr))
+
+    def __json__(self, request=None):
+        return '{0}{1}{0}'.format(self.delimiter, self.name)
+
+    @classmethod
+    def sub(self, string):
+        return self.pattern.sub(lambda m: m.group('name'), string)
 
 
 JSFeed = JS('CLLD.Feed')

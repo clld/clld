@@ -64,6 +64,20 @@ CLLD.TreeView = (function(){
 })();
 
 
+CLLD.MultiSelect = (function(){
+    return {
+        data: function (term, page) {return {q: term, t: 'select2'};},
+        results: function (data, page) {return data;},
+        addItem: function (eid, obj) {
+            var data, s = $('#'+eid);
+            data = s.select2('data');
+            data.push(obj);
+            s.select2('data', data);
+        }
+    }
+})();
+
+
 CLLD.Feed = (function(){
     var _init = function(spec) {
         var feed = new google.feeds.Feed(spec.url);

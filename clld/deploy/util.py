@@ -96,7 +96,7 @@ server {{
 
 _SUPERVISOR_TEMPLATE = """\
 [program:{app.name}]
-command={gunicorn} -u {app.name} -g {app.name} --error-logfile {app.error_log} {app.config}
+command={gunicorn} -u {app.name} -g {app.name} --limit-request-line 8000 --error-logfile {app.error_log} {app.config}
 autostart=%s
 autorestart=%s
 redirect_stderr=True

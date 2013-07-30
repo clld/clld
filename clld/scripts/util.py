@@ -123,8 +123,6 @@ def gbs(**kw):
         (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
     ]
 
-    api_url = "https://www.googleapis.com/books/v1/volumes?"
-
     args = parsed_args(*add_args, **kw)
     if args.command == 'download' and not args.api_key:
         raise argparse.ArgumentError(None, 'no API key found for download')
@@ -136,6 +134,7 @@ def gbs(**kw):
 def gbs_func(command, args, sources=None):
     log = args.log
     count = 0
+    api_url = "https://www.googleapis.com/books/v1/volumes?"
 
     if not sources:
         sources = DBSession.query(common.Source)\
