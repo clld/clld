@@ -39,6 +39,7 @@ install_requires = [
     'markupsafe',
     'requests',
     'rdflib',
+    'colander',
 ]
 
 if not PY3:
