@@ -31,7 +31,6 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
-from clld.web.adapters import misc
 from clld.web.views import index_view, resource_view, _raise, _ping, js, unapi
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap
@@ -330,8 +329,6 @@ def get_configurator(pkg, *utilities, **kw):
             rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
         config.register_adapter(
             getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), rsc.interface)
-        if name == 'source':
-            config.register_adapter(misc.BibtexAdapter, rsc.interface)
 
         kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         if model == common.Dataset:

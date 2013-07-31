@@ -7,6 +7,7 @@ from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParamete
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation
 from clld.web.adapters.rdf import Rdf
+from clld.web.adapters import biblio
 from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 
 
@@ -95,6 +96,8 @@ def includeme(config):
         (interfaces.IFile,),
         interfaces.IRepresentation,
         name=OctetStream.mimetype)
+
+    config.include(biblio)
 
 
 def get_adapters(interface, ctx, req):

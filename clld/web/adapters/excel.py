@@ -10,6 +10,8 @@ from clld.lib.excel import hyperlink
 
 
 class ExcelAdapter(Index):
+    """renders DataTables as excel sheets
+    """
     extension = 'xls'
     mimetype = 'application/vnd.ms-excel'
 

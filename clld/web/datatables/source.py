@@ -28,7 +28,6 @@ class Sources(DataTable):
             self.language = Language.get(req.params['language'])
         else:
             self.language = None
-        self.download_formats.append('bib')
 
     def base_query(self, query):
         if self.language:

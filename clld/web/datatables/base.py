@@ -18,7 +18,7 @@ from clld.db.models.common import Language
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JSMap, JS_CLLD
-from clld.interfaces import IDataTable
+from clld.interfaces import IDataTable, IIndex
 
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
@@ -187,7 +187,6 @@ class DataTable(object):
         self._options = None
         self.count_all = None
         self.count_filtered = None
-        self.download_formats = ['xls']
 
     def __unicode__(self):
         return '%ss' % inspect(self.model).class_.__name__
@@ -281,7 +280,7 @@ class DataTable(object):
             HTML.ul(
                 #HTML.li(HTML.a('csv', href="#")),
                 *[HTML.li(HTML.a(fmt, href="#", onclick="document.location.href = CLLD.DataTable.current_url('%s'); return false;" % fmt))
-                  for fmt in self.download_formats],
+                  for fmt in [a.extension for n, a in self.req.registry.getAdapters([self.model()], IIndex)] if fmt != 'html'],
                 **dict(class_="dropdown-menu")),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
             class_='btn-group right')

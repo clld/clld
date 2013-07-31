@@ -5,6 +5,10 @@ Functionality to handle bibligraphical data in the BibTeX format.
 """
 from collections import OrderedDict
 import re
+import codecs
+
+from path import path
+from zope.interface import Interface, implementer
 
 from clld.util import UnicodeMixin, DeclEnum
 from clld.lib.bibutils import convert
@@ -118,7 +122,28 @@ FIELDS = [
 ]
 
 
-class Record(OrderedDict, UnicodeMixin):
+class _Convertable(UnicodeMixin):
+    def format(self, fmt):
+        if fmt == 'txt':
+            if hasattr(self, 'text'):
+                return self.text()
+            raise NotImplementedError()
+        if fmt == 'en':
+            return convert(self.__unicode__(), 'bib', 'end')
+        if fmt == 'ris':
+            return convert(self.__unicode__(), 'bib', 'ris')
+        if fmt == 'mods':
+            return convert(self.__unicode__(), 'bib')
+        return self.__unicode__()
+
+
+class IRecord(Interface):
+    """marker
+    """
+
+
+@implementer(IRecord)
+class Record(OrderedDict, _Convertable):
     """A BibTeX record is basically an ordered dict with two special properties - id and
     genre.
     """
@@ -224,13 +249,50 @@ class Record(OrderedDict, UnicodeMixin):
         res[-1] += '.'
         return ' '.join(res)
 
-    def format(self, fmt):
-        if fmt == 'txt':
-            return self.text()
-        if fmt == 'en':
-            return convert(self.__unicode__(), 'bib', 'end')
-        if fmt == 'ris':
-            return convert(self.__unicode__(), 'bib', 'ris')
-        if fmt == 'mods':
-            return convert(self.__unicode__(), 'bib')
-        return self.__unicode__()
+
+class IDatabase(Interface):
+    """marker
+    """
+
+
+@implementer(IDatabase)
+class Database(_Convertable):
+    """
+    a class to handle bibtex databases, i.e. a container class for Record instances.
+    """
+    def __init__(self, records):
+        self.records = records
+        self._keymap = None
+
+    def __unicode__(self):
+        return '\n'.join(r.__unicode__() for r in self.records)
+
+    @property
+    def keymap(self):
+        """map bibtex record ids to list index
+        """
+        if self._keymap is None:
+            self._keymap = dict((r.id, i) for i, r in enumerate(self.records))
+        return self._keymap
+
+    @classmethod
+    def from_file(cls, bibFile, encoding='utf8'):
+        """
+        a bibtex database defined by a bib-file
+
+        @param bibFile: path of the bibtex-database-file to be read.
+        """
+        if path(bibFile).exists():
+            with codecs.open(bibFile, encoding=encoding) as fp:
+                content = fp.read()
+        else:
+            content = ''
+
+        return cls([Record.from_string('@' + r) for r in content.split('@')[1:]])
+
+    def __len__(self):
+        return len(self.records)
+
+    def __getitem__(self, key):
+        """to access bib records by index or citation key"""
+        return self.records[key if isinstance(key, int) else self.keymap[key]]

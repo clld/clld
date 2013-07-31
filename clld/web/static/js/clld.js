@@ -314,8 +314,9 @@ CLLD.DataTable = (function(){
                 }
             }
             parts = oSettings.sAjaxSource.split('?', 2);
+            parts[0] = parts[0].replace('.html', '');
             if (parts.length == 1) {
-                url = oSettings.sAjaxSource + '.' + fmt + '?'
+                url = parts[0] + '.' + fmt + '?'
             } else {
                 url = parts[0] + '.' + fmt + '?' + parts[1] + '&'
             }
