@@ -3,6 +3,7 @@ from itertools import groupby  # we just import this to have it available in tem
 assert groupby  # appease pyflakes
 import datetime  # we just import this to have it available in templates!
 assert datetime
+from urllib import urlencode
 
 from six import PY3
 if PY3:  # pragma: no cover
@@ -255,12 +256,23 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
     )
 
 
-def icon(class_, inverted=False):
+def icon(class_, inverted=False, **kw):
     if not class_.startswith('icon-'):
         class_ = 'icon-' + class_
     if inverted:
         class_ = '%s icon-white' % class_
-    return HTML.i(class_=class_)
+    return HTML.i(class_=class_, **kw)
+
+
+def contactmail(req, ctx=None, title='contact maintainer'):
+    params = {}
+    for name in ['subject', 'body']:
+        params[name] = pyramid_render(
+            'contactmail_{0}.mako'.format(name), {'req': req, 'ctx': ctx}, request=req)\
+            .strip()\
+            .encode('utf8')
+    href = 'mailto:{0}?{1}'.format(req.dataset.contact, urlencode(params))
+    return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 
 def newline2br(text):
