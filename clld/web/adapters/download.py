@@ -1,4 +1,4 @@
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
 from cStringIO import StringIO
 
 from path import path
@@ -42,7 +42,7 @@ class Download(object):
         if not p.dirname().exists():
             p.dirname().mkdir()
 
-        with ZipFile(p, mode='w') as zipfile:
+        with ZipFile(p, 'w', ZIP_DEFLATED) as zipfile:
             fp = StringIO()
             self.before(req, fp)
             for i, item in enumerate(self.query(req)):

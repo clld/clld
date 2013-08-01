@@ -4,6 +4,8 @@
 
 <%def name="contextnav()">
     ${util.contextnavitem('legal')}
-    ##${util.contextnavitem('download')}
+    % if list(request.registry.getUtilitiesFor(h.interfaces.IDownload)):
+    ${util.contextnavitem('download')}
+    % endif
 </%def>
 ${next.body()}
