@@ -161,7 +161,10 @@ class Record(OrderedDict, _Convertable):
                 data[field] = value
         data.update(kw)
         data.setdefault('title', obj.description)
-        return cls(obj.bibtex_type, obj.id, **data)
+        rec = cls(obj.bibtex_type, obj.id)
+        for key in sorted(data.keys()):
+            rec[key] = data[key]
+        return rec
 
     @classmethod
     def from_string(cls, bibtexString):

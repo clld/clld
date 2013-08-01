@@ -19,6 +19,7 @@ import requests
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld.util import slug
+from clld.interfaces import IDownload
 
 
 def confirm(question, default=False):
@@ -112,6 +113,13 @@ def initializedb(create=None, prime_cache=None, **kw):
     if prime_cache:
         with transaction.manager:
             prime_cache(args)
+
+
+def create_downloads(**kw):
+    args = parsed_args(bootstrap=True)
+    for name, download in args.env['registry'].getUtilitiesFor(IDownload):
+        args.log.info('creating download %s' % name)
+        download.create(args.env['request'])
 
 
 def gbs(**kw):

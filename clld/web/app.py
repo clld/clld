@@ -262,6 +262,10 @@ def register_resource(config, name, model, interface, with_index=False):
             factory=partial(ctx_factory, model, 'index'))
 
 
+def register_download(config, download):
+    config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
+
+
 def get_configurator(pkg, *utilities, **kw):
     """
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
@@ -296,6 +300,7 @@ def get_configurator(pkg, *utilities, **kw):
         'register_menu': register_menu,
         'register_resource': register_resource,
         'register_adapter': register_adapter,
+        'register_download': register_download,
         'add_route_and_view': add_route_and_view,
     }.items():
         config.add_directive(name, func)

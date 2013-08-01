@@ -21,6 +21,7 @@ else:
 
 def add_renderer_globals(module, event):
     if event['request']:
+        _add_localizer(event['request'])
         event['_'] = event['request'].translate
         prod = event['request'].registry.settings.get('clld.environment') == 'production'
         environment.debug = not prod
@@ -42,13 +43,20 @@ tsf = TranslationStringFactory('clld')
 
 
 def add_localizer(event):
-    event.request._LOCALE_ = 'en'
-    localizer = get_localizer(event.request)
+    _add_localizer(event.request)
+
+
+def _add_localizer(request):
+    if hasattr(request, 'translate'):
+        return
+
+    request._LOCALE_ = 'en'
+    localizer = get_localizer(request)
 
     def auto_translate(*args, **kwargs):
         return localizer.translate(tsf(*args, **kwargs))
 
-    event.request.translate = auto_translate
+    request.translate = auto_translate
 
 
 def init_map(event):

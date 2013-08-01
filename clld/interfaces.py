@@ -123,6 +123,20 @@ class IMetadata(Interface):
     """
 
 
+class IDownload(Interface):
+    """
+    """
+    name = Attribute('name the download will be registered for')
+
+    def url(request):
+        """called from the template for the download page
+        """
+
+    def create(request):
+        """called from the script creating all downloads
+        """
+
+
 class IDataTable(Interface):
     """marker
     """
