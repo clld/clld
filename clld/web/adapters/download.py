@@ -14,6 +14,12 @@ from clld.db.meta import DBSession
 
 @implementer(IDownload)
 class Download(object):
+    """
+    >>> from clld.db.models.common import Source
+    >>> from mock import Mock
+    >>> dl = Download(Source, 'clld', ext='x')
+    >>> assert dl.asset_spec(Mock()).startswith('clld:')
+    """
     ext = None
 
     def __init__(self, model, pkg, **kw):

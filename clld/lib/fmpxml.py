@@ -40,7 +40,7 @@ def normalize_markup(s):
         else:
             span.replace_with(span.string)
 
-    return unicode(soup).strip()
+    return unicode(soup.html.body.string).strip()
 
 
 class Result(object):
@@ -87,21 +87,24 @@ class Result(object):
 class Client(object):
     """Client for FileMaker's 'Custom Web Publishing with XML' feature.
     """
-    def __init__(self, host, db, user, password, limit=1000, cache=None):
+    def __init__(self, host, db, user, password, limit=1000, cache=None, verbose=True):
         self.host = host
         self.db = db
         self.user = user
         self.password = password
         self.limit = limit
         self.cache = cache if cache is not None else {}
+        self.verbose = verbose
 
     def _get_batch(self, what, offset=0):
-        print what, offset
+        if self.verbose:
+            print what, offset  # pragma: no cover
         key = '%s-%s-%s' % (what, offset, self.limit)
         if key in self.cache.keys():
             xml = self.cache[key]
         else:
-            print '-- from server'
+            if self.verbose:
+                print '-- from server'  # pragma: no cover
             log.info('retrieving %s (%s to %s)' % (what, offset, offset + self.limit))
             res = requests.get(
                 'http://%s/fmi/xml/FMPXMLRESULT.xml' % self.host,

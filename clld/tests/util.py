@@ -23,6 +23,7 @@ from clld import interfaces
 
 
 ENV = None
+TESTS_DIR = path(clld.__file__).dirname().joinpath('tests')
 
 
 class Route(Mock):
@@ -146,7 +147,7 @@ class TestWithDbAndData(TestWithDb):
 
 
 class TestWithEnv(TestWithDbAndData):
-    __cfg__ = path(clld.__file__).dirname().joinpath('tests', 'test.ini').abspath()
+    __cfg__ = TESTS_DIR.joinpath('test.ini').abspath()
     __setup_db__ = True
 
     def setUp(self):

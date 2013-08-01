@@ -20,3 +20,13 @@ class Tests(unittest.TestCase):
 
         rec = Record.from_string(rec.__unicode__())
         rec = Record.from_object(Mock())
+
+    def test_Database(self):
+        from clld.lib.bibtex import Record, Database
+
+        db = Database([])
+        self.assertEqual(len(db), 0)
+        db = Database([Record('book', 'id')])
+        self.assertEqual(db[0], db['id'])
+        db = Database.from_file('notexisting.bib')
+        self.assertEqual(len(db), 0)

@@ -102,7 +102,7 @@ def _text(e):
 def get_documentation(code):
     """scrape information about a iso 639-3 code from the documentation page.
     """
-    soup = bs(get(url('documentation.asp?id=' + code)))
+    soup = bs(get('documentation.asp?id=' + code))
     assert code in soup.find_all('h1', limit=1)[0].text
 
     info = {}
