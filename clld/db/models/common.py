@@ -145,6 +145,12 @@ class IdNameDescriptionMixin(object):
     markup_description = Column(Unicode)
 
 
+class LanguageSource(Base, Versioned):
+    __table_args__ = (UniqueConstraint('language_pk', 'source_pk'),)
+    language_pk = Column(Integer, ForeignKey('language.pk'))
+    source_pk = Column(Integer, ForeignKey('source.pk'))
+
+
 #-----------------------------------------------------------------------------
 # The mapper classes for basic objects of the clld db model are marked as
 # implementers of the related interface.
@@ -225,7 +231,6 @@ class Language(Base,
     longitude = Column(
         Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
     identifiers = association_proxy('languageidentifier', 'identifier')
-    sources = association_proxy('languagesource', 'source')
 
     def get_identifier(self, type_):
         for i in self.identifiers:
@@ -339,7 +344,8 @@ class Source(Base,
     startpage_int = Column(Integer)
     pages_int = Column(Integer)
 
-    languages = association_proxy('languagesource', 'language')
+    languages = relationship(
+        Language, backref='sources', secondary=LanguageSource.__table__)
 
     @property
     def gbs_identifier(self):
@@ -703,18 +709,6 @@ class LanguageIdentifier(Base, Versioned):
     language = relationship(
         Language,
         backref=backref("languageidentifier", cascade="all, delete-orphan"))
-
-
-class LanguageSource(Base, Versioned):
-    __table_args__ = (UniqueConstraint('language_pk', 'source_pk'),)
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    source_pk = Column(Integer, ForeignKey('source.pk'))
-    source = relationship(
-        Source,
-        backref=backref("languagesource", cascade="all, delete-orphan"))
-    language = relationship(
-        Language,
-        backref=backref("languagesource", cascade="all, delete-orphan"))
 
 
 #

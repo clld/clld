@@ -93,8 +93,8 @@ class TestWithDbAndData(TestWithDb):
 
         language = common.Language(
             id='l1', name='Language 1', latitude=10.5, longitude=0.3)
+        language.sources.append(source)
         identifier = common.Identifier(type='iso639-3', id='iso')
-        ls = common.LanguageSource(language=language, source=source)
         li = common.LanguageIdentifier(language=language, identifier=identifier)
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
