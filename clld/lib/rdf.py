@@ -83,7 +83,11 @@ def convert(string, from_, to_):
         return encoded(string)
     assert from_ in FORMATS and to_ in FORMATS
     g = Graph()
-    g.parse(StringIO(encoded(string)), format=from_)
+    try:
+        g.parse(StringIO(encoded(string)), format=from_)
+    except:
+        print string
+        raise
     out = StringIO()
     g.serialize(out, format=to_)
     out.seek(0)

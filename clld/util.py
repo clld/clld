@@ -13,6 +13,23 @@ class NoDefault(object):
 NO_DEFAULT = NoDefault()
 
 
+def xmlchars(text):
+    invalid = range(0x9)
+    invalid.extend([0xb, 0xc])
+    invalid.extend(range(0xe, 0x20))
+    return re.sub('|'.join('\\x%0.2X' % i for i in invalid), '', text)
+
+
+def format_size(num):
+    """http://stackoverflow.com/a/1094933
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB']:
+        if num < 1024.0 and num > -1024.0:
+            return "%3.1f%s" % (num, x)
+        num /= 1024.0
+    return "%3.1f%s" % (num, 'TB')
+
+
 class UnicodeMixin(object):
     def __unicode__(self):
         """

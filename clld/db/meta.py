@@ -27,6 +27,7 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
     object_mapper,
+    class_mapper,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -117,6 +118,10 @@ class Base(UnicodeMixin):
         d = copy(self.jsondata) or {}
         d.update(**kw)
         self.jsondata = d
+
+    @classmethod
+    def mapper_name(cls):
+        return class_mapper(cls).class_.__name__
 
     @property
     def jsondatadict(self):

@@ -2,7 +2,7 @@ from zope.interface import implementer, implementedBy
 
 from clld import RESOURCES
 from clld import interfaces
-from clld.web.adapters.base import Index, Representation, OctetStream
+from clld.web.adapters.base import Index, Representation, OctetStream, Json
 from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation
@@ -20,6 +20,10 @@ def includeme(config):
 
         if not rsc.with_adapters:
             continue
+
+        cls = type('Json%s' % rsc.model.mapper_name(), (Json,), {})
+        config.registry.registerAdapter(
+            cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)
 
         if rsc.with_index:
             specs.append(

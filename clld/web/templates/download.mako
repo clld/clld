@@ -3,11 +3,16 @@
 <h3>Downloads</h3>
 
 <div class="span5 well well-small">
-    <ul class="nav nav-tabs nav-stacked">
-    % for name, dl in request.registry.getUtilitiesFor(h.interfaces.IDownload):
-        <li><a href="${dl.url(request)}">${getattr(dl, 'description', dl.name)}</a></li>
+    <dl>
+    % for model, dls in h.get_downloads(request):
+        <dt>${_(model)}</dt>
+        % for dl in dls:
+        <dd>
+            <a href="${dl.url(request)}">${dl.label(req)}</a>
+        </dd>
+        % endfor
     % endfor
-    </ul>
+    </dl>
 </div>
 <div class="span6">
     <p>

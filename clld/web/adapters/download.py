@@ -10,6 +10,7 @@ from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
+from clld.util import format_size
 
 
 @implementer(IDownload)
@@ -43,6 +44,12 @@ class Download(object):
     def abspath(self, req):
         return path(AssetResolver().resolve(self.asset_spec(req)).abspath())
 
+    def size(self, req):
+        return format_size(self.abspath(req).size)
+
+    def label(self, req):
+        return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
+
     def create(self, req):
         p = self.abspath(req)
         if not p.dirname().exists():
@@ -67,9 +74,9 @@ It should be cited as
 
 {3}
 """.format(req.dataset.name,
-           '='*(len(req.dataset.name) + len(' data download')),
+           '='*(len(req.dataset.name.encode('utf8')) + len(' data download')),
            req.dataset.license,
-           TxtCitation(None).render(req.dataset, req)))
+           TxtCitation(None).render(req.dataset, req).encode('utf8')))
 
     def query(self, req):
         return DBSession.query(self.model).filter(self.model.active == True)\
@@ -102,10 +109,12 @@ class CsvDump(Download):
         self.writer.writerow(
             [f if isinstance(f, basestring) else f[1] for f in self.fields])
 
+    def row(self, req, fp, item, index):
+        return [getattr(item, f if isinstance(f, basestring) else f[0])
+                for f in self.fields]
+
     def dump(self, req, fp, item, index):
-        self.writer.writerow(
-            [getattr(item, f if isinstance(f, basestring) else f[0])
-             for f in self.fields])
+        self.writer.writerow(self.row(req, fp, item, index))
 
 
 class N3Dump(Download):

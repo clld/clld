@@ -25,17 +25,11 @@ from clld.web.adapters import get_adapter
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 from clld.lib import rdf
+from clld.util import xmlchars
 
 
 def rdf_namespace_attrs():
     return '\n'.join('xmlns:%s="%s"' % item for item in rdf.NAMESPACES.items())
-
-
-def xmlchars(text):
-    invalid = range(0x9)
-    invalid.extend([0xb, 0xc])
-    invalid.extend(range(0xe, 0x20))
-    return re.sub('|'.join('\\x%0.2X' % i for i in invalid), '', text)
 
 
 def urlescape(string):
@@ -82,6 +76,15 @@ class JSNamespace(object):
         return JS(self.prefix + '.' + name)
 
 JS_CLLD = JSNamespace('CLLD')
+
+
+def get_downloads(req):
+    for k, items in groupby(
+        sorted(
+            list(req.registry.getUtilitiesFor(interfaces.IDownload)), key=lambda t: t[0]),
+        lambda t: t[1].model.mapper_name() + 's',
+    ):
+        yield k, sorted([i[1] for i in items], key=lambda d: d.ext)
 
 
 def coins(req, obj, label=''):

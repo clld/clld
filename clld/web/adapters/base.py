@@ -56,6 +56,17 @@ class OctetStream(Renderable):
         return ctx.content
 
 
+@implementer(interfaces.IRepresentation)
+class Json(Renderable):
+    """
+    """
+    mimetype = 'application/json'
+    extension = 'json'
+
+    def render(self, ctx, req):
+        return pyramid_render('json', ctx, request=req)
+
+
 @implementer(interfaces.IIndex)
 class Index(Renderable):
     """Base class for adapters implementing IIndex

@@ -123,9 +123,6 @@ def create_downloads(**kw):
 
 
 def gbs(**kw):
-    def words(s):
-        return set(slug(s.strip(), remove_whitespace=False).split())
-
     add_args = [
         (("command",), dict(help="download|verify|update")),
         (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
@@ -140,6 +137,9 @@ def gbs(**kw):
 
 
 def gbs_func(command, args, sources=None):
+    def words(s):
+        return set(slug(s.strip(), remove_whitespace=False).split())
+
     log = args.log
     count = 0
     api_url = "https://www.googleapis.com/books/v1/volumes?"
@@ -173,10 +173,10 @@ def gbs_func(command, args, sources=None):
                 continue
 
         if command == 'verify':
-            stitle = source.title or source.booktitle
+            stitle = source.description or source.title or source.booktitle
             needs_check = False
             year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
-            if not year or year != str(source.year):
+            if not year or year != slug(source.year or unicode('')):
                 needs_check = True
             twords = words(stitle)
             iwords = words(
