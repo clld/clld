@@ -5,7 +5,9 @@ from subprocess import call
 from importlib import import_module
 import pkg_resources
 import re
+from tempfile import mktemp
 
+from path import path
 from sqlalchemy import create_engine
 
 from clld.db.meta import Base
@@ -69,12 +71,21 @@ def convert_dump(i, o):
 
 
 def postgres2sqlite(name):
-    call("pg_dump  -f /tmp/pg_{0}.sql --data-only --inserts {0}".format(name), shell=True)
-    convert_dump('/tmp/pg_{0}.sql'.format(name), '/tmp/sqlite_{0}.sql'.format(name))
-    engine = create_engine('sqlite:///{0}.sqlite'.format(name))
+    pg_sql = path(mktemp('.sql'))
+    sqlite_sql = path(mktemp('.sql'))
+    sqlite = mktemp('.sqlite')
+
+    call("pg_dump  -f {0} --data-only --inserts {1}".format(pg_sql, name), shell=True)
+    convert_dump(pg_sql, sqlite_sql)
+    engine = create_engine('sqlite:////{0}'.format(sqlite))
     m = import_module('{0}.models'.format(name))
     Base.metadata.create_all(engine)
-    call('sqlite3 -bail -init /tmp/sqlite_{0}.sql {0}.sqlite ".exit"'.format(name), shell=True)
+    call('sqlite3 -bail -init {0} {1} ".exit"'.format(sqlite_sql, sqlite), shell=True)
+    if pg_sql.exists():
+        pg_sql.remove()
+    if sqlite_sql.exists():
+        sqlite_sql.remove()
+    return sqlite
 
 
 if __name__ == '__main__':

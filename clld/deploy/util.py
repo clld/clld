@@ -10,6 +10,7 @@ import json
 import crypt
 import random
 from getpass import getpass
+import os
 
 try:  # pragma: no cover
     from fabric.api import sudo, run, local, put, env, cd
@@ -97,7 +98,8 @@ server {{
 
 _SUPERVISOR_TEMPLATE = """\
 [program:{app.name}]
-command={gunicorn} -u {app.name} -g {app.name} --limit-request-line 8000 --error-logfile {app.error_log} {app.config}
+command={newrelic} run-program {gunicorn} -u {app.name} -g {app.name} --limit-request-line 8000 --error-logfile {app.error_log} {app.config}
+environment=NEW_RELIC_CONFIG_FILE="{app.newrelic_config}"
 autostart=%s
 autorestart=%s
 redirect_stderr=True
@@ -106,6 +108,28 @@ SUPERVISOR_TEMPLATE = {
     'pause': _SUPERVISOR_TEMPLATE % ('false', 'false'),
     'run': _SUPERVISOR_TEMPLATE % ('true', 'true'),
 }
+
+NEWRELIC_TEMPLATE = """\
+[newrelic]
+license_key = {osenv[NEWRELIC_API_KEY]}
+app_name = {app.name}
+monitor_mode = {monitor_mode}
+log_file = {app.newrelic_log}
+log_level = warning
+ssl = false
+capture_params = true
+transaction_tracer.enabled = true
+transaction_tracer.transaction_threshold = apdex_f
+transaction_tracer.record_sql = raw
+transaction_tracer.stack_trace_threshold = 0.5
+transaction_tracer.explain_enabled = true
+transaction_tracer.explain_threshold = 0.5
+transaction_tracer.function_trace =
+error_collector.enabled = true
+error_collector.ignore_errors =
+browser_monitoring.auto_instrument = false
+thread_profiler.enabled = false
+"""
 
 _CONFIG_TEMPLATE = """\
 [app:{app.name}]
@@ -214,12 +238,15 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def get_template_variables(app):
+def get_template_variables(app, monitor_mode):
     return dict(
         app=app,
         env=env,
+        osenv=os.environ,
         config=config,
         gunicorn=app.bin('gunicorn_paster'),
+        newrelic=app.bin('newrelic-admin'),
+        monitor_mode=monitor_mode,
         auth='')
 
 
@@ -234,12 +261,29 @@ def supervisor(app, command, template_variables=None):
     sudo('/etc/init.d/supervisor start')
 
 
+def require_bibutils():
+    """
+    tar -xzvf bibutils_5.0_src.tgz -C /home/{app.name}
+    cd /home/{app.name}/bibutils_5.0
+    configure
+    make
+    sudo make install
+    """
+    tgz = app.src.joinpath('clld', 'tools',  'bibutils_5.0_src.tgz')
+    sudo('tar -xzvf {tgz} -C {app.home}'.format(tgz=tgz, app=app))
+    with cd(app.home.joinpath('bibutils_5.0')):
+        sudo('./configure')
+        sudo('make')
+        sudo('make install')
+
+
 def deploy(app, environment, with_alembic=False):
-    template_variables = get_template_variables(app)
+    template_variables = get_template_variables(
+        app, 'true' if environment == 'production' else 'false')
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()
-    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre', 'bibutils']:
+    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre']:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)
@@ -253,6 +297,8 @@ def deploy(app, environment, with_alembic=False):
         install_repos('clld')
         install_repos(app.name)
         sudo('webassets -m %s.assets build' % app.name)
+
+    require_bibutils(app)
 
     supervisor(app, 'pause', template_variables)
 
@@ -307,5 +353,6 @@ def deploy(app, environment, with_alembic=False):
             app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
     elif environment == 'production':
         create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
+        create_file_as_root(app.newrelic_config, NEWRELIC_TEMPLATE.format(**template_variables))
 
     service.reload('nginx')

@@ -11,6 +11,7 @@ from clld.web.adapters.md import TxtCitation
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.util import format_size
+from clld.scripts.postgres2sqlite import postgres2sqlite
 
 
 @implementer(IDownload)
@@ -50,19 +51,22 @@ class Download(object):
     def label(self, req):
         return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
 
-    def create(self, req):
+    def create(self, req, filename=None):
         p = self.abspath(req)
         if not p.dirname().exists():
             p.dirname().mkdir()
 
         with ZipFile(p, 'w', ZIP_DEFLATED) as zipfile:
-            fp = StringIO()
-            self.before(req, fp)
-            for i, item in enumerate(self.query(req)):
-                self.dump(req, fp, item, i)
-            self.after(req, fp)
-            fp.seek(0)
-            zipfile.writestr(self.name, fp.read())
+            if not filename:
+                fp = StringIO()
+                self.before(req, fp)
+                for i, item in enumerate(self.query(req)):
+                    self.dump(req, fp, item, i)
+                self.after(req, fp)
+                fp.seek(0)
+                zipfile.writestr(self.name, fp.read())
+            else:
+                zipfile.write(filename, self.name)
             zipfile.writestr('README.txt', """
 {0} data download
 {1}
@@ -126,3 +130,10 @@ class N3Dump(Download):
             fp.write(header)
             fp.write('\n\n')
         fp.write(body)
+
+
+class Sqlite(Download):
+    ext = 'sqlite'
+
+    def create(self, req):
+        super(Sqlite, self).create(req, filename=postgres2sqlite(self.pkg))

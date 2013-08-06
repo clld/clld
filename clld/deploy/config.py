@@ -27,12 +27,20 @@ class App(object):
         return path('/home').joinpath(self.name)
 
     @property
+    def newrelic_log(self):
+        return self.home.joinpath('newrelic.log')
+
+    @property
     def www(self):
         return self.home.joinpath('www')
 
     @property
     def config(self):
         return self.home.joinpath('config.ini')
+
+    @property
+    def newrelic_config(self):
+        return self.home.joinpath('newrelic.ini')
 
     @property
     def logs(self):
@@ -69,7 +77,7 @@ class App(object):
 APPS = dict((app.name, app) for app in [
     App('wold2', 8888, domain='wold.livingsources.org'),
     App('wals3', 8887, domain='wals.info'),
-    App('apics', 8886),
+    App('apics', 8886, domain='apics-online.info'),
     App('cgj', 8884),
     App('wow', 8883),
     App('glottolog2', 8882),

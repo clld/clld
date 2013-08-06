@@ -40,6 +40,7 @@ install_requires = [
     'requests',
     'rdflib',
     'colander',
+    'newrelic',
 ]
 
 if not PY3:
