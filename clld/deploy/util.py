@@ -112,7 +112,7 @@ SUPERVISOR_TEMPLATE = {
 
 NEWRELIC_TEMPLATE = """\
 [newrelic]
-license_key = {osenv[NEWRELIC_API_KEY]}
+license_key = {newrelic_api_key}
 app_name = {app.name}
 monitor_mode = {monitor_mode}
 log_file = {app.newrelic_log}
@@ -243,7 +243,7 @@ def get_template_variables(app, monitor_mode):
     return dict(
         app=app,
         env=env,
-        osenv=os.environ,
+        newrelic_api_key=os.environ.get('NEWRELIC_API_KEY'),
         config=config,
         gunicorn=app.bin('gunicorn_paster'),
         newrelic=app.bin('newrelic-admin'),
