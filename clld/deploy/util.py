@@ -293,7 +293,9 @@ def deploy(app, environment, with_alembic=False):
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()
-    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre', 'make']:
+    for pkg in [
+        'libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre', 'make', 'sqlite3'
+    ]:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)

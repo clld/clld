@@ -30,6 +30,7 @@ class BibTex(Metadata):
                 c.name for c in
                 list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
             data['booktitle'] = req.dataset.description
+            data['editor'] = ' and '.join([c.contributor.name for c in list(req.dataset.editors)])
         else:
             genre = 'collection'
             data['editor'] = ' and '.join([c.contributor.name for c in list(ctx.editors)])
@@ -42,7 +43,7 @@ class BibTex(Metadata):
             address=req.dataset.publisher_place,
             publisher=req.dataset.publisher_name,
             year=str(req.dataset.published.year),
-        )
+            **data)
 
     def render(self, ctx, req):
         return self.rec(ctx, req).__unicode__()
