@@ -76,6 +76,7 @@ server {{
     root {app.www};
 
     location / {{
+{auth}
             proxy_pass_header Server;
             proxy_set_header Host $http_host;
             proxy_redirect off;
@@ -261,7 +262,7 @@ def supervisor(app, command, template_variables=None):
     sudo('/etc/init.d/supervisor start')
 
 
-def require_bibutils():
+def require_bibutils(app):
     """
     tar -xzvf bibutils_5.0_src.tgz -C /home/{app.name}
     cd /home/{app.name}/bibutils_5.0
@@ -269,12 +270,21 @@ def require_bibutils():
     make
     sudo make install
     """
-    tgz = app.src.joinpath('clld', 'tools',  'bibutils_5.0_src.tgz')
-    sudo('tar -xzvf {tgz} -C {app.home}'.format(tgz=tgz, app=app))
-    with cd(app.home.joinpath('bibutils_5.0')):
-        sudo('./configure')
-        sudo('make')
-        sudo('make install')
+    if not exists('/usr/local/bin/bib2xml'):
+        tgz = app.venv.joinpath('src', 'clld', 'tools',  'bibutils_5.0_src.tgz')
+        sudo('tar -xzvf {tgz} -C {app.home}'.format(tgz=tgz, app=app))
+        with cd(app.home.joinpath('bibutils_5.0')):
+            sudo('./configure')
+            sudo('make')
+            sudo('make install')
+
+
+def uninstall(app):
+    for file_ in [app.supervisor, app.nginx_location, app.nginx_site]:
+        if exists(file_):
+            sudo('rm %s' % file_)
+    service.reload('nginx')
+    sudo('/etc/init.d/supervisor restart')
 
 
 def deploy(app, environment, with_alembic=False):
@@ -283,7 +293,7 @@ def deploy(app, environment, with_alembic=False):
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()
-    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre']:
+    for pkg in ['libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre', 'make']:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
     require.postgres.database(app.name, app.name)
@@ -330,6 +340,8 @@ def deploy(app, environment, with_alembic=False):
 
     create_file_as_root(
         app.config, CONFIG_TEMPLATES[environment].format(**template_variables))
+    create_file_as_root(
+        app.newrelic_config, NEWRELIC_TEMPLATE.format(**template_variables))
 
     supervisor(app, 'run', template_variables)
 
@@ -337,22 +349,41 @@ def deploy(app, environment, with_alembic=False):
     res = run('curl http://localhost:%s/_ping' % app.port)
     assert json.loads(res)['status'] == 'ok'
 
+    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
+    if pw:
+        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
+        template_variables['auth'] = """\
+    auth_basic "%s";
+    auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
+
     if environment == 'test':
         create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
         require.files.directory(
             str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
-
-        pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
-        if pw:
-            create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
-            template_variables['auth'] = """\
-        auth_basic "%s";
-        auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
-
         create_file_as_root(
             app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
     elif environment == 'production':
         create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
-        create_file_as_root(app.newrelic_config, NEWRELIC_TEMPLATE.format(**template_variables))
 
     service.reload('nginx')
+
+
+def run_script(app, script_name, *args):
+    with cd(app.home):
+        sudo(
+            '%s %s %s#%s %s' % (
+                app.bin('python'),
+                app.src.joinpath(app.name, 'scripts', '%s.py' % script_name),
+                app.config.basename(),
+                app.name,
+                ' '.join('%s' % arg for arg in args),
+            ),
+            user=app.name)
+
+
+def create_downloads(app):
+    dl_dir = app.src.joinpath(app.name, 'static', 'download')
+    require.files.directory(dl_dir, use_sudo=True, mode="777")
+    # run the script to create the exports from the database as glottolog3 user
+    run_script(app, 'create_downloads')
+    require.files.directory(dl_dir, use_sudo=True, mode="755")
