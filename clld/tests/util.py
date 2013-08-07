@@ -1,5 +1,11 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+import threading
+from collections import namedtuple
+import time
+from wsgiref.simple_server import make_server
 import unittest
+import re
 import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
@@ -13,6 +19,8 @@ from sqlalchemy import create_engine
 from webtest import TestApp
 from webob.request import environ_add_POST
 from zope.interface import Interface
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -222,3 +230,156 @@ class TestWithApp(TestWithEnv):
     def setUp(self):
         TestWithEnv.setUp(self)
         self.app = ExtendedTestApp(self.env['app'])
+
+
+class ServerThread(threading.Thread):
+    """ Run WSGI server on a background thread.
+
+    Pass in WSGI app object and serve pages from it for Selenium browser.
+    """
+    def __init__(self, app, host='0.0.0.0:8880'):
+        threading.Thread.__init__(self)
+        self.app = app
+        self.host, self.port = host.split(':')
+        self.srv = None
+
+    def run(self):
+        """
+        Open WSGI server to listen to HOST_BASE address
+        """
+        self.srv = make_server(self.host, int(self.port), self.app)
+        try:
+            self.srv.serve_forever()
+        except:
+            import traceback
+            traceback.print_exc()
+            # Failed to start
+            self.srv = None
+
+    def quit(self):
+        """
+        """
+        if self.srv:
+            self.srv.shutdown()
+
+
+class PageObject(object):
+    def __init__(self, browser, eid, url=None):
+        self.browser = browser
+        if url:
+            self.browser.get(url)
+        self.e = self.browser.find_element_by_id(eid)
+
+
+class Map(PageObject):
+    def __init__(self, browser, eid=None, url=None):
+        super(Map, self).__init__(browser, eid or 'map-container', url=url)
+
+    def test_show_marker(self, index=0):
+        time.sleep(1)
+        assert not self.e.find_elements_by_class_name('leaflet-popup-content')
+        marker = self.e.find_elements_by_class_name('leaflet-marker-icon')
+        marker[0].click()
+        time.sleep(0.3)
+        assert self.e.find_elements_by_class_name('leaflet-popup-content')
+
+    def test_show_legend(self, name='iconsize'):
+        e = self.e.find_element_by_id('legend-%s-container' % name)
+        assert not e.is_displayed()
+        opener = self.e.find_element_by_id('legend-%s-opener' % name)
+        opener.click()
+        time.sleep(0.3)
+        assert e.is_displayed()
+        opener.click()  # TODO: better test would be to click somewhere else!
+        time.sleep(0.3)
+        assert not e.is_displayed()
+
+
+class DataTable(PageObject):
+    info_pattern = re.compile('\s+'.join([
+        'Showing', '(?P<offset>[0-9,]+)',
+        'to', '(?P<limit>[0-9,]+)',
+        'of', '(?P<filtered>[0-9,]+)',
+        'entries(\s*\(filtered from (?P<total>[0-9,]+) total entries\))?',
+    ]))
+
+    def __init__(self, browser, eid=None, url=None):
+        super(DataTable, self).__init__(browser, eid or 'list-container', url=url)
+
+    def get_info(self):
+        """
+        Showing 1 to 100 of 431 entries (filtered from 4,039 total entries)
+        """
+        fieldnames = 'offset limit filtered total'
+        res = []
+        info = self.e.find_element_by_class_name('dataTables_info')
+        m = self.info_pattern.search(info.text.strip())
+        if not m:
+            print(info.text)
+            raise ValueError()
+        for n in fieldnames.split():
+            n = m.group(n)
+            if n:
+                n = int(n.replace(',', ''))
+            res.append(n)
+        return namedtuple('Info', fieldnames)(*res)
+
+    def get_first_row(self):
+        res = []
+        row = self.e.find_element_by_xpath('//tbody/tr')
+        for cell in row.find_elements_by_tag_name('td'):
+            res.append(cell.text.strip())
+        return res
+
+    def filter(self, name, value):
+        filter_ = self.e.find_element_by_id('dt-filter-%s' % name)
+        if filter_.find_elements_by_tag_name('option'):
+            filter_ = Select(filter_)
+            filter_.select_by_visible_text(value)
+        else:
+            filter_.send_keys(value)
+        time.sleep(2)
+
+    def sort(self, label):
+        sort = None
+        for e in self.e.find_elements_by_xpath("//th[@class='sorting']"):
+            if e.text.strip().startswith(label):
+                sort = e
+        assert sort
+        sort.click()
+        time.sleep(2)
+
+
+class TestWithSelenium(unittest.TestCase):
+    """run tests using selenium with the firefox driver
+    """
+    host = '0.0.0.0:8880'
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Create a Firefox test browser instance with hacked settings.
+
+        We do this only once per testing module.
+        """
+        profile = webdriver.firefox.firefox_profile.FirefoxProfile()
+        cls.browser = webdriver.Firefox(firefox_profile=profile)
+        cls.server = ServerThread(cls.app, cls.host)
+        cls.server.start()
+        time.sleep(0.3)
+        assert cls.server.srv
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        cls.server.quit()
+
+    def url(self, path):
+        assert path.startswith('/')
+        return 'http://%s%s' % (self.host, path)
+
+    def get_map(self, path, eid=None):
+        return Map(self.browser, eid=eid, url=self.url(path))
+
+    def get_datatable(self, path, eid=None):
+        return DataTable(self.browser, eid=eid, url=self.url(path))

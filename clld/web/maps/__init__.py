@@ -1,8 +1,9 @@
 from markupsafe import Markup
 from pyramid.renderers import render
 
-from clld.interfaces import IDataTable, IMapMarker
+from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
+from clld.web.util.htmllib import HTML
 from clld.web.adapters import GeoJsonLanguages
 
 
@@ -18,6 +19,51 @@ class Layer(object):
             setattr(self, k, v)
 
 
+class Legend(object):
+    """Object holding all data necessary to render a navpill with a dropdown above a map.
+    """
+    def __init__(self, map_, name, items, label=None, stay_open=False, item_attrs=None):
+        self.map = map_
+        self.name = name
+        self.label = label or name.capitalize()
+        self.items = items
+        self.stay_open = stay_open
+        self.item_attrs = item_attrs or {}
+
+    def format_id(self, suffix=None):
+        suffix = suffix or ''
+        if suffix:
+            suffix = '-' + suffix
+        return 'legend-%s%s' % (self.name, suffix)
+
+    def render_item(self, item):
+        if not isinstance(item, (tuple, list)):
+            item = [item]
+        attrs = self.item_attrs
+        if self.stay_open:
+            class_ = attrs.get('class', attrs.get('class_', ''))
+            attrs['class'] = class_ + ' stay-open'
+        return HTML.li(*item, **attrs)
+
+    def render(self):
+        a_attrs = {
+            'class': 'dropdown-toggle',
+            'data-toggle': "dropdown",
+            'href': "#",
+            'id': self.format_id('opener')}
+        ul_class = 'dropdown-menu'
+        if self.stay_open:
+            ul_class += ' stay-open'
+        return HTML.li(
+            HTML.a(self.label, HTML.b(class_='caret'), **a_attrs),
+            HTML.ul(
+                *map(self.render_item, self.items),
+                **dict(class_=ul_class, id=self.format_id('container'))),
+            class_='dropdown',
+            id=self.format_id(),
+        )
+
+
 class Map(object):
     """Map objects bridge the technology divide between server side python code and
     client side leaflet maps.
@@ -27,6 +73,7 @@ class Map(object):
         self.ctx = ctx
         self.eid = eid
         self._layers = None
+        self._legends = None
         self.map_marker = req.registry.getUtility(IMapMarker)
 
     @property
@@ -53,6 +100,65 @@ class Map(object):
     def render(self):
         return Markup(render(
             'clld:web/templates/map.mako', {'map': self}, request=self.req))
+
+    @property
+    def legends(self):
+        if self._legends is None:
+            self._legends = list(self.get_legends())
+        return self._legends
+
+    def get_legends(self):
+        if len(self.layers) > 1:
+            items = []
+            total = 0
+            repr_attrs = dict(class_='pull-right stay-open', style="padding-right: 10px;")
+
+            for layer in self.layers:
+                representation = ''
+                if hasattr(layer, 'representation'):
+                    total += layer.representation
+                    representation = HTML.span(str(layer.representation), **repr_attrs)
+                items.append([
+                    HTML.label(
+                        HTML.input(
+                            class_="stay-open",
+                            type="checkbox",
+                            checked="checked",
+                            onclick=helpers.JS_CLLD.mapToggleLayer(self.eid, layer.id, helpers.JS("this"))),
+                        getattr(layer, 'marker', ''),
+                        layer.name,
+                        class_="checkbox inline stay-open",
+                        style="margin-left: 5px; margin-right: 5px;",
+                    ),
+                    representation,
+                ])
+            if total:
+                items.append(HTML.span(HTML.b(str(total)), **repr_attrs))
+            yield Legend(
+                self,
+                'layers',
+                items,
+                label='Legend',
+                stay_open=True,
+                item_attrs=dict(style='clear: right'))
+        items = []
+        for size in [15, 20, 30, 40]:
+            attrs = dict(name="iconsize", value=str(size), type="radio")
+            if size == self.options().get('icon_size', 30):
+                attrs['checked'] = 'checked'
+            items.append(HTML.label(
+                HTML.input(onclick=helpers.JS_CLLD.mapResizeIcons(self.eid), **attrs),
+                HTML.img(
+                    height=str(size),
+                    width=str(size),
+                    src=self.req.registry.getUtility(IIcon, 'cff6600').url(self.req)),
+                class_="radio",
+                style="margin-left: 5px; margin-right: 5px;"))
+        yield Legend(
+            self,
+            'iconsize',
+            items,
+            label='Icon size')
 
 
 class ParameterMap(Map):
