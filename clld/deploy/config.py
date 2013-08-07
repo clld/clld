@@ -11,6 +11,7 @@ class App(object):
         self.port = port
         self.host = kw.get('host', '%s.clld.org' % name)
 
+        kw.setdefault('deploy_duration', 1)
         for k, v in kw.items():
             setattr(self, k, v)
 
@@ -81,7 +82,7 @@ APPS = dict((app.name, app) for app in [
     App('cgj', 8884),
     App('wow', 8883),
     App('glottolog2', 8882),
-    App('glottolog3', 8881, domain='glottolog.org'),
+    App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2),
     App('solr', 8080),
 ])
 

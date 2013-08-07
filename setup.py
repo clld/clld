@@ -50,6 +50,7 @@ tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     'pep8',
     'mock',
+    'selenium',
 ]
 
 if not PY3:

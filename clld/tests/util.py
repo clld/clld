@@ -19,8 +19,11 @@ from sqlalchemy import create_engine
 from webtest import TestApp
 from webob.request import environ_add_POST
 from zope.interface import Interface
-from selenium import webdriver
-from selenium.webdriver.support.ui import Select
+try:
+    from selenium import webdriver
+    from selenium.webdriver.support.ui import Select
+except ImportError:
+    webdriver = None
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -264,7 +267,14 @@ class ServerThread(threading.Thread):
 
 
 class PageObject(object):
+    """Virtual base class for objects we wish to interact with in selenium tests.
+    """
     def __init__(self, browser, eid, url=None):
+        """
+        :param browser: The selenium webdriver instance.
+        :param eid: Element id of a dom object.
+        :param url: If specified, we first navigate to this url.
+        """
         self.browser = browser
         if url:
             self.browser.get(url)
@@ -307,8 +317,7 @@ class DataTable(PageObject):
         super(DataTable, self).__init__(browser, eid or 'list-container', url=url)
 
     def get_info(self):
-        """
-        Showing 1 to 100 of 431 entries (filtered from 4,039 total entries)
+        """Parses the DataTables result info.
         """
         fieldnames = 'offset limit filtered total'
         res = []
@@ -325,6 +334,9 @@ class DataTable(PageObject):
         return namedtuple('Info', fieldnames)(*res)
 
     def get_first_row(self):
+        """
+        :return: list with text-values of the cells of the first table row.
+        """
         res = []
         row = self.e.find_element_by_xpath('//tbody/tr')
         for cell in row.find_elements_by_tag_name('td'):
@@ -332,6 +344,10 @@ class DataTable(PageObject):
         return res
 
     def filter(self, name, value):
+        """filters the table by using value for the column specified by name.
+
+        Note that this abstracts the different ways filter controls can be implemented.
+        """
         filter_ = self.e.find_element_by_id('dt-filter-%s' % name)
         if filter_.find_elements_by_tag_name('option'):
             filter_ = Select(filter_)
@@ -341,6 +357,8 @@ class DataTable(PageObject):
         time.sleep(2)
 
     def sort(self, label):
+        """Triggers a table sort by clicking on the th Element specified by label.
+        """
         sort = None
         for e in self.e.find_elements_by_xpath("//th[@class='sorting']"):
             if e.text.strip().startswith(label):

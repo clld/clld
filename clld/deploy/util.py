@@ -11,6 +11,9 @@ import crypt
 import random
 from getpass import getpass
 import os
+from datetime import datetime, timedelta
+
+from pytz import timezone, utc
 
 try:  # pragma: no cover
     from fabric.api import sudo, run, local, put, env, cd
@@ -94,7 +97,24 @@ server {{
     location /static/ {{
             alias {app.venv}/src/{app.name}/{app.name}/static/;
     }}
+
+    error_page 502 503 =502 /503.html;
+    location = /503.html {{
+        root {app.www};
+    }}
 }}
+"""
+
+HTTP_503_TEMPLATE = """\
+<html>
+    <head>
+        <title>Service Unavailable</title>
+    </head>
+<body>
+<h1>{app.name} is currently down for maintenance</h1>
+<p>We expect to be back around {timestamp}. Thanks for your patience.</p>
+</body>
+</html>
 """
 
 _SUPERVISOR_TEMPLATE = """\
@@ -239,7 +259,7 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def get_template_variables(app, monitor_mode):
+def get_template_variables(app, monitor_mode=False):
     return dict(
         app=app,
         env=env,
@@ -287,9 +307,22 @@ def uninstall(app):
     sudo('/etc/init.d/supervisor restart')
 
 
+def maintenance(app, hours=2, template_variables=None):
+    """turn maintenance mode on|off
+    """
+    template_variables = template_variables or get_template_variables(app)
+    ts = utc.localize(datetime.utcnow() + timedelta(hours=hours))
+    ts = ts.astimezone(timezone('Europe/Berlin')).strftime('%Y-%m-%d %H:%M %Z%z')
+    require.files.directory(app.www, use_sudo=True)
+    create_file_as_root(
+        app.www.joinpath('503.html'),
+        HTTP_503_TEMPLATE.format(timestamp=ts, **template_variables))
+
+
 def deploy(app, environment, with_alembic=False):
     template_variables = get_template_variables(
         app, 'true' if environment == 'production' else 'false')
+
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])
     require.postgres.server()
@@ -312,6 +345,31 @@ def deploy(app, environment, with_alembic=False):
 
     require_bibutils(app)
 
+    #
+    # configure nginx:
+    #
+    require.files.directory(
+        str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
+    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
+    if pw:
+        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
+        template_variables['auth'] = """\
+    auth_basic "%s";
+    auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
+
+    if environment == 'test':
+        create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
+        create_file_as_root(
+            app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
+    elif environment == 'production':
+        create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
+
+    maintenance(app, hours=app.deploy_duration, template_variables=template_variables)
+    service.reload('nginx')
+
+    #
+    # configure supervisor, but don't start the app yet
+    #
     supervisor(app, 'pause', template_variables)
 
     #
@@ -351,23 +409,9 @@ def deploy(app, environment, with_alembic=False):
     res = run('curl http://localhost:%s/_ping' % app.port)
     assert json.loads(res)['status'] == 'ok'
 
-    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
-    if pw:
-        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
-        template_variables['auth'] = """\
-    auth_basic "%s";
-    auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
 
-    if environment == 'test':
-        create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
-        require.files.directory(
-            str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
-        create_file_as_root(
-            app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
-    elif environment == 'production':
-        create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
 
-    service.reload('nginx')
+
 
 
 def run_script(app, script_name, *args):
