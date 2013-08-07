@@ -247,6 +247,9 @@ def add_route_and_view(config, route_name, route_pattern, view, **kw):
 
 
 def register_resource(config, name, model, interface, with_index=False):
+    # in case of tests, this method may be called multiple times!
+    if [rsc for rsc in RESOURCES if rsc.name == name]:
+        return
     RESOURCES.append(Resource(name, model, interface, with_index=with_index))
     config.register_adapter(excel.ExcelAdapter, interface)
     config.add_route_and_view(

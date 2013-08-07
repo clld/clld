@@ -278,7 +278,10 @@ class PageObject(object):
         self.browser = browser
         if url:
             self.browser.get(url)
-        self.e = self.browser.find_element_by_id(eid)
+        try:
+            self.e = self.browser.find_element_by_id(eid)
+        except:
+            self.e = self.browser.find_element_by_class_name(eid)
 
 
 class Map(PageObject):
@@ -314,7 +317,8 @@ class DataTable(PageObject):
     ]))
 
     def __init__(self, browser, eid=None, url=None):
-        super(DataTable, self).__init__(browser, eid or 'list-container', url=url)
+        time.sleep(0.5)
+        super(DataTable, self).__init__(browser, eid or 'dataTables_wrapper', url=url)
 
     def get_info(self):
         """Parses the DataTables result info.
@@ -323,9 +327,6 @@ class DataTable(PageObject):
         res = []
         info = self.e.find_element_by_class_name('dataTables_info')
         m = self.info_pattern.search(info.text.strip())
-        if not m:
-            print(info.text)
-            raise ValueError()
         for n in fieldnames.split():
             n = m.group(n)
             if n:
