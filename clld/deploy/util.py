@@ -16,7 +16,8 @@ from datetime import datetime, timedelta
 from pytz import timezone, utc
 
 try:  # pragma: no cover
-    from fabric.api import sudo, run, local, put, env, cd
+    from fabric.api import sudo, run, local, put, env, cd, task
+    env.use_ssh_config = True
     from fabric.contrib.console import confirm
     from fabric.contrib.files import exists
     from fabtools import require
@@ -31,8 +32,13 @@ except ImportError:  # pragma: no cover
 from clld.deploy import config
 
 
+# we prevent the tasks defined here from showing up in fab --list, because we only
+# want the wrapped version imported from clld.deploy.tasks to be listed.
+__all__ = []
+
 DEFAULT_SITE = """\
 server {
+        listen 80 default_server;
         root /usr/share/nginx/www;
         index index.html index.htm;
         server_name localhost;
@@ -271,6 +277,7 @@ def get_template_variables(app, monitor_mode=False):
         auth='')
 
 
+@task
 def supervisor(app, command, template_variables=None):
     template_variables = template_variables or get_template_variables(app)
     assert command in SUPERVISOR_TEMPLATE
@@ -299,6 +306,7 @@ def require_bibutils(app):
             sudo('make install')
 
 
+@task
 def uninstall(app):
     for file_ in [app.supervisor, app.nginx_location, app.nginx_site]:
         if exists(file_):
@@ -307,6 +315,7 @@ def uninstall(app):
     sudo('/etc/init.d/supervisor restart')
 
 
+@task
 def maintenance(app, hours=2, template_variables=None):
     """turn maintenance mode on|off
     """
@@ -319,6 +328,7 @@ def maintenance(app, hours=2, template_variables=None):
         HTTP_503_TEMPLATE.format(timestamp=ts, **template_variables))
 
 
+@task
 def deploy(app, environment, with_alembic=False):
     template_variables = get_template_variables(
         app, 'true' if environment == 'production' else 'false')
@@ -405,15 +415,12 @@ def deploy(app, environment, with_alembic=False):
 
     supervisor(app, 'run', template_variables)
 
-    time.sleep(3)
+    time.sleep(5)
     res = run('curl http://localhost:%s/_ping' % app.port)
     assert json.loads(res)['status'] == 'ok'
 
 
-
-
-
-
+@task
 def run_script(app, script_name, *args):
     with cd(app.home):
         sudo(
@@ -427,6 +434,7 @@ def run_script(app, script_name, *args):
             user=app.name)
 
 
+@task
 def create_downloads(app):
     dl_dir = app.src.joinpath(app.name, 'static', 'download')
     require.files.directory(dl_dir, use_sudo=True, mode="777")

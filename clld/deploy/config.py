@@ -1,6 +1,9 @@
 from path import path
 
 
+SERVERS = ['cldbstest', 'clld1']
+
+
 def repos(name):
     return 'git://github.com/clld/%s.git' % name
 
@@ -12,8 +15,11 @@ class App(object):
         self.host = kw.get('host', '%s.clld.org' % name)
 
         kw.setdefault('deploy_duration', 1)
+        kw.setdefault('production', SERVERS[0])
+        kw.setdefault('test', SERVERS[1])
         for k, v in kw.items():
             setattr(self, k, v)
+        assert self.production != self.test
 
     @property
     def src(self):
@@ -76,14 +82,15 @@ class App(object):
 
 
 APPS = dict((app.name, app) for app in [
-    App('wold2', 8888, domain='wold.livingsources.org'),
-    App('wals3', 8887, domain='wals.info'),
-    App('apics', 8886, domain='apics-online.info'),
-    App('cgj', 8884),
-    App('wow', 8883),
+    App('wold2', 8888, domain='wold.livingsources.org', test=SERVERS[0], production=SERVERS[1]),
+    App('wals3', 8887, domain='wals.info', test=SERVERS[0], production=SERVERS[1]),
+    App('apics', 8886, domain='apics-online.info', test=SERVERS[0], production=SERVERS[1]),
+    App('cgj', 8884, test=SERVERS[0], production=SERVERS[1]),
+    App('wow', 8883, test=SERVERS[1]),
     App('glottolog2', 8882),
-    App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2),
+    App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, test=SERVERS[1], production=SERVERS[0]),
     App('solr', 8080),
+    App('glottologcurator', 8889, test=SERVERS[1]),
 ])
 
 ERROR_EMAIL = 'robert_forkel@eva.mpg.de'
