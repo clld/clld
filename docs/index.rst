@@ -21,6 +21,7 @@ Contents:
     linkeddata
     protocols
     extending
+    deployment
 
 
 Indices and tables
