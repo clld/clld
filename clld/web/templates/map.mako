@@ -1,6 +1,6 @@
 <% options = map.options() %>
 % if options.get('sidebar'):
-<div>
+<div id="map-container">
     % if hasattr(map, 'legend'):
     ${map.legend()}
     % endif
