@@ -7,5 +7,6 @@
     % if list(request.registry.getUtilitiesFor(h.interfaces.IDownload)):
     ${util.contextnavitem('download')}
     % endif
+    ${util.contextnavitem('contact')}
 </%def>
 ${next.body()}

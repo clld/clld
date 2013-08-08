@@ -6,7 +6,7 @@ from clld.web.adapters.base import Index, Representation, OctetStream, Json
 from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation
-from clld.web.adapters.rdf import Rdf
+from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
 from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 
@@ -42,6 +42,14 @@ def includeme(config):
                 notation.mimetype,
                 notation.extension,
                 name + '/rdf.mako', {'rdflibname': notation.name}))
+
+        rdf_xml = RDF_NOTATIONS['xml']
+        specs.append((
+            interface,
+            RdfIndex,
+            rdf_xml.mimetype,
+            rdf_xml.extension,
+            'index_rdf.mako', {'rdflibname': rdf_xml.name}))
 
     specs.append(
         (interfaces.IContribution, Representation, 'application/vnd.clld.md+xml',

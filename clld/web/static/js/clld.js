@@ -519,10 +519,14 @@ CLLD.mapShowInfoWindow = function(eid, layer) {
 };
 
 CLLD.mapResizeIcons = function(eid, size) {
-    var map = CLLD.Maps[eid];
+    var hidden, map = CLLD.Maps[eid];
     size = size === undefined ? $('input[name=iconsize]:checked').val(): size;
     map.eachMarker(function(marker){
+        hidden = marker._icon.style.display == 'none';
         marker.setIcon(map.icon(marker.feature, parseInt(size)));
+        if (hidden) {
+            marker._icon.style.display = 'none';
+        }
     });
 };
 

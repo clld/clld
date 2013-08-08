@@ -316,6 +316,7 @@ def get_configurator(pkg, *utilities, **kw):
 
     config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
     config.add_route_and_view('download', '/download', lambda r: {}, renderer='download.mako')
+    config.add_route_and_view('contact', '/contact', lambda r: {}, renderer='contact.mako')
     config.add_route_and_view('_js', '/_js', js, http_cache=3600)
 
     # add some maintenance hatches

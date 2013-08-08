@@ -50,8 +50,13 @@ ${TxtCitation.render(request.dataset, request)}
     </void:Dataset>
     % for rsc in RESOURCES:
     <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-        <void:dataDump rdf:resource="${request.route_url(rsc.name + 's_alt', ext='rdf')}"/>
-        ##<void:entities>${count}</void:entities>'
+        <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
+        % if not dls:
+        <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
+        % endif
+        % for dl in dls:
+        <void:dataDump rdf:resource="${dl.url(request)}"/>
+        % endfor
     </void:Dataset>
     % endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">

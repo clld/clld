@@ -40,7 +40,10 @@ def normalize_markup(s):
         else:
             span.replace_with(span.string)
 
-    return unicode(soup.html.body.string).strip()
+    s = soup.html.body.string
+    if not s:
+        return
+    return unicode(s).strip()
 
 
 class Result(object):

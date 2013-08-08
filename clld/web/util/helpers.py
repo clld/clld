@@ -87,6 +87,13 @@ def get_downloads(req):
         yield k, sorted([i[1] for i in items], key=lambda d: d.ext)
 
 
+def get_rdf_dumps(req, model):
+    rdf_exts = [n.extension for n in rdf.FORMATS.values()]
+    for name, dl in req.registry.getUtilitiesFor(interfaces.IDownload):
+        if dl.model == model and dl.ext in rdf_exts:
+            yield dl
+
+
 def coins(req, obj, label=''):
     if not isinstance(obj, bibtex.Record):
         adapter = get_adapter(interfaces.IMetadata, obj, req, ext='md.bib')
