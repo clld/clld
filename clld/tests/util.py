@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 import threading
 from collections import namedtuple
 import time
-from wsgiref.simple_server import make_server
+from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
 import warnings
@@ -235,6 +235,11 @@ class TestWithApp(TestWithEnv):
         self.app = ExtendedTestApp(self.env['app'])
 
 
+class Handler(WSGIRequestHandler):
+    def log_message(self, *args, **kw):
+        return
+
+
 class ServerThread(threading.Thread):
     """ Run WSGI server on a background thread.
 
@@ -250,7 +255,7 @@ class ServerThread(threading.Thread):
         """
         Open WSGI server to listen to HOST_BASE address
         """
-        self.srv = make_server(self.host, int(self.port), self.app)
+        self.srv = make_server(self.host, int(self.port), self.app, handler_class=Handler)
         try:
             self.srv.serve_forever()
         except:
@@ -278,10 +283,14 @@ class PageObject(object):
         self.browser = browser
         if url:
             self.browser.get(url)
+        self.eid = eid
+
+    @property
+    def e(self):
         try:
-            self.e = self.browser.find_element_by_id(eid)
+            return self.browser.find_element_by_id(self.eid)
         except:
-            self.e = self.browser.find_element_by_class_name(eid)
+            return self.browser.find_element_by_class_name(self.eid)
 
 
 class Map(PageObject):
@@ -338,11 +347,14 @@ class DataTable(PageObject):
         """
         :return: list with text-values of the cells of the first table row.
         """
-        res = []
-        row = self.e.find_element_by_xpath('//tbody/tr')
-        for cell in row.find_elements_by_tag_name('td'):
-            res.append(cell.text.strip())
-        return res
+        table = None
+        for t in self.e.find_elements_by_tag_name('table'):
+            if 'dataTable' in t.get_attribute('class'):
+                table = t
+                break
+        assert table
+        tr = table.find_element_by_tag_name('tbody').find_element_by_tag_name('tr')
+        return [td.text.strip() for td in tr.find_elements_by_tag_name('td')]
 
     def filter(self, name, value):
         """filters the table by using value for the column specified by name.
@@ -355,7 +367,7 @@ class DataTable(PageObject):
             filter_.select_by_visible_text(value)
         else:
             filter_.send_keys(value)
-        time.sleep(2)
+        time.sleep(2.5)
 
     def sort(self, label):
         """Triggers a table sort by clicking on the th Element specified by label.
@@ -366,7 +378,7 @@ class DataTable(PageObject):
                 sort = e
         assert sort
         sort.click()
-        time.sleep(2)
+        time.sleep(2.5)
 
 
 class TestWithSelenium(unittest.TestCase):
@@ -381,6 +393,10 @@ class TestWithSelenium(unittest.TestCase):
 
         We do this only once per testing module.
         """
+        import logging
+        selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+        selenium_logger.setLevel(logging.WARNING)
+
         profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         cls.browser = webdriver.Firefox(firefox_profile=profile)
         cls.server = ServerThread(cls.app, cls.host)

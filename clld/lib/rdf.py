@@ -56,16 +56,17 @@ def properties_as_xml_snippet(subject, props):
     if isinstance(subject, basestring):
         subject = URIRef(subject)
     g = ClldGraph()
-    for p, o in props:
-        if ':' in p:
-            prefix, name = p.split(':')
-            p = getattr(NAMESPACES[prefix], name)
-        if isinstance(o, basestring):
-            if o.startswith('http://') or o.startswith('https://'):
-                o = URIRef(o)
-            else:
-                o = Literal(o)
-        g.add((subject, p, o))
+    if props:
+        for p, o in props:
+            if ':' in p:
+                prefix, name = p.split(':')
+                p = getattr(NAMESPACES[prefix], name)
+            if isinstance(o, basestring):
+                if o.startswith('http://') or o.startswith('https://'):
+                    o = URIRef(o)
+                else:
+                    o = Literal(o)
+            g.add((subject, p, o))
     res = []
     in_desc = False
     for line in g.serialize(format='xml').split('\n'):
