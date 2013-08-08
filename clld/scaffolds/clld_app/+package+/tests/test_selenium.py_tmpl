@@ -1,0 +1,7 @@
+from clld.tests.util import TestWithSelenium
+
+import {{package}}
+
+
+class Tests(TestWithSelenium):
+    app = {{package}}.main({}, **{'sqlalchemy.url': 'postgres://robert@/{{package}}'})
