@@ -443,3 +443,14 @@ def create_downloads(app):
     # run the script to create the exports from the database as glottolog3 user
     run_script(app, 'create_downloads')
     require.files.directory(dl_dir, use_sudo=True, mode="755")
+
+
+def newrelic_sysmond():
+    """
+    wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list
+    apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys ...
+    apt-get update
+    apt-get install newrelic-sysmond
+    nrsysmond-config --set license_key=...
+    /etc/init.d/newrelic-sysmond start
+    """
