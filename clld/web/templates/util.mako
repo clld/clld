@@ -152,7 +152,7 @@
 <%def name="language_meta(lang=None)">
     <% lang = lang or ctx %>
     <div class="accordion" id="sidebar-accordion">
-        % if request.map:
+        % if getattr(request, 'map', False):
         <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="Map" open="${True}">
             ${request.map.render()}
             <p>Coordinates: ${lang.latitude}, ${lang.longitude}</p>

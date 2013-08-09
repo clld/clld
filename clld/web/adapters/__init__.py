@@ -124,6 +124,10 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
     """
     adapters = dict(get_adapters(interface, ctx, req))
 
+    if not ext and not name and (not req.accept or str(req.accept) == '*/*'):
+        # force text/html in case there are no specific criteria to decide
+        ext = 'html'
+
     if ext:
         # find adapter by requested file extension
         adapter = [r for r in adapters.values() if r.extension == ext]
