@@ -3,7 +3,8 @@
 <%block name="properties">
     <rdf:type rdf:resource="${str(h.rdf.NAMESPACES['bibo']) + (TYPE_MAP.get(ctx.type) or 'bibo:Document').split(':')[1]}"/>
 
-    % for l in request.db.query(h.models.Language).join(h.models.LanguageSource).filter(h.models.LanguageSource.source_pk == ctx.pk):
+    ##% for l in request.db.query(h.models.Language).join(h.models.LanguageSource).filter(h.models.LanguageSource.source_pk == ctx.pk):
+    % for l in ctx.languages:
     <dcterms:references rdf:resource="${request.resource_url(l)}"/>
     % endfor
     % if getattr(ctx, 'url', None):

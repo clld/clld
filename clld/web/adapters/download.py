@@ -2,11 +2,12 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
 from cStringIO import StringIO
 from contextlib import closing
+import time
 
 from path import path
 from zope.interface import implementer
 from pyramid.path import AssetResolver
-from sqlalchemy.orm import joinedload, class_mapper
+from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
 from clld.lib.dsv import UnicodeCsvWriter
 from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
@@ -14,8 +15,28 @@ from clld.web.adapters.md import TxtCitation
 from clld.web.util.helpers import rdf_namespace_attrs
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
+from clld.db.models.common import Language, Source, LanguageIdentifier
 from clld.util import format_size
 from clld.scripts.postgres2sqlite import postgres2sqlite
+
+
+def page_query(q, n=1000):
+    """
+    http://stackoverflow.com/a/1217947
+    """
+    s = time.time()
+    offset = 0
+    while True:
+        r = False
+        for elem in q.limit(n).offset(offset):
+            r = True
+            yield elem
+        offset += n
+        e = time.time()
+        print e - s, offset, 'done'
+        s = e
+        if not r:
+            break
 
 
 @implementer(IDownload)
@@ -68,7 +89,7 @@ class Download(object):
             # covers all relevant metadata.
             with closing(GzipFile(p, 'w')) as fp:
                 self.before(req, fp)
-                for i, item in enumerate(self.query(req)):
+                for i, item in enumerate(page_query(self.query(req))):
                     self.dump(req, fp, item, i)
                 self.after(req, fp)
         else:
@@ -76,7 +97,7 @@ class Download(object):
                 if not filename:
                     fp = StringIO()
                     self.before(req, fp)
-                    for i, item in enumerate(self.query(req)):
+                    for i, item in enumerate(page_query(self.query(req))):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
                     fp.seek(0)
@@ -99,8 +120,15 @@ It should be cited as
            TxtCitation(None).render(req.dataset, req).encode('utf8')))
 
     def query(self, req):
-        return DBSession.query(self.model).filter(self.model.active == True)\
-            .order_by(self.model.pk)
+        q = DBSession.query(self.model).filter(self.model.active == True)
+        if self.model == Language:
+            q = q.options(
+                joinedload_all(Language.languageidentifier, LanguageIdentifier.identifier),
+                #joinedload(Language.sources)
+            )
+        if self.model == Source:
+            q = q.options(joinedload(Source.languages))
+        return q.order_by(self.model.pk)
 
     def before(self, req, fp):
         pass

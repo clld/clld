@@ -33,7 +33,7 @@
   % else:
     % if verb == 'Identify':
     <oai:Identify>
-      <oai:repositoryName>${request.pub.get('sitetitle_short', request.pub.get('sitetitle', 'clld'))}</oai:repositoryName>
+      <oai:repositoryName>${request.dataset}</oai:repositoryName>
       <oai:baseURL>${request.route_url('olac')}</oai:baseURL>
       <oai:protocolVersion>2.0</oai:protocolVersion>
       <oai:adminEmail>robert_forkel@eva.mpg.de</oai:adminEmail>
@@ -45,7 +45,7 @@
                 xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                                     http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
           <oai:scheme>${cfg.scheme}</oai:scheme>
-          <oai:repositoryIdentifier>${request.pub.get('domain', 'clld')}</oai:repositoryIdentifier>
+          <oai:repositoryIdentifier>${request.dataset.domain}</oai:repositoryIdentifier>
           <oai:delimiter>${cfg.delimiter}</oai:delimiter>
           <oai:sampleIdentifier>${cfg.format_identifier(request, earliest)}</oai:sampleIdentifier>
         </oai:oai-identifier>
