@@ -18,6 +18,7 @@ from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid import events
 from pyramid.request import Request, reify
+from pyramid.response import Response
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
@@ -269,6 +270,13 @@ def register_download(config, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
+def google_site_verification(config, key):
+    config.add_route('google-site-verification', key + '.html')
+    config.add_view(
+        lambda r: Response('google-site-verification: %s.html' % key),
+        route_name='google-site-verification')
+
+
 def get_configurator(pkg, *utilities, **kw):
     """
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
@@ -310,6 +318,7 @@ def get_configurator(pkg, *utilities, **kw):
         'register_adapter': register_adapter,
         'register_download': register_download,
         'add_route_and_view': add_route_and_view,
+        'google_site_verification': google_site_verification,
     }.items():
         config.add_directive(name, func)
 
