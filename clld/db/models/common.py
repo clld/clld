@@ -35,6 +35,7 @@ from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
 from clld.lib import bibtex
+from clld.lib import coins
 from clld.web.util.htmllib import HTML
 
 
@@ -374,6 +375,12 @@ class Source(Base,
 
     def bibtex(self):
         return bibtex.Record.from_object(self)
+
+    def coins(self, req):
+        return HTML.span(
+            ' ',
+            **coins.ContextObject.from_bibtex(req.dataset.name, self.bibtex()).span_attrs()
+        )
 
 
 class Contribution_data(Base, Versioned, DataMixin):

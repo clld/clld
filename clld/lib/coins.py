@@ -177,7 +177,8 @@ class ContextObject(list, UnicodeMixin):
             'techreport': ('book', 'report'),
             'unpublished': ('book', 'document'),
             'misc': ('book', 'unknown'),
-        }.get(rec.genre.lower(), ('book', 'document' if rec.get('author') else 'unknown'))
+        }.get(getattr(rec.genre, 'value', rec.genre),  # allow EnumSymbol as genre.
+              ('book', 'document' if rec.get('author') else 'unknown'))
         if genre:
             data = [('genre', genre)]
         else:

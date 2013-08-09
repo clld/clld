@@ -270,13 +270,6 @@ def register_download(config, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
-def google_site_verification(config, key):
-    config.add_route('google-site-verification', key + '.html')
-    config.add_view(
-        lambda r: Response('google-site-verification: %s.html' % key),
-        route_name='google-site-verification')
-
-
 def get_configurator(pkg, *utilities, **kw):
     """
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
@@ -318,7 +311,6 @@ def get_configurator(pkg, *utilities, **kw):
         'register_adapter': register_adapter,
         'register_download': register_download,
         'add_route_and_view': add_route_and_view,
-        'google_site_verification': google_site_verification,
     }.items():
         config.add_directive(name, func)
 
@@ -341,6 +333,11 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('robots', '/robots.txt', robots)
     config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex)
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
+
+    config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')
+    config.add_view(
+        lambda r: Response('google-site-verification: googlebbc8f4da1abdc58b.html'),
+        route_name='google-site-verification')
 
     config.add_route_and_view('unapi', '/unapi', unapi)
     config.add_route_and_view('olac', '/olac', olac)
