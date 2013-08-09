@@ -224,7 +224,7 @@ class DataTable(object):
             {'datatable': self, 'options': Markup(dumps(self.options))},
             request=self.req))
 
-    def get_query(self, limit=200, offset=0):
+    def get_query(self, limit=1000, offset=0):
         query = self.base_query(DBSession.query(self.model))
         self.count_all = query.count()
 
@@ -254,7 +254,7 @@ class DataTable(object):
         query = query.order_by(self.model.pk)
         limit = int(self.req.params.get('iDisplayLength', limit))
         if limit == -1:
-            limit = 200
+            limit = 1000
         query = query\
             .limit(limit)\
             .offset(int(self.req.params.get('iDisplayStart', offset)))
@@ -263,11 +263,7 @@ class DataTable(object):
     def toolbar(self):
         """
         """
-        #
-        # TODO: construct available download formats dynamically?
-        #
         return HTML.div(
-            #button('!', onclick="CLLD.DataTable.current_url('xls')"),
             HTML.a(
                 icon('download-alt'),
                 HTML.span(class_="caret"),
@@ -275,11 +271,16 @@ class DataTable(object):
                     'class_': "btn dropdown-toggle",
                     'data-toggle': "dropdown",
                     'href': "#",
+                    'id': "dt-dl-opener",
                 }
             ),
             HTML.ul(
                 #HTML.li(HTML.a('csv', href="#")),
-                *[HTML.li(HTML.a(fmt, href="#", onclick="document.location.href = CLLD.DataTable.current_url('%s'); return false;" % fmt))
+                *[HTML.li(HTML.a(
+                    fmt,
+                    href="#",
+                    onclick="document.location.href = CLLD.DataTable.current_url('%s'); return false;" % fmt,
+                    id='dt-dl-%s' % fmt))
                   for fmt in [a.extension for n, a in self.req.registry.getAdapters([self.model()], IIndex)] if fmt != 'html'],
                 **dict(class_="dropdown-menu")),
             button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),

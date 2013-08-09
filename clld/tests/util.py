@@ -6,6 +6,7 @@ import time
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
+from tempfile import mkdtemp
 import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
@@ -380,6 +381,14 @@ class DataTable(PageObject):
         sort.click()
         time.sleep(2.5)
 
+    def download(self, fmt):
+        opener = self.e.find_element_by_id('dt-dl-opener')
+        link = self.e.find_element_by_id('dt-dl-%s' % fmt)
+        assert not link.is_displayed()
+        opener.click()
+        assert link.is_displayed()
+        link.click()
+
 
 class TestWithSelenium(unittest.TestCase):
     """run tests using selenium with the firefox driver
@@ -397,7 +406,14 @@ class TestWithSelenium(unittest.TestCase):
         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
         selenium_logger.setLevel(logging.WARNING)
 
+        cls.downloads = path(mkdtemp())
+
         profile = webdriver.firefox.firefox_profile.FirefoxProfile()
+        profile.set_preference("browser.download.folderList", 2)
+        profile.set_preference("browser.download.manager.showWhenStarting", False)
+        profile.set_preference("browser.download.dir", str(cls.downloads))
+        profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/x-bibtex")
+
         cls.browser = webdriver.Firefox(firefox_profile=profile)
         cls.server = ServerThread(cls.app, cls.host)
         cls.server.start()
@@ -408,6 +424,7 @@ class TestWithSelenium(unittest.TestCase):
     def tearDownClass(cls):
         cls.browser.quit()
         cls.server.quit()
+        cls.downloads.rmtree()
 
     def url(self, path):
         assert path.startswith('/')
