@@ -198,7 +198,7 @@ class ContextObject(list, UnicodeMixin):
         elif mtx == 'dissertation':
             if 'title' in rec:
                 data.append(('title', rec['title']))
-            data.append(('degree', 'phd' if rec.genre == 'phdthesis' else 'masters'))
+            data.append(('degree', 'phd' if getattr(rec.genre, 'value', rec.genre) == 'phdthesis' else 'masters'))
             data.append(('inst', rec.get('school', rec.get('institution', ''))))
 
         if 'url' in rec:
