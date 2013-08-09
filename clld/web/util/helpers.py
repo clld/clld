@@ -84,7 +84,7 @@ def get_downloads(req):
             list(req.registry.getUtilitiesFor(interfaces.IDownload)), key=lambda t: t[0]),
         lambda t: t[1].model.mapper_name() + 's',
     ):
-        yield k, sorted([i[1] for i in items], key=lambda d: d.ext)
+        yield k, sorted([i[1] for i in items if i[1].size], key=lambda d: d.ext)
 
 
 def get_rdf_dumps(req, model):

@@ -73,7 +73,9 @@ class Download(object):
         return path(AssetResolver().resolve(self.asset_spec(req)).abspath())
 
     def size(self, req):
-        return format_size(self.abspath(req).size)
+        _path = self.abspath(req)
+        if _path.exists():
+            return format_size(_path.size)
 
     def label(self, req):
         return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
