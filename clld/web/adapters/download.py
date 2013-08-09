@@ -1,13 +1,17 @@
 from zipfile import ZipFile, ZIP_DEFLATED
+from gzip import GzipFile
 from cStringIO import StringIO
+from contextlib import closing
 
 from path import path
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, class_mapper
 from clld.lib.dsv import UnicodeCsvWriter
+from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
+from clld.web.util.helpers import rdf_namespace_attrs
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.util import format_size
@@ -27,6 +31,7 @@ class Download(object):
     def __init__(self, model, pkg, **kw):
         if self.ext is None:
             self.ext = kw['ext']
+        self.rdf = self.ext in [fmt.extension for fmt in FORMATS.values()]
         self.model = model
         self.pkg = pkg if isinstance(pkg, basestring) else pkg.__name__
         for k, v in kw.items():
@@ -37,7 +42,8 @@ class Download(object):
         return '%s.%s' % (class_mapper(self.model).class_.__name__.lower(), self.ext)
 
     def asset_spec(self, req):
-        return '%s:static/download/%s-%s.zip' % (self.pkg, req.dataset.id, self.name)
+        return '%s:static/download/%s-%s.%s' % (
+            self.pkg, req.dataset.id, self.name, 'gz' if self.rdf else 'zip')
 
     def url(self, req):
         return req.static_url(self.asset_spec(req))
@@ -56,18 +62,28 @@ class Download(object):
         if not p.dirname().exists():
             p.dirname().mkdir()
 
-        with ZipFile(p, 'w', ZIP_DEFLATED) as zipfile:
-            if not filename:
-                fp = StringIO()
+        if self.rdf:
+            # we do not create archives with a readme for rdf downloads, because each
+            # RDF entity points to the dataset and the void description of the dataset
+            # covers all relevant metadata.
+            with closing(GzipFile(p, 'w')) as fp:
                 self.before(req, fp)
                 for i, item in enumerate(self.query(req)):
                     self.dump(req, fp, item, i)
                 self.after(req, fp)
-                fp.seek(0)
-                zipfile.writestr(self.name, fp.read())
-            else:
-                zipfile.write(filename, self.name)
-            zipfile.writestr('README.txt', """
+        else:
+            with ZipFile(p, 'w', ZIP_DEFLATED) as zipfile:
+                if not filename:
+                    fp = StringIO()
+                    self.before(req, fp)
+                    for i, item in enumerate(self.query(req)):
+                        self.dump(req, fp, item, i)
+                    self.after(req, fp)
+                    fp.seek(0)
+                    zipfile.writestr(self.name, fp.read())
+                else:
+                    zipfile.write(filename, self.name)
+                zipfile.writestr('README.txt', """
 {0} data download
 {1}
 
@@ -130,6 +146,20 @@ class N3Dump(Download):
             fp.write(header)
             fp.write('\n\n')
         fp.write(body)
+
+
+class RdfXmlDump(Download):
+    ext = 'rdf'
+
+    def before(self, req, fp):
+        fp.write('<rdf:RDF %s>\n' % rdf_namespace_attrs())
+
+    def after(self, req, fp):
+        fp.write('</rdf:RDF>')
+
+    def dump_rendered(self, req, fp, item, index, rendered):
+        body = rendered.split('rdf:Description')[1]
+        fp.write('<rdf:Description%srdf:Description>\n' % body)
 
 
 class Sqlite(Download):
