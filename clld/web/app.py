@@ -274,7 +274,12 @@ def get_configurator(pkg, *utilities, **kw):
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
     """
     kw.setdefault('package', pkg)
+    routes = kw.pop('routes', [])
+
     config = Configurator(**kw)
+
+    for name, pattern in routes:
+        config.add_route(name, pattern)
 
     config.set_request_factory(ClldRequest)
     config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)

@@ -79,6 +79,11 @@ location /{app.name}/static/ {{
 
 SITE_TEMPLATE = """\
 server {{
+    server_name  www.{app.domain};
+    return       301 http://{app.domain}$request_uri;
+}}
+
+server {{
     server_name {app.domain};
     access_log /var/log/{app.name}/access.log;
 
