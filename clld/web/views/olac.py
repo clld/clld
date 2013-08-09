@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from copy import copy
 from collections import namedtuple
 
+from pyramid.renderers import render
+from pyramid.response import Response
 from sqlalchemy.orm import joinedload_all
 
 from clld.util import UnicodeMixin
@@ -171,10 +173,16 @@ def olac(req):
     res = dict(verb=None, error=None, response_date=timestamp(), params={}, date=date)
     res['cfg'] = req.registry.getUtility(IOlacConfig)
 
+    def response(res):
+        return Response(
+            render('olac.mako', res, request=req).encode('utf8'),
+            content_type='application.xml',
+            charset=None)
+
     def error(_error):
         if _error:
             res['error'] = (_error, ERRORS[_error])
-        return res
+        return response(res)
 
     args = dict(req.params.items())
     res['params'] = copy(args)
@@ -247,4 +255,4 @@ def olac(req):
             return error("badArgument")
 
     #c.contribs = config.get('wals.editors.names').split(" and ")
-    return res
+    return response(res)

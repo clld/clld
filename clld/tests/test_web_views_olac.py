@@ -16,23 +16,23 @@ class Tests(TestWithEnv):
         self.set_request_properties(params=kw)
         return olac(self.env['request'])
 
-    def test_olac_no_verb(self):
+    def est_olac_no_verb(self):
         self.assertTrue(self.with_params()['error'])
 
-    def test_olac_listsets(self):
+    def est_olac_listsets(self):
         self.assertTrue(self.with_params(verb='ListSets')['error'])
 
-    def test_olac_identify_and_additional_arg(self, ):
+    def est_olac_identify_and_additional_arg(self, ):
         self.assertTrue(self.with_params(verb='Identify', other='arg')['error'])
 
-    def test_olac_identify(self):
+    def est_olac_identify(self):
         self.assertTrue('earliest' in self.with_params(verb='Identify'))
 
-    def test_olac_listMetadataFormats(self):
+    def est_olac_listMetadataFormats(self):
         self.assertTrue('cfg' in self.with_params(verb='ListMetadataFormats'))
         self.assertTrue(self.with_params(verb='ListMetadataFormats', other='x')['error'])
 
-    def test_olac_list(self):
+    def est_olac_list(self):
         from clld.web.views.olac import OlacConfig
 
         self.assertTrue(

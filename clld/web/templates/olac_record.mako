@@ -4,14 +4,12 @@
            xmlns:dcterms="http://purl.org/dc/terms/"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.language-archives.org/OLAC/1.1/ http://www.language-archives.org/OLAC/1.1/olac.xsd">
-    <dc:title>${request.pub.get('sitetitle_short', request.pub.get('sitetitle', 'clld'))} Resources for ${lang}</dc:title>
-
+    <dc:title>${request.dataset} Resources for ${lang}</dc:title>
     ##<dc:contributor xsi:type="olac:role" olac:code="editor" py:for="contrib in c.contribs">${contrib}</dc:contributor>
-
     <dc:description>
-      A page listing all resources in ${request.pub.get('sitetitle_short', request.pub.get('sitetitle', 'clld'))} which are relevant to the language ${lang}.
+      A page listing all resources in ${request.dataset} which are relevant to the language ${lang}.
     </dc:description>
-    <dc:publisher>${request.pub.get('publisher', '')}</dc:publisher>
+    <dc:publisher>${request.dataset.publisher_name}</dc:publisher>
     <dc:language xsi:type="olac:language" olac:code="eng"/>
     % for code in cfg.iso_codes(lang):
     <dc:subject xsi:type="olac:language" olac:code="${code}"/>

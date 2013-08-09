@@ -329,7 +329,7 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
 
     config.add_route_and_view('unapi', '/unapi', unapi)
-    config.add_route_and_view('olac', '/olac', olac, renderer='olac.mako')
+    config.add_route_and_view('olac', '/olac', olac)
 
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model
