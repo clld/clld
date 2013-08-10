@@ -48,17 +48,22 @@ ${TxtCitation.render(request.dataset, request)}
         </dcterms:bibliographicCitation>
         <dcterms:subject rdf:resource="http://dbpedia.org/resource/Linguistics"/>
     </void:Dataset>
-    % for rsc in RESOURCES:
-    <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-        <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
-        % if not dls:
-        <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
+% for rsc in RESOURCES:
+    <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
+    % if not dls:
+        % if rsc.name in request.registry.settings.get('sitemaps', []):
+        <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
+            <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
+        </void:Dataset>
         % endif
+    % else:
+        <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
         % for dl in dls:
-        <void:dataDump rdf:resource="${dl.url(request)}"/>
+            <void:dataDump rdf:resource="${dl.url(request)}"/>
         % endfor
-    </void:Dataset>
-    % endfor
+        </void:Dataset>
+    % endif
+% endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
         <skos:prefLabel xml:lang="en">${request.dataset.publisher_name}</skos:prefLabel>
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>

@@ -16,10 +16,10 @@
               href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
               type="image/x-icon" />
 
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        <script type="text/javascript">
-            google.load("feeds", "1");
-        </script>
+        ##<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        ##<script type="text/javascript">
+        ##    google.load("feeds", "1");
+        ##</script>
 
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
         <!--[if lte IE 8]>

@@ -169,14 +169,13 @@ class OlacConfig(object):
 def olac(req):
     """View implementing the OLAC OAI-PMH repository protocol.
     """
-    req.response.content_type = 'application/xml'
     res = dict(verb=None, error=None, response_date=timestamp(), params={}, date=date)
     res['cfg'] = req.registry.getUtility(IOlacConfig)
 
     def response(res):
         return Response(
             render('olac.mako', res, request=req).encode('utf8'),
-            content_type='application.xml',
+            content_type='application/xml',
             charset=None)
 
     def error(_error):

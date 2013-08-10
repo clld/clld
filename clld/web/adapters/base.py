@@ -29,6 +29,7 @@ class Renderable(object):
 
     def render_to_response(self, ctx, req):
         res = Response(self.render(ctx, req))
+        res.vary = 'Accept'
         res.content_type = self.send_mimetype or self.mimetype
         if self.charset:
             res.content_type += '; charset=%s' % self.charset

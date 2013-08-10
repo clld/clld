@@ -49,16 +49,16 @@ def sitemapindex(req):
     """
     .. seealso:: http://www.sitemaps.org/protocol.html#index
     """
-    def _iter():
+    def _iter(sitemaps):
         for r in RESOURCES:
-            if r.with_index:
+            if r.with_index and r.name in sitemaps:
                 n, m = divmod(_query(req, r).count(), LIMIT)
                 if m:
                     n += 1
                 for i in range(n):
                     yield dict(loc=req.route_url('sitemap', rsc=r.name, n=i))
 
-    return _response('sitemapindex', _iter())
+    return _response('sitemapindex', _iter(req.registry.settings.get('sitemaps', [])))
 
 
 def sitemap(req):
