@@ -2,7 +2,7 @@
 <%def name="li(_format, title)">
     <% url = request.route_url('contribution_alt', id=ctx.id, ext='md.html', _query=dict(format=_format)) %>
     <li class="${'active' if format == _format else ''}">
-        <a onclick='${h.JSModal.show(ctx.name, url)|n}; return false'
+        <a onclick='${h.JSModal.show(ctx.name.replace("'", ""), url)|n}; return false'
            href='#'>
             ${title}
         </a>
@@ -12,7 +12,7 @@
 ## TODO: must get list of available formats from registry!
 ##
 <ul class="nav nav-tabs">
-    ${li('md.txt', _('Text'))}
+    ${li('md.txt', _('Text'))|n}
     ${li('md.bib', _('BibTex'))}
 ##    ${li('ris', 'RIS')}
 </ul>

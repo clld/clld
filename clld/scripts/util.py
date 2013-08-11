@@ -93,6 +93,12 @@ def parsed_args(*arg_specs, **kw):
     args.env = bootstrap(args.config_uri) if kw.get('bootstrap', False) else {}
     module = setup_session(
         args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
+
+    # make sure we create URLs in the correct domain
+    dataset = DBSession.query(common.Dataset).first()
+    if dataset:
+        args.env['request'].environ['HTTP_HOST'] = dataset.domain
+
     if module == 'tests':
         module = 'clld'
     args.module = __import__(args.module or module)
