@@ -185,7 +185,7 @@ clld.environment = production
 use = egg:waitress#main
 host = 0.0.0.0
 port = {app.port}
-workers = 3
+workers = {app.workers}
 proc_name = {app.name}
 
 [loggers]
