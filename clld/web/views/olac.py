@@ -175,7 +175,7 @@ def olac(req):
     def response(res):
         return Response(
             render('olac.mako', res, request=req).encode('utf8'),
-            content_type='application/xml',
+            content_type='text/xml',
             charset=None)
 
     def error(_error):
