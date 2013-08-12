@@ -49,10 +49,19 @@ def start(environment):
 @hosts('localhost')
 @task
 def cache():
-    """start app by changing the supervisord config
+    """
     """
     _assign_host('production')
     execute(varnish.cache, APP)
+
+
+@hosts('localhost')
+@task
+def uncache():
+    """
+    """
+    _assign_host('production')
+    execute(varnish.uncache, APP)
 
 
 @hosts('localhost')

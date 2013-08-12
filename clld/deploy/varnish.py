@@ -17,7 +17,9 @@ from fabric.contrib.files import append, exists
 from fabtools import require
 from fabtools import service
 
-from clld.deploy.util import create_file_as_root, SITE_TEMPLATE, get_template_variables
+from clld.deploy.util import (
+    create_file_as_root, SITE_TEMPLATE, get_template_variables, http_auth,
+)
 from clld.deploy.config import App
 
 
@@ -85,4 +87,11 @@ def cache(app):
     create_file_as_root(
         app.nginx_site,
         SITE_TEMPLATE.format(**get_template_variables(App(app.name, 6081, domain=app.domain))))
+    service.reload('nginx')
+
+
+def uncache(app):
+    tv = get_template_variables(app)
+    tv['auth'] = http_auth(app)
+    create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**tv))
     service.reload('nginx')

@@ -335,6 +335,16 @@ def maintenance(app, hours=2, template_variables=None):
         HTTP_503_TEMPLATE.format(timestamp=ts, **template_variables))
 
 
+def http_auth(app):
+    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
+    if pw:
+        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
+        return """\
+        auth_basic "%s";
+        auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
+    return ''
+
+
 @task
 def deploy(app, environment, with_alembic=False):
     template_variables = get_template_variables(
@@ -367,12 +377,8 @@ def deploy(app, environment, with_alembic=False):
     #
     require.files.directory(
         str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
-    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
-    if pw:
-        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
-        template_variables['auth'] = """\
-    auth_basic "%s";
-    auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
+
+    template_variables['auth'] = http_auth(app)
 
     if environment == 'test':
         create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
