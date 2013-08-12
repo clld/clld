@@ -385,14 +385,10 @@ def deploy(app, environment, with_alembic=False):
     service.reload('nginx')
 
     #
-    # configure supervisor, but don't start the app yet
-    #
-    supervisor(app, 'pause', template_variables)
-
-    #
     # TODO: replace with initialization of db from data repos!
     #
     if not with_alembic and confirm('Recreate database?', default=False):
+        supervisor(app, 'pause', template_variables)
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
         local('gzip -f /tmp/{0.name}.sql'.format(app))
         require.files.file(
@@ -410,6 +406,7 @@ def deploy(app, environment, with_alembic=False):
     else:
         if exists(app.src.joinpath('alembic.ini')):
             if confirm('Upgrade database?', default=False):
+                supervisor(app, 'pause', template_variables)
                 with virtualenv(app.venv):
                     with cd(app.src):
                         sudo('sudo -u {0.name} {1} -n production upgrade head'.format(

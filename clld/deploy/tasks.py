@@ -12,6 +12,7 @@ from fabric.api import task, hosts, execute, env
 
 from clld.deploy import config
 from clld.deploy import util
+from clld.deploy import varnish
 
 
 APP = None
@@ -43,6 +44,15 @@ def start(environment):
     """
     _assign_host(environment)
     execute(util.supervisor, APP, 'run')
+
+
+@hosts('localhost')
+@task
+def cache():
+    """start app by changing the supervisord config
+    """
+    _assign_host('production')
+    execute(varnish.cache, APP)
 
 
 @hosts('localhost')
