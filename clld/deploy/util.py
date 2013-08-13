@@ -116,6 +116,27 @@ server {{
 }}
 """
 
+LOGROTATE_TEMPLATE = """\
+/var/log/{app.name}/access.log {{
+        daily
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        notifempty
+        create 0640 www-data adm
+        sharedscripts
+        prerotate
+                if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+                        run-parts /etc/logrotate.d/httpd-prerotate; \
+                fi; \
+        endscript
+        postrotate
+                [ ! -f /var/run/nginx.pid ] || kill -USR1 `cat /var/run/nginx.pid`
+        endscript
+}}
+"""
+
 HTTP_503_TEMPLATE = """\
 <html>
     <head>
@@ -386,6 +407,9 @@ def deploy(app, environment, with_alembic=False):
             app.nginx_location, LOCATION_TEMPLATE.format(**template_variables))
     elif environment == 'production':
         create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**template_variables))
+        create_file_as_root(
+            '/etc/logrotate.d/{0}'.format(app.name),
+            LOGROTATE_TEMPLATE.format(**template_variables))
 
     maintenance(app, hours=app.deploy_duration, template_variables=template_variables)
     service.reload('nginx')

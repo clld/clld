@@ -4,6 +4,8 @@
 
 h2 {font-size: 28px !important;}
 
+a.pdf { background: url('../images/pdf-icon.gif') no-repeat center left; padding-left: 18px; }
+
 .dt-toolbar {float: right; text-align: right;}
 
 #contextnav ul {margin-top: 10px; margin-bottom: 10px;}

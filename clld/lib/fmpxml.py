@@ -130,3 +130,11 @@ class Client(object):
             batch = self._get_batch(what, offset=len(items))
             items.extend(batch.items)
         return items
+
+    def get_layouts(self):
+        from PyFileMaker import FMServer
+
+        fm = FMServer('%s:%s@%s' % (self.user, self.password, self.host))
+        fm.setDb(self.db)
+        for l in fm.getLayoutNames():
+            print l

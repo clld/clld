@@ -93,6 +93,7 @@ def includeme(config):
                     (adapts,),
                     if_,
                     name=cls.mimetype)
+
     config.registry.registerAdapter(
         GeoJsonLanguages,
         (interfaces.ILanguage,),
