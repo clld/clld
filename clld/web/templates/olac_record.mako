@@ -11,9 +11,7 @@
     </dc:description>
     <dc:publisher>${request.dataset.publisher_name}</dc:publisher>
     <dc:language xsi:type="olac:language" olac:code="eng"/>
-    % for code in cfg.iso_codes(lang):
-    <dc:subject xsi:type="olac:language" olac:code="${code}"/>
-    % endfor
+    <dc:subject xsi:type="olac:language" olac:code="${lang.iso_code}"/>
     <dc:type xsi:type="olac:linguistic-type" olac:code="language_description"/>
     <dc:date xsi:type="dcterms:W3CDTF">${date(lang.updated)}</dc:date>
     <dc:identifier xsi:type="dcterms:URI">${request.resource_url(lang)}</dc:identifier>

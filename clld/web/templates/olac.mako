@@ -55,7 +55,7 @@
       </oai:description>
     </oai:Identify>
     % elif verb == 'GetRecord':
-    <oai:GetRecord">
+    <oai:GetRecord>
       ${record(language)}
     </oai:GetRecord>
     % elif verb == 'ListIdentifiers':

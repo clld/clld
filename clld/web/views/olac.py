@@ -109,7 +109,7 @@ class OlacConfig(object):
         return req.db.query(Language)\
             .join(LanguageIdentifier)\
             .join(Identifier)\
-            .filter(Identifier.type == 'iso639-3')\
+            .filter(Identifier.type == IdentifierType.iso.value)\
             .options(joinedload_all(
                 Language.languageidentifier, LanguageIdentifier.identifier))\
             .distinct()
@@ -131,13 +131,6 @@ class OlacConfig(object):
         if until:
             q = q.filter(Language.updated < until)
         return q
-
-    def iso_codes(self, item):
-        """
-        :return: a list of iso codes an item is associated with
-        """
-        return [li.identifier.id for li in item.languageidentifier
-                if li.identifier.type == IdentifierType.iso.value]
 
     def format_identifier(self, req, item):
         """
@@ -206,6 +199,9 @@ def olac(req):
             return error("cannotDisseminateFormat")
 
         try:
+            #
+            #
+            #
             res['language'] = res['cfg'].get_record(req, args['identifier'])
         except AssertionError:
             return error("idDoesNotExist")
@@ -238,6 +234,9 @@ def olac(req):
             rt = ResumptionToken(
                 None, 0, args.get('from', None), args.get('until', None))
 
+        #
+        #
+        #
         q = res['cfg'].query_records(req, from_=rt.from_, until=rt.until)
         res['languages'] = q.offset(rt.offset).limit(rt.limit).all()
         if not res['languages']:
@@ -253,5 +252,4 @@ def olac(req):
         if args and 'identifier' not in args:
             return error("badArgument")
 
-    #c.contribs = config.get('wals.editors.names').split(" and ")
     return response(res)
