@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<OAI-PMH xmlns:atom="http://www.w3.org/2005/Atom"
-         xmlns="http://www.openarchives.org/OAI/2.0/"
+<oai:OAI-PMH xmlns:atom="http://www.w3.org/2005/Atom"
          xmlns:olac="http://www.language-archives.org/OLAC/1.1/"
          xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
@@ -41,13 +40,13 @@
       <oai:deletedRecord>no</oai:deletedRecord>
       <oai:granularity>YYYY-MM-DD</oai:granularity>
       <oai:description>
-        <oai:oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+        <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
                 xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                                     http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
-          <oai:scheme>${cfg.scheme}</oai:scheme>
-          <oai:repositoryIdentifier>${request.dataset.domain}</oai:repositoryIdentifier>
-          <oai:delimiter>${cfg.delimiter}</oai:delimiter>
-          <oai:sampleIdentifier>${cfg.format_identifier(request, earliest)}</oai:sampleIdentifier>
+          <scheme>${cfg.scheme}</scheme>
+          <repositoryIdentifier>${request.dataset.domain}</repositoryIdentifier>
+          <delimiter>${cfg.delimiter}</delimiter>
+          <sampleIdentifier>${cfg.format_identifier(request, earliest)}</sampleIdentifier>
         </oai:oai-identifier>
       </oai:description>
       <oai:description>
@@ -86,4 +85,4 @@
     </oai:ListMetadataFormats>
     % endif
   % endif
-</OAI-PMH>
+</oai:OAI-PMH>
