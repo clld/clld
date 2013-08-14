@@ -33,7 +33,7 @@ def normalize_markup(s):
     """
     if not s:
         return
-    soup = bs(s.strip().replace('<BR>', '\n'))
+    soup = bs(s.strip().replace('\n', ' ').replace('<BR>', '\n'))
     # remove empty, i.e. unstyled span tags
     for span in soup.find_all('span'):
         new_style = []
