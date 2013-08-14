@@ -47,17 +47,6 @@ class Representation(Renderable):
 
 
 @implementer(interfaces.IRepresentation)
-class OctetStream(Renderable):
-    """
-    """
-    mimetype = 'application/octet-stream'
-
-    def render(self, ctx, req):
-        self.send_mimetype = str(ctx.mime_type)
-        return ctx.content
-
-
-@implementer(interfaces.IRepresentation)
 class Json(Renderable):
     """
     """

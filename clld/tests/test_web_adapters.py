@@ -3,17 +3,11 @@ import unittest
 from mock import Mock
 
 from clld.interfaces import IIndex
-from clld.db.models.common import Contribution, Parameter, Language, File, Dataset
+from clld.db.models.common import Contribution, Parameter, Language, Dataset
 from clld.tests.util import TestWithEnv
 
 
 class Tests(TestWithEnv):
-    def test_OctetStream(self):
-        from clld.web.adapters import OctetStream
-
-        adapter = OctetStream(None)
-        adapter.render(File.first(), None)
-
     def test_BibTex(self):
         from clld.web.adapters import BibTex
 

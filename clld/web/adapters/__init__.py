@@ -2,7 +2,7 @@ from zope.interface import implementer, implementedBy
 
 from clld import RESOURCES
 from clld import interfaces
-from clld.web.adapters.base import Index, Representation, OctetStream, Json
+from clld.web.adapters.base import Index, Representation, Json
 from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation
@@ -104,11 +104,6 @@ def includeme(config):
         (interfaces.IParameter,),
         interfaces.IRepresentation,
         name=GeoJson.mimetype)
-    config.registry.registerAdapter(
-        OctetStream,
-        (interfaces.IFile,),
-        interfaces.IRepresentation,
-        name=OctetStream.mimetype)
 
     config.include(biblio)
 

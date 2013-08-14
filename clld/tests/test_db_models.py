@@ -8,21 +8,19 @@ from clld.db.meta import DBSession
 
 class Tests(TestWithDb):
     def test_Files(self):
-        from clld.db.models.common import Language, Language_files, File
+        from clld.db.models.common import Language, Language_files
 
         if PY3:
             return  # pragma: no cover
 
         l = Language(id='abc', name='Name')
         assert l.iso_code is None
-        l.files.append(Language_files(name='abstract', file=File(content='c')))
+        l._files.append(Language_files(id='abstract'))
         DBSession.add(l)
         DBSession.flush()
         DBSession.refresh(l)
-        f = l.filesdict()['abstract']
-        self.assertEqual(f.content, 'c')
-        self.assertEqual(f.id, f.pk)
-        self.assertTrue(f.data_uri().startswith('data:'))
+        f = l.files['abstract']
+        #self.assertTrue(f.data_uri().startswith('data:'))
 
     def test_Dataset(self):
         from clld import RESOURCES

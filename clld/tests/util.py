@@ -83,8 +83,6 @@ class TestWithDbAndData(TestWithDb):
         DBSession.add(common.Dataset(
             id='d', name='dataset', description='desc', domain='clld'))
 
-        file_ = common.File(mime_type='text/plain', content='text')
-        DBSession.add(file_)
         source = common.Source(id='src')
         contributors = {'a': 'A Name', 'b': 'b Name', 'c': 'c Name', 'd': 'd Name'}
         for id_, name in contributors.items():
@@ -236,12 +234,12 @@ class TestWithApp(TestWithEnv):
         self.app = ExtendedTestApp(self.env['app'])
 
 
-class Handler(WSGIRequestHandler):
+class Handler(WSGIRequestHandler):  # pragma: no cover
     def log_message(self, *args, **kw):
         return
 
 
-class ServerThread(threading.Thread):
+class ServerThread(threading.Thread):  # pragma: no cover
     """ Run WSGI server on a background thread.
 
     Pass in WSGI app object and serve pages from it for Selenium browser.
@@ -272,7 +270,7 @@ class ServerThread(threading.Thread):
             self.srv.shutdown()
 
 
-class PageObject(object):
+class PageObject(object):  # pragma: no cover
     """Virtual base class for objects we wish to interact with in selenium tests.
     """
     def __init__(self, browser, eid, url=None):
@@ -294,7 +292,7 @@ class PageObject(object):
             return self.browser.find_element_by_class_name(self.eid)
 
 
-class Map(PageObject):
+class Map(PageObject):  # pragma: no cover
     def __init__(self, browser, eid=None, url=None):
         super(Map, self).__init__(browser, eid or 'map-container', url=url)
 
@@ -318,7 +316,7 @@ class Map(PageObject):
         assert not e.is_displayed()
 
 
-class DataTable(PageObject):
+class DataTable(PageObject):  # pragma: no cover
     info_pattern = re.compile('\s+'.join([
         'Showing', '(?P<offset>[0-9,]+)',
         'to', '(?P<limit>[0-9,]+)',
@@ -390,7 +388,7 @@ class DataTable(PageObject):
         link.click()
 
 
-class TestWithSelenium(unittest.TestCase):
+class TestWithSelenium(unittest.TestCase):  # pragma: no cover
     """run tests using selenium with the firefox driver
     """
     host = '0.0.0.0:8880'

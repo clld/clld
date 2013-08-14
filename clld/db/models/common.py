@@ -1,6 +1,7 @@
 """
 Common models for all clld apps
 """
+import os
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import date
@@ -48,43 +49,55 @@ class Config(Base):
     value = Column(Unicode)
 
 
-@implementer(interfaces.IFile)
-class File(Base):
-    """Model for storage of files in the database.
+class IdNameDescriptionMixin(object):
+    """id is to be used as string identifier which can be used for sorting and as
+    URL part.
     """
+    id = Column(String, unique=True)
     name = Column(Unicode)
-    mime_type = Column(String)
-    content = Column(LargeBinary)
-
-    @hybrid_property
-    def id(self):
-        return self.pk
-
-    def data_uri(self):
-        return 'data:%s;base64,%s' % (self.mime_type, b64encode(self.content))
+    description = Column(Unicode)
+    markup_description = Column(Unicode)
 
 
-class FilesMixin(object):
+#@implementer(interfaces.IFile)
+#class File(Base):
+#    """Model for storage of files in the database.
+#    """
+#    name = Column(Unicode)
+#    mime_type = Column(String)
+#    content = Column(LargeBinary)
+#
+#    @hybrid_property
+#    def id(self):
+#        return self.pk
+#
+#    def data_uri(self):
+#        return 'data:%s;base64,%s' % (self.mime_type, b64encode(self.content))
+
+
+class FilesMixin(IdNameDescriptionMixin):
     """This mixin provides a way to associate files with another model class.
     """
     @classmethod
     def owner_class(cls):
         return cls.__name__.split('_')[0]
 
-    name = Column(Unicode)
     ord = Column(Integer, default=1)
-
-    @declared_attr
-    def file_pk(cls):
-        return Column(Integer, ForeignKey('file.pk'))
-
-    @declared_attr
-    def file(cls):
-        return relationship(File)
+    mime_type = Column(String)
 
     @declared_attr
     def object_pk(cls):
         return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
+
+    @property
+    def relpath(self):
+        return os.path.join(self.owner_class().lower(), str(self.object.id), str(self.id))
+
+    def create(self, dir_, content):
+        p = dir_.joinpath(self.relpath)
+        p.dirname().makedirs_p()
+        with open(p, 'wb') as fp:
+            fp.write(content)
 
 
 class HasFilesMixin(object):
@@ -95,12 +108,13 @@ class HasFilesMixin(object):
         It is the responsibility of the programmer to make sure conversion to a dict makes
         sense, i.e. the names of associated files are actually unique.
     """
-    def filesdict(self):
-        return dict((f.name, f.file) for f in self.files)
+    @property
+    def files(self):
+        return dict((f.id, f) for f in self._files)
 
     @declared_attr
-    def files(cls):
-        return relationship(cls.__name__ + '_files')
+    def _files(cls):
+        return relationship(cls.__name__ + '_files', backref='object')
 
 
 class DataMixin(object):
@@ -134,16 +148,6 @@ class HasDataMixin(object):
     @declared_attr
     def data(cls):
         return relationship(cls.__name__ + '_data', order_by=cls.__name__ + '_data.key')
-
-
-class IdNameDescriptionMixin(object):
-    """id is to be used as string identifier which can be used for sorting and as
-    URL part.
-    """
-    id = Column(String, unique=True)
-    name = Column(Unicode)
-    description = Column(Unicode)
-    markup_description = Column(Unicode)
 
 
 class LanguageSource(Base, Versioned):

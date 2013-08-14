@@ -196,4 +196,11 @@ class Sqlite(Download):
     ext = 'sqlite'
 
     def create(self, req):
-        super(Sqlite, self).create(req, filename=postgres2sqlite(self.pkg))
+        print '+---------------------------------------------+'
+        print '| This download must be created "by hand".'
+        print '| Make sure a suitable file is available at'
+        print '|', self.abspath(req)
+        print '| when the app is started.'
+        print '+---------------------------------------------+'
+        return
+        #super(Sqlite, self).create(req, filename=postgres2sqlite(self.pkg))

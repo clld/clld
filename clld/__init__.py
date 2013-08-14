@@ -19,7 +19,6 @@ def Resource(name, model, interface, with_index=True, with_adapters=True):
 
 RESOURCES = [
     Resource('dataset', common.Dataset, interfaces.IDataset, with_index=False),
-    Resource('file', common.File, interfaces.IFile, with_adapters=False),
     Resource('contribution', common.Contribution, interfaces.IContribution),
     Resource('parameter', common.Parameter, interfaces.IParameter),
     Resource('language', common.Language, interfaces.ILanguage),

@@ -119,6 +119,11 @@ class ClldRequest(Request):
         route, kw = self._route(obj, rsc, **kw)
         return self.route_path(route, **kw)
 
+    def file_url(self, file_):
+        if 'clld.files' in self.registry.settings:
+            abspath = self.registry.settings['clld.files'].joinpath(file_.relpath)
+            return self.static_url(abspath)
+
 
 def menu_item(resource, ctx, req, label=None):
     """
@@ -292,6 +297,10 @@ def get_configurator(pkg, *utilities, **kw):
     Base.metadata.bind = engine
 
     config.add_settings({'pyramid.default_locale_name': 'en'})
+    if 'clld.files' in config.registry.settings:
+        abspath = path(config.registry.settings['clld.files']).abspath()
+        config.add_settings({'clld.files': abspath})
+        config.add_static_view('files', abspath)
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
@@ -318,7 +327,7 @@ def get_configurator(pkg, *utilities, **kw):
     # routes and views
     #
     config.add_static_view('clld-static', 'clld:web/static')
-    config.add_static_view('static', '%s:static' % config.package_name, cache_max_age=3600)
+    config.add_static_view('static', '%s:static' % config.package_name)
 
     config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
     config.add_route_and_view('download', '/download', lambda r: {}, renderer='download.mako')

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from clld.tests.util import TestWithDb
-from clld.db.models.common import Language, File
+from clld.db.models.common import Language
 from clld.db.meta import DBSession, VersionedDBSession
 
 
@@ -46,9 +46,6 @@ class Tests(TestWithDb):
         #print(l.version)
         self.assertEqual(l.name, 'Name')
         l.history()
-
-        f = File()
-        self.assertEqual(f.history(), [])
 
         # a bit of a hack to test the human readable representations.
         # we exploit the fact, that on py2, string and unicode comparison does type
