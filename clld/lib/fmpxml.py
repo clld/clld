@@ -21,6 +21,15 @@ SC = re.compile("font-variant:\s*small\-caps")
 
 def normalize_markup(s):
     """normalize markup in filemaker data
+
+    >>> assert normalize_markup('') is None
+    >>> assert normalize_markup('<span>bla</span>') == 'bla'
+    >>> s = '<span style="font-style: italic;">bla</span>'
+    >>> assert normalize_markup(s) == s
+    >>> s = '<span style="font-weight: bold;">bla</span>'
+    >>> assert normalize_markup(s) == s
+    >>> s = '<span style="font-variant: small-caps;">bla</span>'
+    >>> assert normalize_markup(s) == s
     """
     if not s:
         return
@@ -40,10 +49,7 @@ def normalize_markup(s):
         else:
             span.replace_with(span.string)
 
-    s = soup.html.body.string
-    if not s:
-        return
-    return unicode(s).strip()
+    return unicode(soup.html.body).replace('<body>', '').replace('</body>', '').strip() or None
 
 
 class Result(object):
