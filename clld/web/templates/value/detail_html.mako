@@ -12,7 +12,7 @@
     <dd>${h.link(request, ctx.valueset.parameter)}</dd>
     % if ctx.valueset.references:
     <dt>References</dt>
-    <dd>${h.linked_references(ctx.valueset)|n}</dd>
+    <dd>${h.linked_references(request, ctx.valueset)|n}</dd>
     % endif
     % for k, v in ctx.datadict().items():
     <dt>${k}</dt>
