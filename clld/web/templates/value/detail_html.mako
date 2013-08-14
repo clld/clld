@@ -7,12 +7,12 @@
 
 <dl>
     <dt>Language:</dt>
-    <dd>${h.link(request, ctx.language)}</dd>
+    <dd>${h.link(request, ctx.valueset.language)}</dd>
     <dt>Parameter:</dt>
-    <dd>${h.link(request, ctx.parameter)}</dd>
-    % if ctx.references:
+    <dd>${h.link(request, ctx.valueset.parameter)}</dd>
+    % if ctx.valueset.references:
     <dt>References</dt>
-    <dd>${h.linked_references(ctx)|n}</dd>
+    <dd>${h.linked_references(ctx.valueset)|n}</dd>
     % endif
     % for k, v in ctx.datadict().items():
     <dt>${k}</dt>
