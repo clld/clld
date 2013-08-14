@@ -47,7 +47,7 @@
           <repositoryIdentifier>${request.dataset.domain}</repositoryIdentifier>
           <delimiter>${cfg.delimiter}</delimiter>
           <sampleIdentifier>${cfg.format_identifier(request, earliest)}</sampleIdentifier>
-        </oai:oai-identifier>
+        </oai-identifier>
       </oai:description>
       <oai:description>
         ${olac_archive.archive()}
