@@ -12,11 +12,12 @@ import random
 from getpass import getpass
 import os
 from datetime import datetime, timedelta
+from importlib import import_module
 
 from pytz import timezone, utc
 
 try:  # pragma: no cover
-    from fabric.api import sudo, run, local, put, env, cd, task
+    from fabric.api import sudo, run, local, put, env, cd, task, execute
     env.use_ssh_config = True
     from fabric.contrib.console import confirm
     from fabric.contrib.files import exists
@@ -27,9 +28,10 @@ try:  # pragma: no cover
     from fabtools import postgres
 except ImportError:  # pragma: no cover
     sudo, run, local, put, env, cd, confirm, require, virtualenv, service, postgres = \
-    None, None, None, None, None, None, None, None, None, None, None
+        None, None, None, None, None, None, None, None, None, None, None
 
 from clld.deploy import config
+from clld.scripts.util import data_file
 
 
 # we prevent the tasks defined here from showing up in fab --list, because we only
@@ -107,6 +109,10 @@ server {{
 
     location /static/ {{
             alias {app.venv}/src/{app.name}/{app.name}/static/;
+    }}
+
+    location /files/ {{
+            alias {app.www}/files/;
     }}
 
     error_page 502 503 =502 /503.html;
@@ -199,6 +205,7 @@ pyramid.includes =
 sqlalchemy.url = {app.sqlalchemy_url}
 exclog.extra_info = true
 clld.environment = production
+clld.files = {app.www}/files
 
 %s
 
@@ -367,6 +374,28 @@ def http_auth(app):
 
 
 @task
+def copy_files(app):
+    data_dir = data_file(import_module(app.name))
+    tarball = '/tmp/%s-files.tgz' % app.name
+    local('tar -C %s -czf %s files' % (data_dir, tarball))
+    require.files.file(tarball, source=tarball)
+    if os.path.exists(tarball):
+        os.remove(tarball)
+    with cd('/tmp'):
+        tarfile = tarball.split('/')[2]
+        sudo('tar -xzf %s' % tarfile)
+        target = app.www.joinpath('files')
+        if exists(target):
+            sudo('cp -r files/* %s' % target)
+            sudo('rm -rf files')
+        else:
+            sudo('mv files %s' % app.www)
+        sudo('chown -R root:root %s' % target)
+        sudo('rm %s' % tarfile)
+        sudo('tree %s' % app.www)
+
+
+@task
 def deploy(app, environment, with_alembic=False):
     template_variables = get_template_variables(
         app, 'true' if environment == 'production' else 'false')
@@ -417,6 +446,9 @@ def deploy(app, environment, with_alembic=False):
     #
     # TODO: replace with initialization of db from data repos!
     #
+    if confirm('Copy files?', default=False):
+        execute(copy_files, app)
+
     if not with_alembic and confirm('Recreate database?', default=False):
         supervisor(app, 'pause', template_variables)
         local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))

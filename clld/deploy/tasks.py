@@ -95,6 +95,15 @@ def create_downloads(environment):
 
 @hosts('localhost')
 @task
+def copy_files(environment):
+    """copy files for the app
+    """
+    _assign_host(environment)
+    execute(util.copy_files, APP)
+
+
+@hosts('localhost')
+@task
 def run_script(environment, script_name, *args):
     """
     """

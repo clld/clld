@@ -89,7 +89,7 @@ APPS = dict((app.name, app) for app in [
     App('cgj', 8884, test=SERVERS[0], production=SERVERS[1]),
     App('wow', 8883, test=SERVERS[1]),
     App('glottolog2', 8882),
-    App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=9, test=SERVERS[1], production=SERVERS[0]),
+    App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=7, test=SERVERS[1], production=SERVERS[0]),
     App('solr', 8080),
     App('glottologcurator', 8889, test=SERVERS[1]),
 ])
