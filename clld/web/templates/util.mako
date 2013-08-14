@@ -188,3 +188,13 @@
     <script src="http://books.google.com/books?jscmd=viewapi&bibkeys=${','.join(ids)}&callback=CLLD.process_gbs_info">
     </script>
 </%def>
+
+##
+##
+##
+<%def name="md_tab_li(_format, route, title)">
+    <% url = request.route_url(route + '_alt', id=ctx.id, ext='md.html', _query=dict(format=_format)) %>
+    <li class="${'active' if format == _format else ''}">
+        <a id='tab-opener-${_format}' onclick='${h.JSModal.show(ctx.name.replace("'", ""), url)|n}; return false' href='#'>${title}</a>
+    </li>
+</%def>

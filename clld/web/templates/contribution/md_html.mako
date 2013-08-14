@@ -1,23 +1,18 @@
+<%namespace name="util" file="../util.mako"/>
 <% format = request.params.get('format', 'md.txt') %>
-<%def name="li(_format, title)">
-    <% url = request.route_url('contribution_alt', id=ctx.id, ext='md.html', _query=dict(format=_format)) %>
-    <li class="${'active' if format == _format else ''}">
-        <a onclick='${h.JSModal.show(ctx.name.replace("'", ""), url)|n}; return false'
-           href='#'>
-            ${title}
-        </a>
-    </li>
-</%def>
-##
-## TODO: must get list of available formats from registry!
-##
 <ul class="nav nav-tabs">
-    ${li('md.txt', _('Text'))|n}
-    ${li('md.bib', _('BibTex'))}
+    ${util.md_tab_li('md.txt', 'contribution', _('Text'))|n}
+    ${util.md_tab_li('md.bib', 'contribution', _('BibTex'))}
 ##    ${li('ris', 'RIS')}
 </ul>
 <% from clld.web.adapters import get_adapter %>
 <% adapter = get_adapter(h.interfaces.IMetadata, ctx, request, ext=format) %>
+% if format == 'md.bib':
 <pre>
 ${adapter.render(ctx, request)}
 </pre>
+% else:
+<blockquote>
+${h.text2html(adapter.render(ctx, request))|n}
+</blockquote>
+% endif
