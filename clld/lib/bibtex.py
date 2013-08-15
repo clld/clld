@@ -127,7 +127,7 @@ class _Convertable(UnicodeMixin):
         if fmt == 'txt':
             if hasattr(self, 'text'):
                 return self.text()
-            raise NotImplementedError()
+            raise NotImplementedError()  # pragma: no cover
         if fmt == 'en':
             return convert(self.__unicode__(), 'bib', 'end')
         if fmt == 'ris':

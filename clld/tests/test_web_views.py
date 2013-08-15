@@ -1,7 +1,7 @@
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, XmlResponse
 from clld.db.models import common
 from clld.interfaces import IDataTable
 
@@ -61,9 +61,14 @@ class Tests(TestWithEnv):
     def test_unapi(self):
         from clld.web.views import unapi
 
-        unapi(self.env['request'])
+        assert XmlResponse(unapi(self.env['request'])).root.tag == 'formats'
+
         self.set_request_properties(params={'format': 'bib'})
         self.assertTrue(isinstance(unapi(self.env['request']), HTTPNotFound))
+
+        self.set_request_properties(params={'id': '/contributions/c'})
+        assert XmlResponse(unapi(self.env['request'])).findall('format')
+
         self.set_request_properties(params={'format': 'bib', 'id': '/languages/l1'})
         unapi(self.env['request'])
         self.set_request_properties(params={'format': 'bibtex', 'id': '/contributions/c'})

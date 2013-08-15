@@ -18,9 +18,6 @@ def includeme(config):
     for rsc in RESOURCES:
         name, interface = rsc.name, rsc.interface
 
-        if not rsc.with_adapters:
-            continue
-
         cls = type('Json%s' % rsc.model.mapper_name(), (Json,), {})
         config.registry.registerAdapter(
             cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)

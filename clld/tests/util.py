@@ -7,6 +7,7 @@ from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
 from tempfile import mkdtemp
+from xml.etree import cElementTree as et
 import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
@@ -106,6 +107,13 @@ class TestWithDbAndData(TestWithDb):
         language.sources.append(source)
         identifier = common.Identifier(type='iso639-3', id='iso')
         li = common.LanguageIdentifier(language=language, identifier=identifier)
+
+        for i in range(2, 102):
+            _l = common.Language(id='l%s' % i, name='Language %s' % i)
+            _i = common.Identifier(type='iso639-3', id='%.3i' % i, name='%.3i' % i)
+            _li = common.LanguageIdentifier(language=_l, identifier=_i)
+            DBSession.add(_l)
+
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
         valueset = common.ValueSet(
@@ -433,3 +441,20 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
 
     def get_datatable(self, path, eid=None):
         return DataTable(self.browser, eid=eid, url=self.url(path))
+
+
+class XmlResponse(object):
+    ns = None
+
+    def __init__(self, response):
+        self.root = et.fromstring(response.body)
+
+    def findall(self, name):
+        if not name.startswith('{') and self.ns:
+            name = '{%s}%s' % (self.ns, name)
+        return self.root.findall('.//%s' % name)
+
+    def findone(self, name):
+        _all = self.findall(name)
+        if _all:
+            return _all[0]

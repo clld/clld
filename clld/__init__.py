@@ -4,7 +4,7 @@ from clld.db.models import common
 from clld import interfaces
 
 
-_Resource = namedtuple('Resource', 'name model interface with_index with_adapters')
+_Resource = namedtuple('Resource', 'name model interface with_index')
 
 
 class _ExtendedResource(_Resource):
@@ -13,8 +13,8 @@ class _ExtendedResource(_Resource):
         return self.name + 's'
 
 
-def Resource(name, model, interface, with_index=True, with_adapters=True):
-    return _ExtendedResource(name, model, interface, with_index, with_adapters)
+def Resource(name, model, interface, with_index=True):
+    return _ExtendedResource(name, model, interface, with_index)
 
 
 RESOURCES = [

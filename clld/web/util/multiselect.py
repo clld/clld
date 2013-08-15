@@ -14,7 +14,7 @@ class MultiSelect(object):
         self.collection = collection
         self.url = url
         self.eid = eid
-        self.name = name or class_mapper(self.model).class_.__name__.lower() + 's'
+        self.name = name or self.model.mapper_name().lower() + 's'
         self._options = None
 
     @property

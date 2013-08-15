@@ -10,7 +10,10 @@ class Tests(unittest.TestCase):
     def test_get_taburls(self):
         from clld.lib.iso import get_taburls
 
-        with patch('clld.lib.iso.requests', self._requests('<a href="#">a</a>')):
+        with patch(
+            'clld.lib.iso.requests',
+            self._requests('<a href="iso-639-3-macrolanguages_20121971.tab">a</a>')
+        ):
             get_taburls()
 
     def test_get__tab(self):
@@ -18,10 +21,11 @@ class Tests(unittest.TestCase):
 
         with patch.multiple(
             'clld.lib.iso',
-            requests=self._requests('a\tb\nc\td'),
+            requests=self._requests('a\tb\nc\td\naa'),
             get_taburls=Mock(return_value={'name': 'path'})
         ):
-            assert list(get_tab('name'))
+            res = list(get_tab('name'))
+            assert res[-1].b is None
 
     def test_get_documentation(self):
         from clld.lib.iso import get_documentation

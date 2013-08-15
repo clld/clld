@@ -2,6 +2,8 @@ import unittest
 
 from mock import Mock
 
+from clld.tests.util import TESTS_DIR
+
 
 class Tests(unittest.TestCase):
     def test_Record(self):
@@ -28,5 +30,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(db), 0)
         db = Database([Record('book', 'id')])
         self.assertEqual(db[0], db['id'])
+        assert unicode(db)
         db = Database.from_file('notexisting.bib')
         self.assertEqual(len(db), 0)
+        db = Database.from_file(TESTS_DIR.joinpath('test.bib'))
+        self.assertEqual(len(db), 1)

@@ -7,6 +7,9 @@ import cStringIO
 
 
 def rows(filename, delimiter='\t'):
+    """
+    >>> assert list(rows(__file__))
+    """
     with open(filename, 'r') as fp:
         for line in fp:
             yield [s.strip() for s in line.split(delimiter)]
@@ -15,6 +18,10 @@ def rows(filename, delimiter='\t'):
 class UnicodeCsvWriter:
     """A CSV writer which will write rows to CSV file object "fp",
     which is encoded in the given encoding.
+
+    >>> fp = cStringIO.StringIO()
+    >>> writer = UnicodeCsvWriter(fp)
+    >>> writer.writerows([[1, u'\xef']])
     """
 
     def __init__(self, fp, dialect=csv.excel, encoding="utf-8", **kw):

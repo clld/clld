@@ -1,5 +1,8 @@
 """
 python postgres2sqlite.py apics 2>&1 >/dev/null | less
+
+Unfortunately this approach does not seem to work, thus, our only option is
+intialize_db and making sure all db changes are done via alembic migrations.
 """
 from subprocess import call
 from importlib import import_module
@@ -24,6 +27,8 @@ def replace_booleans(line):
           token equals "true" or false", it was a boolean value in postgres. Obviously
           this assumption does not hold for a text value like "..., true, ...".
           We may switch to using sqlparse for a more robust detection of booleans.
+
+    >>> assert replace_booleans('INSERT (true, false);').strip() == 'INSERT (1, 0);'
     """
     insert, values = line.split('(', 1)
     assert values.endswith(');')
@@ -42,6 +47,10 @@ STMT_END = re.compile("([^\']\'|\, [0-9]+)\)\;$")
 
 
 def inserts(iterator):
+    """
+    >>> assert list(inserts(["INSERT (1, 1);"])) == ['INSERT (1, 1);']
+    >>> assert list(inserts(["INSERT ('a", "b');"])) == ["INSERT ('a__newline__b');"]
+    """
     insert = []
     for line in iterator:
         line = line.strip()
@@ -60,7 +69,7 @@ def inserts(iterator):
                     yield c
 
 
-def convert_dump(i, o):
+def convert_dump(i, o):  # pragma: no cover
     _insert = False
     with file(o, 'w') as fp:
         fp.write('.echo OFF\n.bail ON\n')
@@ -70,7 +79,7 @@ def convert_dump(i, o):
         fp.write('END;\n')
 
 
-def postgres2sqlite(name):
+def postgres2sqlite(name):  # pragma: no cover
     pg_sql = path(mktemp('.sql'))
     sqlite_sql = path(mktemp('.sql'))
     sqlite = mktemp('.sqlite')
@@ -88,7 +97,7 @@ def postgres2sqlite(name):
     return sqlite
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     import sys
     postgres2sqlite(sys.argv[1])
     sys.exit(0)

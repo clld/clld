@@ -22,7 +22,7 @@ from clld.util import slug
 from clld.interfaces import IDownload
 
 
-def confirm(question, default=False):
+def confirm(question, default=False):  # pragma: no cover
     """Ask a yes/no question via raw_input() and return their answer.
 
     "question" is a string that is presented to the user.
@@ -40,6 +40,9 @@ def confirm(question, default=False):
 
 
 def data_file(module, *comps):
+    """
+    >>> assert data_file(common)
+    """
     return path(module.__file__).dirname().joinpath('..', 'data', *comps)
 
 
@@ -54,7 +57,7 @@ def setup_session(config_uri, session=None, base=None, engine=None):
     return path(config_uri.split('#')[0]).abspath().dirname().basename()
 
 
-class ExistingDir(argparse.Action):
+class ExistingDir(argparse.Action):  # pragma: no cover
     def __call__(self, parser, namespace, values, option_string=None):
         path_ = path(values)
         if not path_.exists():
@@ -64,7 +67,7 @@ class ExistingDir(argparse.Action):
         setattr(namespace, self.dest, path_)
 
 
-class ExistingConfig(argparse.Action):
+class ExistingConfig(argparse.Action):  # pragma: no cover
     def __call__(self, parser, namespace, values, option_string=None):
         path_ = path(values.split('#')[0])
         if not path_.exists():
@@ -72,12 +75,12 @@ class ExistingConfig(argparse.Action):
         setattr(namespace, self.dest, values)
 
 
-class SqliteDb(argparse.Action):
+class SqliteDb(argparse.Action):  # pragma: no cover
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, 'engine', create_engine('sqlite:///%s' % values[0]))
 
 
-def parsed_args(*arg_specs, **kw):
+def parsed_args(*arg_specs, **kw):  # pragma: no cover
     """pass a truthy value as keyword parameter bootstrap to bootstrap the app.
     """
     parser = argparse.ArgumentParser()
@@ -111,7 +114,7 @@ def parsed_args(*arg_specs, **kw):
     return args
 
 
-def initializedb(create=None, prime_cache=None, **kw):
+def initializedb(create=None, prime_cache=None, **kw):  # pragma: no cover
     args = parsed_args((("--prime-cache-only",), dict(action="store_true")), **kw)
     if not args.prime_cache_only:
         if create:
@@ -129,7 +132,7 @@ def create_downloads(**kw):
         download.create(args.env['request'])
 
 
-def gbs(**kw):
+def gbs(**kw):  # pragma: no cover
     add_args = [
         (("command",), dict(help="download|verify|update")),
         (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
@@ -143,7 +146,7 @@ def gbs(**kw):
         gbs_func(args.command, args, kw.get('sources'))
 
 
-def gbs_func(command, args, sources=None):
+def gbs_func(command, args, sources=None):  # pragma: no cover
     def words(s):
         return set(slug(s.strip(), remove_whitespace=False).split())
 
@@ -247,6 +250,9 @@ class Data(defaultdict):
 
     The values are dictionaries, keyed by the name of the mapper class used to create the
     new objects.
+
+    >>> d = Data()
+    >>> assert d['k'] == {}
     """
     def __init__(self):
         super(Data, self).__init__(dict)
@@ -258,6 +264,6 @@ class Data(defaultdict):
             new = kw['_obj']
         else:
             new = model(**kw)
-        self[model.__mapper__.class_.__name__][key] = new
+        self[model.mapper_name()][key] = new
         DBSession.add(new)
         return new

@@ -31,6 +31,11 @@ def add_renderer_globals(module, event):
     event['h'] = helpers
     event['u'] = module  # pragma: no cover
     if module:
+        # this is the hook for clld apps to provide additional template context for
+        # templates associated with default views: provide a python with an appropriately
+        # named function, and this function will be invoked, passing the current template
+        # context as keyword parameters, and adding the items from the returned dict
+        # to the template context.
         _renderer = event.get('renderer_name', '')
         if _renderer.endswith('.mako'):
             func = getattr(module, _renderer[:-5].replace('/', '_').replace('.', '_'), 0)

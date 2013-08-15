@@ -6,6 +6,9 @@ else:  # pragma: no cover
 
 
 def hyperlink(url, label=None):
+    """
+    >>> assert hyperlink('http://example.org', label='"example"')
+    """
     f = xlwt.Font()
     f.underline = xlwt.Font.UNDERLINE_SINGLE
 

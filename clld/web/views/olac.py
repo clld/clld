@@ -154,9 +154,8 @@ class OlacConfig(object):
                 req.dataset.publisher_url,
                 '%s, Germany' % req.dataset.publisher_place,
             ),
-            'synopsis': '',
+            'synopsis': req.dataset.description or '',
         }
-        ##<synopsis>The World Atlas of Language Structures Online is a large database of structural (phonological, grammatical, lexical) properties of languages gathered from descriptive materials (such as reference grammars).<py:if test="repos=='refdb'"> The RefDB archive contains bibliographical records for all resources cited in WALS Online.</py:if></synopsis>
 
 
 def olac(req):

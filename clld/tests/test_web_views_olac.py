@@ -1,6 +1,17 @@
 from datetime import date
+from xml.etree import cElementTree as et
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, XmlResponse
+
+
+class OaiPmhResponse(XmlResponse):
+    ns = 'http://www.openarchives.org/OAI/2.0/'
+
+    @property
+    def error(self):
+        e = self.findall('error')
+        if e:
+            return e[0].get('code')
 
 
 def test_ResumptionToken():
@@ -14,55 +25,52 @@ class Tests(TestWithEnv):
         from clld.web.views.olac import olac
 
         self.set_request_properties(params=kw)
-        return olac(self.env['request'])
+        return OaiPmhResponse(olac(self.env['request']))
 
-    def est_olac_no_verb(self):
-        self.assertTrue(self.with_params()['error'])
+    def test_olac_no_verb(self):
+        self.assertEqual(self.with_params().error, 'badVerb')
 
-    def est_olac_listsets(self):
-        self.assertTrue(self.with_params(verb='ListSets')['error'])
+    def test_olac_listsets(self):
+        self.assertNotEqual(self.with_params(verb='ListSets').error, None)
 
-    def est_olac_identify_and_additional_arg(self, ):
-        self.assertTrue(self.with_params(verb='Identify', other='arg')['error'])
+    def test_olac_identify_and_additional_arg(self):
+        self.assertEqual(self.with_params(verb='Identify', other='arg').error, 'badArgument')
 
-    def est_olac_identify(self):
-        self.assertTrue('earliest' in self.with_params(verb='Identify'))
+    def test_olac_identify(self):
+        assert self.with_params(verb='Identify').findall('Identify')
 
-    def est_olac_listMetadataFormats(self):
-        self.assertTrue('cfg' in self.with_params(verb='ListMetadataFormats'))
-        self.assertTrue(self.with_params(verb='ListMetadataFormats', other='x')['error'])
+    def test_olac_listMetadataFormats(self):
+        self.with_params(verb='ListMetadataFormats').findone('metadataPrefix').text == 'olac'
+        assert self.with_params(verb='ListMetadataFormats', other='x').error
 
-    def est_olac_list(self):
+    def test_olac_list(self):
         from clld.web.views.olac import OlacConfig
 
-        self.assertTrue(
-            self.with_params(verb='ListIdentifiers', metadataPrefix='olac')['languages'])
-        cfg = OlacConfig()
-        assert cfg.description(self.env['request'])
-        res = self.with_params(verb='ListIdentifiers', metadataPrefix='olac')['languages']
-        assert cfg.iso_codes(res[0])
-        id_ = cfg.format_identifier(self.env['request'], res[0])
-        self.assertTrue(self.with_params(
-            verb='GetRecord', metadataPrefix='olac', identifier=id_)['language'])
-        self.assertTrue(self.with_params(
-            verb='GetRecord', metadataPrefix='olac')['error'])
-        self.assertTrue(self.with_params(
-            verb='GetRecord', metadataPrefix='ol', identifier=id_)['error'])
-        self.assertTrue(self.with_params(
-            verb='GetRecord', metadataPrefix='olac', identifier=id_+'123')['error'])
+        assert self.with_params(verb='ListIdentifiers', metadataPrefix='olac').findall('header')
 
-        self.assertTrue(
-            self.with_params(verb='ListIdentifiers', resumptionToken='tr', o='')['error'])
-        self.assertTrue(
-            self.with_params(verb='ListIdentifiers', resumptionToken='tr')['error'])
-        self.assertEqual(
-            self.with_params(
-                verb='ListIdentifiers',
-                resumptionToken='0f2000-01-01u2222-01-01').get('error'),
-            None)
-        self.assertTrue(
-            self.with_params(verb='ListIdentifiers', resumptionToken='100')['error'])
-        self.assertTrue(
-            self.with_params(
-                verb='ListIdentifiers',
-                resumptionToken='100f2000-01-01u2000-01-01')['error'])
+        cfg = OlacConfig()
+        #assert cfg.description(self.env['request'])
+
+        #res = self.with_params(verb='ListIdentifiers', metadataPrefix='olac')['languages']
+        #assert cfg.iso_codes(res[0])
+
+        id_ = self.with_params(verb='Identify').findone(
+            '{http://www.openarchives.org/OAI/2.0/oai-identifier}sampleIdentifier').text
+
+        assert self.with_params(verb='GetRecord', metadataPrefix='olac', identifier=id_).findone('record')
+        assert self.with_params(verb='GetRecord', metadataPrefix='olac').error
+        assert self.with_params(verb='GetRecord', metadataPrefix='ol', identifier=id_).error
+        assert self.with_params(verb='GetRecord', metadataPrefix='olac', identifier=id_+'123').error
+        assert self.with_params(verb='ListIdentifiers', resumptionToken='tr', metadataPrefix='olac').error
+        assert self.with_params(verb='ListIdentifiers', resumptionToken='tr', o='x').error
+        assert self.with_params(verb='ListIdentifiers').error
+        assert self.with_params(verb='ListIdentifiers', metadataPrefix='olac', set='x').error
+        assert self.with_params(verb='ListIdentifiers', resumptionToken='tr').error
+        assert not self.with_params(
+            verb='ListIdentifiers',
+            resumptionToken='0f2000-01-01u2222-01-01').error
+        assert not self.with_params(verb='ListIdentifiers', resumptionToken='100').error
+        assert self.with_params(verb='ListIdentifiers', resumptionToken='200').error
+        assert self.with_params(
+            verb='ListIdentifiers',
+            resumptionToken='100f2000-01-01u2000-01-01').error

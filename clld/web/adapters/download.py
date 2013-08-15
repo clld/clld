@@ -20,7 +20,7 @@ from clld.util import format_size
 from clld.scripts.postgres2sqlite import postgres2sqlite
 
 
-def page_query(q, n=1000):
+def page_query(q, n=1000, verbose=False):
     """
     http://stackoverflow.com/a/1217947
     """
@@ -33,7 +33,8 @@ def page_query(q, n=1000):
             yield elem
         offset += n
         e = time.time()
-        print e - s, offset, 'done'
+        if verbose:
+            print e - s, offset, 'done'  # pragma: no cover
         s = e
         if not r:
             break
@@ -80,7 +81,7 @@ class Download(object):
     def label(self, req):
         return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
 
-    def create(self, req, filename=None):
+    def create(self, req, filename=None, verbose=True):
         p = self.abspath(req)
         if not p.dirname().exists():
             p.dirname().mkdir()
@@ -91,7 +92,7 @@ class Download(object):
             # covers all relevant metadata.
             with closing(GzipFile(p, 'w')) as fp:
                 self.before(req, fp)
-                for i, item in enumerate(page_query(self.query(req))):
+                for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                     self.dump(req, fp, item, i)
                 self.after(req, fp)
         else:
@@ -99,7 +100,7 @@ class Download(object):
                 if not filename:
                     fp = StringIO()
                     self.before(req, fp)
-                    for i, item in enumerate(page_query(self.query(req))):
+                    for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
                     fp.seek(0)

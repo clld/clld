@@ -1,3 +1,6 @@
+"""
+script to create the default set of map marker icons distributed with clld.
+"""
 import sys
 
 try:
@@ -16,7 +19,7 @@ from pyramid.path import AssetResolver
 from clld.web.icon import ICONS
 
 
-def polygon(*points):
+def polygon(*points):  # pragma: no cover
     args = []
     for i, point in enumerate(points):
         args.append(path.moveto(*point) if i == 0 else path.lineto(*point))
@@ -42,13 +45,15 @@ def pyxColor(string):
     """
     :param string: RGB color name like 'ffffff'
     :return: pyx color.
+
+    >>> assert pyxColor('ffffff')
     """
     assert len(string) == 6
     colorTuple = tuple(int('0x' + c, 16) for c in [string[i:i+2] for i in range(0, 6, 2)])
     return color.rgb(*[i / 255.0 for i in colorTuple])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     if not pyx:
         sys.exit(1)
     asset_resolver = AssetResolver()
