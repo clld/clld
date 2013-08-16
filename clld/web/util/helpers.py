@@ -185,7 +185,7 @@ def button(*content, **attrs):
 def cite_button(req, ctx):
     return button(
         'cite',
-        id="cite-button",
+        id="cite-button-%s" % ctx.id,
         onclick=JSModal.show(ctx.name, req.resource_url(ctx, ext='md.html')))
 
 

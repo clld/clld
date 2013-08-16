@@ -208,7 +208,7 @@
     % for fmt in ['md.txt', 'md.bib', 'md.ris']:
         % if fmt in adapters:
         <li class="${'active' if format == fmt else ''}">
-            <a id='tab-opener-${fmt}'
+            <a id='md-tab-opener-${fmt}'
                onclick='${h.JSModal.show(ctx.name.replace("'", ""), request.resource_url(ctx, ext='md.html', _query=dict(format=fmt)))|n}; return false'
                href='#'>${adapters[fmt].label}</a>
         </li>
