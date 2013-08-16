@@ -198,3 +198,29 @@
         <a id='tab-opener-${_format}' onclick='${h.JSModal.show(ctx.name.replace("'", ""), url)|n}; return false' href='#'>${title}</a>
     </li>
 </%def>
+
+
+<%def name="md_tabs()">
+    <% format = request.params.get('format', 'md.txt') %>
+    <% adapters = dict((a.extension, a) for n, a in h.get_adapters(h.interfaces.IMetadata, ctx, request)) %>
+
+    <ul class="nav nav-tabs">
+    % for fmt in ['md.txt', 'md.bib', 'md.ris']:
+        % if fmt in adapters:
+        <li class="${'active' if format == fmt else ''}">
+            <a id='tab-opener-${fmt}'
+               onclick='${h.JSModal.show(ctx.name.replace("'", ""), request.resource_url(ctx, ext='md.html', _query=dict(format=fmt)))|n}; return false'
+               href='#'>${adapters[fmt].label}</a>
+        </li>
+        % endif
+    % endfor
+    </ul>
+
+    % if format == 'md.txt':
+    <blockquote>
+    ${h.text2html(adapters[format].render(ctx, request))|n}
+    </blockquote>
+    % else:
+    <pre>${adapters[format].render(ctx, request)}</pre>
+    % endif
+</%def>

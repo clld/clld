@@ -18,6 +18,7 @@ class Metadata(Representation):
 class BibTex(Metadata):
     """Render a resource's metadata as BibTex record.
     """
+    __label__ = 'BibTeX'
     unapi = 'bibtex'
     extension = 'md.bib'
     mimetype = 'text/x-bibtex'
@@ -50,9 +51,21 @@ class BibTex(Metadata):
 
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
+class ReferenceManager(BibTex):
+    __label__ = 'RIS'
+    unapi = 'ris'
+    extension = 'md.ris'
+    mimetype = "application/x-research-info-systems"
+
+    def render(self, ctx, req):
+        return self.rec(ctx, req).format('ris')
+
+
+@implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class TxtCitation(Metadata):
     """Render a resource's metadata as plain text string.
     """
+    __label__ = 'Text'
     extension = 'md.txt'
     mimetype = 'text/plain'
 

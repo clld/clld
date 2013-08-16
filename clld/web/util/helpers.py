@@ -21,7 +21,7 @@ from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
 from clld.db.meta import DBSession
 from clld.db.models import common as models
-from clld.web.adapters import get_adapter
+from clld.web.adapters import get_adapter, get_adapters
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 from clld.lib import rdf
@@ -180,6 +180,13 @@ def button(*content, **attrs):
         class_.append('btn')
     attrs['class'] = ' '.join(class_)
     return tag(*content, **attrs)
+
+
+def cite_button(req, ctx):
+    return button(
+        'cite',
+        id="cite-button",
+        onclick=JSModal.show(ctx.name, req.resource_url(ctx, ext='md.html')))
 
 
 # regex to match standard abbreviations in gloss units:

@@ -20,6 +20,10 @@ class Renderable(object):
         self.obj = obj
 
     @property
+    def label(self):
+        return getattr(self, '__label__', self.__class__.__name__)
+
+    @property
     def charset(self):
         return 'utf-8' \
             if self.mimetype.startswith('text/') \

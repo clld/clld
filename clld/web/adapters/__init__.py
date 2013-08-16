@@ -5,7 +5,7 @@ from clld import interfaces
 from clld.web.adapters.base import Index, Representation, Json
 from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
 from clld.web.adapters.excel import ExcelAdapter
-from clld.web.adapters.md import BibTex, TxtCitation
+from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
 from clld.lib.rdf import FORMATS as RDF_NOTATIONS
@@ -16,22 +16,29 @@ def includeme(config):
     """
     specs = []
     for rsc in RESOURCES:
+        # each resource is available ...
         name, interface = rsc.name, rsc.interface
 
+        # ... as json
         cls = type('Json%s' % rsc.model.mapper_name(), (Json,), {})
         config.registry.registerAdapter(
             cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)
 
         if rsc.with_index:
+            # ... as html index
             specs.append(
                 (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
 
+        # ... as html details page
         specs.append(
             (interface, Representation, 'text/html', 'html', name + '/detail_html.mako',
              {}))
+        # ... as html snippet (if the template exists)
         specs.append(
             (interface, Representation, 'application/vnd.clld.snippet+xml',
              'snippet.html', name + '/snippet_html.mako', {}))
+
+        # ... as RDF in various notations
         for notation in RDF_NOTATIONS.values():
             specs.append((
                 interface,
@@ -40,6 +47,7 @@ def includeme(config):
                 notation.extension,
                 name + '/rdf.mako', {'rdflibname': notation.name}))
 
+        # ... as RDF collection index
         rdf_xml = RDF_NOTATIONS['xml']
         specs.append((
             interface,
@@ -48,9 +56,10 @@ def includeme(config):
             rdf_xml.extension,
             'index_rdf.mako', {'rdflibname': rdf_xml.name}))
 
-    specs.append(
-        (interfaces.IContribution, Representation, 'application/vnd.clld.md+xml',
-         'md.html', 'contribution/md_html.mako', {}))
+    # citeable resources are available as html page listing available metadata formats:
+    for _if in [interfaces.IContribution, interfaces.IDataset]:
+        specs.append(
+            (_if, Representation, 'application/vnd.clld.md+xml', 'md.html', 'md_html.mako', {}))
 
     specs.extend([
         (
@@ -82,7 +91,7 @@ def includeme(config):
         config.registry.registerAdapter(
             cls, (interface,), list(implementedBy(base))[0], name=mimetype)
 
-    for cls in [BibTex, TxtCitation]:
+    for cls in [BibTex, TxtCitation, ReferenceManager]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
             for adapts in [interfaces.IContribution, interfaces.IDataset]:
                 config.registry.registerAdapter(
