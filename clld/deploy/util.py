@@ -386,7 +386,7 @@ def copy_files(app):
         sudo('tar -xzf %s' % tarfile)
         target = app.www.joinpath('files')
         if exists(target):
-            sudo('cp -r files/* %s' % target)
+            sudo('cp -ru files/* %s' % target)
             sudo('rm -rf files')
         else:
             sudo('mv files %s' % app.www)
