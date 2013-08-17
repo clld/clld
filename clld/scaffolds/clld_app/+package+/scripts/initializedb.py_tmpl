@@ -1,34 +1,24 @@
 from __future__ import unicode_literals
 import sys
-import transaction
 
-from clld.scripts.util import setup_session, Data
+from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
 
 from {{package}} import models
 
 
-def main(cfg):
-    setup_session(cfg)
+def main(args):
     data = Data()
 
-    with transaction.manager:
-        pass
 
-
-def prime_cache(cfg):
+def prime_cache(args):
     """If data needs to be denormalized for lookup, do that here.
     This procedure should be separate from the db initialization, because
     it will have to be run periodiucally whenever data has been updated.
     """
-    setup_session(cfg)
-
-    with transaction.manager:
-        pass
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        main(sys.argv[1])
-    prime_cache(sys.argv[1])
+    initializedb(create=main, prime_cache=prime_cache)
+    sys.exit(0)

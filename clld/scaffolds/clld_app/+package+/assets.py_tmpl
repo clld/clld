@@ -6,4 +6,4 @@ import {{package}}
 
 environment.append_path(
     path({{package}}.__file__).dirname().joinpath('static'), url='/{{package}}:static/')
-environment.load_path = reversed(environment.load_path)
+environment.load_path = list(reversed(environment.load_path))
