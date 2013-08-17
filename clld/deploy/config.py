@@ -83,6 +83,8 @@ class App(object):
 
 
 APPS = dict((app.name, app) for app in [
+    App('phoible', 8890, domain='phoible.org', test=SERVERS[1]),
+    App('glottologcurator', 8889, test=SERVERS[1]),
     App('wold2', 8888, domain='wold.livingsources.org', test=SERVERS[0], production=SERVERS[1]),
     App('wals3', 8887, domain='wals.info', test=SERVERS[0], production=SERVERS[1]),
     App('apics', 8886, domain='apics-online.info', test=SERVERS[0], production=SERVERS[1]),
@@ -91,7 +93,6 @@ APPS = dict((app.name, app) for app in [
     App('glottolog2', 8882),
     App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=7, test=SERVERS[1], production=SERVERS[0]),
     App('solr', 8080),
-    App('glottologcurator', 8889, test=SERVERS[1]),
 ])
 
 ERROR_EMAIL = 'robert_forkel@eva.mpg.de'
