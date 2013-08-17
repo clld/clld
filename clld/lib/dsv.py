@@ -4,15 +4,29 @@ support for reading and writing deimiter-separated value files.
 import csv
 import codecs
 import cStringIO
+from collections import namedtuple
 
 
-def rows(filename, delimiter='\t'):
+def rows(filename, delimiter='\t', namedtuples=False, encoding=None):
     """
     >>> assert list(rows(__file__))
     """
+    cls = None
+
+    def normalize_name(s):
+        if s == 'class':
+            return 'class_'
+        return s.replace('-', '_')
+
     with open(filename, 'r') as fp:
-        for line in fp:
-            yield [s.strip() for s in line.split(delimiter)]
+        for i, line in enumerate(fp):
+            if encoding:
+                line = line.decode(encoding)
+            row = [s.strip() for s in line.split(delimiter)]
+            if namedtuples and i == 0:
+                cls = namedtuple('Row', map(normalize_name, row))
+            else:
+                yield cls(*row) if cls else row
 
 
 class UnicodeCsvWriter:
