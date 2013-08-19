@@ -66,6 +66,9 @@ class Tests(TestWithEnv):
         self.set_request_properties(params={'format': 'bib'})
         self.assertTrue(isinstance(unapi(self.env['request']), HTTPNotFound))
 
+        self.set_request_properties(params={'id': '/contributions/ccc'})
+        self.assertTrue(isinstance(unapi(self.env['request']), HTTPNotFound))
+
         self.set_request_properties(params={'id': '/contributions/c'})
         assert XmlResponse(unapi(self.env['request'])).findall('format')
 

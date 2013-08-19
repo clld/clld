@@ -4,8 +4,8 @@ from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 from purl import URL
 
-from clld.db.models.common import Contribution, ValueSet, Language
-from clld.tests.util import TestWithEnv, Route
+from clld.db.models.common import Contribution, ValueSet, Language, Language_files
+from clld.tests.util import TestWithEnv, Route, TESTS_DIR
 from clld.interfaces import IMapMarker
 
 
@@ -15,6 +15,7 @@ class Tests(TestWithEnv):
         c = self.env['request'].db.query(Contribution).first()
         self.env['request'].resource_url(c, ext='geojson')
         self.assertEqual(None, self.env['request'].ctx_for_url('/some/path/to/nowhere'))
+        self.env['request'].file_url(Language_files(id='1', object=Language.first()))
 
     def test_ctx_factory(self):
         from clld.web.app import ctx_factory
@@ -37,3 +38,10 @@ class Tests(TestWithEnv):
     def test_MapMarker(self):
         marker = self.env['request'].registry.getUtility(IMapMarker)
         self.assertTrue(marker(None, self.env['request']))
+
+    def test_add_config_from_file(self):
+        from clld.web.app import add_settings_from_file
+
+        config = Configurator()
+        add_settings_from_file(config, TESTS_DIR.joinpath('test.ini'))
+        assert 'app:main.use' in config.registry.settings

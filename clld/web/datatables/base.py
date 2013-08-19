@@ -8,7 +8,6 @@ import re
 
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
-from sqlalchemy.inspection import inspect
 from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
@@ -147,7 +146,7 @@ class LinkToMapCol(Col):
 
     def format(self, item):
         obj = self.get_obj(item)
-        if not obj or obj.latitude is None:
+        if not obj or getattr(obj, 'latitude', None) is None:
             return ''
         return HTML.a(
             icon('icon-globe'),
@@ -189,10 +188,10 @@ class DataTable(object):
         self.count_filtered = None
 
     def __unicode__(self):
-        return '%ss' % inspect(self.model).class_.__name__
+        return '%ss' % self.model.mapper_name()
 
     def __repr__(self):
-        return '%ss' % inspect(self.model).class_.__name__
+        return '%ss' % self.model.mapper_name()
 
     def col_defs(self):
         raise NotImplementedError  # pragma: no cover
@@ -252,11 +251,11 @@ class DataTable(object):
                         query = query.order_by(order)
 
         query = query.order_by(self.model.pk)
-        limit = int(self.req.params.get('iDisplayLength', limit))
-        if limit == -1:
-            limit = 1000
+        if 'iDisplayLength' in self.req.params:
+            # make sure no more than 1000 items can be selected
+            limit = min([int(self.req.params['iDisplayLength']), 1000])
         query = query\
-            .limit(limit)\
+            .limit(limit if limit != -1 else 1000)\
             .offset(int(self.req.params.get('iDisplayStart', offset)))
         return query
 

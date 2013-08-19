@@ -31,6 +31,7 @@ import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
 from clld.db.models import common
 from clld.web.adapters import Representation
+from clld.web.adapters.download import N3Dump
 from clld.web.icon import MapMarker
 from clld import interfaces
 
@@ -59,6 +60,8 @@ def main(global_config, **settings):
     config.register_resource('testresource', common.Language, IF, with_index=True)
     config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')
+    config.register_download(N3Dump(common.Language, 'clld'))
+    config.register_menu(('home', lambda ctx, req: (req.resource_url(req.dataset), 'tt')))
     return config.make_wsgi_app()
 
 
@@ -116,6 +119,7 @@ class TestWithDbAndData(TestWithDb):
 
         param = common.Parameter(id='p', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
+        de2 = common.DomainElement(id='de2', name='DomainElement2', parameter=param)
         valueset = common.ValueSet(
             id='vs', language=language, parameter=param, contribution=contribution)
         value = common.Value(
@@ -198,6 +202,21 @@ class TestWithEnv(TestWithDbAndData):
         for k, v in props.items():
             self._prop_cache[k] = getattr(self.env['request'], k, None)
             self._set_request_property(k, v)
+
+    def utility(self, utility, interface):
+        class Mgr(object):
+            def __init__(self, registry, u, i):
+                self.registry = registry
+                self.utility = u
+                self.provided = i
+
+            def __enter__(self):
+                self.registry.registerUtility(self.utility, self.provided)
+
+            def __exit__(self, ext, exv, trb):
+                self.registry.unregisterUtility(self.utility, self.provided)
+
+        return Mgr(self.env['registry'], utility, interface)
 
     def handle_dt(self, cls, model, **kw):
         dt = cls(self.env['request'], model, **kw)

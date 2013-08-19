@@ -275,6 +275,14 @@ def register_download(config, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
+def add_settings_from_file(config, file_):
+    if file_.exists():
+        cfg = get_config(file_)
+        if 'mako.directories_list' in cfg:
+            cfg['mako.directories'] = cfg['mako.directories_list']  # pragma: no cover
+        config.add_settings(cfg)
+
+
 def get_configurator(pkg, *utilities, **kw):
     """
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
@@ -298,6 +306,7 @@ def get_configurator(pkg, *utilities, **kw):
 
     config.add_settings({'pyramid.default_locale_name': 'en'})
     if 'clld.files' in config.registry.settings:
+        # deployment-specific location of static data files
         abspath = path(config.registry.settings['clld.files']).abspath()
         config.add_settings({'clld.files': abspath})
         config.add_static_view('files', abspath)
@@ -320,6 +329,7 @@ def get_configurator(pkg, *utilities, **kw):
         'register_adapter': register_adapter,
         'register_download': register_download,
         'add_route_and_view': add_route_and_view,
+        'add_settings_from_file': add_settings_from_file,
     }.items():
         config.add_directive(name, func)
 
@@ -404,11 +414,7 @@ def get_configurator(pkg, *utilities, **kw):
         config.add_translation_dirs('%s:locale' % config.package_name)
         config.add_translation_dirs('clld:locale')
 
-    if pkg_dir.joinpath('appconf.ini').exists():
-        cfg = get_config(pkg_dir.joinpath('appconf.ini'))
-        if 'mako.directories_list' in cfg:
-            cfg['mako.directories'] = cfg['mako.directories_list']  # pragma: no cover
-        config.add_settings(cfg)
+    config.add_settings_from_file(pkg_dir.joinpath('appconf.ini'))
 
     v = maybe_import('%s.views' % config.package_name)
     if v:

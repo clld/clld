@@ -26,24 +26,12 @@ class TypeCol(Col):
         return Sentence.type
 
 
-class IdCol(Col):
-    def __init__(self, dt, name='id', **kw):
-        kw.setdefault('sTitle', dt.req.translate('No.'))
-        kw.setdefault('sClass', 'right')
-        kw.setdefault('input_size', 'mini')
-        super(IdCol, self).__init__(dt, name, **kw)
-
-    def order(self):
-        return cast(self.dt.model.id, Integer)
-
-
 class Sentences(DataTable):
     def base_query(self, query):
         return query.join(Language).options(joinedload(Sentence.language))
 
     def col_defs(self):
         return [
-            #IdCol(self),
             LinkCol(self, 'name', sTitle='Primary text', sClass="object-language"),
             Col(self, 'analyzed', sTitle='Analyzed text'),
             Col(self, 'gloss', sClass="gloss"),

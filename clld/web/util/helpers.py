@@ -109,7 +109,7 @@ def format_gbs_identifier(source):
 
 
 def format_frequency(req, obj, marker=None, height='20', width='20'):
-    if not obj.frequency:
+    if not obj.frequency or obj.frequency == 100:
         return ''
     res = 'Frequency: %s%%' % round(obj.frequency, 1)
     marker = marker or req.registry.queryUtility(interfaces.IFrequencyMarker)
@@ -117,8 +117,6 @@ def format_frequency(req, obj, marker=None, height='20', width='20'):
         url = marker(obj, req)
         if url:
             return HTML.img(src=url, height=height, width=width, alt=res, title=res)
-    if not obj.frequency or obj.frequency == 100:
-        return ''
     return res
 
 
@@ -302,6 +300,9 @@ def newline2br(text):
 
 
 def text2html(text, mode='br', sep='\n\n'):
+    """
+    >>> assert 'div' in unicode(text2html('chunk', mode='p'))
+    """
     if mode == 'p':
         return HTML.div(*[HTML.p(literal(newline2br(line))) for line in text.split(sep)])
     return HTML.p(literal(newline2br(text)))

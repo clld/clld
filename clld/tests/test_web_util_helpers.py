@@ -2,6 +2,7 @@ from mock import Mock, patch, MagicMock
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
+from clld.interfaces import ILinkAttrs, IFrequencyMarker
 
 
 class Tests(TestWithEnv):
@@ -10,6 +11,30 @@ class Tests(TestWithEnv):
 
         link(self.env['request'], common.Language(id='id', name='Name'))
         link(self.env['request'], common.Value.first())
+
+        with self.utility(Mock(return_value={}), ILinkAttrs):
+            link(self.env['request'], common.Value.first())
+
+    def test_gbs_link(self):
+        from clld.web.util.helpers import gbs_link
+
+        gbs_link(MagicMock(), pages='34')
+        gbs_link(MagicMock(jsondata=dict(gbs=dict(accessInfo=dict(viewability='NO_PAGES')))))
+
+    def test_map_marker_img(self):
+        from clld.web.util.helpers import map_marker_img
+
+        map_marker_img(self.env['request'], None, marker=Mock(return_value=None))
+
+    def test_get_downloads(self):
+        from clld.web.util.helpers import get_downloads
+
+        list(get_downloads(self.env['request']))
+
+    def test_get_rdf_dumps(self):
+        from clld.web.util.helpers import get_rdf_dumps
+
+        list(get_rdf_dumps(self.env['request'], common.Language))
 
     def test_external_link(self):
         from clld.web.util.helpers import external_link
@@ -35,6 +60,12 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import coins
 
         coins(self.env['request'], common.Contribution.first())
+        coins(self.env['request'], None)
+
+    def test_format_gbs_identifier(self):
+        from clld.web.util.helpers import format_gbs_identifier
+
+        format_gbs_identifier(common.Source.first())
 
     def test_linked_references(self):
         from clld.web.util.helpers import linked_references
@@ -49,15 +80,24 @@ class Tests(TestWithEnv):
 
         self.assertTrue('<br' in text2html('abc\ndef'))
 
+    def test_contactmail(self):
+        from clld.web.util.helpers import contactmail
+
+        contactmail(self.env['request'])
+
     def test_format_frequency(self):
         from clld.web.util.helpers import format_frequency
 
         format_frequency(self.env['request'], common.Value.first())
         format_frequency(self.env['request'], Mock(frequency=None))
 
+        with self.utility(Mock(return_value='url'), IFrequencyMarker):
+            format_frequency(self.env['request'], common.Value.first())
+
     def test_rendered_sentence(self):
         from clld.web.util.helpers import rendered_sentence
 
+        rendered_sentence(MagicMock())
         rendered_sentence(common.Sentence.first())
         rendered_sentence(common.Sentence.first(), abbrs=dict(SG='singular'))
 

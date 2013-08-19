@@ -6,13 +6,23 @@
 Cross-Linguistic Linked Data
 ============================
 
-Python library providing common functionality for the applications of the CLLD project.
+The Cross_linguistic Linked Data project provides software for the publication of
+cross-linguistic databases. In particular it provides
+
+- a common core database model,
+- a pyramid application scaffold,
+- a core web application implemmented in the pyramid framework,
+- scripts exploiting the core database model.
+
 
 Contents:
 
 .. toctree::
     :maxdepth: 2
 
+    #install
+    #examples
+    #tutorial
     resources
     interfaces
     db

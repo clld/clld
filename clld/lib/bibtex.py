@@ -211,6 +211,8 @@ class Record(OrderedDict, _Convertable):
                     m = endLine.match(line)
                     if m:
                         break
+                    # Note: fields with names not matching the expected pattern are simply
+                    # ignored.
 
         return cls(genre, id_, **data)
 

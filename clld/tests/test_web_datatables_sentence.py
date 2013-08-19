@@ -15,3 +15,10 @@ class Tests(TestWithEnv):
             'sSortDir_0': 'desc',
         })
         self.handle_dt(Sentences, common.Sentence)
+
+        self.set_request_properties(params={
+            'sSearch_4': 'text',
+            'iSortingCols': '1',
+            'iSortCol_0': '4',
+            'sSortDir_0': 'desc'})
+        self.handle_dt(Sentences, common.Sentence)
