@@ -20,9 +20,7 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    #install
-    #examples
-    #tutorial
+    tutorial
     resources
     interfaces
     db
