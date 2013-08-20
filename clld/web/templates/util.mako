@@ -80,6 +80,17 @@
 </%def>
 
 ##
+##
+##
+<%def name="stacked_links(items)">
+    <ul class="nav nav-pills nav-stacked">
+    % for item in items:
+        <li>${h.link(request, item)}</li>
+    % endfor
+    </ul>
+</%def>
+
+##
 ## format an HTML table, enhanced via jQuery DataTables
 ##
 <%def name="table(items, eid='table', class_='table-hover', options=None)">
@@ -123,6 +134,31 @@
             <p>${p}</p>
         % endfor
     </div>
+</%def>
+
+##
+## format history of an object
+##
+<%def name="history(obj_)">
+    <% versions = obj_.history().all() %>
+    % if versions:
+    <%self:well title="History">
+        <table>
+            <tbody>
+                <tr>
+                    <td>${str(obj_.updated).split(' ')[0]}</td>
+                    <td>${caller.body(item=obj_)}</td>
+                </tr>
+                % for v in versions:
+                <tr>
+                    <td>${str(v.updated).split(' ')[0]}</td>
+                    <td>${caller.body(item=v)}</td>
+                </tr>
+                % endfor
+            </tbody>
+        </table>
+    </%self:well>
+    % endif
 </%def>
 
 ##

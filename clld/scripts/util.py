@@ -252,8 +252,9 @@ class Data(defaultdict):
     >>> d = Data()
     >>> assert d['k'] == {}
     """
-    def __init__(self):
+    def __init__(self, **kw):
         super(Data, self).__init__(dict)
+        self.defaults = kw
 
     def add(self, model, key, **kw):
         if kw.keys() == ['_obj']:
@@ -261,6 +262,8 @@ class Data(defaultdict):
             # which should be added to the session.
             new = kw['_obj']
         else:
+            for k, v in self.defaults.items():
+                kw.setdefault(k, v)
             new = model(**kw)
         self[model.mapper_name()][key] = new
         DBSession.add(new)
