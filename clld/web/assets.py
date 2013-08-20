@@ -42,6 +42,7 @@ bundles = {
         Bundle(
             'css/clld.css',
             'css/jqtree.css',
+            'css/leaflet.css',
             'css/leaflet.label.css',
             'css/hint.css',
             filters='yui_css'),
