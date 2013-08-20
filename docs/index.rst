@@ -14,6 +14,10 @@ cross-linguistic databases. In particular it provides
 - a core web application implemmented in the pyramid framework,
 - scripts exploiting the core database model.
 
+Online documentation: http://clld.readthedocs.org/
+
+Source code and issue tracker: https://github.com/clld/clld
+
 
 Contents:
 

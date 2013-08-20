@@ -2,7 +2,7 @@
 Installation
 ------------
 
-TODO: recommend forking?
+#TODO: recommend forking?
 
 In a virtualenv::
 
