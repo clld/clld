@@ -20,6 +20,8 @@ def rows(filename, delimiter='\t', namedtuples=False, encoding=None):
 
     with open(filename, 'r') as fp:
         for i, line in enumerate(fp):
+            if line.endswith('\r'):
+                line = line[:-1]
             if encoding:
                 line = line.decode(encoding)
             row = [s.strip() for s in line.split(delimiter)]

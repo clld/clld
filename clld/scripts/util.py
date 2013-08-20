@@ -16,7 +16,7 @@ from path import path
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
 
-from clld.db.meta import DBSession, Base
+from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.util import slug
 from clld.interfaces import IDownload
@@ -46,14 +46,13 @@ def data_file(module, *comps):
     return path(module.__file__).dirname().joinpath('..', 'data', *comps)
 
 
-def setup_session(config_uri, session=None, base=None, engine=None):
-    session = session or DBSession
-    base = base or Base
+def setup_session(config_uri, engine=None):
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
     engine = engine or engine_from_config(settings, 'sqlalchemy.')
-    session.configure(bind=engine)
-    base.metadata.create_all(engine)
+    DBSession.configure(bind=engine)
+    VersionedDBSession.configure(bind=engine)
+    Base.metadata.create_all(engine)
     return path(config_uri.split('#')[0]).abspath().dirname().basename()
 
 
@@ -94,8 +93,7 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     args = parser.parse_args(args=kw.pop('args', None))
     engine = getattr(args, 'engine', kw.get('engine', None))
     args.env = bootstrap(args.config_uri) if kw.get('bootstrap', False) else {}
-    module = setup_session(
-        args.config_uri, session=kw.get('session'), base=kw.get('base'), engine=engine)
+    module = setup_session(args.config_uri, engine=engine)
 
     # make sure we create URLs in the correct domain
     if args.env:

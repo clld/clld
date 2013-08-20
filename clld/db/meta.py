@@ -108,13 +108,6 @@ class Base(UnicodeMixin):
     jsondata = Column(JSONEncodedDict)
 
     def update_jsondata(self, **kw):
-        #
-        # TODO: remove hack after successful data import of glottolog 2
-        #
-        import json
-        if isinstance(self.jsondata, basestring):
-            self.jsondata = json.loads(self.jsondata)
-
         d = copy(self.jsondata) or {}
         d.update(**kw)
         self.jsondata = d

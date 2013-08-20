@@ -53,8 +53,7 @@ backend {app.name} {{
     .port = "{app.port}";
 }}
 
-sub vcl_recv
-{{
+sub vcl_recv {{
     if (req.http.host ~ "^{app.domain}$")  {{ set req.backend = {app.name}; }}
 }}
 
