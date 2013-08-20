@@ -31,13 +31,9 @@ ${ctx.coins(request)|n}
 </div>
 
 <%def name="sidebar()">
-% if ctx.languagesource:
+% if ctx.languages:
 <%util:well title="${_('Languages')}">
-    <ul class="nav nav-pills nav-stacked">
-    % for source_assoc in ctx.languagesource:
-        <li>${h.link(request, source_assoc.language)}</li>
-    % endfor
-    </ul>
+    ${util.stacked_links(ctx.languages)}
 </%util:well>
 % endif
 </%def>
