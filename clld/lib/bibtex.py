@@ -123,6 +123,8 @@ FIELDS = [
 
 
 class _Convertable(UnicodeMixin):
+    """Mixin adding a shortcut to clld.lib.bibutils.convert as method.
+    """
     def format(self, fmt):
         if fmt == 'txt':
             if hasattr(self, 'text'):
@@ -146,11 +148,27 @@ class IRecord(Interface):
 class Record(OrderedDict, _Convertable):
     """A BibTeX record is basically an ordered dict with two special properties - id and
     genre.
+
+    To overcome the limitation of single values per field in BibTeX, we allow fields,
+    i.e. values of the dict to be iterables of strings as well.
+    Note that to support this use case comprehensively, various methods of retrieving
+    values will behave differently. I.e. values will be
+
+    - joined to a string in __getitem__,
+    - retrievable as assigned with get (i.e. only use get if you know how a value was\
+      assigned),
+    - retrievable as list with getall
+
+    >>> r = Record('article', '1', author=['a', 'b'], editor='a and b')
+    >>> assert r['author'] == 'a and b'
+    >>> assert r.get('author') == r.getall('author')
+    >>> assert r['editor'] == r.get('editor')
+    >>> assert r.getall('editor') == ['a', 'b']
     """
-    def __init__(self, genre, id_, *args, **kwargs):
+    def __init__(self, genre, id_, *args, **kw):
         self.genre = genre
         self.id = id_
-        super(Record, self).__init__(args, **kwargs)
+        super(Record, self).__init__(args, **kw)
 
     @classmethod
     def from_object(cls, obj, **kw):
@@ -216,16 +234,37 @@ class Record(OrderedDict, _Convertable):
 
         return cls(genre, id_, **data)
 
+    @staticmethod
+    def sep(key):
+        return ' and ' if key in ['author', 'editor'] else '; '
+
+    def getall(self, key):
+        """
+        :return: list of strings representing the values of the record for field 'key'.
+        """
+        res = self.get(key, [])
+        if isinstance(res, basestring):
+            res = res.split(Record.sep(key))
+        return filter(None, res)
+
+    def __getitem__(self, key):
+        """
+        :return: string representing the concatenation of the values for field 'key'.
+        """
+        value = OrderedDict.__getitem__(self, key)
+        if not isinstance(value, (tuple, list)):
+            value = [value]
+        return Record.sep(key).join(filter(None, value))
+
     def __unicode__(self):
+        """
+        :return: string encoding the record in BibTeX syntax.
+        """
         fields = []
         m = max([0] + list(map(len, self.keys())))
 
         for k in self.keys():
-            values = self[k]
-            if not isinstance(values, (tuple, list)):
-                values = [values]
-            fields.append(
-                "  %s = {%s}," % (k.ljust(m), " and ".join(filter(None, values))))
+            fields.append("  %s = {%s}," % (k.ljust(m), self[k]))
 
         return """@%s{%s,
 %s
@@ -233,6 +272,9 @@ class Record(OrderedDict, _Convertable):
 """ % (getattr(self.genre, 'value', self.genre), self.id, "\n".join(fields)[:-1])
 
     def text(self):
+        """half-assed implementation of what millions of bibstyles, citation styles, ...
+        try to do.
+        """
         res = ["%s (%s)" % (self.get('author', 'Anonymous'), self.get('year', 's.a.'))]
         if self.get('title'):
             res.append('"%s"' % self.get('title', ''))

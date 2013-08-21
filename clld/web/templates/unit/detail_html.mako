@@ -18,12 +18,6 @@
 % endfor
 </dl>
 
-<ul>
-% for c in ctx.counterparts:
-<li>${h.link(request, c.valueset.parameter)} (${h.link(request, c.valueset.contribution)} Dictionary)</li>
-% endfor
-</ul>
-
 <h3>${_('Values')}</h3>
 <dl>
     % for value in ctx.unitvalues:

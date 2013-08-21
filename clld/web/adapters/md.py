@@ -26,15 +26,15 @@ class BibTex(Metadata):
     def rec(self, ctx, req):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
-            genre = 'incollection'
-            data['author'] = ' and '.join([
+            genre = 'inbook'
+            data['author'] = [
                 c.name for c in
-                list(ctx.primary_contributors) + list(ctx.secondary_contributors)])
+                list(ctx.primary_contributors) + list(ctx.secondary_contributors)]
             data['booktitle'] = req.dataset.description
-            data['editor'] = ' and '.join([c.contributor.name for c in list(req.dataset.editors)])
+            data['editor'] = [c.contributor.name for c in list(req.dataset.editors)]
         else:
-            genre = 'collection'
-            data['editor'] = ' and '.join([c.contributor.name for c in list(ctx.editors)])
+            genre = 'book'
+            data['editor'] = [c.contributor.name for c in list(ctx.editors)]
 
         return bibtex.Record(
             genre,

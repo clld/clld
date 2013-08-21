@@ -36,9 +36,9 @@ class Tests(TestWithEnv):
     def test_Values_with_parameter(self):
         from clld.web.datatables.value import Values
 
-        self.set_request_properties(params={'parameter': 'p'})
+        self.set_request_properties(params={'parameter': 'parameter'})
         self.handle_dt(Values, common.Value)
-        self.set_request_properties(params={'parameter': 'p', 'sSearch_2': 's'})
+        self.set_request_properties(params={'parameter': 'parameter', 'sSearch_2': 's'})
         self.handle_dt(Values, common.Value)
         self.set_request_properties(params={'parameter': 'no-domain'})
         self.handle_dt(Values, common.Value)

@@ -11,9 +11,4 @@ class Tests(TestWithEnv):
             'iSortCol_0': '0',
             'sSortDir_0': 'desc'})
 
-        dt = Contributors(self.env['request'], common.Contributor)
-        dt.render()
-        self.assertTrue(isinstance(dt.options, dict))
-        for item in dt.get_query():
-            for col in dt.cols:
-                col.format(item)
+        self.handle_dt(Contributors, common.Contributor)

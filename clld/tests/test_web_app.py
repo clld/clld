@@ -1,5 +1,6 @@
 import unittest
 
+from zope.interface import Interface
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 from purl import URL
@@ -7,6 +8,7 @@ from purl import URL
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
 from clld.tests.util import TestWithEnv, Route, TESTS_DIR
 from clld.interfaces import IMapMarker
+from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
@@ -16,6 +18,12 @@ class Tests(TestWithEnv):
         self.env['request'].resource_url(c, ext='geojson')
         self.assertEqual(None, self.env['request'].ctx_for_url('/some/path/to/nowhere'))
         self.env['request'].file_url(Language_files(id='1', object=Language.first()))
+        assert self.env['request'].get_datatable('valuesets', ValueSet)
+
+    def test_menu_item(self):
+        from clld.web.app import menu_item
+
+        assert menu_item('contributions', None, self.env['request'])
 
     def test_ctx_factory(self):
         from clld.web.app import ctx_factory
@@ -45,3 +53,19 @@ class Tests(TestWithEnv):
         config = Configurator()
         add_settings_from_file(config, TESTS_DIR.joinpath('test.ini'))
         assert 'app:main.use' in config.registry.settings
+
+    def test_get_configurator(self):
+        from clld.web.app import get_configurator, menu_item
+
+        class IF(Interface):
+            """" """""
+
+        config = get_configurator(
+            'clld',
+            settings={'sqlalchemy.url': 'sqlite://'},
+            routes=[('languages', '/other')])
+        # should have no effect, because a resource with this name is registered by
+        # default:
+        config.register_resource('language', None, None)
+        config.register_resource('testresource', Language, IF, with_index=True)
+        config.register_download(N3Dump(Language, 'clld'))

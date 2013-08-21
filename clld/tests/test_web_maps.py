@@ -25,7 +25,7 @@ class Tests(TestWithEnv):
 
         self.set_request_properties(matched_route=MockRoute())
 
-        dt = ParameterMap(common.Parameter.get('p'), self.env['request'])
+        dt = ParameterMap(common.Parameter.get('parameter'), self.env['request'])
         for l in dt.layers:
             l.representation = 5
         dt.render()

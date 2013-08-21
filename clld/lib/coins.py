@@ -217,9 +217,7 @@ class ContextObject(list, UnicodeMixin):
             if bibfield in rec:
                 data.append((openurlfield, rec[bibfield]))
 
-        for i, author in enumerate(
-            filter(None, re.split('\s+and\s+', rec.get('author', '').strip()))
-        ):
+        for i, author in enumerate(rec.getall('author')):
             if i == 0:
                 parts = re.split('\s*,\s*', author, 1)
                 if len(parts) == 1:

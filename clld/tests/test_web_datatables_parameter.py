@@ -6,9 +6,4 @@ class Tests(TestWithEnv):
     def test_Parameters(self):
         from clld.web.datatables.parameter import Parameters
 
-        dt = Parameters(self.env['request'], common.Parameter)
-        dt.render()
-        self.assertTrue(isinstance(dt.options, dict))
-        for item in dt.get_query():
-            for col in dt.cols:
-                col.format(item)
+        self.handle_dt(Parameters, common.Parameter)

@@ -29,5 +29,5 @@ class Tests(TestWithEnv):
         self._get_dt(contribution=common.Contribution.first())
 
     def test_Valuesets_with_parameter(self):
-        self.set_request_properties(params={'parameter': 'p'})
+        self.set_request_properties(params={'parameter': 'parameter'})
         self._get_dt()

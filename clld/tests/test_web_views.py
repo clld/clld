@@ -69,10 +69,11 @@ class Tests(TestWithEnv):
         self.set_request_properties(params={'id': '/contributions/ccc'})
         self.assertTrue(isinstance(unapi(self.env['request']), HTTPNotFound))
 
-        self.set_request_properties(params={'id': '/contributions/c'})
+        self.set_request_properties(params={'id': '/contributions/contribution'})
         assert XmlResponse(unapi(self.env['request'])).findall('format')
 
-        self.set_request_properties(params={'format': 'bib', 'id': '/languages/l1'})
+        self.set_request_properties(params={'format': 'bib', 'id': '/languages/language'})
         unapi(self.env['request'])
-        self.set_request_properties(params={'format': 'bibtex', 'id': '/contributions/c'})
+        self.set_request_properties(
+            params={'format': 'bibtex', 'id': '/contributions/contribution'})
         unapi(self.env['request'])

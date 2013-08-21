@@ -401,7 +401,9 @@ def get_configurator(pkg, *utilities, **kw):
 
     if 'clld.favicon' not in config.registry.settings:
         favicon = {'clld.favicon': 'clld:web/static/images/favicon.ico'}
-        if pkg_dir.joinpath('static', 'favicon.ico').exists():
+        # hard to test (in particular on travis) and without too much consequence
+        # (and the consequences faced are easy to spot).
+        if pkg_dir.joinpath('static', 'favicon.ico').exists():  # pragma: no cover
             favicon['clld.favicon'] = config.package_name + ':static/favicon.ico'
         config.add_settings(favicon)
 

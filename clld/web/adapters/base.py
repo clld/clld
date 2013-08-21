@@ -10,6 +10,9 @@ class Renderable(object):
 
     Adapters can provide custom behaviour either by specifying a template to use for
     rendering, or by overwriting the render method.
+
+    >>> r = Renderable(None)
+    >>> assert r.label == 'Renderable'
     """
     template = None
     mimetype = 'text/plain'

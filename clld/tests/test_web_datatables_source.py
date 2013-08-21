@@ -10,7 +10,7 @@ class Tests(TestWithEnv):
         self.assertTrue(isinstance(dt.options, dict))
 
         self.set_request_properties(params={
-            'language': 'l1',
+            'language': 'language',
             'sSearch_5': 'book',
             'iSortingCols': '1',
             'iSortCol_0': '5',

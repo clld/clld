@@ -57,10 +57,7 @@ def main(global_config, **settings):
     settings['mako.directories'] = ['clld:web/templates']
     config = get_configurator(
         None, (MapMarker(), interfaces.IMapMarker), settings=settings)
-    config.register_resource('testresource', common.Language, IF, with_index=True)
-    config.register_resource('test2resource', Mock(), IF, with_index=False)
     config.register_adapter(Representation, Mock, name='test')
-    config.register_download(N3Dump(common.Language, 'clld'))
     config.register_menu(('home', lambda ctx, req: (req.resource_url(req.dataset), 'tt')))
     return config.make_wsgi_app()
 
@@ -85,17 +82,23 @@ class TestWithDbAndData(TestWithDb):
         TestWithDb.setUp(self)
 
         DBSession.add(common.Dataset(
-            id='d', name='dataset', description='desc', domain='clld'))
+            id='dataset', name='dataset', description='desc', domain='clld'))
 
-        source = common.Source(id='src')
-        contributors = {'a': 'A Name', 'b': 'b Name', 'c': 'c Name', 'd': 'd Name'}
+        source = common.Source(id='source')
+        contributors = {
+            'contributor': 'A Name',
+            'b': 'b Name',
+            'c': 'c Name',
+            'd': 'd Name'}
         for id_, name in contributors.items():
             contributors[id_] = common.Contributor(id=id_, name=name)
 
-        contribution = common.Contribution(id='c', name='Contribution')
+        contribution = common.Contribution(id='contribution', name='Contribution')
         cr = common.ContributionReference(contribution=contribution, source=source)
         assert common.ContributionContributor(
-            contribution=contribution, primary=True, contributor=contributors['a'])
+            contribution=contribution,
+            primary=True,
+            contributor=contributors['contributor'])
         assert common.ContributionContributor(
             contribution=contribution, primary=False, contributor=contributors['b'])
         assert common.ContributionContributor(
@@ -106,7 +109,7 @@ class TestWithDbAndData(TestWithDb):
         DBSession.add(contribution)
 
         language = common.Language(
-            id='l1', name='Language 1', latitude=10.5, longitude=0.3)
+            id='language', name='Language 1', latitude=10.5, longitude=0.3)
         language.sources.append(source)
         identifier = common.Identifier(type='iso639-3', id='iso')
         li = common.LanguageIdentifier(language=language, identifier=identifier)
@@ -117,13 +120,13 @@ class TestWithDbAndData(TestWithDb):
             _li = common.LanguageIdentifier(language=_l, identifier=_i)
             DBSession.add(_l)
 
-        param = common.Parameter(id='p', name='Parameter')
+        param = common.Parameter(id='parameter', name='Parameter')
         de = common.DomainElement(id='de', name='DomainElement', parameter=param)
         de2 = common.DomainElement(id='de2', name='DomainElement2', parameter=param)
         valueset = common.ValueSet(
-            id='vs', language=language, parameter=param, contribution=contribution)
+            id='valueset', language=language, parameter=param, contribution=contribution)
         value = common.Value(
-            id='v',
+            id='value',
             domainelement=de,
             valueset=valueset,
             frequency=50,
@@ -136,11 +139,11 @@ class TestWithDbAndData(TestWithDb):
         value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
         DBSession.add(value)
 
-        unit = common.Unit(id='u', name='Unit', language=language)
-        up = common.UnitParameter(id='up', name='UnitParameter')
+        unit = common.Unit(id='unit', name='Unit', language=language)
+        up = common.UnitParameter(id='unitparameter', name='UnitParameter')
         DBSession.add(unit)
         DBSession.add(common.UnitValue(
-            id='uv', name='UnitValue', unit=unit, unitparameter=up))
+            id='unitvalue', name='UnitValue', unit=unit, unitparameter=up))
 
         up2 = common.UnitParameter(id='up2', name='UnitParameter with domain')
         de = common.UnitDomainElement(id='de', name='de', parameter=up2)
