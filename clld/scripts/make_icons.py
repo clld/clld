@@ -11,7 +11,7 @@ try:
 
     #linewidth = style.linewidth(1.2)
     linewidth = style.linewidth(1.1)
-except ImportError:
+except ImportError:  # pragma: no cover
     pyx = False
 
 from pyramid.path import AssetResolver
@@ -28,11 +28,6 @@ def polygon(*points):  # pragma: no cover
 
 
 shapes = {
-    #"c": path.circle(10, 10, 7.6),  # circle
-    #"s": path.rect(2.8, 2.8, 14.4, 14.4),  # square
-    #"t": polygon((1, 2.5), (19, 2.5), (10, 18.5)),  # triangle (pyramid)
-    #"f": polygon((1, 17.5), (19, 17.5), (10, 1.5)),  # inverted pyramid
-    #"d": polygon((10, 1), (19, 10), (10, 19), (1, 10)),  # diamond
     "c": path.circle(20, 20, 13.6),  # circle
     "s": path.rect(8, 8, 24, 24),  # square
     "t": polygon((2, 4), (38, 4), (20, 35)),  # triangle (pyramid)

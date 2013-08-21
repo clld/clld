@@ -74,7 +74,7 @@ class EnumSymbol(UnicodeMixin):
     def __cmp__(self, other):
         return cmp(self.value, other.value)
 
-    def __json__(self, request):
+    def __json__(self, request=None):
         return self.value
 
 

@@ -30,3 +30,11 @@ def test_DeclEnum():
         db_type.process_bind_param(A.val1, None), None)
     assert db_type.process_result_value(
         db_type.process_bind_param(None, None), None) is None
+    assert A.val1.__json__() == A.val1.__unicode__()
+
+
+def test_format_size():
+    from clld.util import format_size
+
+    for i in range(10):
+        assert format_size(1000 ** i)

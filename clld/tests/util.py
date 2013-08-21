@@ -24,7 +24,7 @@ from zope.interface import Interface
 try:
     from selenium import webdriver
     from selenium.webdriver.support.ui import Select
-except ImportError:
+except ImportError:  # pragma: no cover
     webdriver = None
 
 import clld
@@ -239,6 +239,12 @@ class TestWithEnv(TestWithDbAndData):
 
 
 def _add_header(headers, name, value):
+    """
+    >>> headers = []
+    >>> assert _add_header(headers, 'n', 'v') == [('n', 'v')]
+    >>> headers = {}
+    >>> assert _add_header(headers, 'n', 'v') == {'n': 'v'}
+    """
     if isinstance(headers, dict):
         headers[name] = value
     else:

@@ -27,16 +27,6 @@ class Tests(TestWithEnv):
 
         map_marker_img(self.env['request'], None, marker=Mock(return_value=None))
 
-    def test_get_downloads(self):
-        from clld.web.util.helpers import get_downloads
-
-        list(get_downloads(self.env['request']))
-
-    def test_get_rdf_dumps(self):
-        from clld.web.util.helpers import get_rdf_dumps
-
-        list(get_rdf_dumps(self.env['request'], common.Language))
-
     def test_external_link(self):
         from clld.web.util.helpers import external_link
 
@@ -95,11 +85,12 @@ class Tests(TestWithEnv):
         with self.utility(Mock(return_value='url'), IFrequencyMarker):
             format_frequency(self.env['request'], common.Value.first())
 
-    def test_get_rdf_dumps(self):
-        from clld.web.util.helpers import get_rdf_dumps
+    def test_get_downloads(self):
+        from clld.web.util.helpers import get_rdf_dumps, get_downloads
 
         with self.utility(N3Dump(common.Language, 'clld'), IDownload):
             assert list(get_rdf_dumps(self.env['request'], common.Language))
+            assert list(get_downloads(self.env['request']))
 
     def test_rendered_sentence(self):
         from clld.web.util.helpers import rendered_sentence

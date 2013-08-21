@@ -7,16 +7,23 @@ import cStringIO
 from collections import namedtuple
 
 
+def normalize_name(s):
+    """
+    >>> assert normalize_name('class') == 'class_'
+    >>> assert normalize_name('a-name') == 'a_name'
+    """
+    if s == 'class':
+        return 'class_'
+    return s.replace('-', '_')
+
+
 def rows(filename, delimiter='\t', namedtuples=False, encoding=None, newline='\n'):
     """
     >>> assert list(rows(__file__))
+    >>> from clld.tests.util import TESTS_DIR
+    >>> assert list(rows(TESTS_DIR.joinpath('test.tab'), namedtuples=True, encoding='utf8'))
     """
     cls = None
-
-    def normalize_name(s):
-        if s == 'class':
-            return 'class_'
-        return s.replace('-', '_')
 
     with open(filename, 'r') as fp:
         for i, line in enumerate(fp.read().split(newline)):
