@@ -1,8 +1,11 @@
 from zope.interface import implementer
 from pyramid.renderers import render as pyramid_render
+from sqlalchemy.orm import joinedload
 
 from clld.web.adapters.base import Renderable
 from clld import interfaces
+from clld.db.meta import DBSession
+from clld.db.models.common import Parameter, ValueSet, Value
 
 
 @implementer(interfaces.IRepresentation)
@@ -80,11 +83,13 @@ class GeoJsonParameter(GeoJson):
         return {'name': ctx.name}
 
     def feature_iterator(self, ctx, req):
+        q = DBSession.query(ValueSet).join(Value).filter(ValueSet.parameter_pk == ctx.pk)\
+            .options(joinedload(ValueSet.values), joinedload(ValueSet.language))
         de = req.params.get('domainelement')
         if de:
             return [vs for vs in ctx.valuesets
                     if vs.values and vs.values[0].domainelement.id == de]
-        return [vs for vs in ctx.valuesets if vs.values]
+        return q
 
     def get_language(self, ctx, req, valueset):
         return valueset.language
