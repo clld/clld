@@ -84,7 +84,9 @@ class Col(object):
     def search(self, qs):
         if self.model_col:
             if isinstance(self.model_col.property.columns[0].type, (String, Unicode)):
-                return icontains(self.model_col, qs)
+                if not hasattr(self, 'choices'):
+                    return icontains(self.model_col, qs)
+                return self.model_col.__eq__(qs)
             if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
                 return filter_number(self.model_col, qs)
             if isinstance(self.model_col.property.columns[0].type, Boolean):

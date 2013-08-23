@@ -29,7 +29,7 @@ class ValueNameCol(LinkCol):
 
     def search(self, qs):
         if self.dt.parameter and self.dt.parameter.domain:
-            return icontains(DomainElement.name, qs)
+            return DomainElement.name.__eq__(qs)
         return icontains(Value.description, qs)
 
 
