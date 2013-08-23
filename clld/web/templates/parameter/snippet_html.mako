@@ -8,21 +8,23 @@
 
 % if ctx.domain:
 <% total = 0 %>
-<table class="table table-hover domain" style="width: auto;">
+<table class="table table-hover table-condensed domain" style="width: auto;">
     <thead>
         <tr>
-            <th>Value</th><th>Representation</th>
+            <th>&nbsp;</th><th>Value</th><th>Representation</th>
         </tr>
     </thead>
     <tbody>
         % for de in ctx.domain:
         <tr>
             <% total += len(de.values) %>
-            <td>${de.name}</td><td style="text-align: right;">${len(de.values)}</td>
+            <td>${h.map_marker_img(request, de)}</td>
+            <td>${de.description or de.name}</td>
+            <td class="right">${len(de.values)}</td>
         </tr>
         % endfor
         <tr>
-            <td><b>Total:</b></td><td style="text-align: right;">${total}</td>
+            <td colspan="2" class="right"><b>Total:</b></td><td class="right">${total}</td>
         </tr>
     </tbody>
 </table>
