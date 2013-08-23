@@ -329,15 +329,16 @@ class PageObject(object):  # pragma: no cover
 
 
 class Map(PageObject):  # pragma: no cover
-    def __init__(self, browser, eid=None, url=None):
+    def __init__(self, browser, eid=None, url=None, sleep=2):
         super(Map, self).__init__(browser, eid or 'map-container', url=url)
+        time.sleep(sleep)
 
     def test_show_marker(self, index=0):
-        time.sleep(1)
+        time.sleep(0.5)
         assert not self.e.find_elements_by_class_name('leaflet-popup-content')
         marker = self.e.find_elements_by_class_name('leaflet-marker-icon')
         marker[0].click()
-        time.sleep(0.3)
+        time.sleep(0.9)
         assert self.e.find_elements_by_class_name('leaflet-popup-content')
 
     def test_show_legend(self, name='iconsize'):
@@ -458,14 +459,14 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
     def tearDownClass(cls):
         cls.browser.quit()
         cls.server.quit()
-        cls.downloads.rmtree()
+        #cls.downloads.rmtree()
 
     def url(self, path):
         assert path.startswith('/')
         return 'http://%s%s' % (self.host, path)
 
-    def get_map(self, path, eid=None):
-        return Map(self.browser, eid=eid, url=self.url(path))
+    def get_map(self, path, eid=None, sleep=2):
+        return Map(self.browser, eid=eid, url=self.url(path), sleep=sleep)
 
     def get_datatable(self, path, eid=None):
         return DataTable(self.browser, eid=eid, url=self.url(path))
