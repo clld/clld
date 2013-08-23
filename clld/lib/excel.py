@@ -14,6 +14,5 @@ def hyperlink(url, label=None):
 
     style = xlwt.XFStyle()
     style.font = f
-
-    return xlwt.Formula('HYPERLINK("%s";"%s")' % (
-        url, label.replace('"', "'") if label else url))
+    label = label.replace('"', "'") if label else url
+    return xlwt.Formula('HYPERLINK("%s";"%s")' % (url, label[:255]))
