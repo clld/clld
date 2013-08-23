@@ -404,7 +404,14 @@ def deploy(app, environment, with_alembic=False):
     require.postfix.server(env['host'])
     require.postgres.server()
     for pkg in [
-        'libpq-dev', 'git', 'nginx', 'supervisor', 'openjdk-6-jre', 'make', 'sqlite3'
+        'libpq-dev',
+        'git',
+        'nginx',
+        'supervisor',
+        'openjdk-6-jre',
+        'make',
+        'sqlite3',
+        'curl',
     ]:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
@@ -509,12 +516,18 @@ def create_downloads(app):
     require.files.directory(dl_dir, use_sudo=True, mode="755")
 
 
-def newrelic_sysmond():
-    """
-    wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list
-    apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys ...
-    apt-get update
-    apt-get install newrelic-sysmond
-    nrsysmond-config --set license_key=...
-    /etc/init.d/newrelic-sysmond start
-    """
+def bootstrap():
+    for pkg in 'vim tree nginx'.split():
+        require.deb.package(pkg)
+
+    sudo('/etc/init.d/nginx start')
+
+    for cmd in [
+        'wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list',
+        'apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys 548C16BF',
+        'apt-get update',
+        'apt-get install newrelic-sysmond',
+        'nrsysmond-config --set license_key=%s' % os.environ['NEWRELIC_API_KEY'],
+        '/etc/init.d/newrelic-sysmond start',
+    ]:
+        sudo(cmd)

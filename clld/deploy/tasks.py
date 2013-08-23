@@ -28,6 +28,11 @@ def _assign_host(environment):
     env.hosts = [getattr(APP, environment)]
 
 
+@task
+def bootstrap():
+    util.bootstrap()
+
+
 @hosts('localhost')
 @task
 def stop(environment):
