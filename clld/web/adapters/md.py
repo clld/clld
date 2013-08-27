@@ -32,13 +32,15 @@ class BibTex(Metadata):
                 list(ctx.primary_contributors) + list(ctx.secondary_contributors)]
             data['booktitle'] = req.dataset.description
             data['editor'] = [c.contributor.name for c in list(req.dataset.editors)]
+            id_ = '%s-%s' % (req.dataset.id, ctx.id)
         else:
             genre = 'book'
             data['editor'] = [c.contributor.name for c in list(ctx.editors)]
+            id_ = req.dataset.id
 
         return bibtex.Record(
             genre,
-            ctx.id,
+            id_,
             title=getattr(ctx, 'citation_name', ctx.__unicode__()),
             url=req.resource_url(ctx),
             address=req.dataset.publisher_place,
