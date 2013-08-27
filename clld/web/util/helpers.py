@@ -11,6 +11,12 @@ if PY3:  # pragma: no cover
 else:
     from urllib import quote
 
+try:
+    import newrelic.agent
+    NEWRELIC = True
+except ImportError:
+    NEWRELIC = False
+
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload_all
 from markupsafe import Markup

@@ -11,7 +11,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="author" content="">
-
+        % if h.NEWRELIC:
+        ${h.newrelic.agent.get_browser_timing_header()|n}
+        % endif
         <link rel="shortcut icon"
               href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
               type="image/x-icon" />
@@ -167,5 +169,8 @@
             <%block name="javascript"> </%block>
         </script>
     ##</div>
+        % if h.NEWRELIC:
+        ${h.newrelic.agent.get_browser_timing_header()|n}
+        % endif
     </body>
 </html>
