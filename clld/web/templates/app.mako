@@ -170,7 +170,7 @@
         </script>
     ##</div>
         % if h.NEWRELIC:
-        ${h.newrelic.agent.get_browser_timing_header()|n}
+        ${h.newrelic.agent.get_browser_timing_footer()|n}
         % endif
     </body>
 </html>
