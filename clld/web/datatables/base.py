@@ -166,12 +166,13 @@ class DetailsRowLinkCol(Col):
         kw.setdefault('sClass', 'center')
         kw.setdefault('sType', 'html')
         kw.setdefault('sTitle', 'Details')
+        self.button_text = kw.pop('button_text', 'more')
         Col.__init__(self, dt, name or '', **kw)
 
     def format(self, item):
         return button(
             #icon('info-sign', inverted=True),
-            'more',
+            self.button_text,
             href=self.dt.req.resource_url(item, ext='snippet.html'),
             title="show details",
             class_="btn-info details",

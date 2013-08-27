@@ -2,6 +2,17 @@
 <%namespace name="util" file="../util.mako"/>
 <%! active_menu_item = "sentences" %>
 
+<%def name="sidebar()">
+    % if ctx.value_assocs:
+    <%util:well title="${_('Datapoints')}">
+        <ul>
+            % for va in ctx.value_assocs:
+            <li>${h.link(request, va.value.valueset, label='%s: %s' % (va.value.valueset.parameter.name, va.value.domainelement.name))}</li>
+            % endfor
+        </ul>
+    </%util:well>
+    % endif
+</%def>
 
 <h2>${_('Sentence')} ${ctx.id}</h2>
 <dl>

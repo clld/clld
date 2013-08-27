@@ -31,9 +31,27 @@ ${ctx.coins(request)|n}
 </div>
 
 <%def name="sidebar()">
-% if ctx.languages:
-<%util:well title="${_('Languages')}">
-    ${util.stacked_links(ctx.languages)}
-</%util:well>
-% endif
+    <% referents = context.get('referents', {}) %>
+    <div class="accordion" id="sidebar-accordion">
+    % if referents.get('language'):
+        <%util:accordion_group eid="acc-l" parent="sidebar-accordion" title="${_('Languages')}" open="${True}">
+            ${util.stacked_links(referents['language'])}
+        </%util:accordion_group>
+    % endif
+    % if referents.get('contribution'):
+        <%util:accordion_group eid="acc-c" parent="sidebar-accordion" title="${_('Contributions')}">
+            ${util.stacked_links(referents['contribution'])}
+        </%util:accordion_group>
+    % endif
+    % if referents.get('valueset'):
+        <%util:accordion_group eid="acc-v" parent="sidebar-accordion" title="${_('ValueSets')}">
+            ${util.stacked_links(referents['valueset'])}
+        </%util:accordion_group>
+    % endif
+    % if referents.get('sentence'):
+        <%util:accordion_group eid="acc-s" parent="sidebar-accordion" title="${_('Sentences')}">
+            ${util.stacked_links(referents['sentence'])}
+        </%util:accordion_group>
+    % endif
+    </div>
 </%def>

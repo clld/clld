@@ -4,9 +4,6 @@
 
 
 <h2>${_('Sources')}</h2>
-<p>
-    ${_('Sources cited in this project')}
-</p>
 <div>
     ${ctx.render()}
 </div>

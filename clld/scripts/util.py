@@ -154,7 +154,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
 
     if not sources:
         sources = DBSession.query(common.Source)\
-            .order_by(cast(common.Source.id, Integer))\
+            .order_by(common.Source.id)\
             .options(joinedload(common.Source.data))
     if callable(sources):
         sources = sources()

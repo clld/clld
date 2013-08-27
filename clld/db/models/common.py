@@ -549,6 +549,9 @@ class Sentence(Base,
                HasFilesMixin):
     """Sentence of a language serving as example for some statement.
     """
+    #: Inherited from IdNameDescriptionMixin:
+    #: name: The text of the sentence in object language
+    #: description: A translation of the sentence
     analyzed = Column(Unicode)
     gloss = Column(Unicode)
     type = Column(Unicode)
@@ -557,6 +560,8 @@ class Sentence(Base,
     original_script = Column(Unicode)
     xhtml = Column(Unicode)
 
+    #: The following columns store data which contains markup and should be looked at
+    #: first, when rendering a sentence:
     markup_text = Column(Unicode)
     markup_analyzed = Column(Unicode)
     markup_gloss = Column(Unicode)
