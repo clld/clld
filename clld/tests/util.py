@@ -390,7 +390,9 @@ class DataTable(PageObject):  # pragma: no cover
                 break
         assert table
         tr = table.find_element_by_tag_name('tbody').find_element_by_tag_name('tr')
-        return [td.text.strip() for td in tr.find_elements_by_tag_name('td')]
+        res = [td.text.strip() for td in tr.find_elements_by_tag_name('td')]
+        print res
+        return res
 
     def filter(self, name, value):
         """filters the table by using value for the column specified by name.
@@ -405,7 +407,7 @@ class DataTable(PageObject):  # pragma: no cover
             filter_.send_keys(value)
         time.sleep(2.5)
 
-    def sort(self, label):
+    def sort(self, label, sleep=2.5):
         """Triggers a table sort by clicking on the th Element specified by label.
         """
         sort = None
@@ -414,7 +416,7 @@ class DataTable(PageObject):  # pragma: no cover
                 sort = e
         assert sort
         sort.click()
-        time.sleep(2.5)
+        time.sleep(sleep)
 
     def download(self, fmt):
         opener = self.e.find_element_by_id('dt-dl-opener')

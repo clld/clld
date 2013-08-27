@@ -304,7 +304,8 @@ def get_configurator(pkg, *utilities, **kw):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
-    config.add_settings({'pyramid.default_locale_name': 'en'})
+    config.add_settings(
+        {'pyramid.default_locale_name': 'en', 'clld.pkg': config.package_name})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files
         abspath = path(config.registry.settings['clld.files']).abspath()
