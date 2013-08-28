@@ -60,6 +60,10 @@ class ClldRequest(Request):
         """
         return DBSession
 
+    @property
+    def blog(self):
+        return self.registry.queryUtility(interfaces.IBlog)
+
     @reify
     def dataset(self):
         """Properties of the dataset an application serves are used in various places,

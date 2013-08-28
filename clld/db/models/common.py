@@ -377,8 +377,14 @@ class Source(Base,
             id_ = identifier['identifier']
         return id_
 
+    def __bibtex__(self):
+        return {}
+
     def bibtex(self):
-        return bibtex.Record.from_object(self)
+        exclude = ['gbs', 'glottolog_ref_id']
+        kw = {k: self.jsondatadict[k] for k in self.jsondatadict if not k in exclude}
+        kw.update(self.__bibtex__())
+        return bibtex.Record.from_object(self, **kw)
 
     def coins(self, req):
         return HTML.span(

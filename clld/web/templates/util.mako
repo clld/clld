@@ -137,6 +137,26 @@
 </%def>
 
 ##
+##
+##
+<%def name="feed(title, url, eid='feed')">
+    <%self:well>
+        <div id="${eid}">
+        % if hasattr(caller, 'body'):
+            ${caller.body()}
+        % else:
+            No items.
+        % endif
+        </div>
+        <script>
+$(document).ready(function() {
+    ${h.JSFeed.init(dict(eid=eid, url=url, title=title))|n}
+});
+        </script>
+    </%self:well>
+</%def>
+
+##
 ## format history of an object
 ##
 <%def name="history(obj_)">

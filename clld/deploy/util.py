@@ -206,6 +206,9 @@ sqlalchemy.url = {app.sqlalchemy_url}
 exclog.extra_info = true
 clld.environment = production
 clld.files = {app.www}/files
+blog.host = {bloghost}
+blog.user = {bloguser}
+blog.password = {blogpassword}
 
 %s
 
@@ -298,10 +301,11 @@ def create_file_as_root(path, content, **kw):
         str(path), contents=content, owner='root', group='root', use_sudo=True, **kw)
 
 
-def get_template_variables(app, monitor_mode=False):
+def get_template_variables(app, monitor_mode=False, with_blog=False):
     if monitor_mode and not os.environ.get('NEWRELIC_API_KEY'):
         print('--> Warning: no newrelic api key found in environment')
-    return dict(
+
+    res = dict(
         app=app,
         env=env,
         newrelic_api_key=os.environ.get('NEWRELIC_API_KEY'),
@@ -309,7 +313,22 @@ def get_template_variables(app, monitor_mode=False):
         gunicorn=app.bin('gunicorn_paster'),
         newrelic=app.bin('newrelic-admin'),
         monitor_mode=monitor_mode,
-        auth='')
+        auth='',
+        bloghost='',
+        bloguser='',
+        blogpassword='')
+
+    if with_blog:
+        for key, default in [
+            ('bloghost', 'blog.%s' % app.domain), ('bloguser', app.name)
+        ]:
+            custom = raw_input('Blog %s [%s]: ' % (key[4:], default))
+            res[key] = custom if custom else default
+
+        res['blogpassword'] = getpass(prompt='Blog password: ')
+        assert res['blogpassword']
+
+    return res
 
 
 @task
@@ -396,9 +415,11 @@ def copy_files(app):
 
 
 @task
-def deploy(app, environment, with_alembic=False):
+def deploy(app, environment, with_alembic=False, with_blog=False):
     template_variables = get_template_variables(
-        app, 'true' if environment == 'production' else 'false')
+        app,
+        monitor_mode='true' if environment == 'production' else 'false',
+        with_blog=with_blog)
 
     require.users.user(app.name, shell='/bin/bash')
     require.postfix.server(env['host'])

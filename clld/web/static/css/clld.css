@@ -12,6 +12,8 @@ a.pdf { background: url('../images/pdf-icon.gif') no-repeat center left; padding
 
 #sidebar {margin-top: 10px;}
 
+div.well h3 {margin-top: 0;}
+
 td.right{
     text-align: right !important;
 }
