@@ -82,11 +82,11 @@ def maintenance(environment, hours=2):
 
 @hosts('localhost')
 @task
-def deploy(environment):
+def deploy(environment, **kw):
     """deploy the app
     """
     _assign_host(environment)
-    execute(util.deploy, APP, environment)
+    execute(util.deploy, APP, environment, **kw)
 
 
 @hosts('localhost')
