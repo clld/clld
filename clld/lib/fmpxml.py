@@ -49,7 +49,8 @@ def normalize_markup(s):
         else:
             span.replace_with(span.string)
 
-    return unicode(soup.html.body).replace('<body>', '').replace('</body>', '').strip() or None
+    res = unicode(soup.html.body).replace('<body>', '').replace('</body>', '')
+    return res.replace('<p>', '').replace('</p>', '').strip() or None
 
 
 class Result(object):
