@@ -4,6 +4,7 @@ assert groupby  # appease pyflakes
 import datetime  # we just import this to have it available in templates!
 assert datetime
 from urllib import urlencode
+from base64 import b64encode
 
 from six import PY3
 if PY3:  # pragma: no cover
@@ -45,6 +46,12 @@ def urlescape(string):
 
 def dumps(obj):
     return JS.sub(pyramid_render('json', obj))
+
+
+def data_uri(filename, mimetype):
+    with open(filename) as fp:
+        content = fp.read()
+    return 'data:%s;base64,%s' % (mimetype, b64encode(content))
 
 
 class JS(object):

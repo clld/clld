@@ -1,3 +1,5 @@
+from json import loads
+
 from zope.interface import implementer
 from pyramid.renderers import render as pyramid_render
 from sqlalchemy.orm import joinedload
@@ -6,6 +8,29 @@ from clld.web.adapters.base import Renderable
 from clld import interfaces
 from clld.db.meta import DBSession
 from clld.db.models.common import Parameter, ValueSet, Value
+
+
+def _flatten(d, parent_key=''):
+    items = []
+
+    if isinstance(d, list):
+        for i, v in enumerate(d):
+            items.extend(_flatten(v, '_'.join(filter(None, [parent_key, str(i)]))))
+    elif isinstance(d, dict):
+        for k, v in d.items():
+            new_key = parent_key + '_' + k if parent_key else k
+            items.extend(_flatten(v, new_key))
+    else:
+        items.append((parent_key, d))
+    return items
+
+
+def flatten(d):
+    """
+    >>> sorted(flatten({'a': {'b': [1, {'c': 4}, 3]}}).keys())
+    ['a_b_0', 'a_b_1_c', 'a_b_2']
+    """
+    return dict(_flatten(d))
 
 
 @implementer(interfaces.IRepresentation)
@@ -96,6 +121,17 @@ class GeoJsonParameter(GeoJson):
 
     def feature_properties(self, ctx, req, valueset):
         return {'values': list(valueset.values)}
+
+
+class GeoJsonParameterFlatProperties(GeoJsonParameter):
+    extension = 'flat.geojson'
+    mimetype = 'application/flat+geojson'
+
+    def render(self, ctx, req, dump=True):
+        res = loads(GeoJson.render(self, ctx, req, dump=True))
+        for f in res['features']:
+            f['properties'] = flatten(f['properties'])
+        return pyramid_render('json', res, request=req) if dump else res
 
 
 @implementer(interfaces.IIndex)

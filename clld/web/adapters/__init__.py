@@ -3,7 +3,9 @@ from zope.interface import implementer, implementedBy
 from clld import RESOURCES
 from clld import interfaces
 from clld.web.adapters.base import Index, Representation, Json
-from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonParameter
+from clld.web.adapters.geojson import (
+    GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
+)
 from clld.web.adapters.excel import ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
@@ -110,6 +112,11 @@ def includeme(config):
         (interfaces.IParameter,),
         interfaces.IRepresentation,
         name=GeoJson.mimetype)
+    config.registry.registerAdapter(
+        GeoJsonParameterFlatProperties,
+        (interfaces.IParameter,),
+        interfaces.IRepresentation,
+        name=GeoJsonParameterFlatProperties.mimetype)
 
     config.include(biblio)
 
