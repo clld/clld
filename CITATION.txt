@@ -1,0 +1,11 @@
+To cite clld in publications, please use:
+
+  R. Forkel. clld: Publishing linguistic databases as Linked Data, 2013.
+
+A BibTeX entry for LaTeX users is
+
+  @Misc{,
+    author = {Robert Forkel},
+    title = {Publishing linguistic databases as Linked Data},
+    year = {2013}
+  }
