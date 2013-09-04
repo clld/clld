@@ -1,9 +1,15 @@
 from json import dumps
 import re
+from functools import partial
 
 from pyramid.response import Response
 from pyramid.httpexceptions import (
-    HTTPNotAcceptable, HTTPFound, HTTPNotFound, HTTPMultipleChoices,
+    HTTPNotAcceptable,
+    HTTPFound,
+    HTTPNotFound,
+    HTTPMultipleChoices,
+    HTTPMovedPermanently,
+    HTTPGone,
 )
 from pyramid.interfaces import IRoutesMapper
 from pyramid.renderers import render, render_to_response
@@ -12,6 +18,24 @@ from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld import RESOURCES
 from clld.web.adapters import get_adapter, get_adapters
 from clld.db.models.common import Language
+
+
+def xpartial(func, *args, **kw):
+    """augment partial to make it possible to register partials as view callables.
+    """
+    res = partial(func, *args, **kw)
+    res.__module__ = func.__module__
+    return res
+
+
+def redirect(cls, location, ctx, req):
+    if callable(location):
+        location = location(req)
+    raise cls(location=location)
+
+
+def gone(ctx, req):
+    raise HTTPGone()
 
 
 def view(interface, ctx, req):
