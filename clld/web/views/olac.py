@@ -161,8 +161,15 @@ class OlacConfig(object):
 def olac(req):
     """View implementing the OLAC OAI-PMH repository protocol.
     """
+    return olac_with_cfg(req, req.registry.getUtility(IOlacConfig))
+
+
+def olac_with_cfg(req, cfg):
+    """If applications want to disseminate metadata for other resources than languages
+    this function can be used to provide a second olac repository.
+    """
     res = dict(verb=None, error=None, response_date=timestamp(), params={}, date=date)
-    res['cfg'] = req.registry.getUtility(IOlacConfig)
+    res['cfg'] = cfg
 
     def response(res):
         return Response(
@@ -233,9 +240,6 @@ def olac(req):
             rt = ResumptionToken(
                 None, 0, args.get('from', None), args.get('until', None))
 
-        #
-        #
-        #
         q = res['cfg'].query_records(req, from_=rt.from_, until=rt.until)
         res['languages'] = q.offset(rt.offset).limit(rt.limit).all()
         if not res['languages']:
