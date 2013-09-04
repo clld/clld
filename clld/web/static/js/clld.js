@@ -485,6 +485,10 @@ CLLD.Map = function(eid, layers, options) {
             }
         }
     };
+
+    if (options.on_init) {
+        options.on_init(this);
+    }
 }
 
 CLLD.map = function(eid, layers, options) {
