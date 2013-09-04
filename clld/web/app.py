@@ -6,6 +6,7 @@ from collections import OrderedDict
 import re
 import importlib
 from hashlib import md5
+from uuid import uuid4
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload
@@ -15,7 +16,7 @@ from path import path
 import transaction
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.response import Response
@@ -32,7 +33,9 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
-from clld.web.views import index_view, resource_view, _raise, _ping, js, unapi
+from clld.web.views import (
+    index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
+)
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
@@ -287,6 +290,24 @@ def add_settings_from_file(config, file_):
         config.add_settings(cfg)
 
 
+def _route_and_view(config, pattern, view, name=None):
+    name = name or str(uuid4())
+    config.add_route(name, pattern)
+    config.add_view(view, route_name=name)
+
+
+def add_301(config, pattern, location, name=None):
+    _route_and_view(
+        config, pattern, xpartial(redirect, HTTPMovedPermanently, location), name=name)
+
+
+def add_410(config, pattern, name=None):
+    _route_and_view(config, pattern, gone, name=name)
+
+
+#
+# the main interface:
+#
 def get_configurator(pkg, *utilities, **kw):
     """
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
@@ -335,6 +356,8 @@ def get_configurator(pkg, *utilities, **kw):
         'register_download': register_download,
         'add_route_and_view': add_route_and_view,
         'add_settings_from_file': add_settings_from_file,
+        'add_301': add_301,
+        'add_410': add_410,
     }.items():
         config.add_directive(name, func)
 
