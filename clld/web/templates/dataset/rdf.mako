@@ -34,7 +34,9 @@
         <void:feature rdf:resource="${format.uri}"/>
         % endfor
         % for rsc in RESOURCES:
+            % if rsc.name in request.registry.settings.get('sitemaps', []) and rsc.with_index:
         <void:subset rdf:resource="${request.route_url(rsc.name + 's')}"/>
+            % endif
         % endfor
         ##<dcterms:creator>Glottolog 2.0</dcterms:creator>
         % for ed in request.dataset.editors:
@@ -51,17 +53,19 @@ ${TxtCitation.render(request.dataset, request)}
 % for rsc in RESOURCES:
     <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
     % if not dls:
-        % if rsc.name in request.registry.settings.get('sitemaps', []):
+        % if rsc.name in request.registry.settings.get('sitemaps', []) and rsc.with_index:
         <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
             <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
         </void:Dataset>
         % endif
     % else:
+        % if rsc.with_index:
         <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-        % for dl in dls:
+            % for dl in dls:
             <void:dataDump rdf:resource="${dl.url(request)}"/>
-        % endfor
+            % endfor
         </void:Dataset>
+        % endif
     % endif
 % endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
