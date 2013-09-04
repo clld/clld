@@ -2,7 +2,7 @@
 We provide some infrastructure to build extensible database models.
 """
 from copy import copy
-from datetime import datetime
+from datetime import datetime, date
 try:
     import simplejson as json
 except ImportError:
@@ -155,8 +155,15 @@ class Base(UnicodeMixin):
         cols = []
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
+
+        def value(obj, col):
+            v = getattr(obj, col)
+            if isinstance(v, (date, datetime)):
+                v = str(v)
+            return v
+
         return dict(
-            (col, getattr(self, col))
+            (col, value(self, col))
             for col in set(cols) if col not in ['created', 'updated'])
 
     def __unicode__(self):
