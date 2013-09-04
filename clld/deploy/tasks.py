@@ -82,11 +82,13 @@ def maintenance(environment, hours=2):
 
 @hosts('localhost')
 @task
-def deploy(environment, **kw):
+def deploy(environment, with_blog=False):
     """deploy the app
     """
     _assign_host(environment)
-    execute(util.deploy, APP, environment, **kw)
+    if not with_blog:
+        with_blog = getattr(APP, 'with_blog', False)
+    execute(util.deploy, APP, environment, with_blog=with_blog)
 
 
 @hosts('localhost')
