@@ -164,7 +164,7 @@ class Base(UnicodeMixin):
 
         return dict(
             (col, value(self, col))
-            for col in set(cols) if col not in ['created', 'updated'])
+            for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
 
     def __unicode__(self):
         """
