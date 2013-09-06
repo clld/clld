@@ -45,14 +45,26 @@ class ExcelAdapter(Index):
         return res
 
 
+class Languages(ExcelAdapter):
+    def header(self, ctx, req):
+        return super(Languages, self).header(ctx, req) + ['Latitude', 'Longitude']
+
+    def row(self, ctx, req, item):
+        res = super(Languages, self).row(ctx, req, item)
+        res.extend([item.latitude, item.longitude])
+        return res
+
+
 class Values(ExcelAdapter):
     def header(self, ctx, req):
-        return super(Values, self).header(ctx, req) + ['Parameter', 'Language']
+        return super(Values, self).header(ctx, req) + [
+            'Parameter', 'Language', 'Frequency', 'Confidence']
 
     def row(self, ctx, req, item):
         res = super(Values, self).row(ctx, req, item)
         for obj in [item.valueset.parameter, item.valueset.language]:
             res.append(hyperlink(req.resource_url(obj), obj.__unicode__()))
+        res.extend([item.frequency or '', item.confidence or ''])
         return res
 
 
