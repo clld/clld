@@ -134,9 +134,13 @@ def format_frequency(req, obj, marker=None, height='20', width='20'):
     return res
 
 
-def map_marker_img(req, obj, marker=None, height='20', width='20'):
+def map_marker_url(req, obj, marker=None):
     marker = marker or req.registry.getUtility(interfaces.IMapMarker)
-    url = marker(obj, req)
+    return marker(obj, req)
+
+
+def map_marker_img(req, obj, marker=None, height='20', width='20'):
+    url = map_marker_url(req, obj, marker=marker)
     if url:
         return HTML.img(src=url, height=height, width=width)
     return ''
