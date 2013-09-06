@@ -1,6 +1,6 @@
-from clld.web.datatables.base import DataTable, Col
+from clld.web.datatables.base import DataTable, LinkCol
 
 
 class Unitparameters(DataTable):
     def col_defs(self):
-        return [Col(self, 'name')]
+        return [LinkCol(self, 'name')]

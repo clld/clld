@@ -7,13 +7,6 @@ from clld.web.util.htmllib import HTML, literal
 
 
 class UnitValueNameCol(LinkCol):
-    def get_attrs(self, item):
-        label = item.__unicode__()
-        title = label
-        if self.dt.parameter:
-            label = HTML.span(map_marker_img(self.dt.req, item), literal('&nbsp;'), label)
-        return {'label': label, 'title': title}
-
     def order(self):
         return common.UnitDomainElement.id \
             if self.dt.parameter and self.dt.parameter.domain \
