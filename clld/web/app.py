@@ -7,6 +7,7 @@ import re
 import importlib
 from hashlib import md5
 from uuid import uuid4
+import datetime
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload
@@ -23,6 +24,7 @@ from pyramid.response import Response
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
+from pyramid.renderers import JSON
 from purl import URL
 
 import clld
@@ -316,6 +318,11 @@ def get_configurator(pkg, *utilities, **kw):
     routes = kw.pop('routes', [])
 
     config = Configurator(**kw)
+
+    json_renderer = JSON()
+    json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
+    json_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
+    config.add_renderer('json', json_renderer)
 
     for name, pattern in routes:
         config.add_route(name, pattern)

@@ -5,6 +5,22 @@ import string
 
 from six import PY3
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
+import dateutil.parser
+
+
+DATETIME_ISO_FORMAT = re.compile('[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]+')
+
+
+def parse_json_with_datetime(d):
+    """
+    converts iso formatted timestamps found as values in the dict d to datetime objects.
+    """
+    res = {}
+    for k, v in d.items():
+        if isinstance(v, basestring) and DATETIME_ISO_FORMAT.match(v):
+            v = dateutil.parser.parse(v)
+        res[k] = v
+    return res
 
 
 class NoDefault(object):

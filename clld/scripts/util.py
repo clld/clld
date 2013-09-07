@@ -109,6 +109,7 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
         args.log.info('using bind %s' % engine)
     args.data_file = partial(data_file, args.module)
     args.module_dir = path(args.module.__file__).dirname()
+    args.migrations_dir = path(args.module.__file__).dirname().joinpath('..', 'migrations')
     return args
 
 
