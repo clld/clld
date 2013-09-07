@@ -6,15 +6,14 @@ from clld.web.util.helpers import JS, dumps
 
 
 class MultiSelect(object):
-    def __init__(self, req, model, eid, name=None, collection=None, url=None):
+    def __init__(self, req, name, eid, collection=None, url=None):
         assert collection or url
         assert not (collection and url)
         self.req = req
-        self.model = model
         self.collection = collection
         self.url = url
         self.eid = eid
-        self.name = name or self.model.mapper_name().lower() + 's'
+        self.name = name
         self._options = None
 
     @property
