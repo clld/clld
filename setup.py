@@ -40,7 +40,7 @@ install_requires = [
     'requests',
     'rdflib',
     'colander',
-    'dateutil',
+    'python-dateutil',
     'newrelic',
 ]
 
