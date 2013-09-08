@@ -39,13 +39,16 @@ The following goals directed the design:
 
 These constraints led to the following design decisions:
 
-- Target Ubuntu 12.04 with python 2.7 (but keep an eye on python 3.x compatibility) as
+- Target Ubuntu 12.04 with postgresql 9.1 and python 2.7 (but keep an eye on python 3.x compatibility) as
   primary deployment platform.
-- Use sqlalchemy and it's implementation of joined table inheritance to provide a core
-  database model that can easily be extended.
-- Use the pyramid framework for its extensible configuration mechanism and support of the
-  Zope component architecture (zca).
-- Use zca for pluggable functionality.
+- Use `sqlalchemy <http://sqlalchemy.org>`_ and it's implementation of
+  `joined table inheritance <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#joined-table-inheritance>`_
+  to provide a core database model that can easily be extended.
+- Use the `pyramid framework <http://docs.pylonsproject.org/projects/pyramid/>`_ for its
+  `extensible configuration mechanism <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/extconfig.html>`_
+  and support of the
+  `Zope component architecture (zca) <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/zca.html>`_.
+- Use `zca <http://www.muthukadan.net/docs/zca.html>`_ for pluggable functionality.
 - Allow UI customization via i18n and templates.
 
 
