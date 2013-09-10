@@ -5,11 +5,15 @@ from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
 
+import {{package}}
 from {{package}} import models
 
 
 def main(args):
     data = Data()
+
+    dataset = common.Dataset(id={{package}}.__name__)
+    DBSession.add(dataset)
 
 
 def prime_cache(args):
