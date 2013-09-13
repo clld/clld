@@ -23,7 +23,7 @@ from clld.interfaces import IDataTable, IIndex
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
 
-def filter_number(col, qs, type_=None):
+def filter_number(col, qs, type_=None, qs_weight=1):
     op = col.__eq__
     match = OPERATOR_PATTERN.match(qs)
     if match:
@@ -41,9 +41,9 @@ def filter_number(col, qs, type_=None):
             qs = type_(qs.strip())
         else:
             if isinstance(col.property.columns[0].type, Float):
-                qs = float(qs.strip())
+                qs = float(qs.strip()) * qs_weight
             if isinstance(col.property.columns[0].type, Integer):
-                qs = int(qs.strip())
+                qs = int(qs.strip()) * qs_weight
         return op(qs)
     except ValueError:  # pragma: no cover
         # if we cannot form a proper filter argument, we return None
