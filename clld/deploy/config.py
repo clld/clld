@@ -84,13 +84,13 @@ class App(object):
 
 APPS = dict((app.name, app) for app in [
     App('phoible', 8890, domain='phoible.org', test=SERVERS[1], production=SERVERS[2]),
-    App('glottologcurator', 8889, test=SERVERS[1]),
+    App('glottologcurator', 8889, test=SERVERS[1], workers=1, dependencies=['glottolog3']),
     App('wold2', 8888, domain='wold.livingsources.org', test=SERVERS[0], production=SERVERS[1]),
     App('wals3', 8887, domain='wals.info', test=SERVERS[2], production=SERVERS[1], with_blog=True),
     App('apics', 8886, domain='apics-online.info', test=SERVERS[0], production=SERVERS[1]),
     App('cgj', 8884, test=SERVERS[0], production=SERVERS[1]),
     App('wow', 8883, test=SERVERS[1]),
-    App('glottolog2', 8882),
+    App('ewave', 8882, test=SERVERS[1], production=SERVERS[2]),
     App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=5, test=SERVERS[1], production=SERVERS[0]),
     App('solr', 8080),
 ])

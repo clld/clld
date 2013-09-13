@@ -70,6 +70,18 @@ location /{app.name} {{
         proxy_pass http://127.0.0.1:{app.port}/;
 }}
 
+location /{app.name}/admin {{
+{admin_auth}
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Forwarded-For  $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass http://127.0.0.1:{app.port}/admin;
+}}
+
 location /{app.name}/clld-static/ {{
         alias {app.venv}/src/clld/clld/web/static/;
 }}
@@ -101,6 +113,18 @@ server {{
             proxy_connect_timeout 10;
             proxy_read_timeout 10;
             proxy_pass http://127.0.0.1:{app.port}/;
+    }}
+
+    location /admin {{
+{admin_auth}
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Forwarded-For  $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+            proxy_connect_timeout 10;
+            proxy_read_timeout 10;
+            proxy_pass http://127.0.0.1:{app.port}/admin;
     }}
 
     location /clld-static/ {{
@@ -157,7 +181,7 @@ HTTP_503_TEMPLATE = """\
 
 _SUPERVISOR_TEMPLATE = """\
 [program:{app.name}]
-command={newrelic} run-program {gunicorn} -u {app.name} -g {app.name} --limit-request-line 8000 --error-logfile {app.error_log} {app.config}
+command={newrelic} run-program {gunicorn} -u {app.name} -g {app.name} --max-requests 1000 --limit-request-line 8000 --error-logfile {app.error_log} {app.config}
 environment=NEW_RELIC_CONFIG_FILE="{app.newrelic_config}"
 autostart=%s
 autorestart=%s
@@ -206,6 +230,7 @@ sqlalchemy.url = {app.sqlalchemy_url}
 exclog.extra_info = true
 clld.environment = production
 clld.files = {app.www}/files
+clld.home = {app.home}
 blog.host = {bloghost}
 blog.user = {bloguser}
 blog.password = {blogpassword}
@@ -383,13 +408,22 @@ def maintenance(app, hours=2, template_variables=None):
 
 
 def http_auth(app):
-    pw = getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name)
-    if pw:
-        create_file_as_root(app.nginx_htpasswd, '%s:%s\n' % (app.name, hashpw(pw)))
-        return """\
+    pwds = {
+        app.name: getpass(prompt='HTTP Basic Auth password for user %s: ' % app.name),
+        'admin': ''}
+
+    while not pwds['admin']:
+        pwds['admin'] = getpass(prompt='HTTP Basic Auth password for user admin: ')
+
+    create_file_as_root(
+        app.nginx_htpasswd,
+        ''.join('%s:%s\n' % (name, hashpw(pw)) for name, pw in pwds.items()))
+
+    return bool(pwds[app.name]), """\
+        proxy_set_header Authorization $http_authorization;
+        proxy_pass_header  Authorization;
         auth_basic "%s";
         auth_basic_user_file %s;""" % (app.name, app.nginx_htpasswd)
-    return ''
 
 
 @task
@@ -445,6 +479,8 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
         sudo('pip install -U pip')
         require.python.package('gunicorn', use_sudo=True)
         install_repos('clld')
+        for repos in getattr(app, 'dependencies', []):
+            install_repos(repos)
         install_repos(app.name)
         sudo('webassets -m %s.assets build' % app.name)
 
@@ -456,7 +492,10 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
     require.files.directory(
         str(app.nginx_location.dirname()), owner='root', group='root', use_sudo=True)
 
-    template_variables['auth'] = http_auth(app)
+    restricted, auth = http_auth(app)
+    if restricted:
+        template_variables['auth'] = auth
+    template_variables['admin_auth'] = auth
 
     if environment == 'test':
         create_file_as_root('/etc/nginx/sites-available/default', DEFAULT_SITE)
