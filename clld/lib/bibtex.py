@@ -272,29 +272,74 @@ class Record(OrderedDict, _Convertable):
 """ % (getattr(self.genre, 'value', self.genre), self.id, "\n".join(fields)[:-1])
 
     def text(self):
-        """half-assed implementation of what millions of bibstyles, citation styles, ...
-        try to do.
+        """linearize the bib record according to the rules of the unified style
+
+        Book:
+        author. year. booktitle. (series, volume.) address: publisher.
+
+        Article:
+        author. year. title. journal volume(issue). pages.
+
+        Incollection:
+        author. year. title. In editor (ed.), booktitle, pages. address: publisher.
+
+        .. seealso::
+
+            http://celxj.org/downloads/UnifiedStyleSheet.pdf
+            https://github.com/citation-style-language/styles/blob/master/unified-style-linguistics.csl
         """
-        res = ["%s (%s)" % (self.get('author', 'Anonymous'), self.get('year', 's.a.'))]
-        if self.get('title'):
-            res.append('"%s"' % self.get('title', ''))
+        genre = getattr(self.genre, 'value', self.genre)
         if self.get('editor'):
-            res.append("in %s (ed)" % self.get('editor'))
-        if self.get('booktitle'):
-            res.append("%s" % self.get('booktitle'))
-        for attr in ['school', 'journal', 'volume']:
-            if self.get(attr):
-                res.append(self.get(attr))
-        if self.get('issue'):
-            res.append("(%s)" % self['issue'])
-        if self.get('pages'):
-            res[-1] += '.'
-            res.append("pp. %s" % self['pages'])
+            editors = self['editor']
+            affix = 'eds' if ' and ' in editors or '&' in editors else 'ed'
+        else:
+            editors, affix = None, None
+
+        res = [self.get('author', self.get('editor')), self.get('year', 'n.d')]
+        if genre == 'book':
+            res.append(self.get('booktitle') or self.get('title'))
+            res.append(', '.join(filter(None, [self.get('series'), self.get('volume')])))
+        elif genre == 'misc':
+            # in case of misc records, we use the note field in case a title is missing.
+            res.append(self.get('title') or self.get('note'))
+        else:
+            res.append(self.get('title'))
+
+        if genre == 'article':
+            atom = ' '.join(filter(None, [self.get('journal'), self.get('volume')]))
+            if self.get('issue'):
+                atom += '(%s)' % self['issue']
+            res.append(atom)
+            res.append(self.get('pages'))
+        elif genre == 'incollection':
+            prefix = 'In'
+            atom = ''
+            if editors:
+                atom += " %s (%s.)" % (editors, affix)
+            if self.get('booktitle'):
+                if atom:
+                    atom += ','
+                atom += " %s" % self['booktitle']
+            if self.get('pages'):
+                atom += ", %s" % self['pages']
+            res.append(prefix + atom)
+        else:
+            if editors:
+                res.append("In %s (%s.)" % (editors, affix))
+
+            for attr in ['school', 'journal', 'volume']:
+                if self.get(attr):
+                    res.append(self.get(attr))
+
+            if self.get('issue'):
+                res.append("(%s)" % self['issue'])
+
+            if self.get('pages'):
+                res.append(self['pages'])
+
         if self.get('publisher'):
-            res[-1] += '.'
-            res.append("%s: %s" % (self.get('address', ''), self['publisher']))
-        res[-1] += '.'
-        return ' '.join(res)
+            res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
+        return ' '.join(atom + '.' for atom in filter(None, res))
 
 
 class IDatabase(Interface):

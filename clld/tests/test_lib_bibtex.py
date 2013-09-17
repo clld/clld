@@ -15,7 +15,7 @@ class Tests(unittest.TestCase):
             pages='1-4', publisher='M')
         self.assertTrue('@book' in rec.__unicode__())
         self.assertTrue('@book' in rec.__str__())
-        self.assertTrue('The Title' in rec.text())
+        self.assertTrue('bt' in rec.text())
 
         for fmt in ['txt', 'en', 'ris', 'mods']:
             rec.format(fmt)
