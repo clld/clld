@@ -22,6 +22,9 @@ from clld.db.models.common import Language
 
 def xpartial(func, *args, **kw):
     """augment partial to make it possible to register partials as view callables.
+
+    >>> f = xpartial(lambda x, y: x + y, 1)
+    >>> assert f(1) == 2
     """
     res = partial(func, *args, **kw)
     res.__module__ = func.__module__

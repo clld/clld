@@ -58,7 +58,7 @@ class _LinkToMapCol(LinkToMapCol):
 
 class RefsCol(Col):
     def format(self, item):
-        return linked_references(self.dt.req, item.valueset)
+        return ', '.join(filter(None, [item.valueset.source, linked_references(self.dt.req, item.valueset)]))
 
 
 class Values(DataTable):

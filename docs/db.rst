@@ -2,9 +2,8 @@
 Database
 --------
 
+The clld data model includes the following entities commonly found in linguistic databases and publications:
 
-Common models
-~~~~~~~~~~~~~
 
 .. automodule:: clld.db.models.common
     :members:

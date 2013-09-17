@@ -60,7 +60,8 @@ class Col(object):
         self.name = name
         self.js_args = {
             'sName': name,
-            'sTitle': '' if not name else self.dt.req.translate(name.replace('_', ' ').capitalize())}
+            'sTitle': '' if not name
+            else self.dt.req.translate(name.replace('_', ' ').capitalize())}
 
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):
@@ -69,6 +70,9 @@ class Col(object):
                 setattr(self, key, val)
 
         if not hasattr(self, 'model_col'):
+            #
+            # TODO: fix mechanism to infer model_col for derived classes!)
+            #
             self.model_col = None
             model_col = getattr(self.dt.model, self.name, None)
             if model_col and hasattr(model_col.property, 'columns'):
@@ -79,12 +83,16 @@ class Col(object):
                 self.choices = ['True', 'False']
 
     def order(self):
+        """called when collecting the order by clauses of a datatable's search query
+        """
         return self.model_col
 
     def search(self, qs):
+        """called when collecting the filter criteria of a datatable's search query
+        """
         if self.model_col:
             if isinstance(self.model_col.property.columns[0].type, (String, Unicode)):
-                if not hasattr(self, 'choices'):
+                if not getattr(self, 'choices', None):
                     return icontains(self.model_col, qs)
                 return self.model_col.__eq__(qs)
             if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
@@ -93,11 +101,29 @@ class Col(object):
                 return self.model_col.__eq__(qs == 'True')
 
     def format(self, item):
+        """called when converting the matching result items of a datatable's search query
+        to json.
+        """
         if self.model_col:
             if isinstance(self.model_col.property.columns[0].type, Boolean):
                 return '%s' % getattr(item, self.model_col.name, '')
             return getattr(item, self.model_col.name, None) or ''
         return getattr(item, self.name, None) or ''
+
+
+class PercentCol(Col):
+    """treats a model col of type float as percentage.
+    """
+    def __init__(self, dt, name, **kw):
+        kw['sClass'] = 'right'
+        kw.setdefault('input_size', 'small')
+        super(PercentCol, self).__init__(dt, name, **kw)
+
+    def search(self, qs):
+        return filter_number(self.model_col, qs, qs_weight=0.01)
+
+    def format(self, item):
+        return '%.0f%%' % (100 * getattr(item, self.model_col.name),)
 
 
 class LinkCol(Col):

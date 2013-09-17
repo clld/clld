@@ -9,7 +9,7 @@ Cross-Linguistic Linked Data
 The Project
 -----------
 
-The goal of Cross-Linguistic Linked Data project (CLLD) is to help collecting the world's
+The goal of the Cross-Linguistic Linked Data project (CLLD) is to help collecting the world's
 language diversity heritage. This is to be facilitated by developing, providing and
 maintaining interoperable data publication structures.
 

@@ -15,7 +15,7 @@ else:
 try:
     import newrelic.agent
     NEWRELIC = True
-except ImportError:
+except ImportError:  # pragma: no cover
     NEWRELIC = False
 
 from sqlalchemy import or_
@@ -358,7 +358,9 @@ def linked_references(req, obj):
             gbs,
             class_='citation',
         ))
-    return HTML.span(*chunks)
+    if chunks:
+        return HTML.span(*chunks)
+    return ''
 
 
 def language_identifier(req, obj):

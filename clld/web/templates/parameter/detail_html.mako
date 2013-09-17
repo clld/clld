@@ -5,6 +5,10 @@
 
 <h2>${_('Parameter')} ${ctx.name}</h2>
 
+% if ctx.description:
+<p>${ctx.description}</p>
+% endif
+
 % if request.map:
 ${request.map.render()}
 % endif

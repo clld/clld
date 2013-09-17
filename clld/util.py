@@ -14,6 +14,8 @@ DATETIME_ISO_FORMAT = re.compile('[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2
 def parse_json_with_datetime(d):
     """
     converts iso formatted timestamps found as values in the dict d to datetime objects.
+
+    >>> assert parse_json_with_datetime(dict(d='2012-12-12T20:12:12.12'))['d'].year
     """
     res = {}
     for k, v in d.items():

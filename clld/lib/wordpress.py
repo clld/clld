@@ -33,10 +33,10 @@ class Client(object):
 
     provides a unified interface to functionality called over xmlrpc or plain http
 
-    >>> c = Client('blog.example.org')
+    >>> c = Client('blog.example.org', 'user', 'password')
     >>> assert c.service_url == 'http://blog.example.org/xmlrpc.php'
     """
-    def __init__(self, url, user=None, password=None):
+    def __init__(self, url, user, password):
         self.user = user
         self.password = password
         if not url.startswith('http://') and not url.startswith('https://'):
