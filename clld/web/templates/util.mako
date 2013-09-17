@@ -194,6 +194,13 @@ $(document).ready(function() {
             <p>${a.description}</p>
             % endif
             ${h.rendered_sentence(a.sentence, fmt=fmt)}
+            % if a.sentence.audio:
+            <div>
+                <audio controls="controls">
+                    <source src="${request.file_url(a.sentence.audio)}"/>
+                </audio>
+            </div>
+            % endif
             % if a.sentence.references and fmt == 'long':
             <p>Source: ${h.linked_references(request, a.sentence)|n}</p>
             % endif
