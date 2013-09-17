@@ -16,6 +16,16 @@ class Tests(TestWithEnv):
         with self.utility(Mock(return_value={}), ILinkAttrs):
             link(self.env['request'], common.Value.first())
 
+    def test_get_referents(self):
+        from clld.web.util.helpers import get_referents
+
+        get_referents(common.Source.first(), exclude=['language'])
+
+    def test_data_uri(self):
+        from clld.web.util.helpers import data_uri
+
+        data_uri(__file__, 'text/plain')
+
     def test_gbs_link(self):
         from clld.web.util.helpers import gbs_link
 

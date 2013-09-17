@@ -1,5 +1,5 @@
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HTTPFound
 
 from clld.tests.util import TestWithEnv, XmlResponse
 from clld.db.models import common
@@ -57,6 +57,16 @@ class Tests(TestWithEnv):
         from clld.web.views import js
 
         js(self.env['request'])
+
+    def test_gone(self):
+        from clld.web.views import gone
+
+        self.assertRaises(HTTPGone, gone, None, None)
+
+    def test_redirect(self):
+        from clld.web.views import redirect
+
+        self.assertRaises(HTTPFound, redirect, HTTPFound, lambda r: 'x', None, None)
 
     def test_unapi(self):
         from clld.web.views import unapi

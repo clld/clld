@@ -19,6 +19,7 @@ class Tests(TestWithEnv):
         self.assertEqual(None, self.env['request'].ctx_for_url('/some/path/to/nowhere'))
         self.env['request'].file_url(Language_files(id='1', object=Language.first()))
         assert self.env['request'].get_datatable('valuesets', ValueSet)
+        assert self.env['request'].blog is None
 
     def test_menu_item(self):
         from clld.web.app import menu_item
@@ -69,3 +70,5 @@ class Tests(TestWithEnv):
         config.register_resource('language', None, None)
         config.register_resource('testresource', Language, IF, with_index=True)
         config.register_download(N3Dump(Language, 'clld'))
+        config.add_301('/301pattern', 'http://example.org')
+        config.add_410('/410pattern')

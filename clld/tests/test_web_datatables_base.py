@@ -50,3 +50,14 @@ class Tests(TestWithEnv):
 
         self.set_request_properties(params={'sSearch_0': '> 1', 'sSearch_1': '> 1'})
         self.handle_dt(TestTable, common.Language)
+
+    def test_DataTable3(self):
+        from clld.web.datatables.base import DataTable, PercentCol, Col
+
+        class TestTable(DataTable):
+            def col_defs(self):
+                return [PercentCol(self, 'frequency'), Col(self, 'name', choices=['a'])]
+
+        self.handle_dt(TestTable, common.Value)
+        self.set_request_properties(params={'sSearch_0': '> 10', 'sSearch_1': 'a'})
+        self.handle_dt(TestTable, common.Value)
