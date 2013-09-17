@@ -584,6 +584,12 @@ class Sentence(Base,
         return relationship(
             'Language', backref=backref('sentences', order_by=cls.language_pk))
 
+    @property
+    def audio(self):
+        for f in self._files:
+            if f.mime_type.split('/') == 'audio':
+                return f
+
 
 class Unit_data(Base, Versioned, DataMixin):
     pass
