@@ -147,7 +147,7 @@ class HasDataMixin(object):
 
     @declared_attr
     def data(cls):
-        return relationship(cls.__name__ + '_data', order_by=cls.__name__ + '_data.key')
+        return relationship(cls.__name__ + '_data', order_by=cls.__name__ + '_data.ord')
 
 
 class LanguageSource(Base, Versioned):
@@ -449,7 +449,11 @@ class ValueSet(Base,
     source = Column(Unicode)
 
     parameter = relationship('Parameter', backref='valuesets')
-    contribution = relationship('Contribution', backref='valuesets')
+
+    @declared_attr
+    def contribution(cls):
+        return relationship(
+            'Contribution', backref=backref('valuesets', order_by=cls.parameter_pk))
 
     @declared_attr
     def language(cls):

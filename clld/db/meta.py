@@ -159,7 +159,7 @@ class Base(UnicodeMixin):
         def value(obj, col):
             v = getattr(obj, col)
             if isinstance(v, (date, datetime)):
-                v = str(v)
+                v = v.isoformat()
             return v
 
         return dict(
