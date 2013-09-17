@@ -576,7 +576,7 @@ def create_downloads(app):
     require.files.directory(dl_dir, use_sudo=True, mode="755")
 
 
-def bootstrap():
+def bootstrap():  # pragma: no cover
     for pkg in 'vim tree nginx'.split():
         require.deb.package(pkg)
 

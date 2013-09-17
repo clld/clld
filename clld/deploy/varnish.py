@@ -64,7 +64,7 @@ sub vcl_fetch {{
 """
 
 
-def cache(app):
+def cache(app):  # pragma: no cover
     """require an app to be put behind varnish
     """
     require.deb.package('varnish')
@@ -89,7 +89,7 @@ def cache(app):
     service.reload('nginx')
 
 
-def uncache(app):
+def uncache(app):  # pragma: no cover
     tv = get_template_variables(app)
     tv['auth'] = http_auth(app)
     create_file_as_root(app.nginx_site, SITE_TEMPLATE.format(**tv))
