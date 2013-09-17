@@ -151,7 +151,7 @@ span.sc {
   font-variant: small-caps;
 }
 
-td.object-language, div.object-language {
+td.object-language, div.object-language, td.original-script, div.original-script {
     font-style: italic;
 }
 

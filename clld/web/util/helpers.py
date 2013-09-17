@@ -274,12 +274,12 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
     return HTML.p(
         HTML.div(
             HTML.div(
+                HTML.div(sentence.original_script, class_='original-script')
+                if sentence.original_script else '',
                 HTML.div(literal(sentence.markup_text or sentence.name), class_='object-language'),
                 HTML.div(*units, **{'class': 'gloss-box'}) if units else '',
                 HTML.div(sentence.description, class_='translation')
                 if sentence.description else '',
-                HTML.div(sentence.original_script, class_='original_script')
-                if sentence.original_script else '',
                 #HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
                 class_='body',
             ),
