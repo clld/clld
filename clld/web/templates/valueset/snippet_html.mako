@@ -8,7 +8,7 @@
 <ul class="unstyled">
 % for value in ctx.values:
 <li>
-${h.link(request, value)}${h.format_frequency_and_confidence(value)}
+${h.link(request, value)}${h.format_frequency(request, value)}
 % if value.confidence:
 <dl>
     <dt>${_('Confidence')}:</dt>
@@ -18,10 +18,6 @@ ${h.link(request, value)}${h.format_frequency_and_confidence(value)}
 % if value.sentence_assocs:
 <h4>${_('Sentences')}</h4>
 ${util.sentences(value)}
-% endif
-
-% if not ctx.references and not ctx.sentence_assocs:
-<p>No details available</p>
 % endif
 </li>
 % endfor

@@ -587,7 +587,7 @@ class Sentence(Base,
     @property
     def audio(self):
         for f in self._files:
-            if f.mime_type.split('/') == 'audio':
+            if f.mime_type.split('/')[0] == 'audio':
                 return f
 
 

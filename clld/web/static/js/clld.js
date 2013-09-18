@@ -118,6 +118,8 @@ CLLD.Modal = (function(){
 })();
 
 
+CLLD.DataTables = {};
+
 CLLD.DataTable = (function(){
 
     var _init = function(eid, toolbar, options) {
@@ -244,10 +246,10 @@ CLLD.DataTable = (function(){
         $('#'+eid+' tbody td button.details').live('click', function () {
             var nTr = $(this).parents('tr')[0];
             if (CLLD.DataTable.dt.fnIsOpen(nTr)) {
-                CLLD.DataTable.dt.fnClose( nTr );
+                CLLD.DataTable.dt.fnClose(nTr);
             } else {
                 $.get($(this).attr('href'), {}, function(data, textStatus, jqXHR) {
-                    CLLD.DataTable.dt.fnOpen( nTr, data, 'details' );
+                    CLLD.DataTable.dt.fnOpen(nTr, data, 'details');
                 }, 'html');
             }
         });
@@ -327,7 +329,7 @@ CLLD.DataTable = (function(){
 })();
 
 
-CLLD.Maps = {}
+CLLD.Maps = {};
 
 /*
  * Manager for a leaflet map

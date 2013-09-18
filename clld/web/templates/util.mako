@@ -94,7 +94,8 @@
 ## format an HTML table, enhanced via jQuery DataTables
 ##
 <%def name="table(items, eid='table', class_='table-hover', options=None)">
-    <% _options = {'aaSorting': [], 'bLengthChange': False, 'bPaginate': False, 'bInfo': False, 'sDom': 'fr<"toolbar">tip'} %>
+    ##<% _options = {'aaSorting': [], 'bLengthChange': False, 'bPaginate': False, 'bInfo': False, 'sDom': 'fr<"toolbar">tip'} %>
+    <% _options = {'aaSorting': [], 'bLengthChange': True, 'bPaginate': False, 'bInfo': False, 'sDom': 'fr<"toolbar">tip'} %>
     <% _options.update(options or {}) %>
     <table id="${eid}" class="standard table ${class_}">
         <thead>
@@ -114,7 +115,17 @@
     <script>
     $(document).ready(function() {
         ##$('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false, sDom: 'fr<"toolbar">tip'});
-        $('#${eid}').dataTable(${dumps(_options)|n});
+        CLLD.DataTables['${eid}'] = $('#${eid}').dataTable(${dumps(_options)|n});
+        $('#${eid} tbody td button.sdetails').live('click', function () {
+            var nTr = $(this).parents('tr')[0];
+            if (CLLD.DataTables['${eid}'].fnIsOpen(nTr)) {
+                CLLD.DataTables['${eid}'].fnClose(nTr);
+            } else {
+                $.get($(this).attr('href'), {}, function(data, textStatus, jqXHR) {
+                    CLLD.DataTables['${eid}'].fnOpen(nTr, data, 'details');
+                }, 'html');
+            }
+        });
     });
     </script>
 </%def>
