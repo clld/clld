@@ -211,6 +211,13 @@ class Dataset(Base,
                 'class': 'Dataset'}
         )
 
+    def license_icon(self, req):
+        if 'license_icon' in self.jsondatadict:
+            url = self.jsondatadict['license_icon']
+            if not url.startswith('http'):
+                url = req.static_url('clld:web/static/images/' + url)
+            return url
+
 
 class Language_data(Base, Versioned, DataMixin):
     pass
