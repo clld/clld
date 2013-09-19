@@ -166,6 +166,11 @@ class Record(OrderedDict, _Convertable):
     >>> assert r.getall('editor') == ['a', 'b']
     """
     def __init__(self, genre, id_, *args, **kw):
+        if isinstance(genre, basestring):
+            try:
+                genre = EntryType.from_string(genre.lower())
+            except ValueError:
+                genre = EntryType.misc
         self.genre = genre
         self.id = id_
         super(Record, self).__init__(args, **kw)
