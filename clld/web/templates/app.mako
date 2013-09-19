@@ -117,10 +117,8 @@
                 <%block name="footer">
                     <div class="row-fluid" style="padding-top: 15px; border-top: 1px solid black;">
                         <div class="span3">
-                            <a href="https://github.com/clld/${request.registry.settings['clld.pkg']}">
-                                <i class="icon-share">&nbsp;</i>
-                                Application source on<br/>
-                                <img height="25px" src="${request.static_url('clld:web/static/images/GitHub_Logo.png')}" />
+                            <a href="http://www.eva.mpg.de" title="Max Planck Institute for Evolutionary Anthropology, Leipzig">
+                                <img width="80" src="${request.static_url('clld:web/static/images/minerva.png')}" />
                             </a>
                         </div>
                         <div class="span6" style="text-align: center;">
@@ -146,6 +144,12 @@
                         </div>
                         <div class="span3" style="text-align: right;">
                             <a href="${request.route_url('legal')}">disclaimer</a>
+                            <br/>
+                            <a href="https://github.com/clld/${request.registry.settings['clld.pkg']}">
+                                <i class="icon-share">&nbsp;</i>
+                                Application source on<br/>
+                                <img height="25" src="${request.static_url('clld:web/static/images/GitHub_Logo.png')}" />
+                            </a>
                         </div>
                     </div>
                 </%block>
