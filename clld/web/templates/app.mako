@@ -69,16 +69,35 @@
                             </li>
                         % endfor
                         </ul>
-                        % if hasattr(self, 'contextnav'):
-                        <br>
-                        <ul class="nav pull-right">
-                            ${self.contextnav()}
-                        </ul>
-                        % endif
+                        ##% if hasattr(self, 'contextnav'):
+                        ##<br>
+                        ##<ul class="nav pull-right">
+                        ##    ${self.contextnav()}
+                        ##</ul>
+                        ##% endif
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
+        % if hasattr(self, 'contextnav'):
+        <div id="contextnavbar" class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target="#second">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <div id="second" class="nav-collapse collapse">
+                        <ul class="nav pull-right">
+                            ${self.contextnav()}
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        % endif
+
         <div class="container-fluid">
             % if ctx and getattr(ctx, 'metadata', None):
             <abbr class="unapi-id" title="${h.urlescape(request.resource_url(ctx))}"></abbr>

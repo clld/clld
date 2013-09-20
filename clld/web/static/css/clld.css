@@ -1,6 +1,19 @@
 /*
  *
  */
+#contextnavbar .nav li {
+  min-height: 26px !important;
+}
+
+#contextnavbar a {
+  height: 18px !important;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#contextnavbar .navbar-inner {
+  min-height: 26px !important;
+}
 
 h2 {font-size: 28px !important;}
 
