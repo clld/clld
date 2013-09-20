@@ -54,7 +54,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 
 
-TAB_NAME_PATTERN = re.compile('iso-639-3(?P<name>_Name_Index|\-macrolanguages|_Retirements)?_(?P<date>[0-9]{8})\.tab$')
+TAB_NAME_PATTERN = re.compile('iso-639-3(?P<name>_Name_Index|\-macrolanguages|_Retirements)?(_(?P<date>[0-9]{8}))?\.tab$')
 
 
 def get(path):
