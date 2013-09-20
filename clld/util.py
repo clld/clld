@@ -275,3 +275,58 @@ def slug(s, remove_whitespace=True):
 def encoded(string, encoding='utf8'):
     assert isinstance(string, basestring)
     return string.encode(encoding) if isinstance(string, unicode) else string
+
+
+class cached_property(object):
+    """Decorator for read-only properties evaluated only once.
+
+    It can be used to create a cached property like this::
+
+        import random
+
+        # the class containing the property must be a new-style class
+        class MyClass(object):
+            # create property whose value is cached
+            @cached_property()
+            def randint(self):
+                # will only be evaluated once.
+                return random.randint(0, 100)
+
+    The value is cached  in the '_cache' attribute of the object instance that
+    has the property getter method wrapped by this decorator. The '_cache'
+    attribute value is a dictionary which has a key for every property of the
+    object which is wrapped by this decorator. Each entry in the cache is
+    created only when the property is accessed for the first time and is the last
+    computed property value.
+
+    To expire a cached property value manually just do::
+
+        del instance._cache[<property name>]
+
+    inspired by the recipe by Christopher Arndt in the PythonDecoratorLibrary
+
+    >>> import random
+    >>> class C(object):
+    ...     @cached_property()
+    ...     def attr(self):
+    ...         return random.randint(1, 100000)
+    ...
+    >>> c = C()
+    >>> call1 = c.attr
+    >>> assert call1 == c.attr
+    >>> del c._cache['attr']
+    >>> assert call1 != c.attr
+    """
+    def __call__(self, fget):
+        self.fget = fget
+        self.__doc__ = fget.__doc__
+        self.__name__ = fget.__name__
+        self.__module__ = fget.__module__
+        return self
+
+    def __get__(self, inst, owner):
+        if not hasattr(inst, '_cache'):
+            inst._cache = {}
+        if self.__name__ not in inst._cache:
+            inst._cache[self.__name__] = self.fget(inst)
+        return inst._cache[self.__name__]
