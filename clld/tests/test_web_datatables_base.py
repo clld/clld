@@ -15,8 +15,8 @@ class Tests(TestWithEnv):
             def col_defs(self):
                 return [
                     Col(self, 'pk'),
-                    DetailsRowLinkCol(self),
-                    LinkToMapCol(self),
+                    DetailsRowLinkCol(self, 'd'),
+                    LinkToMapCol(self, 'm'),
                     LinkCol(self, 'link'),
                     Col(self, 'active'),
                     Col(self, 'name', model_col=None),

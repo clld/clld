@@ -4,7 +4,7 @@ from clld.lib.bibtex import EntryType
 
 
 class TypeCol(Col):
-    def __init__(self, dt, name='btype', *args, **kw):
+    def __init__(self, dt, name, *args, **kw):
         kw['sTitle'] = 'BibTeX type'
         kw['choices'] = [(t.value, t.description) for t in EntryType]
         super(TypeCol, self).__init__(dt, name, *args, **kw)
@@ -37,17 +37,14 @@ class Sources(DataTable):
 
     def col_defs(self):
         return [
-            DetailsRowLinkCol(self),
+            DetailsRowLinkCol(self, 'd'),
             LinkCol(self, 'name'),
             Col(self, 'description', sTitle='Title'),
             Col(self, 'year'),
             Col(self, 'author'),
-            TypeCol(self),
+            TypeCol(self, 'bibtex_type'),
         ]
 
-    def get_options(self):
-        opts = super(Sources, self).get_options()
+    def xhr_query(self):
         if self.language:
-            opts['sAjaxSource'] = self.req.route_url(
-                'sources', _query={'language': self.language.id})
-        return opts
+            return {'language': self.language.id}

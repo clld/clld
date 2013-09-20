@@ -84,11 +84,7 @@ class Unitvalues(DataTable):
     def toolbar(self):
         return ''
 
-    def get_options(self):
-        opts = DataTable.get_options(self)
+    def xhr_query(self):
         for attr in ['parameter', 'contribution', 'unit']:
             if getattr(self, attr):
-                opts['sAjaxSource'] = self.req.route_url(
-                    'unitvalues', _query={attr: getattr(self, attr).id})
-
-        return opts
+                return {attr: getattr(self, attr).id}

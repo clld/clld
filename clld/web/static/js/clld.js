@@ -237,31 +237,31 @@ CLLD.DataTable = (function(){
             }
         } );
 
-        CLLD.DataTable.dt = $('#'+eid).dataTable(options);
-        $('.dataTables_filter').hide();
+        CLLD.DataTables[eid] = $('#'+eid).dataTable(options);
+        $('#'+eid+'_filter').hide();
         if (toolbar) {
-            $("div.dt-toolbar").html(toolbar);
+            $("."+eid+"-toolbar").html(toolbar);
         }
-        $('#searchCol').change(function(){CLLD.DataTable.dt.fnFilter($('.dataTables_filter input').val())});
+        //$('#'+eid+' #searchCol').change(function(){CLLD.DataTables[eid].fnFilter($('#'+eid+' .dataTables_filter input').val())});
         $('#'+eid+' tbody td button.details').live('click', function () {
             var nTr = $(this).parents('tr')[0];
-            if (CLLD.DataTable.dt.fnIsOpen(nTr)) {
-                CLLD.DataTable.dt.fnClose(nTr);
+            if (CLLD.DataTables[eid].fnIsOpen(nTr)) {
+                CLLD.DataTables[eid].fnClose(nTr);
             } else {
                 $.get($(this).attr('href'), {}, function(data, textStatus, jqXHR) {
-                    CLLD.DataTable.dt.fnOpen(nTr, data, 'details');
+                    CLLD.DataTables[eid].fnOpen(nTr, data, 'details');
                 }, 'html');
             }
         });
 
-        $("tfoot input").keyup( function () {
+        $("#"+eid+" tfoot input").keyup( function () {
             /* Filter on the column (the index) of this element */
-            CLLD.DataTable.dt.fnFilter(this.value, $("tfoot .control").index(this));
+            CLLD.DataTables[eid].fnFilter(this.value, $("#"+eid+" tfoot .control").index(this));
         });
 
-        $("tfoot select").change( function () {
+        $("#"+eid+" tfoot select").change( function () {
             /* Filter on the column (the index) of this element */
-            CLLD.DataTable.dt.fnFilter($(this).val(), $("tfoot .control").index(this));
+            CLLD.DataTables[eid].fnFilter($(this).val(), $("#"+eid+" tfoot .control").index(this));
         });
 
         var dl = '<p>You may use the download button <i class="icon-download-alt"> </i> to download the currently selected items in various formats.</p>';
@@ -272,40 +272,34 @@ CLLD.DataTable = (function(){
             }
         }
 
-        if (dl) {
-            $('#cdOpener').clickover({
-                html: true,
-                content: '<dl>'+dl+'</dl>',
-                title: 'Column Descriptions',
-                placement: 'left',/*function (context, source) {
-                    var position = $(source).position();
-                    if (position.top < 80){
-                        return "bottom";
-                    }
-                    return "left";
-                },*/
-                trigger: "click"
-            });
-        } else {
-            $('#cdOpener').hide();
-        }
+        $('.'+eid+'-cdOpener').clickover({
+            html: true,
+            content: '<dl>'+dl+'</dl>',
+            title: 'Column Descriptions',
+            placement: 'left',/*function (context, source) {
+                var position = $(source).position();
+                if (position.top < 80){
+                    return "bottom";
+                }
+                return "left";
+            },*/
+            trigger: "click"
+        });
 
         for (i=0; i < options.aoColumns.length; i++) {
             col = options.aoColumns[i];
             if (col.sFilter) {
-                CLLD.DataTable.dt.fnFilter(col.sFilter, i);
+                CLLD.DataTables[eid].fnFilter(col.sFilter, i);
             }
         }
-
     };
 
     return {
-        dt: undefined,
         init: _init,
-        current_url: function(fmt) {
+        current_url: function(eid, fmt) {
             var url, parts,
                 query = {'sEcho': 1},
-                oSettings = CLLD.DataTable.dt.fnSettings();
+                oSettings = CLLD.DataTables[eid].fnSettings();
             query.iSortingCols = oSettings.aaSorting.length;
             for (i=0; i < oSettings.aaSorting.length; i++) {
                 query['iSortCol_' + i] = oSettings.aaSorting[i][0];

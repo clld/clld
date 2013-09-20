@@ -79,14 +79,14 @@ class Valuesets(DataTable):
 
         refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
 
-        res = [DetailsRowLinkCol(self)]
+        res = [DetailsRowLinkCol(self, 'd')]
 
         if self.parameter:
             return res + [
                 LanguageCol(self, 'language', model_col=Language.name),
                 #name_col,
                 refs_col,
-                _LinkToMapCol(self),
+                _LinkToMapCol(self, 'm'),
             ]
 
         if self.language:
@@ -112,17 +112,7 @@ class Valuesets(DataTable):
     def toolbar(self):
         return ''
 
-    def get_options(self):
-        opts = DataTable.get_options(self)
-        #opts["aaSorting"] = [[1, "asc"]]
-
-        #opts['bLengthChange'] = False
-        #opts['bPaginate'] = False
-        #opts['bInfo'] = False
-
+    def xhr_query(self):
         for attr in ['parameter', 'contribution', 'language']:
             if getattr(self, attr):
-                opts['sAjaxSource'] = self.req.route_url(
-                    'values', _query={attr: getattr(self, attr).id})
-
-        return opts
+                return {attr: getattr(self, attr).id}

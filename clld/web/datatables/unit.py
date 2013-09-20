@@ -40,10 +40,6 @@ class Units(DataTable):
             LanguageLinkCol(self, 'language', model_col=Language.name),
         ]
 
-    def get_options(self):
-        opts = DataTable.get_options(self)
+    def xhr_query(self):
         if self.language:
-            opts['sAjaxSource'] = self.req.route_url(
-                'units', _query={'language': self.language.id})
-            #opts["aaSorting"] = [[ 2, "asc" ]]
-        return opts
+            return {'language': self.language.id}

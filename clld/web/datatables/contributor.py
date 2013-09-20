@@ -5,6 +5,8 @@ from clld.db.models.common import Contributor
 
 
 class ContributionsCol(Col):
+    __kw__ = {'bSearchable': False, 'bSortable': False}
+
     def format(self, item):
         return HTML.ul(
             *[HTML.li(HTML.a(c.contribution.name,
@@ -19,6 +21,8 @@ class NameCol(LinkCol):
 
 
 class UrlCol(Col):
+    __kw__ = {'bSearchable': False, 'bSortable': False}
+
     def format(self, item):
         return external_link(item.url, 'homepage') if item.url else ''
 
@@ -27,7 +31,7 @@ class Contributors(DataTable):
     def col_defs(self):
         return [
             NameCol(self, 'name'),
-            ContributionsCol(self, 'Contributions', bSortable=False, bSearchable=False),
+            ContributionsCol(self, 'Contributions'),
             Col(self, 'address'),
-            UrlCol(self, 'Homepage', bSortable=False, bSearchable=False),
+            UrlCol(self, 'Homepage'),
         ]

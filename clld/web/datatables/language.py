@@ -6,10 +6,10 @@ from clld.web.datatables.base import (
 class Languages(DataTable):
     def col_defs(self):
         return [
-            DetailsRowLinkCol(self),
+            DetailsRowLinkCol(self, 'd'),
             IdCol(self, 'id'),
             LinkCol(self, 'name'),
-            LinkToMapCol(self),
+            LinkToMapCol(self, 'm'),
             Col(self, 'latitude', sDescription='<small>The geographic latitude</small>'),
             Col(self, 'longitude'),
         ]

@@ -18,12 +18,18 @@ from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JSMap, JS_CLLD
 from clld.interfaces import IDataTable, IIndex
+from clld.util import cached_property
 
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
 
 def filter_number(col, qs, type_=None, qs_weight=1):
+    """
+    :param col: an sqlalchemy column instance.
+    :param qs: a string, providing a filter criterion.
+    :return: sqlalchemy filter expression.
+    """
     op = col.__eq__
     match = OPERATOR_PATTERN.match(qs)
     if match:
@@ -55,6 +61,9 @@ class Col(object):
     """
     dt_name_pattern = re.compile('[a-z]+[A-Z]+[a-z]+')
 
+    # convenient way to provide defaults for some kw arguments of __init__:
+    __kw__ = {}
+
     def __init__(self, dt, name, **kw):
         self.dt = dt
         self.name = name
@@ -62,6 +71,10 @@ class Col(object):
             'sName': name,
             'sTitle': '' if not name
             else self.dt.req.translate(name.replace('_', ' ').capitalize())}
+
+        # take the defaults into account:
+        for k, v in self.__kw__.items():
+            kw.setdefault(k, v)
 
         for key, val in kw.items():
             if self.dt_name_pattern.match(key):
@@ -114,10 +127,7 @@ class Col(object):
 class PercentCol(Col):
     """treats a model col of type float as percentage.
     """
-    def __init__(self, dt, name, **kw):
-        kw['sClass'] = 'right'
-        kw.setdefault('input_size', 'small')
-        super(PercentCol, self).__init__(dt, name, **kw)
+    __kw__ = {'sClass': 'right', 'input_size': 'small'}
 
     def search(self, qs):
         return filter_number(self.model_col, qs, qs_weight=0.01)
@@ -151,10 +161,7 @@ class LanguageCol(LinkCol):
 
 
 class IdCol(LinkCol):
-    def __init__(self, dt, name='ID', **kw):
-        kw.setdefault('sClass', 'right')
-        kw.setdefault('input_size', 'mini')
-        super(IdCol, self).__init__(dt, name, **kw)
+    __kw__ = {'sClass': 'right', 'input_size': 'mini'}
 
     def get_attrs(self, item):
         return {'label': item.id}
@@ -164,10 +171,7 @@ class LinkToMapCol(Col):
     """We use the CLLD.Map.showInfoWindow API function to construct a button to open
     a popup on the map.
     """
-    def __init__(self, dt, name=None, **kw):
-        kw.setdefault('bSearchable', False)
-        kw.setdefault('bSortable', False)
-        super(LinkToMapCol, self).__init__(dt, name or '', **kw)
+    __kw__ = {'bSearchable': False, 'bSortable': False, 'sTitle': ''}
 
     def get_obj(self, item):
         return item
@@ -186,18 +190,17 @@ class LinkToMapCol(Col):
 
 
 class DetailsRowLinkCol(Col):
-    def __init__(self, dt, name=None, **kw):
-        kw.setdefault('bSortable', False)
-        kw.setdefault('bSearchable', False)
-        kw.setdefault('sClass', 'center')
-        kw.setdefault('sType', 'html')
-        kw.setdefault('sTitle', 'Details')
-        self.button_text = kw.pop('button_text', 'more')
-        Col.__init__(self, dt, name or '', **kw)
+    __kw__ = {
+        'bSearchable': False,
+        'bSortable': False,
+        'sClass': 'center',
+        'sType': 'html',
+        'sTitle': 'Details',
+        'button_text': 'more',
+    }
 
     def format(self, item):
         return button(
-            #icon('info-sign', inverted=True),
             self.button_text,
             href=self.dt.req.resource_url(item, ext='snippet.html'),
             title="show details",
@@ -208,11 +211,14 @@ class DetailsRowLinkCol(Col):
 @implementer(IDataTable)
 class DataTable(object):
     def __init__(self, req, model, eid=None, **kw):
+        """
+        :param req: request object.
+        :param model: mapper class, instances of this class will be the rows in the table.
+        :param eid: HTML element id that will be assigned to this data table.
+        """
         self.model = model
         self.req = req
         self.eid = eid or self.__class__.__name__
-        self._cols = None
-        self._options = None
         self.count_all = None
         self.count_filtered = None
 
@@ -225,21 +231,34 @@ class DataTable(object):
     def col_defs(self):
         raise NotImplementedError  # pragma: no cover
 
-    @property
+    @cached_property()
     def cols(self):
-        if not self._cols:
-            self._cols = self.col_defs()
-        return self._cols
+        return self.col_defs()
 
-    @property
+    def xhr_query(self):
+        """
+        :return: a mapping to be passed as query parameters to the server when requesting\
+        table data via xhr.
+        """
+        return {}
+
+    @cached_property()
     def options(self):
-        if not self._options:
-            self._options = self.get_options()
-            self._options['bServerSide'] = True
-            self._options['bProcessing'] = True
-            if 'sAjaxSource' not in self._options:
-                self._options['sAjaxSource'] = self.req.url
-        return self._options
+        opts = {
+            'bServerSide': True,
+            'bProcessing': True,
+            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'" + self.eid + "-toolbar'>>r>t<'span4'i><'span6'p>",
+            "bAutoWidth": False,
+            "sPaginationType": "bootstrap",
+            "aoColumns": [col.js_args for col in self.cols],
+            "iDisplayLength": 100,
+            "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
+            'sAjaxSource': self.req.route_url(
+            '%ss' % self.model.mapper_name().lower(), _query=self.xhr_query() or {}),
+        }
+        opts.update(self.get_options())
+        #opts.setdefault('sAjaxSource', self.req.url)
+        return opts
 
     def base_query(self, query):
         """Custom DataTables can overwrite this method to add joins, or apply filters.
@@ -307,22 +326,12 @@ class DataTable(object):
                 *[HTML.li(HTML.a(
                     fmt,
                     href="#",
-                    onclick="document.location.href = CLLD.DataTable.current_url('%s'); return false;" % fmt,
+                    onclick="document.location.href = CLLD.DataTable.current_url('%s', '%s'); return false;" % (self.eid, fmt),
                     id='dt-dl-%s' % fmt))
                   for fmt in [a.extension for n, a in self.req.registry.getAdapters([self.model()], IIndex)] if fmt != 'html'],
                 **dict(class_="dropdown-menu")),
-            button(icon('info-sign', inverted=True), class_='btn-info', id='cdOpener'),
+            button(icon('info-sign', inverted=True), class_='btn-info %s-cdOpener' % self.eid),
             class_='btn-group right')
 
     def get_options(self):
-        return {
-            #"bStateSave": True,
-            #"sDom": "<'dt-before-table row-fluid'<'span6'l><'span6'f<'dt-toolbar'>>r>t"
-            #"<'row-fluid'<'span6'i><'span6'p>>",
-            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'dt-toolbar'>>r>t<'span4'i><'span6'p>",
-            "bAutoWidth": False,
-            "sPaginationType": "bootstrap",
-            "aoColumns": [col.js_args for col in self.cols],
-            "iDisplayLength": 100,
-            "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
-        }
+        return {}
