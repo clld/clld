@@ -77,6 +77,9 @@ class GeoJson(Renderable):
         """
         return feature
 
+    def get_coordinates(self, obj):
+        return [obj.longitude, obj.latitude]
+
     def render(self, ctx, req, dump=True):
         self.map_marker = req.registry.getUtility(interfaces.IMapMarker)
         features = []
@@ -90,7 +93,8 @@ class GeoJson(Renderable):
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [language.longitude, language.latitude]},
+                    "coordinates": self.get_coordinates(language),
+                },
                 "properties": self._feature_properties(ctx, req, feature, language),
             })
 
