@@ -256,7 +256,7 @@ class DataTable(object):
             'sAjaxSource': self.req.route_url(
             '%ss' % self.model.mapper_name().lower(), _query=self.xhr_query() or {}),
         }
-        opts.update(self.get_options())
+        opts.update(self.get_options() or {})
         #opts.setdefault('sAjaxSource', self.req.url)
         return opts
 
