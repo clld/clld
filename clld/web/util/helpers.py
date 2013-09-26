@@ -237,7 +237,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         end = 0
         for match in GLOSS_ABBR_PATTERN.finditer(gloss):
             if match.start() > end:
-                res.append(literal(gloss[end:match.start()]))
+                res.append(gloss[end:match.start()])
 
             abbr = match.group('abbr')
             if abbr in abbrs:
@@ -258,7 +258,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
 
             end = match.end()
 
-        res.append(literal(gloss[end:]))
+        res.append(gloss[end:])
         return filter(None, res)
 
     units = []
@@ -267,7 +267,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         glossed = sentence.gloss
         for morpheme, gloss in zip(analyzed.split('\t'), glossed.split('\t')):
             units.append(HTML.div(
-                HTML.div(literal(morpheme), class_='morpheme'),
+                HTML.div(morpheme, class_='morpheme'),
                 HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
                 class_='gloss-unit'))
 
