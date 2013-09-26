@@ -28,6 +28,11 @@ class TypeCol(Col):
         return Sentence.type
 
 
+class TsvCol(Col):
+    def search(self, qs):
+        return super(TsvCol, self).search('\t'.join(qs.split()))
+
+
 class Sentences(DataTable):
     def __init__(self, req, model, parameter=None, language=None, **kw):
         for attr, _model in [('parameter', Parameter), ('language', Language)]:
@@ -54,9 +59,10 @@ class Sentences(DataTable):
 
     def col_defs(self):
         return [
+            Col(self, 'id', bSortable=False, input_size='mini'),
             LinkCol(self, 'name', sTitle='Primary text', sClass="object-language"),
-            Col(self, 'analyzed', sTitle='Analyzed text'),
-            Col(self, 'gloss', sClass="gloss"),
+            TsvCol(self, 'analyzed', sTitle='Analyzed text'),
+            TsvCol(self, 'gloss', sClass="gloss"),
             Col(self, 'description', sTitle=self.req.translate('Translation'), sClass="translation"),
             TypeCol(self, 'type'),
             LanguageCol(self, 'language'),
