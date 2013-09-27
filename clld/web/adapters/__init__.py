@@ -30,6 +30,8 @@ def includeme(config):
             # ... as html index
             specs.append(
                 (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
+            specs.append(
+                (interface, Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
 
         # ... as html details page
         specs.append(
