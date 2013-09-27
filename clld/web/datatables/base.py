@@ -271,6 +271,9 @@ class DataTable(object):
             {'datatable': self, 'options': Markup(dumps(self.options))},
             request=self.req))
 
+    def default_order(self):
+        return self.model.pk
+
     def get_query(self, limit=1000, offset=0):
         query = self.base_query(DBSession.query(self.model))
         self.count_all = query.count()
@@ -298,7 +301,7 @@ class DataTable(object):
                             order = desc(order)
                         query = query.order_by(order)
 
-        query = query.order_by(self.model.pk)
+        query = query.order_by(self.default_order())
         if 'iDisplayLength' in self.req.params:
             # make sure no more than 1000 items can be selected
             limit = min([int(self.req.params['iDisplayLength']), 1000])
