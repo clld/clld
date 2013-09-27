@@ -52,6 +52,7 @@ tests_require = [
     'pep8',
     'mock',
     'selenium',
+    'coverage',
 ]
 
 if not PY3:
