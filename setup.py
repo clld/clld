@@ -24,6 +24,7 @@ except IOError:
 install_requires = [
     'setuptools',
     'Pyramid >= 1.4',
+    'pyramid_mako',
     'sqlalchemy>=0.7.9',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat

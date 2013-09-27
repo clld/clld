@@ -318,6 +318,7 @@ def get_configurator(pkg, *utilities, **kw):
     routes = kw.pop('routes', [])
 
     config = Configurator(**kw)
+    config.include('pyramid_mako')
 
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
