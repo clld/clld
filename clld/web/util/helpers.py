@@ -122,6 +122,10 @@ def format_gbs_identifier(source):
     return source.gbs_identifier.replace(':', '-') if source.gbs_identifier else source.pk
 
 
+def format_coordinates(obj):
+    return HTML.span('{0.latitude:.2f}; {0.longitude:.2f}'.format(obj), class_='geo')
+
+
 def format_frequency(req, obj, marker=None, height='20', width='20'):
     if not obj.frequency or obj.frequency == 100:
         return ''
