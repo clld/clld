@@ -131,6 +131,22 @@
 </%def>
 
 ##
+## format a list of key-value pairs as HTML table
+##
+<%def name="dl_table(*items, **kw)">
+    <table class="table table-condensed">
+        <tbody>
+            % for key, value in items:
+            <tr><th>${key}</th><td>${value}</td></tr>
+            % endfor
+            % for key, value in kw.items():
+            <tr><th>${key}</th><td>${value}</td></tr>
+            % endfor
+        </tbody>
+    </table>
+</%def>
+
+##
 ## format a div of class well
 ##
 <%def name="well(title=None, paragraphs=None)">
