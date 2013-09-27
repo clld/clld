@@ -4,12 +4,12 @@
     <link href="${request.url}"/>
     <updated>${h.datetime.datetime.now().isoformat()}</updated>
     <author>${request.dataset.name}</author>
-    <id></id>
+    <id>${request.url}</id>
     % for item in ctx.get_query(limit=1000):
     <entry>
         <title>${item}</title>
         <link href="${request.resource_url(item)}"/>
-        <id>${item.id}</id>
+        <id>${request.resource_url(item)}</id>
         <updated>${item.updated.isoformat()}</updated>
         % if item.description:
         <summary>${item.description}</summary>
