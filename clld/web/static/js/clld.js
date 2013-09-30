@@ -87,6 +87,9 @@ CLLD.Feed = (function(){
             if (!result.error) {
                 var title = spec.title == undefined ? result.feed.title : spec.title
                 //var content = '<h3><a href="'+result.feed.link+'">'+title+'</a></h3>';
+                if (spec.linkTitle) {
+                    title = '<a href="'+spec.url+'">'+title+'</a>';
+                }
                 var content = '<h3>'+title+'</h3>';
                 for (var j = 0; j < result.feed.entries.length; j++) {
                     var entry = result.feed.entries[j];
