@@ -166,7 +166,7 @@
 ##
 ##
 ##
-<%def name="feed(title, url, eid='feed')">
+<%def name="feed(title, url, eid='feed', **kw)">
     <%self:well>
         <div id="${eid}">
         % if hasattr(caller, 'body'):
@@ -177,7 +177,7 @@
         </div>
         <script>
 $(document).ready(function() {
-    ${h.JSFeed.init(dict(eid=eid, url=url, title=title))|n}
+    ${h.JSFeed.init(dict(eid=eid, url=url, title=title, **kw))|n}
 });
         </script>
     </%self:well>
