@@ -327,6 +327,9 @@ CLLD.Maps = {};
 
 /*
  * Manager for a leaflet map
+ *
+ * qw remove the attribution control by default. see
+ * https://groups.google.com/d/msg/leaflet-js/fA6M7fbchOs/JTNVhqdc7JcJ
  */
 CLLD.Map = function(eid, layers, options) {
     CLLD.Maps[eid] = this;
@@ -337,7 +340,8 @@ CLLD.Map = function(eid, layers, options) {
             center: [5.5, 152.58],
             scrollWheelZoom: false,
             maxZoom: options.max_zoom == undefined ? 6 : options.max_zoom,
-            fullscreenControl: true
+            fullscreenControl: true,
+            attributionControl: false
         }
     );
 
