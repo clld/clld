@@ -17,25 +17,40 @@ def normalize_name(s):
     return s.replace('-', '_')
 
 
-def rows(filename, delimiter='\t', namedtuples=False, encoding=None, newline='\n'):
+def rows(filename=None,
+         content=None,
+         delimiter='\t',
+         namedtuples=False,
+         encoding=None,
+         newline='\n'):
     """
     >>> assert list(rows(__file__))
     >>> from clld.tests.util import TESTS_DIR
     >>> assert list(rows(TESTS_DIR.joinpath('test.tab'), namedtuples=True, encoding='utf8'))
     """
+    assert filename or content
+    assert not (filename and content)
     cls = None
+    fields = []
 
-    with open(filename, 'r') as fp:
-        for i, line in enumerate(fp.read().split(newline)):
-            if not line.strip():
-                continue
-            if encoding:
-                line = line.decode(encoding)
-            row = [s.strip() for s in line.split(delimiter)]
-            if namedtuples and i == 0:
-                cls = namedtuple('Row', map(normalize_name, row))
-            else:
-                yield cls(*row) if cls else row
+    if filename:
+        with open(filename, 'r') as fp:
+            content = fp.read()
+
+    for i, line in enumerate(content.split(newline)):
+        if not line.strip():
+            continue
+        if encoding:
+            line = line.decode(encoding)
+        row = [s.strip() for s in line.split(delimiter)]
+        if namedtuples and i == 0:
+            fields = row
+            cls = namedtuple('Row', map(normalize_name, row))
+        else:
+            if fields:
+                while len(row) < len(fields):
+                    row.append(None)
+            yield cls(*row) if cls else row
 
 
 class UnicodeCsvWriter:

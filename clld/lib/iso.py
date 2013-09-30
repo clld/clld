@@ -53,6 +53,8 @@ import re
 import requests
 from bs4 import BeautifulSoup as bs
 
+from clld.lib import dsv
+
 
 TAB_NAME_PATTERN = re.compile('iso-639-3(?P<name>_Name_Index|\-macrolanguages|_Retirements)?(_(?P<date>[0-9]{8}))?\.tab$')
 
@@ -85,14 +87,7 @@ def get_taburls():
 def get_tab(name):
     """generator for entries in a tab file specified by name.
     """
-    lines = get(get_taburls()[name]).split('\n')
-    fields = lines[0].split('\t')
-    cls = namedtuple('Row', lines[0].lower().strip())
-    for line in lines[1:]:
-        row = line.strip().split('\t')
-        while len(row) < len(fields):
-            row.append(None)
-        yield cls(*row)
+    return dsv.rows(content=get(get_taburls()[name]), namedtuples=True)
 
 
 def _text(e):
