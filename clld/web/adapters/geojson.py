@@ -33,6 +33,15 @@ def flatten(d):
     return dict(_flatten(d))
 
 
+def pacific_centered_coordinates(obj):
+    """The world should be divided between Icelandic (westernmost language) and
+    Tupi (easternmost language), i.e. between -17 and -36.
+
+    We chose -26 as divider because that puts cape verde to the west of africa.
+    """
+    return [obj.longitude if obj.longitude > -26 else obj.longitude + 360, obj.latitude]
+
+
 @implementer(interfaces.IRepresentation)
 class GeoJson(Renderable):
     """Base class for adapters which render geojson feature collections.
