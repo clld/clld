@@ -85,18 +85,19 @@ class Download(object):
         p = self.abspath(req)
         if not p.dirname().exists():
             p.dirname().mkdir()
+        tmp = path('%s.tmp' % p)
 
         if self.rdf:
             # we do not create archives with a readme for rdf downloads, because each
             # RDF entity points to the dataset and the void description of the dataset
             # covers all relevant metadata.
-            with closing(GzipFile(p, 'w')) as fp:
+            with closing(GzipFile(tmp, 'w')) as fp:
                 self.before(req, fp)
                 for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                     self.dump(req, fp, item, i)
                 self.after(req, fp)
         else:
-            with ZipFile(p, 'w', ZIP_DEFLATED) as zipfile:
+            with ZipFile(tmp, 'w', ZIP_DEFLATED) as zipfile:
                 if not filename:
                     fp = StringIO()
                     self.before(req, fp)
@@ -121,6 +122,9 @@ It should be cited as
            '='*(len(req.dataset.name.encode('utf8')) + len(' data download')),
            req.dataset.license,
            TxtCitation(None).render(req.dataset, req).encode('utf8')))
+        if p.exists():
+            p.remove()
+        tmp.move(p)
 
     def query(self, req):
         q = DBSession.query(self.model).filter(self.model.active == True)
