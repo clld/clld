@@ -253,6 +253,10 @@ class Language(Base,
     def iso_code(self):
         return self.get_identifier(IdentifierType.iso)
 
+    @property
+    def glottocode(self):
+        return self.get_identifier(IdentifierType.glottolog)
+
 
 class DomainElement_data(Base, Versioned, DataMixin):
     pass
