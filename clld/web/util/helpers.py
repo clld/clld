@@ -213,6 +213,7 @@ def cite_button(req, ctx):
 # We look for sequences of uppercase letters which are not followed by a lowercase letter.
 GLOSS_ABBR_PATTERN = re.compile(
     '(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
+ALT_TRANSLATION_LANGUAGE_PATTERN = re.compile('((?P<language>[a-zA-Z\s]+)\:)')
 
 
 #
@@ -265,6 +266,17 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         res.append(gloss[end:])
         return filter(None, res)
 
+    def alt_translation(sentence):
+        if sentence.jsondatadict.get('alt_translation'):
+            text = sentence.jsondatadict['alt_translation']
+            if ALT_TRANSLATION_LANGUAGE_PATTERN.match(text):
+                name, text = [t.strip() for t in text.split(':', 1)]
+                name = HTML.span(name + ': ')
+            else:
+                name = ''
+            return HTML.div(name, HTML.span(text, class_='translation'))
+        return ''
+
     units = []
     if sentence.analyzed and sentence.gloss:
         analyzed = sentence.analyzed
@@ -284,6 +296,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
                 HTML.div(*units, **{'class': 'gloss-box'}) if units else '',
                 HTML.div(sentence.description, class_='translation')
                 if sentence.description else '',
+                alt_translation(sentence),
                 #HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
                 class_='body',
             ),

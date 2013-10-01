@@ -168,8 +168,8 @@ td.object-language, div.object-language, td.original-script, div.original-script
     font-style: italic;
 }
 
-td.translation:before, div.translation:before { content: "\2018"; }
-td.translation:after, div.translation:after { content: "\2019"; }
+.translation:before { content: "\2018"; }
+.translation:after { content: "\2019"; }
 
 .hint--bottom {
     border-bottom: 1px dotted #333333;
