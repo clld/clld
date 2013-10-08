@@ -358,14 +358,16 @@ def get_template_variables(app, monitor_mode=False, with_blog=False):
 
 @task
 def supervisor(app, command, template_variables=None):
+    """
+    .. seealso: http://serverfault.com/a/479754
+    """
     template_variables = template_variables or get_template_variables(app)
     assert command in SUPERVISOR_TEMPLATE
-    sudo('/etc/init.d/supervisor stop')
     create_file_as_root(
         app.supervisor,
         SUPERVISOR_TEMPLATE[command].format(**template_variables), mode='644')
-    time.sleep(1)
-    sudo('/etc/init.d/supervisor start')
+    sudo('supervisorctl reread %s' % app.name)
+    sudo('supervisorctl update %s' % app.name)
 
 
 def require_bibutils(app):
@@ -391,7 +393,7 @@ def uninstall(app):
         if exists(file_):
             sudo('rm %s' % file_)
     service.reload('nginx')
-    sudo('/etc/init.d/supervisor restart')
+    sudo('supervisorctl stop %s' % app.name)
 
 
 @task
