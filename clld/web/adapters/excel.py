@@ -58,13 +58,14 @@ class Languages(ExcelAdapter):
 class Values(ExcelAdapter):
     def header(self, ctx, req):
         return super(Values, self).header(ctx, req) + [
-            'Parameter', 'Language', 'Frequency', 'Confidence']
+            'Parameter', 'Language', 'Frequency', 'Confidence', 'References']
 
     def row(self, ctx, req, item):
         res = super(Values, self).row(ctx, req, item)
         for obj in [item.valueset.parameter, item.valueset.language]:
             res.append(hyperlink(req.resource_url(obj), obj.__unicode__()))
         res.extend([item.frequency or '', item.confidence or ''])
+        res.append(';'.join(r.source.name for r in item.valueset.references))
         return res
 
 
