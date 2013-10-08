@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy.orm import joinedload
 
 from clld.db.meta import DBSession
@@ -43,3 +45,23 @@ def compute_number_of_values():
 
 def get_distinct_values(col, key=None):
     return sorted([r[0] for r in DBSession.query(col).distinct() if r[0]], key=key)
+
+
+def page_query(q, n=1000, verbose=False):
+    """
+    http://stackoverflow.com/a/1217947
+    """
+    s = time.time()
+    offset = 0
+    while True:
+        r = False
+        for elem in q.limit(n).offset(offset):
+            r = True
+            yield elem
+        offset += n
+        e = time.time()
+        if verbose:
+            print e - s, offset, 'done'  # pragma: no cover
+        s = e
+        if not r:
+            break
