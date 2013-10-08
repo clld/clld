@@ -170,6 +170,8 @@ td.object-language, div.object-language, td.original-script, div.original-script
 
 .translation:before { content: "\2018"; }
 .translation:after { content: "\2019"; }
+th.translation:before {content: "";}
+th.translation:after {content: "";}
 
 .hint--bottom {
     border-bottom: 1px dotted #333333;
