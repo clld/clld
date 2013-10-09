@@ -366,8 +366,11 @@ def supervisor(app, command, template_variables=None):
     create_file_as_root(
         app.supervisor,
         SUPERVISOR_TEMPLATE[command].format(**template_variables), mode='644')
-    sudo('supervisorctl reread %s' % app.name)
-    sudo('supervisorctl update %s' % app.name)
+    if command == 'run':
+        sudo('supervisorctl restart %s' % app.name)
+    else:
+        sudo('supervisorctl reread %s' % app.name)
+        sudo('supervisorctl update %s' % app.name)
 
 
 def require_bibutils(app):
