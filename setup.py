@@ -46,7 +46,7 @@ install_requires = [
 ]
 
 if not PY3:
-    install_requires.extend('xlwt Babel fabric fabtools pyx'.split())
+    install_requires.extend('xlrd xlwt Babel fabric fabtools pyx'.split())
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
