@@ -344,7 +344,8 @@ class Record(OrderedDict, _Convertable):
 
         if self.get('publisher'):
             res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
-        return ' '.join(atom + '.' for atom in filter(None, res))
+        return ' '.join(
+            map(lambda a: a + ('' if a.endswith('.') else '.'), filter(None, res)))
 
 
 class IDatabase(Interface):
