@@ -268,6 +268,9 @@ CLLD.DataTable = (function(){
         });
 
         var dl = '<p>You may use the download button <i class="icon-download-alt"> </i> to download the currently selected items in various formats.</p>';
+        if (options.sDescription) {
+            dl += options.sDescription;
+        }
         for (i=0; i < options.aoColumns.length; i++) {
             col = options.aoColumns[i];
             if (col.sDescription) {
