@@ -18,9 +18,9 @@
               href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
               type="image/x-icon" />
 
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.css" />
         <!--[if lte IE 8]>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.ie.css" />
         <![endif]-->
 
         % for asset in assets['css'].urls():
@@ -29,15 +29,12 @@
 
         % if request.registry.settings.get('clld.environment') == 'production':
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.6/leaflet.js"></script>
         % endif
 
         % for asset in assets['js'].urls():
         <script src="${request.static_url(asset[1:])}"></script>
         % endfor
-
-        ##<!-- DataTables -->
-        ##<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -49,7 +46,6 @@
         <%block name="head"> </%block>
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
-    ##<div id="content">
         <%block name="header"></%block>
 
         <div class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
@@ -69,12 +65,6 @@
                             </li>
                         % endfor
                         </ul>
-                        ##% if hasattr(self, 'contextnav'):
-                        ##<br>
-                        ##<ul class="nav pull-right">
-                        ##    ${self.contextnav()}
-                        ##</ul>
-                        ##% endif
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
@@ -192,7 +182,6 @@
         <script>
             <%block name="javascript"> </%block>
         </script>
-    ##</div>
         % if h.NEWRELIC:
         ${h.newrelic.agent.get_browser_timing_footer()|n}
         % endif
