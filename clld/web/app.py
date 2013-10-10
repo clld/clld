@@ -458,7 +458,7 @@ def get_configurator(pkg, *utilities, **kw):
     if v:
         config.scan(v)  # pragma: no cover
 
-    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='home'))
+    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='Home'))
     for plural in config.registry.settings.get(
         'clld.menuitems_list',
         ['contributions', 'parameters', 'languages', 'contributors']
