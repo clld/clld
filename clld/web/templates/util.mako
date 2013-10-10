@@ -259,7 +259,7 @@ $(document).ready(function() {
         </%self:accordion_group>
         % endif
 	% if lang.identifiers:
-        <%self:accordion_group eid="acc-names" parent="sidebar-accordion" title="Alternative names">
+        <%self:accordion_group eid="acc-names" parent="sidebar-accordion" title="${_('Alternative names')}">
             <dl>
             % for type_, identifiers in h.groupby(sorted(lang.identifiers, key=lambda i: i.type), lambda j: j.type):
                 <dt>${type_}:</dt>
