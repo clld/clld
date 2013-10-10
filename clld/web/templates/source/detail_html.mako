@@ -2,7 +2,6 @@
 <%namespace name="util" file="../util.mako"/>
 <%! active_menu_item = "sources" %>
 
-
 <h2>${ctx.name}</h2>
 ${ctx.coins(request)|n}
 
@@ -39,7 +38,7 @@ ${ctx.coins(request)|n}
         </%util:accordion_group>
     % endif
     % if referents.get('contribution'):
-        <%util:accordion_group eid="acc-c" parent="sidebar-accordion" title="${_('Contributions')}">
+        <%util:accordion_group eid="acc-c" parent="sidebar-accordion" title="${_('Contributions')}" open="${not referents.get('language')}">
             ${util.stacked_links(referents['contribution'])}
         </%util:accordion_group>
     % endif
