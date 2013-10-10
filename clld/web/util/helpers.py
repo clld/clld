@@ -383,8 +383,11 @@ def linked_references(req, obj):
 def language_identifier(req, obj):
     label = obj.name or obj.id
 
-    if obj.type == 'iso639-3':
+    if obj.type == models.IdentifierType.iso.value:
         label = external_link('http://www.sil.org/iso639-3/documentation.asp?id=%s'
+                              % obj.id, label=label)
+    elif obj.type == models.IdentifierType.glottolog.value:
+        label = external_link('http://glottolog.org/resource/languoid/id/%s'
                               % obj.id, label=label)
     elif obj.type == 'ethnologue':
         if re.match('[a-z]{3}', obj.id):
