@@ -31,9 +31,9 @@ def dict_append(d, k, v):
 
     >>> d = {}
     >>> dict_append(d, 1, 1)
-    >>> assert d[1] = [1]
+    >>> assert d[1] == [1]
     >>> dict_append(d, 1, 2)
-    >>> assert d[1] = [1, 2]
+    >>> assert d[1] == [1, 2]
     """
     if k in d:
         d[k].append(v)
