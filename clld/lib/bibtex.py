@@ -347,6 +347,11 @@ class Record(OrderedDict, _Convertable):
 
         if self.get('publisher'):
             res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
+
+        note = self.get('note')
+        if note and note not in res:
+            res.append('(%s)' % note)
+
         return ' '.join(
             map(lambda a: a + ('' if a.endswith('.') else '.'), filter(None, res)))
 
