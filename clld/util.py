@@ -25,6 +25,22 @@ def parse_json_with_datetime(d):
     return res
 
 
+def dict_append(d, k, v):
+    """
+    Assumes d is a dictionary with lists as values. Appends v to the list for key k.
+
+    >>> d = {}
+    >>> dict_append(d, 1, 1)
+    >>> assert d[1] = [1]
+    >>> dict_append(d, 1, 2)
+    >>> assert d[1] = [1, 2]
+    """
+    if k in d:
+        d[k].append(v)
+    else:
+        d[k] = [v]
+
+
 class NoDefault(object):
     pass
 
