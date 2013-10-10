@@ -245,7 +245,7 @@ $(document).ready(function() {
         % if getattr(request, 'map', False):
         <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="Map" open="${True}">
             ${request.map.render()}
-            <p>Coordinates: ${lang.latitude}, ${lang.longitude}</p>
+            <p>Coordinates: ${h.format_coordinates(lang)}</p>
         </%self:accordion_group>
         % endif
         % if lang.sources:
@@ -258,6 +258,7 @@ $(document).ready(function() {
             </ul>
         </%self:accordion_group>
         % endif
+	% if lang.identifiers:
         <%self:accordion_group eid="acc-names" parent="sidebar-accordion" title="Alternative names">
             <dl>
             % for type_, identifiers in h.groupby(sorted(lang.identifiers, key=lambda i: i.type), lambda j: j.type):
@@ -268,11 +269,12 @@ $(document).ready(function() {
             % endfor
             </dl>
         </%self:accordion_group>
+	% endif
     </div>
 </%def>
 
 ##
-## language meta-information
+##
 ##
 <%def name="gbs_links(ids)">
     <script src="http://books.google.com/books?jscmd=viewapi&bibkeys=${','.join(ids)}&callback=CLLD.process_gbs_info">
