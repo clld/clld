@@ -4,9 +4,6 @@
 
 
 <h2>${_('Languages')}</h2>
-<p>
-    ${_('Languages under analysis for this project')}
-</p>
 
 % if request.map:
 ${request.map.render()}
