@@ -190,7 +190,7 @@ class Record(OrderedDict, _Convertable):
         return rec
 
     @classmethod
-    def from_string(cls, bibtexString):
+    def from_string(cls, bibtexString, lowercase=False):
         id_, genre, data = None, None, {}
 
         # the following patterns are designed to match preprocessed input lines.
@@ -229,7 +229,10 @@ class Record(OrderedDict, _Convertable):
                     if value.endswith(','):
                         value = value[:-1].strip()
                     if value.endswith('}') or value.endswith('"'):
-                        data[m.group('field')] = value[:-1].strip()
+                        field = m.group('field')
+                        if lowercase:
+                            field = field.lower()
+                        data[field] = value[:-1].strip()
                 else:
                     m = endLine.match(line)
                     if m:
@@ -374,7 +377,7 @@ class Database(_Convertable):
         return self._keymap
 
     @classmethod
-    def from_file(cls, bibFile, encoding='utf8'):
+    def from_file(cls, bibFile, encoding='utf8', lowercase=False):
         """
         a bibtex database defined by a bib-file
 
@@ -386,7 +389,8 @@ class Database(_Convertable):
         else:
             content = ''
 
-        return cls([Record.from_string('@' + r) for r in content.split('@')[1:]])
+        return cls([Record.from_string('@' + r, lowercase=lowercase)
+                    for r in content.split('@')[1:]])
 
     def __len__(self):
         return len(self.records)
