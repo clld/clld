@@ -186,14 +186,18 @@ class _GeoJson(GeoJsonLanguages):
 
 
 class LanguageMap(Map):
+    def get_language(self):
+        return self.ctx
+
     def get_layers(self):
-        geojson = _GeoJson(self.ctx)
-        yield Layer(
-            self.ctx.id, self.ctx.name, geojson.render(self.ctx, self.req, dump=False))
+        lang = self.get_language()
+        geojson = _GeoJson(lang)
+        yield Layer(lang.id, lang.name, geojson.render(lang, self.req, dump=False))
 
     def options(self):
+        lang = self.get_language()
         return {
-            'center': [self.ctx.latitude, self.ctx.longitude],
+            'center': [lang.latitude, lang.longitude],
             'zoom': 3,
             'no_popup': True,
             'sidebar': True}
