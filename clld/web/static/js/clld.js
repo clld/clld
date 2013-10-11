@@ -109,9 +109,13 @@ CLLD.Feed = (function(){
 
 
 CLLD.Modal = (function(){
-    var _show = function(title, url) {
+    var _show = function(title, url, html) {
         $('#ModalLabel').html(title);
-        $('#ModalBody').load(url);
+	if (url) {
+	    $('#ModalBody').load(url);
+	} else {
+	    $('#ModalBody').html(html);
+	}
         $('#Modal').modal('show');
     }
 
@@ -461,10 +465,12 @@ CLLD.Map = function(eid, layers, options) {
 
     this.marker_map = {};
     this.layer_map = {};
+    this.layer_geojson = {};
 
     for (name in layers) {
         if (layers.hasOwnProperty(name)) {
             this.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(this.map);
+	    this.layer_geojson[name] = layers[name];
 
             if ($.type(layers[name]) === 'string') {
                 $.getJSON(layers[name], {layer: name}, function(data) {
@@ -562,6 +568,20 @@ CLLD.mapToggleLayer = function(eid, layer, ctrl) {
     map.layer_map[layer].eachLayer(function(l){
         l._icon.style.display = $(ctrl).prop('checked') ? 'block' : 'none';
     });
+};
+
+CLLD.mapShowGeojson = function(eid, layer) {
+    var map = CLLD.Maps[eid],
+	data = map.layer_geojson[layer];
+
+    if ($.type(data) === 'string') {
+        $.getJSON(data, {layer: layer}, function(_data) {
+	    CLLD.Modal.show('<a href="' + data + '">' + _data.properties.name + '</a>', null, '<pre>' + JSON.stringify(_data, null, 2) + '</pre>');
+        });
+    } else {
+	CLLD.Modal.show(data.properties.name, null, '<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+    }
+    return false;
 };
 
 /*

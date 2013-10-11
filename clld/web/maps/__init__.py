@@ -160,6 +160,12 @@ class Map(object):
             items,
             label='Icon size')
 
+        item = lambda layer: HTML.a(
+                layer.name,
+                onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
+                href=layer.data if isinstance(layer.data, basestring) else '#')
+        yield Legend(self, 'geojson', map(item, self.layers), label='GeoJSON')
+
 
 class ParameterMap(Map):
     def get_layers(self):
