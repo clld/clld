@@ -123,6 +123,8 @@ def format_gbs_identifier(source):
 
 
 def format_coordinates(obj):
+    if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
+        return ''
     return HTML.span('{0.latitude:.2f}; {0.longitude:.2f}'.format(obj), class_='geo')
 
 
