@@ -98,6 +98,7 @@ class FilesMixin(IdNameDescriptionMixin):
         p.dirname().makedirs_p()
         with open(p, 'wb') as fp:
             fp.write(content)
+        return p
 
 
 class HasFilesMixin(object):
@@ -210,13 +211,6 @@ class Dataset(Base,
                 'rel': "dct:type",
                 'class': 'Dataset'}
         )
-
-    def license_icon(self, req):
-        if 'license_icon' in self.jsondatadict:
-            url = self.jsondatadict['license_icon']
-            if not url.startswith('http'):
-                url = req.static_url('clld:web/static/images/' + url)
-            return url
 
 
 class Language_data(Base, Versioned, DataMixin):
@@ -365,13 +359,6 @@ class Source(Base,
 
     @property
     def gbs_identifier(self):
-        #
-        # TODO: remove hack after successful data import of glottolog 2
-        #
-        import json
-        if isinstance(self.jsondata, basestring):
-            self.jsondata = json.loads(self.jsondata)
-
         if not self.jsondata or not self.jsondata.get('gbs'):
             return
         if not self.jsondata['gbs']['volumeInfo'].get('industryIdentifiers'):
@@ -727,6 +714,7 @@ class IdentifierType(DeclEnum):
     iso = 'iso639-3', 'ISO 639-3'
     wals = 'wals', 'WALS Code'
     glottolog = 'glottolog', 'Glottocode'
+    ethnologue = 'ethnologue', 'Ethnologue'
 
 
 class Identifier(Base, Versioned, IdNameDescriptionMixin):

@@ -128,6 +128,14 @@ def format_coordinates(obj):
     return HTML.span('{0.latitude:.2f}; {0.longitude:.2f}'.format(obj), class_='geo')
 
 
+def format_license_icon_url(req):
+    if 'license_icon' in req.dataset.jsondatadict:
+        url = req.dataset.jsondatadict['license_icon']
+        if not url.startswith('http'):
+            url = req.static_url('clld:web/static/images/' + url)
+        return url
+
+
 def format_frequency(req, obj, marker=None, height='20', width='20'):
     if not obj.frequency or obj.frequency == 100:
         return ''
@@ -269,15 +277,15 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         return filter(None, res)
 
     def alt_translation(sentence):
+        res = ''
         if sentence.jsondatadict.get('alt_translation'):
             text = sentence.jsondatadict['alt_translation']
+            name = ''
             if ALT_TRANSLATION_LANGUAGE_PATTERN.match(text):
                 name, text = [t.strip() for t in text.split(':', 1)]
                 name = HTML.span(name + ': ')
-            else:
-                name = ''
-            return HTML.div(name, HTML.span(text, class_='translation'))
-        return ''
+            res = HTML.div(name, HTML.span(text, class_='translation'))
+        return res
 
     units = []
     if sentence.analyzed and sentence.gloss:
@@ -387,14 +395,14 @@ def language_identifier(req, obj):
 
     if obj.type == models.IdentifierType.iso.value:
         label = external_link('http://www.sil.org/iso639-3/documentation.asp?id=%s'
-                              % obj.id, label=label)
+                              % obj.name, label=label)
     elif obj.type == models.IdentifierType.glottolog.value:
         label = external_link('http://glottolog.org/resource/languoid/id/%s'
-                              % obj.id, label=label)
-    elif obj.type == 'ethnologue':
-        if re.match('[a-z]{3}', obj.id):
+                              % obj.name, label=label)
+    elif obj.type == models.IdentifierType.ethnologue.value:
+        if re.match('[a-z]{3}', obj.name):
             label = external_link('http://www.ethnologue.com/language/%s'
-                                  % obj.id, label=label)
+                                  % obj.name, label=label)
 
     return HTML.span(label, class_='language_identifier %s' % obj.type)
 
