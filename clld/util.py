@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import re
 import unicodedata
 import string
+from datetime import date, datetime
 
 from six import PY3
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
@@ -23,6 +24,12 @@ def parse_json_with_datetime(d):
             v = dateutil.parser.parse(v)
         res[k] = v
     return res
+
+
+def format_json(value):
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    return value
 
 
 def dict_append(d, k, v):
@@ -86,11 +93,12 @@ class UnicodeMixin(object):
 class EnumSymbol(UnicodeMixin):
     """Define a fixed symbol tied to a parent class."""
 
-    def __init__(self, cls_, name, value, description):
+    def __init__(self, cls_, name, value, description, *args):
         self.cls_ = cls_
         self.name = name
         self.value = value
         self.description = description
+        self.args = args
 
     def __reduce__(self):
         """Allow unpickling to return the symbol linked to the DeclEnum class."""
