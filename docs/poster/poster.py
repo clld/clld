@@ -1,4 +1,3 @@
-
 # -*- encoding: latin1 -*-
 
 from PIL import Image
@@ -13,16 +12,16 @@ text.preamble(r"""%
 \renewcommand{\familydefault}{\sfdefault}
 \newcommand\head[1]{{\fontsize{70}{75}\selectfont\bfseries#1\vspace{5mm}\par}}
 \newcommand\subhead[1]{{\fontsize{41}{44}\selectfont\bfseries#1\par}}
-\renewcommand\section[1]{{\fontsize{31}{34}\selectfont\bfseries#1\vspace{5mm}\par}}
-\renewcommand\subsection[1]{{\fontsize{27}{30}\vspace{4mm}\selectfont\bfseries#1\vspace{0mm}\par}}
-\renewcommand\normalsize{\fontsize{26}{28}\selectfont}\normalsize
+\renewcommand\section[1]{{\fontsize{34}{37}\selectfont\bfseries#1\vspace{5mm}\par}}
+\renewcommand\subsection[1]{{\fontsize{32}{33}\vspace{4mm}\selectfont\bfseries#1\vspace{0mm}\par}}
+\renewcommand\normalsize{\fontsize{30}{32}\selectfont}\normalsize
 \leftmargini2em\labelwidth1em\labelsep0.5em\parindent0pt\parskip1ex
 """)
 
 paperformat = document.paperformat.A0
-margin = 1.4
+margin = 1.0
 background = 2.5
-padding = 1.4
+padding = 1.0
 
 leftpos = rightpos = paperformat.height - margin - background
 
@@ -117,8 +116,8 @@ This twofold strategy is implemented by three service components:
 \begin{itemize}
 \item infrastructural: Glottolog - a comprehensive language catalog and bibliography,
 \item structural: Dictionaria -- a dictionary journal and CrossGram Journal -- a journal publishing typological databases,
-\item technological: clld - a software platform for implementing linguistic database applications, which will be used
-to serve standalone database publications like IDS, WOLD, ASJP, WALS, APiCS, eWAVE, valency as well as the journals.
+\item technological: \texttt{clld} - a software platform for implementing linguistic database applications, which will be used
+to serve standalone database publications like IDS, WOLD, ASJP, WALS, APiCS, eWAVE, ValPal as well as the journals.
 \end{itemize}
 To maximize resuability
 \begin{itemize}
@@ -156,9 +155,9 @@ c.insert(box(r"""
 #
 #
 c.insert(box(r"""
-\section{Linked Data}
+\section{Linked Data - disseminating data in standard formats}
 \begin{itemize}
-\item defines a unified data access protocol for the web.
+\item Defines a unified data access protocol for the web.
 \item Well-suited for distributed data providers
 \begin{itemize}
 \item identifiers are URLs which are globally unique,
@@ -169,16 +168,20 @@ c.insert(box(r"""
 """, 2))
 
 c.insert(box(r"""
-\subsection{Linked Data Explorer accessing Glottolog RDF}
+\subsection{Use off-the-shelf tools to explore a dataset}
+Linked Data Explorer accessing Glottolog Linked Data serialized as RDF/XML.
+
 \vspace{14cm}
 \PyXMarker{rdf}
-""", 2, rdf=('rdf.png', 14, 0)))
+""", 2, rdf=('rdf.png', 14, 0.5)))
 
 c.insert(box(r"""
-\subsection{Tilemill accessing APiCS GeoJSON}
+\subsection{Use off-the-shelf tools to transform a dataset}
+The map-making software Tilemill accessing APiCS data in GeoJSON format.
+
 \vspace{14cm}
 \PyXMarker{geojson}
-""", 2, geojson=('geojson.png', 14, 0)))
+""", 2, geojson=('geojson.png', 14, 0.5)))
 
 c.insert(box(r"""
 \subsection{Comparing WALS and APiCS data pulled in as GeoJSON}
