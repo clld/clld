@@ -159,6 +159,8 @@ class Record(OrderedDict, _Convertable):
       assigned),
     - retrievable as list with getall
 
+    .. notes:: Unknown genres are converted to "misc".
+
     >>> r = Record('article', '1', author=['a', 'b'], editor='a and b')
     >>> assert r['author'] == 'a and b'
     >>> assert r.get('author') == r.getall('author')
