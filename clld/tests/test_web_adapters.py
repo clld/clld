@@ -58,6 +58,13 @@ class Tests(TestWithEnv):
         self.assertTrue(
             '{' in adapter.render(Parameter.get('parameter'), self.env['request']))
 
+    def test_GeoJsonParameterFlatProperties(self):
+        from clld.web.adapters import GeoJsonParameterFlatProperties
+
+        adapter = GeoJsonParameterFlatProperties(None)
+        self.assertTrue(
+            '{' in adapter.render(Parameter.get('no-domain'), self.env['request']))
+
     def test_GeoJsonLanguages(self):
         from clld.web.adapters import GeoJsonLanguages
 
@@ -88,5 +95,10 @@ class Tests(TestWithEnv):
 
 
 class Tests2(unittest.TestCase):
+    def test_pacific_centered(self):
+        from clld.web.adapters.geojson import pacific_centered_coordinates
+
+        assert pacific_centered_coordinates(Mock(longitude=-50, latitude=1))[0] > 0
+
     def test_register_app(self):
         pass

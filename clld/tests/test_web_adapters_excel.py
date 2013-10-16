@@ -4,6 +4,13 @@ from clld.tests.util import TestWithEnv
 
 
 class Tests(TestWithEnv):
+    def test_Languages(self):
+        from clld.web.adapters.excel import Languages
+
+        adapter = Languages(None)
+        adapter.render_to_response(
+            datatables.Languages(self.env['request'], Language), self.env['request'])
+
     def test_Values(self):
         from clld.web.adapters.excel import Values
 

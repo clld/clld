@@ -31,7 +31,7 @@ def test_deploy():
 def test_tasks():
     from clld.deploy.tasks import (
         init, deploy, start, stop, maintenance, cache, uncache, run_script,
-        create_downloads, copy_files,
+        create_downloads, copy_files, bootstrap,
     )
 
     init('apics')

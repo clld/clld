@@ -131,7 +131,7 @@
                             </a>
                         </div>
                         <div class="span6" style="text-align: center;">
-                            <% license_icon = request.dataset.license_icon(request) %>
+                            <% license_icon = h.format_license_icon_url(request) %>
                             % if license_icon:
                             <a rel="license" href="${request.dataset.license}">
                                 <img alt="License" style="border-width:0" src="${license_icon}" />

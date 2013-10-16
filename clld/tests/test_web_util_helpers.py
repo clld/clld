@@ -112,6 +112,11 @@ class Tests(TestWithEnv):
     def test_language_identifier(self):
         from clld.web.util.helpers import language_identifier
 
-        language_identifier(self.env['request'], Mock(type='x', id='abc'))
-        language_identifier(self.env['request'], Mock(type='iso639-3', id='abc'))
-        language_identifier(self.env['request'], Mock(type='ethnologue', id='abc'))
+        for identifier in common.Language.get('language').identifiers:
+            language_identifier(self.env['request'], identifier)
+
+    def test_format_coordinates(self):
+        from clld.web.util.helpers import format_coordinates
+
+        assert format_coordinates(common.Language.get('l2')) == ''
+        assert format_coordinates(common.Language.get('language')) != ''

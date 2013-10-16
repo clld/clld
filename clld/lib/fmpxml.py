@@ -71,13 +71,13 @@ class Result(object):
                 data = self._find('data', col)
                 if data:
                     val = data[0].text
-                else:
-                    assert '::' in name
+                else:  # pragma: no cover
+                    assert '::' in name  # make sure this is a derived value from a different table.
                     val = None
                 if val and type_ == 'NUMBER':
                     try:
                         val = int(val)
-                    except ValueError:
+                    except ValueError:  # pragma: no cover
                         try:
                             val = float(val)
                         except ValueError:
@@ -138,10 +138,9 @@ class Client(object):
             items.extend(batch.items)
         return items
 
-    def get_layouts(self):
+    def get_layouts(self):  # pragma: no cover
         from PyFileMaker import FMServer
 
         fm = FMServer('%s:%s@%s' % (self.user, self.password, self.host))
         fm.setDb(self.db)
-        for l in fm.getLayoutNames():
-            print l
+        return fm.getLayoutNames()

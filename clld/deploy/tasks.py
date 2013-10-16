@@ -30,7 +30,7 @@ def _assign_host(environment):
 
 @task
 def bootstrap():
-    util.bootstrap()
+    util.bootstrap()  # pragma: no cover
 
 
 @hosts('localhost')

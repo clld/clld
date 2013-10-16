@@ -82,7 +82,11 @@ class TestWithDbAndData(TestWithDb):
         TestWithDb.setUp(self)
 
         DBSession.add(common.Dataset(
-            id='dataset', name='dataset', description='desc', domain='clld'))
+            id='dataset',
+            name='dataset',
+            description='desc',
+            domain='clld',
+            jsondata={'license_icon': 'cc-by'}))
 
         source = common.Source(id='source')
         contributors = {
@@ -111,8 +115,9 @@ class TestWithDbAndData(TestWithDb):
         language = common.Language(
             id='language', name='Language 1', latitude=10.5, longitude=0.3)
         language.sources.append(source)
-        identifier = common.Identifier(type='iso639-3', id='iso')
-        li = common.LanguageIdentifier(language=language, identifier=identifier)
+        for i, type_ in enumerate(common.IdentifierType):
+            id_ = common.Identifier(type=type_.value, id=type_.value + str(i), name='abc')
+            li = common.LanguageIdentifier(language=language, identifier=id_)
 
         for i in range(2, 102):
             _l = common.Language(id='l%s' % i, name='Language %s' % i)
@@ -165,7 +170,8 @@ class TestWithDbAndData(TestWithDb):
             source='own',
             comment='comment',
             original_script='a morpheme',
-            language=language)
+            language=language,
+            jsondata={'alt_translation': 'Spanish: ...'})
         sr = common.SentenceReference(sentence=sentence, source=source)
         DBSession.add(common.Config(key='key', value='value'))
         DBSession.flush()

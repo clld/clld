@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import date
 
 
 def test_slug():
@@ -38,3 +39,9 @@ def test_format_size():
 
     for i in range(10):
         assert format_size(1000 ** i)
+
+
+def test_format_json():
+    from clld.util import format_json
+
+    format_json(date.today())

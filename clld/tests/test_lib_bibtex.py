@@ -7,12 +7,12 @@ from clld.tests.util import TESTS_DIR
 
 class Tests(unittest.TestCase):
     def test_Record(self):
-        from clld.lib.bibtex import Record
+        from clld.lib.bibtex import Record, EntryType
 
         rec = Record(
             'book', '1',
             title='The Title', editor='ed', booktitle='bt', school='s', issue='i',
-            pages='1-4', publisher='M')
+            pages='1-4', publisher='M', note="Revised edition")
         self.assertTrue('@book' in rec.__unicode__())
         self.assertTrue('@book' in rec.__str__())
         self.assertTrue('bt' in rec.text())
@@ -20,8 +20,23 @@ class Tests(unittest.TestCase):
         for fmt in ['txt', 'en', 'ris', 'mods']:
             rec.format(fmt)
 
-        rec = Record.from_string(rec.__unicode__())
+        rec = Record.from_string(rec.__unicode__(), lowercase=True)
         rec = Record.from_object(Mock())
+
+        rec = Record(
+            'incollection', '1',
+            title='The Title', editor='ed', booktitle='bt', school='s', issue='i',
+            pages='1-4', publisher='M', note="Revised edition")
+        self.assertTrue('In ' in rec.text())
+
+        rec = Record(
+            'article', '1',
+            title='The Title', journal='The Journal', volume="The volume", issue='issue')
+        self.assertTrue('The Journal' in rec.text())
+
+        rec = Record('xmisc', '1', note='Something')
+        self.assertTrue(rec.genre == EntryType.misc)
+        self.assertTrue('Something' in rec.text())
 
     def test_Database(self):
         from clld.lib.bibtex import Record, Database

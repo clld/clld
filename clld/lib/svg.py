@@ -15,6 +15,10 @@ SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="blac
 
 
 def pie(data, colors, width=34):
+    """
+    >>> assert pie([2, 7], ['eee', '111'])
+    >>> assert pie([100], ['eee'])
+    """
     radius = width / 2.0 - 0.5
 
     if len(data) == 1:

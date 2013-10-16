@@ -3,10 +3,12 @@ from clld.db.models import common
 
 
 class Tests(TestWithEnv):
-    def test_Values(self):
+    def _run(self, **kw):
         from clld.web.datatables.value import Values
+        return self.handle_dt(Values, common.Value, **kw)
 
-        dt = self.handle_dt(Values, common.Value)
+    def test_Values(self):
+        dt = self._run()
         self.assertTrue(isinstance(dt.options, dict))
 
         self.set_request_properties(params={
@@ -20,25 +22,18 @@ class Tests(TestWithEnv):
             'iSortCol_2': '2',
             'sSortDir_2': 'desc',
         })
-        dt = Values(self.env['request'], common.Value)
-        dt.get_query()
+        dt = self._run()
 
     def test_Values_with_language(self):
-        from clld.web.datatables.value import Values
-
-        self.handle_dt(Values, common.Value, language=common.Language.first())
+        self._run(language=common.Language.first())
 
     def test_Values_with_contribution(self):
-        from clld.web.datatables.value import Values
-
-        self.handle_dt(Values, common.Value, contribution=common.Contribution.first())
+        self._run(contribution=common.Contribution.first())
 
     def test_Values_with_parameter(self):
-        from clld.web.datatables.value import Values
-
         self.set_request_properties(params={'parameter': 'parameter'})
-        self.handle_dt(Values, common.Value)
+        self._run()
         self.set_request_properties(params={'parameter': 'parameter', 'sSearch_2': 's'})
-        self.handle_dt(Values, common.Value)
+        self._run()
         self.set_request_properties(params={'parameter': 'no-domain'})
-        self.handle_dt(Values, common.Value)
+        self._run()

@@ -17,12 +17,6 @@ def get(path):
     return requests.get("http://ethnologue.com" + path).content
 
 
-def get_tab(name):
-    """generator for entries in a tab file specified by name.
-    """
-    #return dsv.rows(content=get(get_taburls()[name]), namedtuples=True)
-
-
 def get_subgroups():
     prefix = '/subgroups/'
 
@@ -78,11 +72,11 @@ def get_classification(group, doc):
         try:
             name = psubgroupname.match(a.text).group('name').strip()
             ext = int(pext.search(a.text).group('ext').strip())
-        except:
+        except:  # pragma: no cover
             print a.text
             raise
         subfamilies, languages = parse_classification(a)
-        if ext != len(languages) and id_ not in ['mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16', 'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern']:
+        if ext != len(languages) and id_ not in ['mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16', 'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern']:  # pragma: no cover
             print group
             print id_
             print ext, len(languages)

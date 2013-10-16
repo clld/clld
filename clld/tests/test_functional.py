@@ -31,3 +31,4 @@ class Tests(TestWithApp):
         for ext in 'bib en ris mods'.split():
             self.app.get('/sources/source.' + ext, status=200)
             self.app.get('/sources.' + ext, status=200)
+        self.app.get('/sources.rdf?sEcho=1', status=200)

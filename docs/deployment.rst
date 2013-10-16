@@ -1,19 +1,18 @@
+
 Deployment of CLLD apps
 -----------------------
 
-Target platform
-~~~~~~~~~~~~~~~
+The 'clld.deploy' package provides functionality to ease the deployment of CLLD apps. The
+functionality is implemented as fabric tasks.
 
-we deploy to the following platform:
 
-ubuntu 12.04 lts with
-- git-core
-- supervisor
-- nginx
-- postgresql
-- libpq
-- python-virtualenv
-- python-devel
+Overview
+~~~~~~~~
+
+- The target platform assumed by these tasks is Ubuntu 12.04 LTS.
+- Source code is transferred to the machines by cloning the respective github repositories.
+- Apps are run by gunicorn, monitored by supervisor, behind nginx as transparent proxy.
+- PostgreSQL is used as database.
 
 
 Automation

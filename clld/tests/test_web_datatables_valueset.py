@@ -14,6 +14,7 @@ class Tests(TestWithEnv):
 
         self.set_request_properties(params={
             'sSearch_0': '> 1',
+            'sSearch_1': 'x',
             'iSortingCols': '2',
             'iSortCol_0': '0',
             'sSortDir_0': 'desc',

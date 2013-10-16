@@ -367,10 +367,14 @@ def supervisor(app, command, template_variables=None):
         app.supervisor,
         SUPERVISOR_TEMPLATE[command].format(**template_variables), mode='644')
     if command == 'run':
+        sudo('supervisorctl reread')
+        sudo('supervisorctl update %s' % app.name)
         sudo('supervisorctl restart %s' % app.name)
     else:
-        sudo('supervisorctl reread %s' % app.name)
-        sudo('supervisorctl update %s' % app.name)
+        sudo('supervisorctl stop %s' % app.name)
+        #sudo('supervisorctl reread %s' % app.name)
+        #sudo('supervisorctl update %s' % app.name)
+    time.sleep(1)
 
 
 def require_bibutils(app):

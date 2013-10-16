@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+import os
+from tempfile import gettempdir
 
 from six import PY3
 
@@ -8,19 +10,23 @@ from clld.db.meta import DBSession
 
 class Tests(TestWithDb):
     def test_Files(self):
-        from clld.db.models.common import Language, Language_files
+        from clld.db.models.common import Sentence, Sentence_files
+        from path import path
 
         if PY3:
             return  # pragma: no cover
 
-        l = Language(id='abc', name='Name')
-        assert l.iso_code is None
-        l._files.append(Language_files(id='abstract'))
+        l = Sentence(id='abc', name='Name')
+        f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
+        p = f.create(path(gettempdir()), 'content')
+        assert os.path.exists(p)
+        os.remove(p)
+        l._files.append(f)
         DBSession.add(l)
         DBSession.flush()
         DBSession.refresh(l)
-        f = l.files['abstract']
-        #self.assertTrue(f.data_uri().startswith('data:'))
+        assert l.files
+        assert l.audio
 
     def test_Dataset(self):
         from clld import RESOURCES
@@ -38,6 +44,13 @@ class Tests(TestWithDb):
         d.last_first()
         d = Contributor(id='abc', name='Robert Forkel')
         self.assertTrue(d.last_first().startswith('Forkel'))
+
+    def test_Language(self):
+        from clld.db.models.common import Language
+
+        d = Language(id='abc')
+        assert d.glottocode is None
+        assert d.iso_code is None
 
     def test_Source(self):
         from clld.db.models.common import Source

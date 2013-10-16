@@ -16,28 +16,25 @@ from clld.web.util.helpers import rdf_namespace_attrs
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.db.models.common import Language, Source, LanguageIdentifier
+from clld.db.util import page_query
 from clld.util import format_size
 from clld.scripts.postgres2sqlite import postgres2sqlite
 
 
-def page_query(q, n=1000, verbose=False):
-    """
-    http://stackoverflow.com/a/1217947
-    """
-    s = time.time()
-    offset = 0
-    while True:
-        r = False
-        for elem in q.limit(n).offset(offset):
-            r = True
-            yield elem
-        offset += n
-        e = time.time()
-        if verbose:
-            print e - s, offset, 'done'  # pragma: no cover
-        s = e
-        if not r:
-            break
+def pkg_name(pkg):
+    return pkg if isinstance(pkg, basestring) else pkg.__name__
+
+
+def abspath(asset_spec):
+    return path(AssetResolver().resolve(asset_spec).abspath())
+
+
+def download_asset_spec(pkg, *comps):
+    return '%s:%s' % (pkg_name(pkg), '/'.join(['static', 'download'] + list(comps)))
+
+
+def download_dir(pkg):
+    return abspath(download_asset_spec(pkg))
 
 
 @implementer(IDownload)
@@ -55,7 +52,7 @@ class Download(object):
             self.ext = kw['ext']
         self.rdf = self.ext in [fmt.extension for fmt in FORMATS.values()]
         self.model = model
-        self.pkg = pkg if isinstance(pkg, basestring) else pkg.__name__
+        self.pkg = pkg_name(pkg)
         for k, v in kw.items():
             setattr(self, k, v)
 
@@ -64,14 +61,14 @@ class Download(object):
         return '%s.%s' % (class_mapper(self.model).class_.__name__.lower(), self.ext)
 
     def asset_spec(self, req):
-        return '%s:static/download/%s-%s.%s' % (
-            self.pkg, req.dataset.id, self.name, 'gz' if self.rdf else 'zip')
+        return download_asset_spec(self.pkg, '%s-%s.%s' % (
+            req.dataset.id, self.name, 'gz' if self.rdf else 'zip'))
 
     def url(self, req):
         return req.static_url(self.asset_spec(req))
 
     def abspath(self, req):
-        return path(AssetResolver().resolve(self.asset_spec(req)).abspath())
+        return abspath(self.asset_spec(req))
 
     def size(self, req):
         _path = self.abspath(req)

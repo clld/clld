@@ -124,7 +124,7 @@ def initializedb(create=None, prime_cache=None, **kw):  # pragma: no cover
             prime_cache(args)
 
 
-def create_downloads(**kw):
+def create_downloads(**kw):  # pragma: no cover
     args = parsed_args(bootstrap=True)
     for name, download in args.env['registry'].getUtilitiesFor(IDownload):
         args.log.info('creating download %s' % name)
