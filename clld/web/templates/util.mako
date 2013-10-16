@@ -316,3 +316,26 @@ $(document).ready(function() {
     <pre>${adapters[format].render(ctx, request)}</pre>
     % endif
 </%def>
+
+##
+##
+##
+<%def name="values_and_sentences(parameter=None)">
+    <div id="list-container">
+    <% parameter = parameter or ctx %>
+    <div class="tabbable">
+	<ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab1" data-toggle="tab">${_('Values')}</a></li>
+	    <li><a href="#tab2" data-toggle="tab">${_('Sentences')}</a></li>
+	</ul>
+	<div class="tab-content" style="overflow: visible;">
+	    <div id="tab1" class="tab-pane active">
+		${request.get_datatable('values', h.models.Value, parameter=parameter).render()}
+	    </div>
+	    <div id="tab2" class="tab-pane">
+		${request.get_datatable('sentences', h.models.Sentence, parameter=parameter).render()}
+	    </div>
+	</div>
+    </div>
+    </div>
+</%def>

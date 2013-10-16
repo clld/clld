@@ -30,27 +30,31 @@ ${ctx.coins(request)|n}
 </div>
 
 <%def name="sidebar()">
-    <% referents = context.get('referents', {}) %>
+    <% referents, one_open = context.get('referents', {}), False %>
     <div class="accordion" id="sidebar-accordion">
     % if referents.get('language'):
-        <%util:accordion_group eid="acc-l" parent="sidebar-accordion" title="${_('Languages')}" open="${True}">
+        <%util:accordion_group eid="acc-l" parent="sidebar-accordion" title="${_('Languages')}" open="${not one_open}">
             ${util.stacked_links(referents['language'])}
         </%util:accordion_group>
+        <% one_open = True %>
     % endif
     % if referents.get('contribution'):
-        <%util:accordion_group eid="acc-c" parent="sidebar-accordion" title="${_('Contributions')}" open="${not referents.get('language')}">
+        <%util:accordion_group eid="acc-c" parent="sidebar-accordion" title="${_('Contributions')}" open="${not one_open}">
             ${util.stacked_links(referents['contribution'])}
         </%util:accordion_group>
+        <% one_open = True %>
     % endif
     % if referents.get('valueset'):
-        <%util:accordion_group eid="acc-v" parent="sidebar-accordion" title="${_('ValueSets')}">
+        <%util:accordion_group eid="acc-v" parent="sidebar-accordion" title="${_('ValueSets')}" open="${not one_open}">
             ${util.stacked_links(referents['valueset'])}
         </%util:accordion_group>
+        <% one_open = True %>
     % endif
     % if referents.get('sentence'):
-        <%util:accordion_group eid="acc-s" parent="sidebar-accordion" title="${_('Sentences')}">
+        <%util:accordion_group eid="acc-s" parent="sidebar-accordion" title="${_('Sentences')}" open="${not one_open}">
             ${util.stacked_links(referents['sentence'])}
         </%util:accordion_group>
+        <% one_open = True %>
     % endif
     </div>
 </%def>

@@ -13,7 +13,4 @@
 ${request.map.render()}
 % endif
 
-<div>
-    <% dt = request.registry.getUtility(h.interfaces.IDataTable, 'values'); dt = dt(request, h.models.Value, parameter=ctx) %>
-    ${dt.render()}
-</div>
+${request.get_datatable('values', h.models.Value, parameter=ctx).render()}
