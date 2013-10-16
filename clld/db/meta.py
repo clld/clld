@@ -35,7 +35,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from clld.db.versioned import versioned_session
-from clld.util import NO_DEFAULT, UnicodeMixin
+from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 
 @event.listens_for(Pool, "checkout")
@@ -145,7 +145,7 @@ class Base(UnicodeMixin):
         """
         model = object_mapper(self).class_
         if not hasattr(model, '__history_mapper__'):
-            return []
+            return []  # pragma: no cover
 
         history_class = model.__history_mapper__.class_
         return DBSession.query(history_class).filter(history_class.pk == self.pk)\
@@ -156,14 +156,8 @@ class Base(UnicodeMixin):
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
 
-        def value(obj, col):
-            v = getattr(obj, col)
-            if isinstance(v, (date, datetime)):
-                v = v.isoformat()
-            return v
-
         return dict(
-            (col, value(self, col))
+            (col, format_json(getattr(self, col)))
             for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
 
     def __unicode__(self):
