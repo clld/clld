@@ -20,6 +20,31 @@ from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.util import slug
 from clld.interfaces import IDownload
+from clld.lib import bibtex
+
+
+def bibtex2source(rec):
+    year = bibtex.unescape(rec.get('year', 'nd'))
+    if year.endswith('}'):
+        year = year[:-1]
+    fields = {}
+    jsondata = {}
+    for field in bibtex.FIELDS:
+        if field in rec:
+            value = bibtex.unescape(rec[field])
+            if hasattr(common.Source, field):
+                fields[field] = value
+            else:
+                jsondata[field] = value
+
+    return common.Source(
+        id=slug(rec.id),
+        name=('%s %s' % (bibtex.unescape(
+            rec.get('author', rec.get('editor', ''))), year)).strip(),
+        description=bibtex.unescape(rec.get('title', rec.get('booktitle', ''))),
+        jsondata=jsondata,
+        bibtex_type=rec.genre,
+        **fields)
 
 
 def confirm(question, default=False):  # pragma: no cover
