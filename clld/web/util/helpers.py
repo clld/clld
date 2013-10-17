@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals
 import re
 from itertools import groupby  # we just import this to have it available in templates!
 assert groupby  # appease pyflakes
@@ -5,6 +7,7 @@ import datetime  # we just import this to have it available in templates!
 assert datetime
 from urllib import urlencode
 from base64 import b64encode
+from math import floor
 
 from six import PY3
 if PY3:  # pragma: no cover
@@ -122,10 +125,44 @@ def format_gbs_identifier(source):
     return source.gbs_identifier.replace(':', '-') if source.gbs_identifier else source.pk
 
 
-def format_coordinates(obj):
+def format_coordinates(obj, no_seconds=True):
+    """
+    WGS84
+    53° 33' 2" N, 9° 59' 36" E
+    53.550556°, 9.993333°
+
+    .. seealso:: http://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
+    """
+    def degminsec(dec, hemispheres):
+        _dec = abs(dec)
+        degrees = int(floor(_dec))
+        _dec = (_dec - int(floor(_dec)))*60
+        minutes = int(floor(_dec))
+        _dec = (_dec - int(floor(_dec)))*60
+        seconds = _dec
+        fmt = "{0}\xb0{1:0>2d}'"
+        if not no_seconds:
+            fmt += '{2:0>2d}"'
+        fmt += hemispheres[0] if dec > 0 else hemispheres[1]
+        return unicode(fmt).format(degrees, minutes, seconds)
+
     if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
         return ''
-    return HTML.span('{0.latitude:.2f}; {0.longitude:.2f}'.format(obj), class_='geo')
+    return HTML.div(
+        HTML.table(
+            HTML.tr(
+                HTML.td(
+                    'Coordinates ',
+                    external_link(
+                        'http://en.wikipedia.org/wiki/World_Geodetic_System_1984',
+                        label="WGS84")),
+                HTML.td(
+                    HTML.span('%s, %s' % (
+                        degminsec(obj.latitude, 'NS'), degminsec(obj.longitude, 'EW'))),
+                    HTML.br(),
+                    HTML.span(
+                        '{0.latitude:.2f}, {0.longitude:.2f}'.format(obj), class_='geo'))),
+            class_="table table-condensed"))
 
 
 def format_license_icon_url(req):
