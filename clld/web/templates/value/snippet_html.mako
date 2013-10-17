@@ -15,6 +15,6 @@
 ${util.sentences(ctx, fmt='short')}
 % endif
 
-% if not ctx.sentence_assocs and not ctx.valueset.description:
+% if not ctx.sentence_assocs and not ctx.valueset.description and not ctx.confidence:
 <p>No details available</p>
 % endif
