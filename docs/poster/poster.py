@@ -199,7 +199,7 @@ c.insert(box(r"""
 """, 2, gl=('glottolog-users.png', 9.5, 2)))
 
 
-c.text(paperformat.width-margin-background, 3, r"\fontsize{10}{12}\selectfont created with \PyX", [text.halign.right])
+c.text(paperformat.width-margin-background, 3, r"\fontsize{16}{18}\selectfont Printed at Universit\"atsrechenzentrum Leipzig", [text.halign.right])
 
 c.writeEPSfile("poster_a4", paperformat=document.paperformat.A4, fittosize=1)
 c.writePDFfile("poster_a4", paperformat=document.paperformat.A4, fittosize=1)
