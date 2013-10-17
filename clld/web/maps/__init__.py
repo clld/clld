@@ -22,13 +22,14 @@ class Layer(object):
 class Legend(object):
     """Object holding all data necessary to render a navpill with a dropdown above a map.
     """
-    def __init__(self, map_, name, items, label=None, stay_open=False, item_attrs=None):
+    def __init__(self, map_, name, items, label=None, stay_open=False, item_attrs=None, pull_right=False):
         self.map = map_
         self.name = name
         self.label = label or name.capitalize()
         self.items = items
         self.stay_open = stay_open
         self.item_attrs = item_attrs or {}
+        self.pull_right = pull_right
 
     def format_id(self, suffix=None):
         suffix = suffix or ''
@@ -59,7 +60,7 @@ class Legend(object):
             HTML.ul(
                 *map(self.render_item, self.items),
                 **dict(class_=ul_class, id=self.format_id('container'))),
-            class_='dropdown',
+            class_='dropdown' + (' pull-right' if self.pull_right else ''),
             id=self.format_id(),
         )
 
@@ -164,7 +165,7 @@ class Map(object):
                 layer.name,
                 onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
                 href=layer.data if isinstance(layer.data, basestring) else '#')
-        yield Legend(self, 'geojson', map(item, self.layers), label='GeoJSON')
+        yield Legend(self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 
 
 class ParameterMap(Map):
