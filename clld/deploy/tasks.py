@@ -93,6 +93,15 @@ def deploy(environment, with_blog=False):
 
 @hosts('localhost')
 @task
+def uninstall(environment):
+    """uninstall the app
+    """
+    _assign_host(environment)
+    execute(util.uninstall, APP)
+
+
+@hosts('localhost')
+@task
 def create_downloads(environment):
     """create all configured downloads
     """
