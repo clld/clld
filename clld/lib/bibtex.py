@@ -511,7 +511,7 @@ class Database(_Convertable):
     a class to handle bibtex databases, i.e. a container class for Record instances.
     """
     def __init__(self, records):
-        self.records = records
+        self.records = filter(lambda r: r.genre and r.id, records)
         self._keymap = None
 
     def __unicode__(self):
