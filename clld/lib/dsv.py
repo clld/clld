@@ -14,7 +14,7 @@ def normalize_name(s):
     """
     if s == 'class':
         return 'class_'
-    return s.replace('-', '_')
+    return s.replace('-', '_').replace('.', '_')
 
 
 def rows(filename=None,
@@ -37,11 +37,12 @@ def rows(filename=None,
         with open(filename, 'r') as fp:
             content = fp.read()
 
+    if encoding:
+        content = content.decode(encoding)
+
     for i, line in enumerate(content.split(newline)):
         if not line.strip():
             continue
-        if encoding:
-            line = line.decode(encoding)
         row = [s.strip() for s in line.split(delimiter)]
         if namedtuples and i == 0:
             fields = row
