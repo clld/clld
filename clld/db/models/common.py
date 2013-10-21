@@ -238,10 +238,13 @@ class Language(Base,
         Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
     identifiers = association_proxy('languageidentifier', 'identifier')
 
+    def get_identifier_objs(self, type_):
+        return [i for i in self.identifiers if i.type == getattr(type_, 'value', type_)]
+
     def get_identifier(self, type_):
-        for i in self.identifiers:
-            if i.type == getattr(type_, 'value', type_):
-                return i.name
+        objs = self.get_identifier_objs(type_)
+        if objs:
+            return objs[0].name
 
     @property
     def iso_code(self):
@@ -711,10 +714,10 @@ class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
 
 
 class IdentifierType(DeclEnum):
-    iso = 'iso639-3', 'ISO 639-3'
-    wals = 'wals', 'WALS Code'
-    glottolog = 'glottolog', 'Glottocode'
-    ethnologue = 'ethnologue', 'Ethnologue'
+    iso = 'iso639-3', 'ISO 639-3', 'http://www.sil.org/iso639-3/documentation.asp?id={0.name}'
+    wals = 'wals', 'WALS Code', 'http://wals.info/languoid/lect/wals_code_{0.name}'
+    glottolog = 'glottolog', 'Glottocode', 'http://glottolog.org/resource/languoid/id/{0.name}'
+    ethnologue = 'ethnologue', 'Ethnologue', 'http://www.ethnologue.com/language/{0.name}'
 
 
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
