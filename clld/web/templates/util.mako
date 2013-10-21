@@ -245,7 +245,7 @@ $(document).ready(function() {
         % if getattr(request, 'map', False):
         <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="Map" open="${True}">
             ${request.map.render()}
-            <p>Coordinates: ${h.format_coordinates(lang)}</p>
+            ${h.format_coordinates(lang)}
         </%self:accordion_group>
         % endif
         % if lang.sources:
@@ -338,4 +338,37 @@ $(document).ready(function() {
 	</div>
     </div>
     </div>
+</%def>
+
+##
+##
+##
+<%def name="sources_list(sources)">
+    <dl>
+        % for source in sources:
+        <dt style="clear: right;">${h.link(request, source)}</dt>
+        <dd id="${h.format_gbs_identifier(source)}">${source.description}</dd>
+        % endfor
+    </dl>
+    ${self.gbs_links(filter(None, [s.gbs_identifier for s in sources]))}
+</%def>
+
+##
+##
+##
+<%def name="codes(lang=None)">
+    <% lang = lang or ctx %>
+    <ul class="inline codes pull-right">
+        % for type_ in [h.models.IdentifierType.glottolog, h.models.IdentifierType.iso]:
+            <% codes = ctx.get_identifier_objs(type_) %>
+            % if len(codes) == 1:
+            <li>
+                <span class="large label label-info">
+                    ${type_.description}:
+                    ${h.language_identifier(request, codes[0], inverted=True, style="color: white;")}
+                </span>
+            </li>
+            % endif
+        % endfor
+    </ul>
 </%def>

@@ -5,10 +5,7 @@
 
 <h2>${_('Language')} ${ctx.name}</h2>
 
-<div>
-    <% dt = request.registry.getUtility(h.interfaces.IDataTable, 'values'); dt = dt(request, h.models.Value, language=ctx) %>
-    ${dt.render()}
-</div>
+${request.get_datatable('values', h.models.Value, language=ctx).render()}
 
 <%def name="sidebar()">
     ${util.language_meta()}
