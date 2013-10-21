@@ -318,7 +318,6 @@ def get_configurator(pkg, *utilities, **kw):
     routes = kw.pop('routes', [])
 
     config = Configurator(**kw)
-    config.include('pyramid_mako')
 
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
@@ -466,6 +465,8 @@ def get_configurator(pkg, *utilities, **kw):
     ):
         menuitems[plural] = partial(menu_item, plural)
     config.registry.registerUtility(menuitems, interfaces.IMenuItems)
+
+    config.include('pyramid_mako')
 
     for utility, interface in utilities:
         config.registry.registerUtility(utility, interface)
