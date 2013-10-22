@@ -374,6 +374,8 @@ def contactmail(req, ctx=None, title='contact maintainer'):
 
 
 def newline2br(text):
+    if not text:
+        return ''
     chunks = []
     for i, line in enumerate(text.split('\n')):
         if i > 0:
