@@ -426,7 +426,7 @@ CLLD.Map = function(eid, layers, options) {
         layer.setIcon(map.icon(feature, size));
         map.oms.addMarker(layer);
         map.marker_map[feature.properties.language.id] = layer;
-        layer.bindLabel(feature.properties.language.name);
+        layer.bindLabel(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
     };
 
     var _zoomToExtent = function() {
@@ -470,7 +470,7 @@ CLLD.Map = function(eid, layers, options) {
     for (name in layers) {
         if (layers.hasOwnProperty(name)) {
             this.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(this.map);
-	    this.layer_geojson[name] = layers[name];
+            this.layer_geojson[name] = layers[name];
 
             if ($.type(layers[name]) === 'string') {
                 $.getJSON(layers[name], {layer: name}, function(data) {
