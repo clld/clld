@@ -4,11 +4,6 @@ from clld.db.models.common import Unit, Language
 from clld.web.datatables.base import DataTable, LinkCol
 
 
-class LanguageLinkCol(LinkCol):
-    def get_obj(self, item):
-        return item.language
-
-
 class DescriptionLinkCol(LinkCol):
     def get_attrs(self, item):
         return {'label': item.description}
@@ -37,7 +32,8 @@ class Units(DataTable):
         return [
             LinkCol(self, 'name'),
             DescriptionLinkCol(self, 'description'),
-            LanguageLinkCol(self, 'language', model_col=Language.name),
+            LinkCol(
+                self, 'language', model_col=Language.name, get_obj=lambda i: i.language),
         ]
 
     def xhr_query(self):

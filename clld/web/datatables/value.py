@@ -5,7 +5,7 @@ from clld.db.models.common import (
 )
 from clld.db.util import icontains
 from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
+    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol,
 )
 from clld.web.util.helpers import linked_references, map_marker_img
 from clld.web.util.htmllib import HTML, literal
@@ -41,22 +41,9 @@ class ValueSetCol(LinkCol):
         return {'label': item.valueset.name}
 
 
-class ParameterCol(LinkCol):
-    def get_obj(self, item):
-        return item.valueset.parameter
-
-
-class ValueLanguageCol(LanguageCol):
-    def get_obj(self, item):
-        return item.valueset.language
-
-
-class _LinkToMapCol(LinkToMapCol):
-    def get_obj(self, item):
-        return item.valueset.language
-
-
 class RefsCol(Col):
+    __kw__ = dict(bSearchable=False, bSortable=False)
+
     def format(self, item):
         return ', '.join(filter(None, [item.valueset.source, linked_references(self.dt.req, item.valueset)]))
 
@@ -116,23 +103,23 @@ class Values(DataTable):
         if self.parameter and self.parameter.domain:
             name_col.choices = [de.name for de in self.parameter.domain]
 
-        refs_col = RefsCol(self, 'source', bSearchable=False, bSortable=False)
-
         res = [DetailsRowLinkCol(self, 'd')]
 
         if self.parameter:
             return res + [
-                ValueLanguageCol(self, 'language', model_col=Language.name),
+                LinkCol(self, 'language',
+                        model_col=Language.name, get_obj=lambda i: i.valueset.language),
                 name_col,
-                refs_col,
-                _LinkToMapCol(self, 'm'),
+                RefsCol(self, 'source'),
+                LinkToMapCol(self, 'm', get_obj=lambda i: i.valueset.language),
             ]
 
         if self.language:
             return res + [
                 name_col,
-                ParameterCol(self, 'parameter', model_col=Parameter.name),
-                refs_col,
+                LinkCol(self, 'parameter',
+                        model_col=Parameter.name, get_obj=lambda i: i.valueset.parameter),
+                RefsCol(self, 'source'),
                 #
                 # TODO: refs?
                 #

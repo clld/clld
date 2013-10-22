@@ -1,10 +1,12 @@
+from functools import partial
+
 from sqlalchemy.orm import joinedload, joinedload_all
 
 from clld.db.models.common import (
     ValueSet, Parameter, Language, Contribution, ValueSetReference,
 )
 from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, LanguageCol,
+    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol,
 )
 from clld.web.util.helpers import linked_references
 
@@ -70,43 +72,30 @@ class Valuesets(DataTable):
         return query
 
     def col_defs(self):
-        #
-        # TODO: move the first col def to apics-specific table!
-        #
-        #name_col = ValueNameCol(self, 'value')
-        #if self.parameter and self.parameter.domain:
-        #    name_col.choices = [de.name for de in self.parameter.domain]
-
         refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
-
         res = [DetailsRowLinkCol(self, 'd')]
+        get = lambda what, i: getattr(i, {'p': 'parameter', 'l': 'language'}[what])
 
         if self.parameter:
             return res + [
-                LanguageCol(self, 'language', model_col=Language.name),
-                #name_col,
+                LinkCol(self, 'language',
+                        model_col=Language.name, get_obj=partial(get, 'l')),
                 refs_col,
-                _LinkToMapCol(self, 'm'),
+                LinkToMapCol(self, 'm', get_obj=partial(get, 'l')),
             ]
 
         if self.language:
             return res + [
-                #name_col,
-                ParameterCol(self, 'parameter', model_col=Parameter.name),
+                LinkCol(self, 'parameter',
+                        model_col=Parameter.name, get_obj=partial(get, 'p')),
                 refs_col,
-                #
-                # TODO: refs?
-                #
             ]
 
         return res + [
-            LanguageCol(self, 'language', model_col=Language.name),
-            #name_col,
-            ParameterCol(self, 'parameter', model_col=Parameter.name),
+            LinkCol(self, 'language', model_col=Language.name, get_obj=partial(get, 'l')),
+            LinkCol(
+                self, 'parameter', model_col=Parameter.name, get_obj=partial(get, 'p')),
             refs_col,
-            #
-            # TODO: contribution col?
-            #
         ]
 
     def toolbar(self):

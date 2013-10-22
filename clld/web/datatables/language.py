@@ -1,16 +1,4 @@
-from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IdCol,
-)
-
-
-class DegreeCol(Col):
-    __kw__ = {'sClass': 'right'}
-
-    def format(self, item):
-        val = getattr(item, self.name)
-        if val:
-            return '{0:.2f}'.format(val)
-        return ''
+from clld.web.datatables.base import DataTable, Col, LinkCol, LinkToMapCol, IdCol
 
 
 class Languages(DataTable):
@@ -20,6 +8,6 @@ class Languages(DataTable):
             IdCol(self, 'id'),
             LinkCol(self, 'name'),
             LinkToMapCol(self, 'm'),
-            DegreeCol(self, 'latitude', sDescription='<small>The geographic latitude</small>'),
-            DegreeCol(self, 'longitude', sDescription='<small>The geographic longitude</small>'),
+            Col(self, 'latitude', sDescription='<small>The geographic latitude</small>'),
+            Col(self, 'longitude', sDescription='<small>The geographic longitude</small>'),
         ]

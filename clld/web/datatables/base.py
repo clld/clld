@@ -8,6 +8,7 @@ import re
 
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
+from sqlalchemy.sql.expression import cast
 from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
@@ -16,7 +17,7 @@ from clld.db.meta import DBSession
 from clld.db.models.common import Language
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import link, button, icon, JSMap, JS_CLLD
+from clld.web.util.helpers import link, button, icon, JS_CLLD
 from clld.interfaces import IDataTable, IIndex
 from clld.util import cached_property
 
@@ -58,15 +59,22 @@ def filter_number(col, qs, type_=None, qs_weight=1):
 
 class Col(object):
     """DataTables are basically a list of column specifications.
+
+    A column in a DataTable typically corresponds to a column of an sqlalchemy model.
+    This column can either be supplied directly via a model_col keyword argument, or we
+    try to look it up as attribute with name "name" on self.dt.model.
     """
     dt_name_pattern = re.compile('[a-z]+[A-Z]+[a-z]+')
 
     # convenient way to provide defaults for some kw arguments of __init__:
     __kw__ = {}
 
-    def __init__(self, dt, name, **kw):
+    def __init__(self, dt, name, get_object=None, model_col=None, **kw):
         self.dt = dt
         self.name = name
+        self._get_object = get_object
+        self.model_col = model_col
+        self.model_col_type = None
         self.js_args = {
             'sName': name,
             'sTitle': '' if not name
@@ -82,19 +90,49 @@ class Col(object):
             else:
                 setattr(self, key, val)
 
-        if not hasattr(self, 'model_col'):
+        if not self.model_col:
+            #
+            # model_col was not explicitely passed as keyword parameter
             #
             # TODO: fix mechanism to infer model_col for derived classes!)
             #
-            self.model_col = None
             model_col = getattr(self.dt.model, self.name, None)
             if model_col and hasattr(model_col.property, 'columns'):
                 self.model_col = model_col
 
-        if self.model_col and isinstance(self.model_col.property.columns[0].type, Boolean):
+        if self.model_col:
+            self.model_col_type = self.model_col.property.columns[0].type
+
+        if isinstance(self.model_col_type, Boolean):
             if not hasattr(self, 'choices'):
                 self.choices = ['True', 'False']
+        elif isinstance(self.model_col_type, (Float, Integer)):
+            self.js_args.setdefault('sClass', 'right')
+            if not hasattr(self, 'input_size'):
+                self.input_size = 'small'
 
+    def get_obj(self, item):
+        """derived columns with a model_col not on self.dt.model should override this
+        method.
+        """
+        if getattr(self, '_get_object'):
+            return self._get_object(item)
+        return item
+
+    def get_value(self, item):
+        mc = self.model_col
+        return getattr(self.get_obj(item), mc.name if mc else self.name, None) or ''
+
+    def format_value(self, value):
+        if isinstance(self.model_col_type, Boolean):
+            return '%s' % value
+        if isinstance(self.model_col_type, Float) and isinstance(value, float):
+            return ('%.' + str(getattr(self, 'precision', 2)) + 'f') % value
+        return value
+
+    #
+    # external API called by DataTable objects:
+    #
     def order(self):
         """called when collecting the order by clauses of a datatable's search query
         """
@@ -103,37 +141,32 @@ class Col(object):
     def search(self, qs):
         """called when collecting the filter criteria of a datatable's search query
         """
-        if self.model_col:
-            if isinstance(self.model_col.property.columns[0].type, (String, Unicode)):
-                if not getattr(self, 'choices', None):
-                    return icontains(self.model_col, qs)
+        if isinstance(self.model_col_type, (String, Unicode)):
+            if getattr(self, 'choices', None):
+                # make sure select box values match sharp!
                 return self.model_col.__eq__(qs)
-            if isinstance(self.model_col.property.columns[0].type, (Float, Integer)):
-                return filter_number(self.model_col, qs)
-            if isinstance(self.model_col.property.columns[0].type, Boolean):
-                return self.model_col.__eq__(qs == 'True')
+            else:
+                return icontains(self.model_col, qs)
+        if isinstance(self.model_col_type, (Float, Integer)):
+            return filter_number(self.model_col, qs)
+        if isinstance(self.model_col_type, Boolean):
+            return self.model_col.__eq__(qs == 'True')
 
     def format(self, item):
         """called when converting the matching result items of a datatable's search query
         to json.
         """
-        if self.model_col:
-            if isinstance(self.model_col.property.columns[0].type, Boolean):
-                return '%s' % getattr(item, self.model_col.name, '')
-            return getattr(item, self.model_col.name, None) or ''
-        return getattr(item, self.name, None) or ''
+        return self.format_value(self.get_value(item))
 
 
 class PercentCol(Col):
     """treats a model col of type float as percentage.
     """
-    __kw__ = {'sClass': 'right', 'input_size': 'small'}
-
     def search(self, qs):
         return filter_number(self.model_col, qs, qs_weight=0.01)
 
-    def format(self, item):
-        return '%.0f%%' % (100 * getattr(item, self.model_col.name),)
+    def format_value(self, value):
+        return '%.0f%%' % (100 * value,)
 
 
 class LinkCol(Col):
@@ -142,13 +175,13 @@ class LinkCol(Col):
     def get_attrs(self, item):
         return {}
 
-    def get_obj(self, item):
-        return item
-
     def format(self, item):
         return link(self.dt.req, self.get_obj(item), **self.get_attrs(item))
 
 
+#
+# TODO: remove LanguageCol, doesn't add anything above get_obj and model_col kw params!
+#
 class LanguageCol(LinkCol):
     def get_obj(self, item):
         return item.language
@@ -164,7 +197,20 @@ class IdCol(LinkCol):
     __kw__ = {'sClass': 'right', 'input_size': 'mini'}
 
     def get_attrs(self, item):
-        return {'label': item.id}
+        return {'label': self.get_obj(item).id}
+
+    def search(self, qs):
+        return self.model_col.__eq__(qs)
+
+
+class IntegerIdCol(IdCol):
+    __kw__ = {'input_size': 'mini', 'sClass': 'right', 'sTitle': 'No.'}
+
+    def search(self, qs):
+        return filter_number(cast(self.model_col, Integer), qs, type_=int)
+
+    def order(self):
+        return cast(self.model_col, Integer)
 
 
 class LinkToMapCol(Col):
@@ -172,9 +218,6 @@ class LinkToMapCol(Col):
     a popup on the map.
     """
     __kw__ = {'bSearchable': False, 'bSortable': False, 'sTitle': ''}
-
-    def get_obj(self, item):
-        return item
 
     def format(self, item):
         obj = self.get_obj(item)
@@ -202,7 +245,7 @@ class DetailsRowLinkCol(Col):
     def format(self, item):
         return button(
             self.button_text,
-            href=self.dt.req.resource_url(item, ext='snippet.html'),
+            href=self.dt.req.resource_url(self.get_obj(item), ext='snippet.html'),
             title="show details",
             class_="btn-info details",
             tag=HTML.button)

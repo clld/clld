@@ -18,17 +18,6 @@ class UnitValueNameCol(LinkCol):
         return common.UnitValue.name.contains(qs)
 
 
-class UnitCol(LinkCol):
-    def get_obj(self, item):
-        return item.unit
-
-    def order(self):
-        return common.Unit.name
-
-    def search(self, qs):
-        return common.Unit.name.contains(qs)
-
-
 class Unitvalues(DataTable):
 
     def __init__(self,
@@ -78,7 +67,7 @@ class Unitvalues(DataTable):
             name_col.choices = sorted([de.name for de in self.parameter.domain])
         return [
             name_col,
-            UnitCol(self, 'unit'),
+            LinkCol(self, 'unit', get_obj=lambda i: i.unit, model_col=common.Unit.name),
         ]
 
     def toolbar(self):
