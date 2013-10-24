@@ -48,6 +48,23 @@ def dict_append(d, k, v):
         d[k] = [v]
 
 
+def dict_merged(d, _filter=None, **kw):
+    """Updates dictionary d with the items passed as keyword parameters if the value
+    passes _filter.
+
+    >>> assert dict_merged(None, a=1) == {'a': 1}
+    >>> assert dict_merged(None, a=1, _filter=lambda i: i != 1) == {}
+    >>> assert dict_merged(None, a=None) == {}
+    """
+    if not _filter:
+        _filter = lambda s: s is not None
+    d = d or {}
+    for k, v in kw.items():
+        if _filter(v):
+            d[k] = v
+    return d
+
+
 class NoDefault(object):
     pass
 
