@@ -18,6 +18,7 @@ from clld.db.models.common import Language
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JS_CLLD
+from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 from clld.util import cached_property
 
@@ -176,7 +177,10 @@ class LinkCol(Col):
         return {}
 
     def format(self, item):
-        return link(self.dt.req, self.get_obj(item), **self.get_attrs(item))
+        obj = self.get_obj(item)
+        if obj:
+            return link(self.dt.req, obj, **self.get_attrs(item))
+        return ''
 
 
 #
@@ -252,7 +256,9 @@ class DetailsRowLinkCol(Col):
 
 
 @implementer(IDataTable)
-class DataTable(object):
+class DataTable(Component):
+    __template__ = 'clld:web/templates/datatable.mako'
+
     def __init__(self, req, model, eid=None, **kw):
         """
         :param req: request object.
@@ -285,9 +291,8 @@ class DataTable(object):
         """
         return {}
 
-    @cached_property()
-    def options(self):
-        opts = {
+    def get_default_options(self):
+        return {
             'bServerSide': True,
             'bProcessing': True,
             "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'" + self.eid + "-toolbar'>>r>t<'span4'i><'span6'p>",
@@ -299,20 +304,14 @@ class DataTable(object):
             'sAjaxSource': self.req.route_url(
             '%ss' % self.model.mapper_name().lower(), _query=self.xhr_query() or {}),
         }
-        opts.update(self.get_options() or {})
-        #opts.setdefault('sAjaxSource', self.req.url)
-        return opts
 
     def base_query(self, query):
         """Custom DataTables can overwrite this method to add joins, or apply filters.
         """
         return query
 
-    def render(self):
-        return Markup(render(
-            'clld:web/templates/datatable.mako',
-            {'datatable': self, 'options': Markup(dumps(self.options))},
-            request=self.req))
+    def get_vars(self):
+        return {'datatable': self, 'options': Markup(dumps(self.options))}
 
     def default_order(self):
         return self.model.pk
@@ -378,6 +377,3 @@ class DataTable(object):
                 **dict(class_="dropdown-menu")),
             button(icon('info-sign', inverted=True), class_='btn-info %s-cdOpener' % self.eid),
             class_='btn-group right')
-
-    def get_options(self):
-        return {}

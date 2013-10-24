@@ -56,10 +56,7 @@ class Values(DataTable):
                  parameter=None,
                  contribution=None,
                  language=None,
-                 search='col',
                  **kw):
-        self.search = search
-
         for attr, _model in [
             ('parameter', Parameter),
             ('contribution', Contribution),

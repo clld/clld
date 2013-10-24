@@ -1,10 +1,9 @@
-from markupsafe import Markup
-from pyramid.renderers import render
-
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
+from clld.web.util.component import Component
 from clld.web.adapters import GeoJsonLanguages
+from clld.util import cached_property
 
 
 class Layer(object):
@@ -65,23 +64,21 @@ class Legend(object):
         )
 
 
-class Map(object):
+class Map(Component):
     """Map objects bridge the technology divide between server side python code and
     client side leaflet maps.
     """
+    __template__ = 'clld:web/templates/map.mako'
+
     def __init__(self, ctx, req, eid='map'):
         self.req = req
         self.ctx = ctx
         self.eid = eid
-        self._layers = None
-        self._legends = None
         self.map_marker = req.registry.getUtility(IMapMarker)
 
-    @property
+    @cached_property()
     def layers(self):
-        if self._layers is None:
-            self._layers = list(self.get_layers())
-        return self._layers
+        return list(self.get_layers())
 
     def get_layers(self):
         route_params = {'ext': 'geojson'}
@@ -95,18 +92,9 @@ class Map(object):
             '%s' % self.ctx,
             self.req.route_url(route_name, **route_params))
 
-    def options(self):
-        return {}
-
-    def render(self):
-        return Markup(render(
-            'clld:web/templates/map.mako', {'map': self}, request=self.req))
-
-    @property
+    @cached_property()
     def legends(self):
-        if self._legends is None:
-            self._legends = list(self.get_legends())
-        return self._legends
+        return list(self.get_legends())
 
     def get_legends(self):
         if len(self.layers) > 1:
@@ -145,7 +133,7 @@ class Map(object):
         items = []
         for size in [15, 20, 30, 40]:
             attrs = dict(name="iconsize", value=str(size), type="radio")
-            if size == self.options().get('icon_size', 30):
+            if size == self.options.get('icon_size', 30):
                 attrs['checked'] = 'checked'
             items.append(HTML.label(
                 HTML.input(onclick=helpers.JS_CLLD.mapResizeIcons(self.eid), **attrs),
@@ -183,7 +171,7 @@ class ParameterMap(Map):
             yield Layer(
                 self.ctx.id, self.ctx.name, self.req.resource_url(self.ctx, ext='geojson'))
 
-    def options(self):
+    def get_default_options(self):
         return {'info_query': {'parameter': self.ctx.pk}, 'hash': True}
 
 
@@ -201,7 +189,7 @@ class LanguageMap(Map):
         geojson = _GeoJson(lang)
         yield Layer(lang.id, lang.name, geojson.render(lang, self.req, dump=False))
 
-    def options(self):
+    def get_default_options(self):
         lang = self.get_language()
         return {
             'center': [lang.latitude, lang.longitude],

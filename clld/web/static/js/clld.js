@@ -467,6 +467,14 @@ CLLD.Map = function(eid, layers, options) {
     this.layer_map = {};
     this.layer_geojson = {};
 
+    this.eachMarker = function(func) {
+        for (id in this.marker_map) {
+            if (this.marker_map.hasOwnProperty(id)) {
+                func(this.marker_map[id]);
+            }
+        }
+    };
+
     for (name in layers) {
         if (layers.hasOwnProperty(name)) {
             this.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(this.map);
@@ -477,10 +485,16 @@ CLLD.Map = function(eid, layers, options) {
                     var map = CLLD.Maps[eid];
                     map.layer_map[data.properties.layer].addData(data);
                     _zoomToExtent();
+                    if (map.options.show_labels) {
+                        map.eachMarker(function(marker){marker.showLabel()})
+                    }
                 });
             } else {
                 this.layer_map[name].addData(layers[name]);
                 _zoomToExtent();
+                if (this.options.show_labels) {
+                    this.eachMarker(function(marker){marker.showLabel()})
+                }
             }
         }
     }
@@ -489,14 +503,6 @@ CLLD.Map = function(eid, layers, options) {
             this.options.center,
             this.options.zoom == undefined ? 5 : this.options.zoom);
     }
-
-    this.eachMarker = function(func) {
-        for (id in this.marker_map) {
-            if (this.marker_map.hasOwnProperty(id)) {
-                func(this.marker_map[id]);
-            }
-        }
-    };
 
     if (options.on_init) {
         options.on_init(this);
