@@ -1,14 +1,11 @@
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import cast
-from sqlalchemy.types import Integer
 
-from clld.db.meta import DBSession
 from clld.db.util import get_distinct_values
 from clld.db.models.common import (
     Language, Sentence, Parameter, ValueSentence, Value, ValueSet,
 )
 from clld.web.datatables.base import (
-    DataTable, LinkCol, DetailsRowLinkCol, LanguageCol, Col,
+    DataTable, LinkCol, DetailsRowLinkCol, Col,
 )
 
 
@@ -65,7 +62,7 @@ class Sentences(DataTable):
             TsvCol(self, 'gloss', sClass="gloss"),
             Col(self, 'description', sTitle=self.req.translate('Translation'), sClass="translation"),
             TypeCol(self, 'type'),
-            LanguageCol(self, 'language'),
+            LinkCol(self, 'language', model_col=Language.name, get_obj=lambda i: i.language),
             DetailsRowLinkCol(self, 'd'),
         ]
 

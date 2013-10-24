@@ -15,10 +15,7 @@ class Component(object):
 
     def render(self):
         return Markup(render(
-            self.__template__, self.get_vars(), request=getattr(self, 'req', None)))
-
-    def get_vars(self):
-        return {'obj': self}
+            self.__template__, {'obj': self}, request=getattr(self, 'req', None)))
 
     def get_options(self):
         return {}

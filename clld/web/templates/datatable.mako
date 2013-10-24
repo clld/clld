@@ -1,7 +1,7 @@
-<table id="${datatable.eid}" cellpadding="0" cellspacing="0" border="0" class="table table-condensed table-bordered table-striped">
+<table id="${obj.eid}" cellpadding="0" cellspacing="0" border="0" class="table table-condensed table-bordered table-striped">
     <thead>
         <tr>
-            % for col in datatable.cols:
+            % for col in obj.cols:
             <th>${col.js_args['sTitle']}</th>
             % endfor
         </tr>
@@ -10,7 +10,7 @@
     </tbody>
     <tfoot>
 	<tr>
-            % for col in datatable.cols:
+            % for col in obj.cols:
 	    <th style="text-align: left;">
                 % if col.js_args.get('bSearchable', True):
 		    % if hasattr(col, 'choices'):
@@ -37,6 +37,6 @@
 </table>
 <script>
 $(document).ready(function() {
-    ${h.JSDataTable.init(datatable.eid, datatable.toolbar(), datatable.options)|n};
+    ${h.JSDataTable.init(obj.eid, obj.toolbar(), obj.options)|n};
 });
 </script>

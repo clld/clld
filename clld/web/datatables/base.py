@@ -9,12 +9,10 @@ import re
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from sqlalchemy.sql.expression import cast
-from pyramid.renderers import render
 from markupsafe import Markup
 from zope.interface import implementer
 
 from clld.db.meta import DBSession
-from clld.db.models.common import Language
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JS_CLLD
@@ -183,20 +181,6 @@ class LinkCol(Col):
         return ''
 
 
-#
-# TODO: remove LanguageCol, doesn't add anything above get_obj and model_col kw params!
-#
-class LanguageCol(LinkCol):
-    def get_obj(self, item):
-        return item.language
-
-    def order(self):
-        return Language.name
-
-    def search(self, qs):
-        return icontains(Language.name, qs)
-
-
 class IdCol(LinkCol):
     __kw__ = {'sClass': 'right', 'input_size': 'mini'}
 
@@ -295,7 +279,8 @@ class DataTable(Component):
         return {
             'bServerSide': True,
             'bProcessing': True,
-            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'" + self.eid + "-toolbar'>>r>t<'span4'i><'span6'p>",
+            "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'"
+            + self.eid + "-toolbar'>>r>t<'span4'i><'span6'p>",
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
             "aoColumns": [col.js_args for col in self.cols],
@@ -309,9 +294,6 @@ class DataTable(Component):
         """Custom DataTables can overwrite this method to add joins, or apply filters.
         """
         return query
-
-    def get_vars(self):
-        return {'datatable': self, 'options': Markup(dumps(self.options))}
 
     def default_order(self):
         return self.model.pk
