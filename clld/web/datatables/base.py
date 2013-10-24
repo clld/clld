@@ -68,10 +68,11 @@ class Col(object):
     # convenient way to provide defaults for some kw arguments of __init__:
     __kw__ = {}
 
-    def __init__(self, dt, name, get_object=None, model_col=None, **kw):
+    def __init__(self, dt, name, get_object=None, model_col=None, format=None, **kw):
         self.dt = dt
         self.name = name
         self._get_object = get_object
+        self._format = format
         self.model_col = model_col
         self.model_col_type = None
         self.js_args = {
@@ -155,6 +156,8 @@ class Col(object):
         """called when converting the matching result items of a datatable's search query
         to json.
         """
+        if getattr(self, '_format'):
+            return self._format(item)
         return self.format_value(self.get_value(item))
 
 
