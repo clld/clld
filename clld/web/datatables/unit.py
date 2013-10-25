@@ -10,16 +10,7 @@ class DescriptionLinkCol(LinkCol):
 
 
 class Units(DataTable):
-
-    def __init__(self, req, model, language=None, **kw):
-        if language:
-            self.language = language
-        elif 'language' in req.params:
-            self.language = Language.get(req.params['language'])
-        else:
-            self.language = None
-
-        DataTable.__init__(self, req, model, **kw)
+    __constraints__ = [Language]
 
     def base_query(self, query):
         query = query.join(Language).options(joinedload(Unit.language))
@@ -35,7 +26,3 @@ class Units(DataTable):
             LinkCol(
                 self, 'language', model_col=Language.name, get_obj=lambda i: i.language),
         ]
-
-    def xhr_query(self):
-        if self.language:
-            return {'language': self.language.id}

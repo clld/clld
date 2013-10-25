@@ -244,7 +244,11 @@ class DetailsRowLinkCol(Col):
 
 @implementer(IDataTable)
 class DataTable(Component):
+    """DataTables are used to manage (sort, filter, display) lists of instances of one
+    model class.
+    """
     __template__ = 'clld:web/templates/datatable.mako'
+    __constraints__ = []
 
     def __init__(self, req, model, eid=None, **kw):
         """
@@ -257,6 +261,19 @@ class DataTable(Component):
         self.eid = eid or self.__class__.__name__
         self.count_all = None
         self.count_filtered = None
+
+        for _model in self.__constraints__:
+            attr = self.attr_from_constraint(_model)
+            if kw.get(attr):
+                setattr(self, attr, kw[attr])
+            elif attr in req.params:
+                setattr(self, attr, _model.get(req.params[attr]))
+            else:
+                setattr(self, attr, None)
+
+    @staticmethod
+    def attr_from_constraint(model):
+        return model.mapper_name().lower()
 
     def __unicode__(self):
         return '%ss' % self.model.mapper_name()
@@ -276,7 +293,12 @@ class DataTable(Component):
         :return: a mapping to be passed as query parameters to the server when requesting\
         table data via xhr.
         """
-        return {}
+        res = {}
+        for _model in self.__constraints__:
+            attr = self.attr_from_constraint(_model)
+            if getattr(self, attr):
+                res[attr] = getattr(self, attr).id
+        return res
 
     def get_default_options(self):
         return {

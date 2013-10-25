@@ -27,30 +27,7 @@ class RefsCol(Col):
 
 
 class Valuesets(DataTable):
-
-    def __init__(self,
-                 req,
-                 model,
-                 parameter=None,
-                 contribution=None,
-                 language=None,
-                 search='col',
-                 **kw):
-        self.search = search
-
-        for attr, _model in [
-            ('parameter', Parameter),
-            ('contribution', Contribution),
-            ('language', Language),
-        ]:
-            if locals()[attr]:
-                setattr(self, attr, locals()[attr])
-            elif attr in req.params:
-                setattr(self, attr, _model.get(req.params[attr]))
-            else:
-                setattr(self, attr, None)
-
-        DataTable.__init__(self, req, model, **kw)
+    __constraints__ = [Parameter, Contribution, Language]
 
     def base_query(self, query):
         query = query.join(Language)\
@@ -100,8 +77,3 @@ class Valuesets(DataTable):
 
     def toolbar(self):
         return ''
-
-    def xhr_query(self):
-        for attr in ['parameter', 'contribution', 'language']:
-            if getattr(self, attr):
-                return {attr: getattr(self, attr).id}

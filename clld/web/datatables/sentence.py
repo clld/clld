@@ -31,16 +31,7 @@ class TsvCol(Col):
 
 
 class Sentences(DataTable):
-    def __init__(self, req, model, parameter=None, language=None, **kw):
-        for attr, _model in [('parameter', Parameter), ('language', Language)]:
-            if locals()[attr]:
-                setattr(self, attr, locals()[attr])
-            elif attr in req.params:
-                setattr(self, attr, _model.get(req.params[attr]))
-            else:
-                setattr(self, attr, None)
-
-        DataTable.__init__(self, req, model, **kw)
+    __constraints__ = [Parameter, Language]
 
     def base_query(self, query):
         if self.language:
@@ -68,8 +59,3 @@ class Sentences(DataTable):
 
     def get_options(self):
         return {'aaSorting': []}
-
-    def xhr_query(self):
-        for attr in ['parameter', 'language']:
-            if getattr(self, attr):
-                return {attr: getattr(self, attr).id}
