@@ -1,6 +1,7 @@
 """
 Common models for all clld apps
 """
+from __future__ import unicode_literals
 import os
 from base64 import b64encode
 from collections import OrderedDict
