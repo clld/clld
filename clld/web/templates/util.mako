@@ -356,9 +356,9 @@ $(document).ready(function() {
 ##
 ##
 ##
-<%def name="codes(lang=None)">
+<%def name="codes(lang=None, style='pull-right')">
     <% lang = lang or ctx %>
-    <ul class="inline codes pull-right">
+    <ul class="inline codes ${style}">
         % for type_ in [h.models.IdentifierType.glottolog, h.models.IdentifierType.iso]:
             <% codes = ctx.get_identifier_objs(type_) %>
             % if len(codes) == 1:
