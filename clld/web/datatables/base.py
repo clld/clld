@@ -208,7 +208,7 @@ class LinkToMapCol(Col):
     """We use the CLLD.Map.showInfoWindow API function to construct a button to open
     a popup on the map.
     """
-    __kw__ = {'bSearchable': False, 'bSortable': False, 'sTitle': ''}
+    __kw__ = {'bSearchable': False, 'bSortable': False, 'sTitle': '', 'map_id': 'map'}
 
     def format(self, item):
         obj = self.get_obj(item)
@@ -217,8 +217,8 @@ class LinkToMapCol(Col):
         return HTML.a(
             icon('icon-globe'),
             title='show %s on map' % getattr(obj, 'name', ''),
-            href="#map",
-            onclick=JS_CLLD.mapShowInfoWindow(None, obj.id),
+            href="#" + self.map_id,
+            onclick=JS_CLLD.mapShowInfoWindow(self.map_id, obj.id),
             class_='btn',
         )
 
