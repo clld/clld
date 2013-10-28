@@ -138,6 +138,7 @@
                             </a>
                             <br />
                             % endif
+                            <%block name="footer_citation">
                             ${request.dataset.formatted_name()}
                             edited by
                             <span xmlns:cc="http://creativecommons.org/ns#"
@@ -145,6 +146,7 @@
                                   rel="cc:attributionURL">
                                 ${request.dataset.formatted_editors()}
                            </span>
+                            </%block>
                             <br />
                             is licensed under a
                             <a rel="license" href="${request.dataset.license}">
