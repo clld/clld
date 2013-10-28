@@ -385,6 +385,12 @@ CLLD.Map = function(eid, layers, options) {
         var map = CLLD.Maps[eid];
         var route = map.options.info_route == undefined ? 'language_alt' : map.options.info_route;
 
+        if (map.options.no_popup) {
+            document.location.href = CLLD.route_url(
+                'language', {'id': layer.feature.properties.language.id});
+            return;
+        }
+
         if (map.marker_map.hasOwnProperty(layer)) {
             // allow opening the info window by language id
             layer = map.marker_map[layer];
