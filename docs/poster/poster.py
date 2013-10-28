@@ -84,7 +84,7 @@ c.insert(box(r"""
 \vspace{-5.55mm}
 \end{center}
 \PyXMarker{header}
-""", 0, header=('header.jpg', 0, 0)))
+""", 0, header=('header2.jpg', 0, 0)))
 
 #
 #
