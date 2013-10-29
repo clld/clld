@@ -1,4 +1,5 @@
 <%! from json import dumps %>
+<%! from clld.util import slug %>
 ##
 ##
 ##
@@ -371,4 +372,15 @@ $(document).ready(function() {
             % endif
         % endfor
     </ul>
+</%def>
+
+###
+### section
+###
+<%def name="section(title, level=3, id=None, prefix='sec-')">
+    <% id = id or prefix + slug(title) %>
+    <div class="section" id="${id}">
+        <h${level}>${title}<a class="headerlink" href="#${id}" title="Permalink to this headline">¶</a></h${level}>
+        ${caller.body()}
+    </div>
 </%def>
