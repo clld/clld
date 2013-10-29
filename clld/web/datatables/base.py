@@ -121,7 +121,8 @@ class Col(object):
 
     def get_value(self, item):
         mc = self.model_col
-        return getattr(self.get_obj(item), mc.name if mc else self.name, None) or ''
+        val = getattr(self.get_obj(item), mc.name if mc else self.name, None)
+        return '' if val is None else val
 
     def format_value(self, value):
         if isinstance(self.model_col_type, Boolean):
