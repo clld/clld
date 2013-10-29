@@ -135,13 +135,13 @@
 ## format a list of key-value pairs as HTML table
 ##
 <%def name="dl_table(*items, **kw)">
-    <table class="table table-condensed">
+    <table class="table table-condensed table-nonfluid">
         <tbody>
             % for key, value in items:
-            <tr><td class="key">${key}</td><td>${value}</td></tr>
+            <tr><td class="key">${key}:</td><td>${value}</td></tr>
             % endfor
             % for key, value in kw.items():
-            <tr><td class="key">${key}</td><td>${value}</td></tr>
+            <tr><td class="key">${key}:</td><td>${value}</td></tr>
             % endfor
         </tbody>
     </table>
