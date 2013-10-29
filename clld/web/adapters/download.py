@@ -2,7 +2,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
 from cStringIO import StringIO
 from contextlib import closing
-import time
 
 from path import path
 from zope.interface import implementer
@@ -18,7 +17,6 @@ from clld.db.meta import DBSession
 from clld.db.models.common import Language, Source, LanguageIdentifier
 from clld.db.util import page_query
 from clld.util import format_size
-from clld.scripts.postgres2sqlite import postgres2sqlite
 
 
 def pkg_name(pkg):
@@ -152,18 +150,26 @@ class CsvDump(Download):
     ext = 'csv'
 
     def __init__(self, model, pkg, fields=None, **kw):
-        kw['fields'] = fields or ['id', 'name']
+        """fields can be a list of column names or a dictionary mapping model attribute
+        names to csv column names.
+        """
         super(CsvDump, self).__init__(model, pkg, **kw)
+        self.fields = fields
         self.writer = None
+
+    def get_fields(self, req):
+        if not self.fields:
+            self.fields = ['id', 'name']
+        return self.fields
 
     def before(self, req, fp):
         self.writer = UnicodeCsvWriter(fp)
         self.writer.writerow(
-            [f if isinstance(f, basestring) else f[1] for f in self.fields])
+            [f if isinstance(f, basestring) else f[1] for f in self.get_fields(req)])
 
     def row(self, req, fp, item, index):
         return [getattr(item, f if isinstance(f, basestring) else f[0])
-                for f in self.fields]
+                for f in self.get_fields(req)]
 
     def dump(self, req, fp, item, index):
         self.writer.writerow(self.row(req, fp, item, index))
