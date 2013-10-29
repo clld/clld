@@ -331,7 +331,7 @@ class DataTable(Component):
             if val and name.startswith('sSearch_'):
                 try:
                     clause = self.cols[int(name.split('_')[1])].search(val)
-                except ValueError:  # pragma: no cover
+                except (ValueError, IndexError):  # pragma: no cover
                     clause = None
                 if clause is not None:
                     query = query.filter(clause)
