@@ -338,8 +338,16 @@ class DataTable(Component):
 
         self.count_filtered = query.count()
 
-        for index in range(int(self.req.params.get('iSortingCols', 0))):
-            col = self.cols[int(self.req.params['iSortCol_%s' % index])]
+        try:
+            iSortingCols = int(self.req.params.get('iSortingCols', 0))
+        except ValueError:
+            iSortingCols = 0
+
+        for index in range(iSortingCols):
+            try:
+                col = self.cols[int(self.req.params.get('iSortCol_%s' % index))]
+            except (TypeError, ValueError, IndexError):  # pragma: no cover
+                continue
             if col.js_args.get('bSortable', True):
                 orders = col.order()
                 if orders is not None:
