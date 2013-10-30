@@ -141,8 +141,18 @@ def format_coordinates(obj, no_seconds=True):
         minutes = int(floor(_dec))
         _dec = (_dec - int(floor(_dec)))*60
         seconds = _dec
-        fmt = "{0}\xb0{1:0>2d}'"
-        if not no_seconds:
+        if no_seconds:
+            if seconds > 30:
+                if minutes < 59:
+                    minutes += 1
+                else:
+                    minutes = 0
+                    degrees += 1
+
+        fmt = "{0}\xb0"
+        if minutes:
+            fmt += "{1:0>2d}'"
+        if not no_seconds and seconds:
             fmt += '{2:0>2d}"'
         fmt += hemispheres[0] if dec > 0 else hemispheres[1]
         return unicode(fmt).format(degrees, minutes, seconds)
