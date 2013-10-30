@@ -1,12 +1,11 @@
-from markupsafe import Markup
-from pyramid.renderers import render
-from sqlalchemy.orm import class_mapper
-
-from clld.web.util.helpers import JS, dumps
+from clld.web.util.helpers import JS
+from clld.web.util.component import Component
 
 
-class MultiSelect(object):
-    def __init__(self, req, name, eid, collection=None, url=None):
+class MultiSelect(Component):
+    __template__ = 'clld:web/templates/multiselect.mako'
+
+    def __init__(self, req, name, eid, collection=None, url=None, selected=None):
         assert collection or url
         assert not (collection and url)
         self.req = req
@@ -14,15 +13,9 @@ class MultiSelect(object):
         self.url = url
         self.eid = eid
         self.name = name
-        self._options = None
+        self.selected = selected
 
-    @property
-    def options(self):
-        if not self._options:
-            self._options = self.get_options()
-        return self._options
-
-    def get_options(self):
+    def get_default_options(self):
         res = {'placeholder': "Search %s" % self.name, 'width': 'element'}
         if not self.collection:
             res.update(
@@ -41,11 +34,6 @@ class MultiSelect(object):
         return {'id': getattr(obj, 'id', obj.pk), 'text': '%s' % obj}
 
     def render(self, selected=None):
-        return Markup(render(
-            'clld:web/templates/multiselect.mako',
-            {
-                'multiselect': self,
-                'selected': selected or [],
-                'options': Markup(dumps(self.options)),
-            },
-            request=self.req))
+        if selected:
+            self.selected = selected
+        return Component.render(self)
