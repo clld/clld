@@ -5,7 +5,7 @@
     <head>
         <meta charset="utf-8">
         <title>
-            ${request.dataset.name}
+            ${request.dataset.name} -
             <%block name="title"> </%block>
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
