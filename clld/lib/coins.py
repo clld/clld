@@ -152,6 +152,14 @@ FIELDS = {
 
 
 class ContextObject(list, UnicodeMixin):
+    """
+    >>> c = ContextObject('sid', 'journal', ('jtitle', '\xe2'))
+    >>> c.span_attrs()
+    {'class': 'Z3988', 'title': 'ctx_ver=Z39.88-2004&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rfr_id=info%3Asid%2Fsid&rft.jtitle=%C3%A2'}
+    >>> c = ContextObject('sid', 'journal', ('jtitle', u'\xe2'))
+    >>> c.span_attrs()
+    {'class': 'Z3988', 'title': 'ctx_ver=Z39.88-2004&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rfr_id=info%3Asid%2Fsid&rft.jtitle=%C3%A2'}
+    """
     def __init__(self, sid, mtx, *data):
         self.sid = sid
         self.mtx = mtx
@@ -251,7 +259,16 @@ class ContextObject(list, UnicodeMixin):
             ('ctx_ver', 'Z39.88-2004'),
             ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:' + self.mtx),
             ('rfr_id', 'info:sid/' + self.sid)]
-        pairs.extend((pair[0], ('%s' % pair[1]).encode('utf8')) for pair in self)
+        for pair in self:
+            value = '%s' % pair[1]
+            if isinstance(value, unicode):
+                value = value.encode('utf8')
+            else:
+                try:
+                    value.decode('utf8')
+                except UnicodeDecodeError:
+                    value = value.decode('latin1').encode('utf8')
+            pairs.append((pair[0], value))
         return urlencode(pairs)
 
     def span_attrs(self):
