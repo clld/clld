@@ -5,7 +5,7 @@
 ##
 <%def name="contextnavitem(route, label=None)">
     <li class="${'active' if request.matched_route.name == route else ''}">
-        <a href="${request.route_url(route)}">${label or route.capitalize()}</a>
+        <a href="${request.route_url(route)}">${label or _(route.capitalize())}</a>
     </li>
 </%def>
 

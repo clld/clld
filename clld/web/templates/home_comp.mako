@@ -3,10 +3,10 @@
 <%! active_menu_item = "dataset" %>
 
 <%def name="contextnav()">
-    ${util.contextnavitem('legal')}
-    % if list(request.registry.getUtilitiesFor(h.interfaces.IDownload)):
-    ${util.contextnavitem('download')}
-    % endif
-    ${util.contextnavitem('contact')}
+    % for name in 'terms glossary history changes credits legal download contact help'.split():
+        % if name in request.registry.settings['home_comp']:
+        ${util.contextnavitem(name)}
+        % endif
+    % endfor
 </%def>
 ${next.body()}

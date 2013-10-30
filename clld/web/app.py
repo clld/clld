@@ -374,9 +374,6 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_static_view('clld-static', 'clld:web/static')
     config.add_static_view('static', '%s:static' % config.package_name)
 
-    config.add_route_and_view('legal', '/legal', lambda r: {}, renderer='legal.mako')
-    config.add_route_and_view('download', '/download', lambda r: {}, renderer='download.mako')
-    config.add_route_and_view('contact', '/contact', lambda r: {}, renderer='contact.mako')
     config.add_route_and_view('_js', '/_js', js, http_cache=3600)
 
     # add some maintenance hatches
@@ -434,6 +431,39 @@ def get_configurator(pkg, *utilities, **kw):
     maybe_import('%s.assets' % config.package_name)
 
     pkg_dir = path(config.package.__file__).dirname().abspath()
+
+    #
+    # inspect default locations for views and templates:
+    #
+    home_comp = OrderedDict()
+    for name, template in [
+        ('terms', False),
+        ('glossary', False),
+        ('history', False),
+        ('changes', False),
+        ('credits', False),
+        ('legal', True),
+        ('download', True),
+        ('contact', True),
+        ('help', False),
+    ]:
+        home_comp[name] = template
+
+    if pkg_dir.joinpath('templates').exists():
+        for p in pkg_dir.joinpath('templates').files():
+            if p.namebase in home_comp and p.ext == '.mako':
+                home_comp[p.namebase] = True
+
+    views = maybe_import('%s.views' % config.package_name)
+    for name, template in home_comp.items():
+        if template:
+            config.add_route_and_view(
+                name,
+                '/' + name,
+                getattr(views, name, lambda r: {}),
+                renderer=name + '.mako')
+
+    config.add_settings({'home_comp': [k for k in home_comp.keys() if home_comp[k]]})
 
     if 'clld.favicon' not in config.registry.settings:
         favicon = {'clld.favicon': 'clld:web/static/images/favicon.ico'}
