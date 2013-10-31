@@ -325,7 +325,8 @@ class DataTable(Component):
         return self.model.pk
 
     def get_query(self, limit=1000, offset=0):
-        query = self.base_query(DBSession.query(self.model))
+        query = self.base_query(
+            DBSession.query(self.model).filter(self.model.active == True))
         self.count_all = query.count()
 
         for name, val in self.req.params.items():

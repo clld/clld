@@ -204,6 +204,9 @@ def ctx_factory(model, type_, req):
             ctx = req.db.query(model).one()
         else:
             ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
+            if ctx.replacement_id:
+                raise HTTPMovedPermanently(
+                    location=req.resource_url(model.get(ctx.replacement_id)))
         ctx.metadata = get_adapters(interfaces.IMetadata, ctx, req)
         return ctx
     except NoResultFound:

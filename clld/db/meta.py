@@ -120,6 +120,14 @@ class Base(UnicodeMixin):
     def jsondatadict(self):
         return self.jsondata or {}
 
+    @property
+    def replacement_id(self):
+        """This property is meant to allow automatically redirecting to a 'better' version
+        of a resource.
+        """
+        if not self.active:
+            return self.jsondatadict.get('__replacement_id__')
+
     @classmethod
     def get(cls, value, key=None, default=NO_DEFAULT):
         """A convenience method.
