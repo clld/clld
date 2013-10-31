@@ -266,3 +266,5 @@ h1:hover > a.headerlink, h2:hover > a.headerlink, h3:hover > a.headerlink, h4:ho
 .table-nonfluid {
    width: auto !important;
 }
+
+.dataTables_wrapper .span4 {margin-left: 0 !important;}
