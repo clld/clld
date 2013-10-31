@@ -14,7 +14,6 @@ from sqlalchemy.orm import joinedload_all, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
-import transaction
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
@@ -210,6 +209,10 @@ def ctx_factory(model, type_, req):
         ctx.metadata = get_adapters(interfaces.IMetadata, ctx, req)
         return ctx
     except NoResultFound:
+        replacement_id = common.Config.get_replacement_id(model, req.matchdict['id'])
+        if replacement_id:
+            raise HTTPMovedPermanently(
+                location=req.route_url(model.mapper_name().lower(), id=replacement_id))
         raise HTTPNotFound()
 
 

@@ -49,6 +49,27 @@ class Config(Base):
     key = Column(Unicode)
     value = Column(Unicode)
 
+    @staticmethod
+    def replacement_key(model, id_):
+        mapper_name = model if isinstance(model, basestring) else model.mapper_name()
+        return '__%s_%s__' % (mapper_name, id_)
+
+    @classmethod
+    def get_replacement_id(cls, model, id_):
+        """
+        :return: id of a resource registered as replacement for the specified resource.
+        """
+        res = DBSession.query(cls.value)\
+            .filter(cls.key == cls.replacement_key(model, id_)).first()
+        if res:
+            return res[0]
+
+    @classmethod
+    def add_replacement(cls, replaced, replacement, model=None):
+        DBSession.add(cls(
+            key=cls.replacement_key(model or replaced, getattr(replaced, 'id', replaced)),
+            value=getattr(replacement, 'id', replacement)))
+
 
 class IdNameDescriptionMixin(object):
     """id is to be used as string identifier which can be used for sorting and as
@@ -730,6 +751,11 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
     id = Column(String)
     type = Column(String)
     lang = Column(String(3), default='en')
+
+    def url(self):
+        type_ = getattr(IdentifierType, self.type, None)
+        if type_:
+            return type_.args[0].format(self)
 
 
 class LanguageIdentifier(Base, Versioned):
