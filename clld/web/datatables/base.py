@@ -3,13 +3,11 @@ This module provides base classes to compose DataTables, i.e. objects which have
 nature: On the client they provide the information to instantiate a jquery DataTables
 object. Server side they know how to provide the data to the client-side table.
 """
-from json import dumps
 import re
 
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from sqlalchemy.sql.expression import cast
-from markupsafe import Markup
 from zope.interface import implementer
 
 from clld.db.meta import DBSession
