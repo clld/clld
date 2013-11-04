@@ -270,7 +270,13 @@ class ContextObject(list, UnicodeMixin):
                     value = value.decode('latin1')
                     value = value.encode('utf8')
             pairs.append((pair[0], value))
-        return urlencode(pairs)
+        #
+        # TODO: investigate why this happens at all!!
+        #
+        try:
+            return urlencode(pairs)
+        except UnicodeDecodeError:
+            return ''
 
     def span_attrs(self):
         return {'class': 'Z3988', 'title': self.__unicode__()}
