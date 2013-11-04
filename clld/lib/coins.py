@@ -267,7 +267,8 @@ class ContextObject(list, UnicodeMixin):
                 try:
                     value.decode('utf8')
                 except UnicodeDecodeError:
-                    value = value.decode('latin1').encode('utf8')
+                    value = value.decode('latin1')
+                    value = value.encode('utf8')
             pairs.append((pair[0], value))
         return urlencode(pairs)
 
