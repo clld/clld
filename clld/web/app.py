@@ -114,10 +114,13 @@ class ClldRequest(Request):
         if not info['route']:
             # FIXME: hack to cater to deployments under a path prefix
             info = mapper(WebobRequest({'PATH_INFO': re.sub('^\/[a-z]+', '', _path)}))
-        if info['route'] and info['match']:
+        if info['route']:
             for rsc in RESOURCES:
                 if rsc.name == info['route'].name:
-                    return rsc.model.get(info['match']['id'], default=None)
+                    if rsc.name == 'dataset':
+                        return self.dataset
+                    if info['match']:
+                        return rsc.model.get(info['match']['id'], default=None)
 
     def resource_url(self, obj, rsc=None, **kw):
         route, kw = self._route(obj, rsc, **kw)
