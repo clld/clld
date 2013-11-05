@@ -38,7 +38,7 @@ from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
 )
 from clld.web.views.olac import olac, OlacConfig
-from clld.web.views.sitemap import robots, sitemapindex, sitemap
+from clld.web.views.sitemap import robots, sitemapindex, sitemap, resourcemap
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
@@ -390,6 +390,8 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('robots', '/robots.txt', robots)
     config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex)
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
+    config.add_route('resourcemap', '/resourcemap.json')
+    config.add_view(resourcemap, route_name='resourcemap', renderer='json')
 
     # TODO: remove google site verification for personal account! should be configurable!
     config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')

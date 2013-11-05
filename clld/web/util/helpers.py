@@ -26,6 +26,7 @@ from sqlalchemy.orm import joinedload_all
 from markupsafe import Markup
 from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
+from pyramid.interfaces import IRoutesMapper
 
 from clld import interfaces
 from clld import RESOURCES
@@ -38,6 +39,15 @@ from clld.lib import bibtex
 from clld.lib import rdf
 from clld.util import xmlchars
 assert xmlchars
+
+
+def get_url_template(req, route, relative=True):
+    if isinstance(route, basestring):
+        route = req.registry.getUtility(IRoutesMapper).get_route(route)
+
+    res = '' if relative else req.application_url
+    param_pattern = re.compile('\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
+    return res + param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
 
 
 def rdf_namespace_attrs():
