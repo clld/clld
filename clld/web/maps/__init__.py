@@ -195,4 +195,5 @@ class LanguageMap(Map):
             'center': [lang.latitude, lang.longitude],
             'zoom': 3,
             'no_popup': True,
+            'no_link': True,
             'sidebar': True}

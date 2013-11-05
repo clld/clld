@@ -386,8 +386,10 @@ CLLD.Map = function(eid, layers, options) {
         var route = map.options.info_route == undefined ? 'language_alt' : map.options.info_route;
 
         if (map.options.no_popup) {
-            document.location.href = CLLD.route_url(
-                'language', {'id': layer.feature.properties.language.id});
+            if (!map.options.no_link) {
+                document.location.href = CLLD.route_url(
+                    'language', {'id': layer.feature.properties.language.id});
+            }
             return;
         }
 
