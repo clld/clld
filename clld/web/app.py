@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from path import path
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPGone
 from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.response import Response
@@ -214,6 +214,8 @@ def ctx_factory(model, type_, req):
     except NoResultFound:
         replacement_id = common.Config.get_replacement_id(model, req.matchdict['id'])
         if replacement_id:
+            if replacement_id == common.Config.gone:
+                raise HTTPGone()
             raise HTTPMovedPermanently(
                 location=req.route_url(model.mapper_name().lower(), id=replacement_id))
         raise HTTPNotFound()
@@ -448,6 +450,7 @@ def get_configurator(pkg, *utilities, **kw):
     #
     home_comp = OrderedDict()
     for name, template in [
+        ('introduction', False),
         ('terms', False),
         ('glossary', False),
         ('history', False),

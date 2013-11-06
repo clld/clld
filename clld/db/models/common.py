@@ -49,6 +49,8 @@ class Config(Base):
     key = Column(Unicode)
     value = Column(Unicode)
 
+    gone = '__gone__'
+
     @staticmethod
     def replacement_key(model, id_):
         mapper_name = model if isinstance(model, basestring) else model.mapper_name()
@@ -65,10 +67,12 @@ class Config(Base):
             return res[0]
 
     @classmethod
-    def add_replacement(cls, replaced, replacement, model=None):
-        DBSession.add(cls(
+    def add_replacement(cls, replaced, replacement, model=None, session=None):
+        session = session or DBSession
+        value = getattr(replacement, 'id', replacement) if replacement else cls.gone
+        session.add(cls(
             key=cls.replacement_key(model or replaced, getattr(replaced, 'id', replaced)),
-            value=getattr(replacement, 'id', replacement)))
+            value=value))
 
 
 class IdNameDescriptionMixin(object):
