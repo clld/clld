@@ -377,10 +377,17 @@ $(document).ready(function() {
 ###
 ### section
 ###
-<%def name="section(title, level=3, id=None, prefix='sec-')">
-    <% id = id or prefix + slug(title) %>
+<%def name="section(title=None, level=3, id=None, prefix='sec-')">
+    <% id = id or prefix + slug(title or 'none') %>
     <div class="section" id="${id}">
-        <h${level}>${title}<a class="headerlink" href="#${id}" title="Permalink to this headline">¶</a></h${level}>
+        <h${level}>
+            % if title:
+            ${title}
+            % elif hasattr(caller, 'title'):
+            ${caller.title()}
+            % endif
+            <a class="headerlink" href="#${id}" title="Permalink to this headline">¶</a>
+        </h${level}>
         ${caller.body()}
     </div>
 </%def>
