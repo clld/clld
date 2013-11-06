@@ -355,7 +355,9 @@ CLLD.Map = function(eid, layers, options) {
         }
     );
 
-    var i, hash, layer, baseLayers = [
+    var i, hash, layer,
+        local_data = false,
+        baseLayers = [
         "Thunderforest.Landscape",
         "Thunderforest.Transport",
         "OpenStreetMap.Mapnik",
@@ -498,14 +500,19 @@ CLLD.Map = function(eid, layers, options) {
                     }
                 });
             } else {
+                local_data = true;
                 this.layer_map[name].addData(layers[name]);
-                _zoomToExtent();
-                if (this.options.show_labels) {
-                    this.eachMarker(function(marker){marker.showLabel()})
-                }
             }
         }
     }
+
+    if (local_data) {
+        _zoomToExtent();
+        if (this.options.show_labels) {
+            this.eachMarker(function(marker){marker.showLabel()})
+        }
+    }
+
     if (this.options.center) {
         this.map.setView(
             this.options.center,
