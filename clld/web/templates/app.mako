@@ -42,7 +42,7 @@
         <![endif]-->
 
         <link rel="unapi-server" type="application/xml" title="unAPI" href="${request.route_url('unapi')}">
-        <script src="${request.route_url('_js')}"></script>
+        <script src="${request.route_url('_js', _query=request.query_params)}"></script>
         <%block name="head"> </%block>
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">

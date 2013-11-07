@@ -57,6 +57,10 @@ class ClldRequest(Request):
         """
         return URL(self.url)
 
+    @reify
+    def query_params(self):
+        return {k: v[0] for k, v in self.purl.query_params().items()}
+
     @property
     def db(self):
         """We make the db session available as request attribute, so we do not have to

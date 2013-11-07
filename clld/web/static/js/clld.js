@@ -3,7 +3,8 @@
  */
 CLLD = {
     'routes': {},
-    'base_url': ''
+    'base_url': '',
+    'query_params': {}
 };
 
 
@@ -402,11 +403,12 @@ CLLD.Map = function(eid, layers, options) {
         if (layer.feature.properties.popup) {
             _openPopup(layer, layer.feature.properties.popup);
         } else {
+
             $.get(
                 CLLD.route_url(
                     route,
                     {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
-                    map.options.info_query),
+                    $.extend({}, CLLD.query_params, map.options.info_query)),
                 map.options.info_query == undefined ? {} : map.options.info_query,
                 function(data, textStatus, jqXHR) {
                     _openPopup(layer, data);

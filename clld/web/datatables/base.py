@@ -300,6 +300,9 @@ class DataTable(Component):
         return res
 
     def get_default_options(self):
+        query_params = {}
+        query_params.update(self.req.query_params)
+        query_params.update(self.xhr_query() or {})
         return {
             'bServerSide': True,
             'bProcessing': True,
@@ -311,7 +314,7 @@ class DataTable(Component):
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
             'sAjaxSource': self.req.route_url(
-            '%ss' % self.model.mapper_name().lower(), _query=self.xhr_query() or {}),
+            '%ss' % self.model.mapper_name().lower(), _query=query_params),
         }
 
     def base_query(self, query):

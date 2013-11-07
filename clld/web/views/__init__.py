@@ -98,7 +98,10 @@ def datatable_xhr_view(ctx, req):
 def js(req):
     param_pattern = re.compile('\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
 
-    res = ["CLLD.base_url = %s;" % dumps(req.application_url)]
+    res = [
+        "CLLD.base_url = %s;" % dumps(req.application_url),
+        "CLLD.query_params = %s;" % dumps(req.query_params),
+    ]
     for route in req.registry.getUtility(IRoutesMapper).get_routes():
         pattern = param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
         res.append('CLLD.routes[%s] = %s;' % tuple(map(dumps, [route.name, pattern])))

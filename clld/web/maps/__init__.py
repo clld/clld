@@ -164,7 +164,7 @@ class ParameterMap(Map):
                     de.id,
                     de.name,
                     self.req.resource_url(
-                        self.ctx, ext='geojson', _query=dict(domainelement=str(de.id))
+                        self.ctx, ext='geojson', _query=dict(domainelement=str(de.id), **self.req.query_params)
                     ),
                     marker=helpers.map_marker_img(self.req, de, marker=self.map_marker))
         else:
