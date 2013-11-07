@@ -94,7 +94,7 @@ class Values(DataTable):
         if self.language:
             return res + [
                 name_col,
-                LinkCol(self, 'parameter',
+                LinkCol(self, 'parameter', sTitle=self.req.translate('Parameter'),
                         model_col=Parameter.name, get_obj=lambda i: i.valueset.parameter),
                 RefsCol(self, 'source'),
                 #
