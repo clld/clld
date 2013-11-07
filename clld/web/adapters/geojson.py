@@ -118,7 +118,12 @@ class GeoJsonParameter(GeoJson):
     """Render a parameter's values as geojson feature collection.
     """
     def featurecollection_properties(self, ctx, req):
-        return {'name': ctx.name}
+        marker = req.registry.getUtility(interfaces.IMapMarker)
+        return {
+            'name': ctx.name,
+            'domain': [
+                {'icon': marker(de, req), 'id': de.id, 'name': de.name}
+                for de in ctx.domain]}
 
     def feature_iterator(self, ctx, req):
         q = DBSession.query(ValueSet).join(Value).filter(ValueSet.parameter_pk == ctx.pk)\
