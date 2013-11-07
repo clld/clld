@@ -31,6 +31,7 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.orm.query import Query
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -54,7 +55,33 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
+class ActiveOnlyQuery(Query):
+    def get(self, ident):
+        # override get() so that the flag is always checked in the
+        # DB as opposed to pulling from the identity map. - this is optional.
+        return Query.get(self.populate_existing(), ident)
+
+    def __iter__(self):
+        return Query.__iter__(self.private())
+
+    def from_self(self, *ent):
+        # override from_self() to automatically apply
+        # the criterion too.   this works with count() and
+        # others.
+        return Query.from_self(self.private(), *ent)
+
+    def private(self):
+        mzero = self._mapper_zero()
+        if mzero is not None:
+            crit = mzero.class_.active == True
+            return self.enable_assertions(False).filter(crit)
+        else:
+            return self
+
+
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+ActiveOnlyDBSession = scoped_session(sessionmaker(
+    extension=ZopeTransactionExtension(), query_cls=ActiveOnlyQuery))
 VersionedDBSession = scoped_session(versioned_session(
     sessionmaker(autoflush=False, extension=ZopeTransactionExtension())))
 
@@ -129,13 +156,14 @@ class Base(UnicodeMixin):
             return self.jsondatadict.get('__replacement_id__')
 
     @classmethod
-    def get(cls, value, key=None, default=NO_DEFAULT):
+    def get(cls, value, key=None, default=NO_DEFAULT, session=None):
         """A convenience method.
         """
+        session = session or DBSession
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
         try:
-            return DBSession.query(cls).filter_by(**{key: value}).one()
+            return session.query(cls).filter_by(**{key: value}).one()
         except (NoResultFound, MultipleResultsFound):
             if default is NO_DEFAULT:
                 raise
