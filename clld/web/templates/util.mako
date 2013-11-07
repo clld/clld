@@ -189,7 +189,6 @@ $(document).ready(function() {
 ##
 <%def name="history(obj_)">
     <% versions = obj_.history().all() %>
-    % if versions:
     <%self:well title="History">
         <table>
             <tbody>
@@ -206,7 +205,6 @@ $(document).ready(function() {
             </tbody>
         </table>
     </%self:well>
-    % endif
 </%def>
 
 ##
