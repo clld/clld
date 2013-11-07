@@ -13,6 +13,12 @@ SVG_PIE_TEMPLATE = """\
 SVG_PATH_TEMPLATE = '    <path fill="%s" d="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>'
 SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>'
 
+#<polygon points="200,10 250,190 160,210" fill="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>
+#    "s": path.rect(8, 8, 24, 24),  # square -> 6.8,6.8 27.2,6.8 27.2,27.2 6.8,27.2
+#    "t": polygon((2, 4), (38, 4), (20, 35)),  # triangle (pyramid) ->
+#    "f": polygon((2, 36), (38, 36), (20, 5)),  # inverted pyramid
+#    "d": polygon((20, 2), (38, 20), (20, 38), (2, 20)),  # diamond
+
 
 def pie(data, colors, width=34):
     """
