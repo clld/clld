@@ -1,7 +1,7 @@
 from path import path
 
 
-SERVERS = ['cldbstest', 'clld1', 'clld3']
+SERVERS = ['cldbstest', 'clld1', 'clld3', 'clld2']
 
 
 def repos(name):
@@ -83,6 +83,7 @@ class App(object):
 
 
 APPS = dict((app.name, app) for app in [
+    App('valpal', 8892, test=SERVERS[2], production=SERVERS[3]),
     App('waab', 8891, test=SERVERS[0], production=SERVERS[2]),
     App('phoible', 8890, domain='phoible.org', test=SERVERS[1], production=SERVERS[2]),
     App('glottologcurator', 8889, test=SERVERS[1], workers=1, dependencies=['glottolog3']),
