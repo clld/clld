@@ -384,6 +384,7 @@ $(document).ready(function() {
             % elif hasattr(caller, 'title'):
             ${caller.title()}
             % endif
+            <a href="#top" title="go to top of the page" style="vertical-align: bottom"><i class="icon icon-upload"> </i></a>
             <a class="headerlink" href="#${id}" title="Permalink to this headline">¶</a>
         </h${level}>
         ${caller.body()}
