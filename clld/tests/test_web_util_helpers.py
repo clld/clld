@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals
 from mock import Mock, patch, MagicMock
 
 from clld.tests.util import TestWithEnv
@@ -95,6 +97,16 @@ class Tests(TestWithEnv):
         with self.utility(Mock(return_value='url'), IFrequencyMarker):
             format_frequency(self.env['request'], common.Value.first())
 
+    def test_format_coordinates(self):
+        from clld.web.util.helpers import format_coordinates
+
+        r = unicode(format_coordinates(Mock(latitude=5.333333333333, longitude=-9.999)))
+        assert "5°20" in r
+        assert "10°W" in r
+        format_coordinates(Mock(latitude=5.333, longitude=-9.99), no_seconds=False)
+        assert format_coordinates(common.Language.get('l2')) == ''
+        assert format_coordinates(common.Language.get('language')) != ''
+
     def test_get_downloads(self):
         from clld.web.util.helpers import get_rdf_dumps, get_downloads
 
@@ -112,11 +124,6 @@ class Tests(TestWithEnv):
     def test_language_identifier(self):
         from clld.web.util.helpers import language_identifier
 
+        assert language_identifier(None, None) == ''
         for identifier in common.Language.get('language').identifiers:
             language_identifier(self.env['request'], identifier)
-
-    def test_format_coordinates(self):
-        from clld.web.util.helpers import format_coordinates
-
-        assert format_coordinates(common.Language.get('l2')) == ''
-        assert format_coordinates(common.Language.get('language')) != ''

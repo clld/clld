@@ -178,9 +178,7 @@ class LinkCol(Col):
 
     def format(self, item):
         obj = self.get_obj(item)
-        if obj:
-            return link(self.dt.req, obj, **self.get_attrs(item))
-        return ''
+        return link(self.dt.req, obj, **self.get_attrs(item)) if obj else ''
 
 
 class IdCol(LinkCol):
@@ -190,7 +188,8 @@ class IdCol(LinkCol):
         return {'label': self.get_obj(item).id}
 
     def search(self, qs):
-        return self.model_col.__eq__(qs)
+        if self.model_col:
+            return self.model_col.__eq__(qs)
 
 
 class IntegerIdCol(IdCol):

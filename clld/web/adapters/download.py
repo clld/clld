@@ -203,7 +203,7 @@ class RdfXmlDump(Download):
 class Sqlite(Download):
     ext = 'sqlite'
 
-    def create(self, req):
+    def create(self, req):  # pragma: no cover
         print '+---------------------------------------------+'
         print '| This download must be created "by hand".'
         print '| Make sure a suitable file is available at'

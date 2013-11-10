@@ -55,7 +55,11 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-class ActiveOnlyQuery(Query):
+class ActiveOnlyQuery(Query):  # pragma: no cover
+    """
+    from a sqlalchemy recipe
+    TODO: include URL
+    """
     def get(self, ident):
         # override get() so that the flag is always checked in the
         # DB as opposed to pulling from the identity map. - this is optional.

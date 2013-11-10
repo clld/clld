@@ -44,10 +44,10 @@ assert xmlchars
 def get_url_template(req, route, relative=True):
     if isinstance(route, basestring):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
-
-    res = '' if relative else req.application_url
-    param_pattern = re.compile('\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
-    return res + param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
+    if route:
+        res = '' if relative else req.application_url
+        param_pattern = re.compile('\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
+        return res + param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
 
 
 def rdf_namespace_attrs():
@@ -158,12 +158,11 @@ def format_coordinates(obj, no_seconds=True):
                 else:
                     minutes = 0
                     degrees += 1
-
         fmt = "{0}\xb0"
         if minutes:
             fmt += "{1:0>2d}'"
         if not no_seconds and seconds:
-            fmt += '{2:0>2d}"'
+            fmt += '{2:0>2f}"'
         fmt += hemispheres[0] if dec > 0 else hemispheres[1]
         return unicode(fmt).format(degrees, minutes, seconds)
 
@@ -394,6 +393,9 @@ def contactmail(req, ctx=None, title='contact maintainer'):
 
 
 def newline2br(text):
+    """
+    >>> assert newline2br(None) == ''
+    """
     if not text:
         return ''
     chunks = []

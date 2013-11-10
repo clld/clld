@@ -112,6 +112,14 @@ class Tests(TestWithDb):
         v.unitparameter_pk = p1.pk
         DBSession.flush()
 
+    def test_Identifier(self):
+        from clld.db.models.common import Identifier, IdentifierType
+
+        i = Identifier(id='a', name='a', type=IdentifierType.iso.value)
+        assert i.url()
+        i = Identifier(id='a', name='a', type='xxx')
+        assert i.url() is None
+
 
 class MoreTests(TestWithDbAndData):
     def test_Contribution(self):

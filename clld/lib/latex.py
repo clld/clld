@@ -81,7 +81,7 @@ def _registry(encoding):
     return (Codec().encode, Codec().decode, StreamReader, StreamWriter)
 
 
-def _tokenize(tex):
+def _tokenize(tex):  # pragma: no cover
     """Convert latex source into sequence of single-token substrings."""
     start = 0
     try:
@@ -127,7 +127,7 @@ def _tokenize(tex):
                     pos += 1
 
 
-class _unlatex:
+class _unlatex:  # pragma: no cover
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
     def __iter__(self):
         """Turn self into an iterator.  It already is one, nothing to do."""

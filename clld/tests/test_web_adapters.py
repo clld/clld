@@ -2,7 +2,7 @@ import os
 import unittest
 from tempfile import mktemp
 
-from mock import Mock
+from mock import Mock, MagicMock, patch
 
 from clld.interfaces import IIndex, IRepresentation
 from clld.db.models.common import Contribution, Parameter, Language, Dataset, Source
@@ -10,6 +10,11 @@ from clld.tests.util import TestWithEnv
 
 
 class Tests(TestWithEnv):
+    def test_download_dir(self):
+        from clld.web.adapters.download import download_dir
+
+        assert download_dir('clld')
+
     def testDownload(self):
         from clld.web.adapters.download import Download
 
@@ -31,6 +36,24 @@ class Tests(TestWithEnv):
         dl = TestDownload(Source, 'clld', ext='rdf')
         dl.create(self.env['request'], verbose=False)
         os.remove(dl.abspath(self.env['request']))
+
+    def testDownload2(self):
+        from clld.web.adapters.download import CsvDump, N3Dump, RdfXmlDump
+
+        with patch.multiple(
+            'clld.web.adapters.download',
+            GzipFile=MagicMock(),
+            ZipFile=MagicMock(),
+            path=Mock(return_value=Mock(
+                dirname=Mock(return_value=Mock(exists=Mock(return_value=False))))),
+        ):
+            dl = CsvDump(Language, 'clld')
+            dl.create(self.env['request'], verbose=False)
+            dl.create(self.env['request'], filename='name.n3', verbose=False)
+            dl = N3Dump(Language, 'clld')
+            dl.create(self.env['request'], verbose=False)
+            dl = RdfXmlDump(Language, 'clld')
+            dl.create(self.env['request'], verbose=False)
 
     def test_BibTex(self):
         from clld.web.adapters import BibTex

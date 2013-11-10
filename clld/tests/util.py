@@ -172,8 +172,11 @@ class TestWithDbAndData(TestWithDb):
             original_script='a morpheme',
             language=language,
             jsondata={'alt_translation': 'Spanish: ...'})
-        sr = common.SentenceReference(sentence=sentence, source=source)
+        common.SentenceReference(sentence=sentence, source=source)
         DBSession.add(common.Config(key='key', value='value'))
+
+        common.Config.add_replacement('replaced', 'language', model=common.Language)
+        common.Config.add_replacement('gone', None, model=common.Language)
         DBSession.flush()
 
 

@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals
 import unittest
 
 from mock import Mock
@@ -6,6 +8,11 @@ from clld.tests.util import TESTS_DIR
 
 
 class Tests(unittest.TestCase):
+    def test_unescape(self):
+        from clld.lib.bibtex import unescape
+
+        assert unescape(r"\ss ") == 'ß'
+
     def test_Record(self):
         from clld.lib.bibtex import Record, EntryType
 
@@ -50,3 +57,4 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(db), 0)
         db = Database.from_file(TESTS_DIR.joinpath('test.bib'))
         self.assertEqual(len(db), 1)
+        assert [r for r in db]

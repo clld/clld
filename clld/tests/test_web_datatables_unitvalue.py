@@ -32,10 +32,10 @@ class Tests(TestWithEnv):
         from clld.web.datatables.unitvalue import Unitvalues
 
         param = common.UnitParameter.first()
-        self.handle_dt(Unitvalues, common.UnitValue, parameter=param)
-        self.set_request_properties(params=dict(parameter=param.id, sSearch_0='s'))
+        self.handle_dt(Unitvalues, common.UnitValue, unitparameter=param)
+        self.set_request_properties(params=dict(unitparameter=param.id, sSearch_0='s'))
         self.handle_dt(Unitvalues, common.UnitValue)
-        self.set_request_properties(params=dict(parameter='up2', sSearch_0='s'))
+        self.set_request_properties(params=dict(unitparameter='up2', sSearch_0='s'))
         self.handle_dt(Unitvalues, common.UnitValue)
 
     def test_Unitvalues_with_unit(self):

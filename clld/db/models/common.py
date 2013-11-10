@@ -757,9 +757,10 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
     lang = Column(String(3), default='en')
 
     def url(self):
-        type_ = getattr(IdentifierType, self.type, None)
-        if type_:
-            return type_.args[0].format(self)
+        try:
+            return IdentifierType.from_string(self.type).args[0].format(self)
+        except ValueError:
+            return
 
 
 class LanguageIdentifier(Base, Versioned):

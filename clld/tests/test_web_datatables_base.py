@@ -8,7 +8,7 @@ from clld.db.models import common
 class Tests(TestWithEnv):
     def test_DataTable(self):
         from clld.web.datatables.base import (
-            DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol,
+            DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IntegerIdCol, IdCol,
         )
 
         class TestTable(DataTable):
@@ -20,7 +20,10 @@ class Tests(TestWithEnv):
                     LinkCol(self, 'link'),
                     Col(self, 'active'),
                     Col(self, 'name', model_col=None),
-                    Col(self, 'description')]
+                    Col(self, 'description', format=lambda i: 'x'),
+                    IntegerIdCol(self, 'id'),
+                    IdCol(self, 'nid',
+                          get_object=lambda i: i, model_col=common.Contributor.id)]
 
         dt = TestTable(self.env['request'], common.Contributor)
         assert unicode(dt) == 'Contributors'
@@ -35,6 +38,18 @@ class Tests(TestWithEnv):
             'iSortingCols': '1',
             'iSortCol_0': '0',
             'sSortDir_0': 'desc'})
+        self.handle_dt(TestTable, common.Contributor)
+
+        self.set_request_properties(params={'iSortingCols': 'x'})
+        self.handle_dt(TestTable, common.Contributor)
+
+        self.set_request_properties(params={'iSortingCols': '1', 'iSortCol_0': '7'})
+        self.handle_dt(TestTable, common.Contributor)
+
+        self.set_request_properties(params={'sSearch_7': '1'})
+        self.handle_dt(TestTable, common.Contributor)
+
+        self.set_request_properties(params={'sSearch_8': 'id'})
         self.handle_dt(TestTable, common.Contributor)
 
     def test_DataTable2(self):

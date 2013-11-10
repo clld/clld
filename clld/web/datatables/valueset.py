@@ -11,16 +11,6 @@ from clld.web.datatables.base import (
 from clld.web.util.helpers import linked_references
 
 
-class ParameterCol(LinkCol):
-    def get_obj(self, item):
-        return item.parameter
-
-
-class _LinkToMapCol(LinkToMapCol):
-    def get_obj(self, item):
-        return item.language
-
-
 class RefsCol(Col):
     def format(self, item):
         return linked_references(self.dt.req, item)

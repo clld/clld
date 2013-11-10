@@ -27,7 +27,12 @@ class Tests(unittest.TestCase):
         client.server = MagicMock()
         client.set_categories([{'name': 'cat', 'description': 'desc'}])
         client.set_categories([{'name': 'cat', 'description': 'desc'}], post_id=3)
-        client.create_post('title', 'content', date=1, tags=['tag'], custom_fields={'a': 'x'})
+        client.create_post(
+            'title', 'content',
+            date=1,
+            tags=['tag'],
+            custom_fields={'a': 'x'},
+            categories=[{'name': 'cat', 'description': 'desc'}])
 
         client.server = MagicMock(wp=Mock(getCategories=Mock(return_value=[{
             'categoryName': 'n', 'categoryId': '1'}])))

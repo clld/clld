@@ -343,7 +343,7 @@ def get_template_variables(app, monitor_mode=False, with_blog=False):
         bloguser='',
         blogpassword='')
 
-    if with_blog:
+    if with_blog:  # pragma: no cover
         for key, default in [
             ('bloghost', 'blog.%s' % app.domain), ('bloguser', app.name)
         ]:
@@ -377,7 +377,7 @@ def supervisor(app, command, template_variables=None):
     time.sleep(1)
 
 
-def require_bibutils(app):
+def require_bibutils(app):  # pragma: no cover
     """
     tar -xzvf bibutils_5.0_src.tgz -C /home/{app.name}
     cd /home/{app.name}/bibutils_5.0
@@ -395,7 +395,7 @@ def require_bibutils(app):
 
 
 @task
-def uninstall(app):
+def uninstall(app):  # pragma: no cover
     for file_ in [app.supervisor, app.nginx_location, app.nginx_site]:
         if exists(file_):
             sudo('rm %s' % file_)
@@ -442,7 +442,7 @@ def copy_files(app):
     local('tar -C %s -czf %s files' % (data_dir, tarball))
     require.files.file(tarball, source=tarball)
     if os.path.exists(tarball):
-        os.remove(tarball)
+        os.remove(tarball)  # pragma: no cover
     with cd('/tmp'):
         tarfile = tarball.split('/')[2]
         sudo('tar -xzf %s' % tarfile)
@@ -451,7 +451,7 @@ def copy_files(app):
             sudo('cp -ru files/* %s' % target)
             sudo('rm -rf files')
         else:
-            sudo('mv files %s' % app.www)
+            sudo('mv files %s' % app.www)  # pragma: no cover
         sudo('chown -R root:root %s' % target)
         sudo('rm %s' % tarfile)
         sudo('tree %s' % app.www)
@@ -487,10 +487,8 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
     with virtualenv(app.venv):
         sudo('pip install -U pip')
         require.python.package('gunicorn', use_sudo=True)
-        install_repos('clld')
-        for repos in getattr(app, 'dependencies', []):
+        for repos in ['clld'] + getattr(app, 'dependencies', []) + [app.name]:
             install_repos(repos)
-        install_repos(app.name)
         sudo('webassets -m %s.assets build' % app.name)
 
     require_bibutils(app)
@@ -563,7 +561,7 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
 
 
 @task
-def run_script(app, script_name, *args):
+def run_script(app, script_name, *args):  # pragma: no cover
     with cd(app.home):
         sudo(
             '%s %s %s#%s %s' % (
@@ -577,7 +575,7 @@ def run_script(app, script_name, *args):
 
 
 @task
-def create_downloads(app):
+def create_downloads(app):  # pragma: no cover
     dl_dir = app.src.joinpath(app.name, 'static', 'download')
     require.files.directory(dl_dir, use_sudo=True, mode="777")
     # run the script to create the exports from the database as glottolog3 user

@@ -11,6 +11,8 @@ class Tests(TestWithApp):
 
     def test_sitemap(self):
         self.app.get('/sitemap.language.0.xml', status=200)
+        self.app.get('/resourcemap.json?rsc=language', status=200)
+        self.app.get('/resourcemap.json?rsc=xxx', status=404)
 
     def test_dataset(self):
         self.app.get('/', status=200)
@@ -22,6 +24,7 @@ class Tests(TestWithApp):
             if not rsc.with_index:  # exclude the special case dataset
                 continue
             self.app.get('/{0}s/{0}'.format(rsc.name), status=200)
+            self.app.get('/{0}s/{0}.snippet.html'.format(rsc.name), status=200)
             self.app.get('/{0}s/{0}.rdf'.format(rsc.name), status=200)
             self.app.get('/%ss' % rsc.name, status=200)
             self.app.get('/%ss.rdf' % rsc.name, status=200)
@@ -32,3 +35,7 @@ class Tests(TestWithApp):
             self.app.get('/sources/source.' + ext, status=200)
             self.app.get('/sources.' + ext, status=200)
         self.app.get('/sources.rdf?sEcho=1', status=200)
+
+    def test_replacement(self):
+        self.app.get('/languages/replaced', status=301)
+        self.app.get('/languages/gone', status=410)
