@@ -13,7 +13,7 @@ from zope.interface import implementer
 from clld.db.meta import DBSession
 from clld.db.util import icontains
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import link, button, icon, JS_CLLD
+from clld.web.util.helpers import link, button, icon, JS_CLLD, external_link
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 from clld.util import cached_property
@@ -158,6 +158,17 @@ class Col(object):
         if getattr(self, '_format'):
             return self._format(item)
         return self.format_value(self.get_value(item))
+
+
+class ExternalLinkCol(Col):
+    __kw__ = {'bSearchable': False, 'bSortable': False}
+
+    def get_attrs(self, item):
+        return {}
+
+    def format(self, item):
+        url = getattr(self.get_obj(item), 'url', None)
+        return external_link(url, **self.get_attrs(item)) if url else ''
 
 
 class PercentCol(Col):
