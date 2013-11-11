@@ -444,10 +444,11 @@ class Record(OrderedDict, _Convertable):
         if self.get('editor'):
             editors = self['editor']
             affix = 'eds' if ' and ' in editors or '&' in editors else 'ed'
+            editors = " %s (%s.)" % (editors, affix)
         else:
-            editors, affix = None, None
+            editors = None
 
-        res = [self.get('author', self.get('editor')), self.get('year', 'n.d')]
+        res = [self.get('author', editors), self.get('year', 'n.d')]
         if genre == 'book':
             res.append(self.get('booktitle') or self.get('title'))
             res.append(', '.join(filter(None, [self.get('series'), self.get('volume')])))
@@ -467,7 +468,7 @@ class Record(OrderedDict, _Convertable):
             prefix = 'In'
             atom = ''
             if editors:
-                atom += " %s (%s.)" % (editors, affix)
+                atom += editors
             if self.get('booktitle'):
                 if atom:
                     atom += ','
@@ -476,8 +477,9 @@ class Record(OrderedDict, _Convertable):
                 atom += ", %s" % self['pages']
             res.append(prefix + atom)
         else:
-            if editors:
-                res.append("In %s (%s.)" % (editors, affix))
+            # check for author to make sure we haven't included the editors yet.
+            if editors and self.get('author'):
+                res.append("In %s" % editors)
 
             for attr in ['school', 'journal', 'volume']:
                 if self.get(attr):
