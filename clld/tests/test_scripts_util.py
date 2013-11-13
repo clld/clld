@@ -12,7 +12,7 @@ class Tests(unittest.TestCase):
     def test_bibtex2source(self):
         from clld.scripts.util import bibtex2source
 
-        bibtex2source(Record('book', 'id', title='tb', custom='cf', year="1920}"))
+        bibtex2source(Record('book', 'id', title='tb', customfield='cf', year="1920}"))
 
     def test_parsed_args(self):
         from clld.scripts.util import parsed_args

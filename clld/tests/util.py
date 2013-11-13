@@ -88,6 +88,8 @@ class TestWithDbAndData(TestWithDb):
             domain='clld',
             jsondata={'license_icon': 'cc-by'}))
 
+        DBSession.add(common.Source(
+            id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))
         source = common.Source(id='source')
         contributors = {
             'contributor': 'A Name',
@@ -95,7 +97,7 @@ class TestWithDbAndData(TestWithDb):
             'c': 'c Name',
             'd': 'd Name'}
         for id_, name in contributors.items():
-            contributors[id_] = common.Contributor(id=id_, name=name)
+            contributors[id_] = common.Contributor(id=id_, name=name, url='http://example.org')
 
         contribution = common.Contribution(id='contribution', name='Contribution')
         cr = common.ContributionReference(contribution=contribution, source=source)

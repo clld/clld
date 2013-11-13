@@ -92,7 +92,7 @@ APPS = dict((app.name, app) for app in [
     App('apics', 8886, domain='apics-online.info', test=SERVERS[0], production=SERVERS[1]),
     App('cgj', 8884, test=SERVERS[0], production=SERVERS[1]),
     App('wow', 8883, test=SERVERS[1]),
-    App('ewave', 8882, test=SERVERS[1], production=SERVERS[2]),
+    App('ewave', 8882, domain='ewave-atlas.org', test=SERVERS[1], production=SERVERS[2]),
     App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=5, test=SERVERS[1], production=SERVERS[0]),
     App('solr', 8080),
 ])

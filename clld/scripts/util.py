@@ -25,17 +25,13 @@ from clld.lib import bibtex
 
 def bibtex2source(rec):
     year = bibtex.unescape(rec.get('year', 'nd'))
-    if year.endswith('}'):
-        year = year[:-1]
     fields = {}
     jsondata = {}
     for field in bibtex.FIELDS:
         if field in rec:
             value = bibtex.unescape(rec[field])
-            if hasattr(common.Source, field):
-                fields[field] = value
-            else:
-                jsondata[field] = value
+            container = fields if hasattr(common.Source, field) else jsondata
+            container[field] = value
 
     return common.Source(
         id=slug(rec.id),

@@ -328,7 +328,7 @@ def create_file_as_root(path, content, **kw):
 
 def get_template_variables(app, monitor_mode=False, with_blog=False):
     if monitor_mode and not os.environ.get('NEWRELIC_API_KEY'):
-        print('--> Warning: no newrelic api key found in environment')
+        print('--> Warning: no newrelic api key found in environment')  # pragma: no cover
 
     res = dict(
         app=app,

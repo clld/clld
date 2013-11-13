@@ -15,7 +15,7 @@ class Tests(TestWithApp):
         self.app.get('/resourcemap.json?rsc=xxx', status=404)
 
     def test_dataset(self):
-        self.app.get('/', status=200)
+        self.app.get('/?__admin__=1', status=200)
         self.app.get('/', accept='application/rdf+xml', status=200)
         self.app.get('/void.md.ris', status=200)
 
@@ -39,3 +39,4 @@ class Tests(TestWithApp):
     def test_replacement(self):
         self.app.get('/languages/replaced', status=301)
         self.app.get('/languages/gone', status=410)
+        self.app.get('/sources/replaced', status=301)
