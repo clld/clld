@@ -58,6 +58,10 @@ class ClldRequest(Request):
         return URL(self.url)
 
     @reify
+    def admin(self):
+        return '__admin__' in self.params
+
+    @reify
     def query_params(self):
         return {k: v[0] for k, v in self.purl.query_params().items()}
 
@@ -130,6 +134,13 @@ class ClldRequest(Request):
         route, kw = self._route(obj, rsc, **kw)
         return self.route_url(route, **kw)
 
+    def route_url(self, route, *args, **kw):
+        if self.admin:
+            if '_query' not in kw:
+                kw['_query'] = {}
+            kw['_query']['__admin__'] = '1'
+        return Request.route_url(self, route, *args, **kw)
+
     def resource_path(self, obj, rsc=None, **kw):
         route, kw = self._route(obj, rsc, **kw)
         return self.route_path(route, **kw)
@@ -200,6 +211,10 @@ def ctx_factory(model, type_, req):
     DataTable incorporating all information to retrieve an appropriately filtered list
     of model instances.
     """
+    def replacement(id_):
+        raise HTTPMovedPermanently(
+            location=req.route_url(model.mapper_name().lower(), id=id_))
+
     if type_ == 'index':
         datatable = req.registry.getUtility(
             interfaces.IDataTable, name=req.matched_route.name)
@@ -211,8 +226,7 @@ def ctx_factory(model, type_, req):
         else:
             ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
             if ctx.replacement_id:
-                raise HTTPMovedPermanently(
-                    location=req.resource_url(model.get(ctx.replacement_id)))
+                return replacement(ctx.replacement_id)
         ctx.metadata = get_adapters(interfaces.IMetadata, ctx, req)
         return ctx
     except NoResultFound:
@@ -220,8 +234,7 @@ def ctx_factory(model, type_, req):
         if replacement_id:
             if replacement_id == common.Config.gone:
                 raise HTTPGone()
-            raise HTTPMovedPermanently(
-                location=req.route_url(model.mapper_name().lower(), id=replacement_id))
+            return replacement(replacement_id)
         raise HTTPNotFound()
 
 
