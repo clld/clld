@@ -93,7 +93,7 @@ location /{app.name}/static/ {{
 
 SITE_TEMPLATE = """\
 server {{
-    server_name  www.{app.domain};
+    server_name  *.{app.domain};
     return       301 http://{app.domain}$request_uri;
 }}
 
