@@ -243,7 +243,7 @@ def external_link(url, label=None, inverted=False, **kw):
 
 
 def gbs_link(source, pages=None):
-    if not source.google_book_search_id or not source.jsondata or not source.jsondata.get('gbs'):
+    if not source or not source.google_book_search_id or not source.jsondata or not source.jsondata.get('gbs'):
         return ''
     if source.jsondata['gbs']['accessInfo']['viewability'] in ['NO_PAGES']:
         return ''
