@@ -318,7 +318,7 @@ def hashpw(pw):
 
 
 def install_repos(name):
-    sudo('pip install -e git+%s#egg=%s' % (config.repos(name), name))
+    sudo('pip install --use-mirrors -e git+%s#egg=%s' % (config.repos(name), name))
 
 
 def create_file_as_root(path, content, **kw):
@@ -485,7 +485,7 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
     require.files.directory(app.logs, use_sudo=True)
 
     with virtualenv(app.venv):
-        sudo('pip install -U pip')
+        sudo('pip install --use-mirrors -U pip')
         require.python.package('gunicorn', use_sudo=True)
         for repos in ['clld'] + getattr(app, 'dependencies', []) + [app.name]:
             install_repos(repos)
