@@ -211,7 +211,7 @@ class Dataset(Base,
     publisher_place = Column(Unicode, default=u"Leipzig")
     publisher_url = Column(String, default="http://www.eva.mpg.de")
     license = Column(
-        String, default="http://creativecommons.org/licenses/by-sa/3.0/")
+        String, default="http://creativecommons.org/licenses/by/3.0/")
     domain = Column(String, nullable=False)
     contact = Column(String)
 
