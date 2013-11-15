@@ -136,7 +136,7 @@ def format_gbs_identifier(source):
     return source.gbs_identifier.replace(':', '-') if source.gbs_identifier else source.pk
 
 
-def format_coordinates(obj, no_seconds=True):
+def format_coordinates(obj, no_seconds=True, wgs_link=True):
     """
     WGS84
     53° 33' 2" N, 9° 59' 36" E
@@ -175,7 +175,7 @@ def format_coordinates(obj, no_seconds=True):
                     'Coordinates ',
                     external_link(
                         'http://en.wikipedia.org/wiki/World_Geodetic_System_1984',
-                        label="WGS84")),
+                        label="WGS84") if wgs_link else ''),
                 HTML.td(
                     HTML.span('%s, %s' % (
                         degminsec(obj.latitude, 'NS'), degminsec(obj.longitude, 'EW'))),
