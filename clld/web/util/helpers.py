@@ -435,18 +435,19 @@ def linked_contributors(req, contribution):
 def linked_references(req, obj):
     chunks = []
     for i, ref in enumerate(getattr(obj, 'references', [])):
-        gbs = gbs_link(ref.source, pages=ref.description)
-        if i > 0:
-            chunks.append('; ')
-        chunks.append(HTML.span(
-            link(req, ref.source),
-            HTML.span(
-                ': %s' % ref.description if ref.description else '',
-                class_='pages'),
-            ' ' if gbs else '',
-            gbs,
-            class_='citation',
-        ))
+        if ref.source:
+            gbs = gbs_link(ref.source, pages=ref.description)
+            if i > 0:
+                chunks.append('; ')
+            chunks.append(HTML.span(
+                link(req, ref.source),
+                HTML.span(
+                    ': %s' % ref.description if ref.description else '',
+                    class_='pages'),
+                ' ' if gbs else '',
+                gbs,
+                class_='citation',
+            ))
     if chunks:
         return HTML.span(*chunks)
     return ''
