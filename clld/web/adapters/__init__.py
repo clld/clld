@@ -135,7 +135,7 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
     """
     adapters = dict(get_adapters(interface, ctx, req))
 
-    if not ext and not name and (not req.accept or str(req.accept) == '*/*'):
+    if not ext and not name and (not req.accept or '*/*' in str(req.accept)):
         # force text/html in case there are no specific criteria to decide
         ext = 'html'
 
