@@ -147,7 +147,8 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
         adapter = adapters.get(name)
     else:
         # or by content negotiation
-        adapter = adapters.get(req.accept.best_match(adapters.keys()))
+        mimetypes = [mt for mt in adapters.keys() if mt != 'application/vnd.ms-excel']
+        adapter = adapters.get(req.accept.best_match(mimetypes))
 
     if isinstance(adapter, list):
         if adapter:
