@@ -112,4 +112,11 @@ def resourcemap(req):
                     'identifiers': [
                         {'type': c.type, 'identifier': c.name} for c in codes]})
             return res
+        if rsc == 'parameter':
+            for id, name in DBSession.query(
+                common.Parameter.id,
+                common.Parameter.name,
+            ).order_by(common.Parameter.pk):
+                res['resources'].append({'id': id, 'name': name})
+            return res
     return HTTPNotFound()
