@@ -16,7 +16,7 @@ for k, v in config.APPS.items():
 
 def url(app, path='/', **query):
     u = URL(host=APPS[app], path=path, query=query)
-    return u.query_params(query)
+    return str(u.query_params(query))
 
 
 def json(app, **kw):
