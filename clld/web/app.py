@@ -23,7 +23,7 @@ from pyramid.response import Response
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
-from pyramid.renderers import JSON
+from pyramid.renderers import JSON, JSONP
 from purl import URL
 
 import clld
@@ -35,7 +35,7 @@ from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.views import (
-    index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
+    index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone, combined,
 )
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap, resourcemap
@@ -352,6 +352,11 @@ def get_configurator(pkg, *utilities, **kw):
     json_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
     config.add_renderer('json', json_renderer)
 
+    jsonp_renderer = JSONP(param_name='callback')
+    jsonp_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
+    jsonp_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
+    config.add_renderer('jsonp', jsonp_renderer)
+
     for name, pattern in routes:
         config.add_route(name, pattern)
 
@@ -364,8 +369,10 @@ def get_configurator(pkg, *utilities, **kw):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
-    config.add_settings(
-        {'pyramid.default_locale_name': 'en', 'clld.pkg': config.package_name})
+    config.add_settings({
+        'pyramid.default_locale_name': 'en',
+        'clld.pkg': config.package_name,
+        'clld.parameters': {}})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files
         abspath = path(config.registry.settings['clld.files']).abspath()
@@ -413,7 +420,9 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('sitemapindex', '/sitemap.xml', sitemapindex)
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
     config.add_route('resourcemap', '/resourcemap.json')
-    config.add_view(resourcemap, route_name='resourcemap', renderer='json')
+    config.add_view(resourcemap, route_name='resourcemap', renderer='jsonp')
+
+    config.add_route_and_view('combined', '/combined', combined, renderer='combined.mako')
 
     # TODO: remove google site verification for personal account! should be configurable!
     config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')

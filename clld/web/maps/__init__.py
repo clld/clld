@@ -1,3 +1,5 @@
+import requests
+
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
@@ -197,3 +199,46 @@ class LanguageMap(Map):
             'no_popup': True,
             'no_link': True,
             'sidebar': True}
+
+
+def layers(spec, size, zindex=0):
+    app, pid, url = spec
+
+    def normalize(geojson):
+        for f in geojson['features']:
+            f['properties']['icon_size'] = size
+            f['properties']['zindex'] = zindex
+            if f['geometry']['coordinates'][0] > 180:
+                f['geometry']['coordinates'][0] = f['geometry']['coordinates'][0] - 360
+        return geojson
+
+    geojson = requests.get(url + '.geojson').json()
+    id_ = '-'.join([app, pid])
+
+    if geojson['properties']['domain'] and not geojson['features']:
+        for de in geojson['properties']['domain']:
+            yield Layer(
+                '-'.join([id_, de['id']]),
+                '%s: %s - %s' % (app, geojson['properties']['name'], de['name']),
+                normalize(requests.get(url + '.geojson?domainelement=' + de['id']).json()),
+                size=size,
+                link=url,
+                marker=HTML.img(src=de['icon'], width=size, height=size))
+    else:
+        yield Layer(
+            id_,
+            '%s: %s' % (app, geojson['properties']['name']),
+            normalize(geojson),
+            size=size,
+            link=url,
+            domain=geojson['properties']['domain'])
+
+
+class CombinedMap(Map):
+    def get_layers(self):
+        for i, spec in enumerate(self.ctx):
+            for layer in layers(spec, (i+1)*10 + 10, (i+1)*(-1000)):
+                yield layer
+
+    def get_options(self):
+        return {'no_popup': True, 'no_link': True}

@@ -17,7 +17,48 @@ from pyramid.renderers import render, render_to_response
 from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld import RESOURCES
 from clld.web.adapters import get_adapter, get_adapters
+from clld.web.util.multiselect import MultiSelect
 from clld.db.models.common import Language
+from clld.web.maps import CombinedMap
+from clld.lib.clld_api import resourcemap
+
+
+class ParameterMultiSelect(MultiSelect):
+    def __init__(self, req, name, eid, collection=None, url=None, selected=None):
+        MultiSelect.__init__(self, req, name, eid, url='x')
+        if not req.registry.settings['clld.parameters']:
+            for app in ['wals', 'apics', #'ewave'
+                        ]:
+                req.registry.settings['clld.parameters'][app] = resourcemap(app, 'parameter')
+
+        self.data = []
+        for app, rm in req.registry.settings['clld.parameters'].items():
+            for param in rm['resources']:
+                self.data.append({
+                    'id': '%s-%s' % (app, param['id']),
+                    'text': '%s %s: %s' % (app, param['id'], param['name'])})
+        self._datadict = dict((d['id'], d) for d in self.data)
+
+    def format_result(self, obj):
+        return obj
+
+    def get_urls(self):
+        for i, param in enumerate(self.req.params.get('parameters', '').split(',')):
+            if param in self._datadict:
+                if self.selected is None:
+                    self.selected = []
+                self.selected.append(self._datadict[param])
+                app, pid = param.split('-', 1)
+                rm = self.req.registry.settings['clld.parameters'][app]
+                yield (app, pid, rm['properties']['uri_template'].format(id=pid))
+
+    def get_default_options(self):
+        return {
+            'placeholder': "Select parameter",
+            'width': 'off',
+            'class': 'span6',
+            'multiple': True,
+            'data': self.data}
 
 
 def xpartial(func, *args, **kw):
@@ -106,6 +147,14 @@ def js(req):
         pattern = param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
         res.append('CLLD.routes[%s] = %s;' % tuple(map(dumps, [route.name, pattern])))
     return Response('\n'.join(res), content_type="text/javascript")
+
+
+def combined(ctx, req):
+    res = {'map': None, 'select': ParameterMultiSelect(req, 'parameters', 'parameters')}
+    urls = list(res['select'].get_urls())
+    if urls:
+        res['map'] = CombinedMap(urls, req)
+    return res
 
 
 def _raise(req):
