@@ -12,7 +12,7 @@ from {{package}} import models
 def main(args):
     data = Data()
 
-    dataset = common.Dataset(id={{package}}.__name__)
+    dataset = common.Dataset(id={{package}}.__name__, domain='{{package}}.clld.org')
     DBSession.add(dataset)
 
 

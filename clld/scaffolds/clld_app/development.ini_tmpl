@@ -8,6 +8,7 @@ pyramid.debug_routematch = false
 pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_tm
+sqlalchemy.url = sqlite://
 
 [server:main]
 use = egg:waitress#main
