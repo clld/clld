@@ -1,7 +1,7 @@
 from path import path
 
 
-SERVERS = ['cldbstest', 'clld1', 'clld3', 'clld2']
+SERVERS = ['cldbstest', 'clld1', 'clld3', 'clld2', 'cldbs']
 
 
 def repos(name):
@@ -33,6 +33,11 @@ class App(object):
     @property
     def home(self):
         return path('/home').joinpath(self.name)
+
+    @property
+    def pages(self):
+        if getattr(self, '_pages', False):
+            return self.home.joinpath('%s-pages' % self.name)
 
     @property
     def newrelic_log(self):
@@ -88,9 +93,9 @@ APPS = dict((app.name, app) for app in [
     App('phoible', 8890, domain='phoible.org', test=SERVERS[1], production=SERVERS[2]),
     App('glottologcurator', 8889, test=SERVERS[1], workers=1, dependencies=['glottolog3']),
     App('wold2', 8888, domain='wold.livingsources.org', test=SERVERS[0], production=SERVERS[1]),
-    App('wals3', 8887, domain='wals.info', test=SERVERS[2], production=SERVERS[0], with_blog=True),
+    App('wals3', 8887, domain='wals.info', workers=7, test=SERVERS[2], production=SERVERS[0], with_blog=True),
     App('apics', 8886, domain='apics-online.info', test=SERVERS[0], production=SERVERS[1]),
-    App('cgj', 8884, test=SERVERS[0], production=SERVERS[1]),
+    App('jcld', 8884, test=SERVERS[0], production=SERVERS[4], _pages=True, domain='jcld.clld.org'),
     App('wow', 8883, test=SERVERS[1]),
     App('ewave', 8882, domain='ewave-atlas.org', test=SERVERS[1], production=SERVERS[2]),
     App('glottolog3', 8881, domain='glottolog.org', deploy_duration=2, workers=5, test=SERVERS[1], production=SERVERS[0]),

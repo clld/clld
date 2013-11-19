@@ -231,6 +231,7 @@ exclog.extra_info = true
 clld.environment = production
 clld.files = {app.www}/files
 clld.home = {app.home}
+clld.pages = {app.pages}
 blog.host = {bloghost}
 blog.user = {bloguser}
 blog.password = {blogpassword}
@@ -484,6 +485,10 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
     require.python.virtualenv(app.venv, use_sudo=True)
     require.files.directory(app.logs, use_sudo=True)
 
+    if app.pages and not exists(str(app.pages)):
+        with cd(str(app.home)):
+            sudo('sudo -u {0} git clone https://github.com/clld/{0}-pages.git'.format(app.name))
+
     with virtualenv(app.venv):
         sudo('pip install --use-mirrors -U pip')
         require.python.package('gunicorn', use_sudo=True)
@@ -525,7 +530,7 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
 
     if not with_alembic and confirm('Recreate database?', default=False):
         supervisor(app, 'pause', template_variables)
-        local('pg_dump -f /tmp/{0.name}.sql {0.name}'.format(app))
+        local('pg_dump -x -f /tmp/{0.name}.sql {0.name}'.format(app))
         local('gzip -f /tmp/{0.name}.sql'.format(app))
         require.files.file(
             '/tmp/{0.name}.sql.gz'.format(app),
