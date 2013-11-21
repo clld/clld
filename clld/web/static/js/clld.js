@@ -345,6 +345,8 @@ CLLD.Maps = {};
 CLLD.Map = function(eid, layers, options) {
     CLLD.Maps[eid] = this;
     this.options = options == undefined ? {} : options;
+    this.options.info_query = this.options.info_query == undefined ? {} : this.options.info_query;
+    this.options.info_route = this.options.info_route == undefined ? 'language_alt' : this.options.info_route;
     this.map = L.map(
         eid,
         {
@@ -386,7 +388,6 @@ CLLD.Map = function(eid, layers, options) {
 
     this.showInfoWindow = function(layer) {
         var map = CLLD.Maps[eid];
-        var route = map.options.info_route == undefined ? 'language_alt' : map.options.info_route;
 
         if (map.options.no_popup) {
             if (!map.options.no_link) {
@@ -406,10 +407,14 @@ CLLD.Map = function(eid, layers, options) {
 
             $.get(
                 CLLD.route_url(
-                    route,
+                    map.options.info_route,
                     {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
-                    $.extend({}, CLLD.query_params, map.options.info_query)),
-                map.options.info_query == undefined ? {} : map.options.info_query,
+                    $.extend(
+                        {},
+                        CLLD.query_params,
+                        map.options.info_query,
+                        layer.feature.properties.info_query == undefined ? {} : layer.feature.properties.info_query)),
+                map.options.info_query,
                 function(data, textStatus, jqXHR) {
                     _openPopup(layer, data);
                 },
