@@ -30,7 +30,7 @@
         % endif
         ${h.rendered_sentence(a.sentence)}
         % if a.sentence.references:
-        <p>See ${h.linked_references(a.sentence)|n}</p>
+        <p>See ${h.linked_references(request, a.sentence)|n}</p>
         % endif
     </li>
     % endfor
