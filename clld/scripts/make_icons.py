@@ -9,8 +9,8 @@ try:
     # set the scale to 1/20th of an inch
     unit.set(uscale=0.05, wscale=0.02, defaultunit="inch")
 
-    #linewidth = style.linewidth(1.2)
-    linewidth = style.linewidth(1.1)
+    linewidth = style.linewidth(1.2)
+    #linewidth = style.linewidth(1.1)
 except ImportError:  # pragma: no cover
     pyx = False
 
