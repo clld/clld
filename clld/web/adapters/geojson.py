@@ -73,7 +73,7 @@ class GeoJson(Renderable):
 
     def _feature_properties(self, ctx, req, feature, language):
         res = {'icon': self.map_marker(feature, req), 'language': language}
-        res.update(self.feature_properties(ctx, req, feature))
+        res.update(self.feature_properties(ctx, req, feature) or {})
         return res
 
     def feature_properties(self, ctx, req, feature):
