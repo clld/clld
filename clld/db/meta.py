@@ -8,6 +8,7 @@ try:
 except ImportError:
     import json
 
+from pytz import UTC
 from sqlalchemy import (
     Column,
     Integer,
@@ -199,6 +200,25 @@ class Base(UnicodeMixin):
         return dict(
             (col, format_json(getattr(self, col)))
             for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
+
+    def __solr__(self, req):
+        res = dict(
+            id=getattr(self, 'id', str(self.pk)),
+            url=req.resource_url(self),
+            dataset=req.dataset.id,
+            rscname=self.mapper_name(),
+            name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
+            active=self.active,
+            updated=self.updated.astimezone(UTC).isoformat().split('+')[0] + 'Z',
+            created=self.created.astimezone(UTC).isoformat().split('+')[0] + 'Z',
+        )
+        for om in object_mapper(self).iterate_to_root():
+            for col in om.local_table.c:
+                if col.key not in res and col.key != 'polymorphic_type':
+                    value = getattr(self, col.key)
+                    if isinstance(value, unicode):
+                        res[col.key + '_t'] = value
+        return res
 
     def __unicode__(self):
         """

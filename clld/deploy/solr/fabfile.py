@@ -1,5 +1,5 @@
 try:
-    from fabric.api import task
+    from fabric.api import task, run
 except ImportError:  # pragma: no cover
     pass
 
@@ -19,3 +19,10 @@ def createcore(name):
 @task
 def dropcore(name):
     solr.drop_core(name)  # pragma: no cover
+
+
+@task
+def dropindex(name):
+    for data in ['<delete><query>*:*</query></delete>', '<commit/>']:
+        run("curl http://localhost:8080/solr/%s/update --data '%s' "
+            "-H 'Content-type:text/xml; charset=utf-8'" % (name, data))

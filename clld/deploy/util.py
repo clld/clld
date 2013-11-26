@@ -49,10 +49,6 @@ server {
                 try_files $uri $uri/ /index.html;
         }
 
-        location /asjp {
-                rewrite ^/(.*) http://cldbs.eva.mpg.de/$1 permanent;
-        }
-
         include /etc/nginx/locations.d/*.conf;
 }
 """
@@ -65,8 +61,8 @@ location /{app.name} {{
         proxy_redirect off;
         proxy_set_header X-Forwarded-For  $remote_addr;
         proxy_set_header X-Scheme $scheme;
-        proxy_connect_timeout 10;
-        proxy_read_timeout 10;
+        proxy_connect_timeout 20;
+        proxy_read_timeout 20;
         proxy_pass http://127.0.0.1:{app.port}/;
 }}
 
@@ -77,8 +73,8 @@ location /{app.name}/admin {{
         proxy_redirect off;
         proxy_set_header X-Forwarded-For  $remote_addr;
         proxy_set_header X-Scheme $scheme;
-        proxy_connect_timeout 10;
-        proxy_read_timeout 10;
+        proxy_connect_timeout 20;
+        proxy_read_timeout 20;
         proxy_pass http://127.0.0.1:{app.port}/admin;
 }}
 
@@ -110,8 +106,8 @@ server {{
             proxy_redirect off;
             proxy_set_header X-Forwarded-For  $remote_addr;
             proxy_set_header X-Scheme $scheme;
-            proxy_connect_timeout 10;
-            proxy_read_timeout 10;
+            proxy_connect_timeout 20;
+            proxy_read_timeout 20;
             proxy_pass http://127.0.0.1:{app.port}/;
     }}
 
@@ -122,8 +118,8 @@ server {{
             proxy_redirect off;
             proxy_set_header X-Forwarded-For  $remote_addr;
             proxy_set_header X-Scheme $scheme;
-            proxy_connect_timeout 10;
-            proxy_read_timeout 10;
+            proxy_connect_timeout 20;
+            proxy_read_timeout 20;
             proxy_pass http://127.0.0.1:{app.port}/admin;
     }}
 
