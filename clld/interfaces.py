@@ -83,6 +83,11 @@ class IUnitDomainElement(Interface):
     """
 
 
+class ICombination(Interface):
+    """marker interface
+    """
+
+
 #----------------------------------------------------------------------------
 # Interfaces for pluggable functionality
 #----------------------------------------------------------------------------

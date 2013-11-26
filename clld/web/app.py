@@ -223,6 +223,8 @@ def ctx_factory(model, type_, req):
     try:
         if model == common.Dataset:
             ctx = req.db.query(model).one()
+        elif model == common.Combination:
+            ctx = common.Combination.get(req.matchdict['id'])
         else:
             ctx = req.registry.getUtility(interfaces.ICtxFactoryQuery)(model, req)
             if ctx.replacement_id:
@@ -422,7 +424,7 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route('resourcemap', '/resourcemap.json')
     config.add_view(resourcemap, route_name='resourcemap', renderer='jsonp')
 
-    config.add_route_and_view('combined', '/combined', combined, renderer='combined.mako')
+    #config.add_route_and_view('combined', '/combined', combined, renderer='combined.mako')
 
     # TODO: remove google site verification for personal account! should be configurable!
     config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')

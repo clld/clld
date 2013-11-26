@@ -6,6 +6,7 @@ import os
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import date
+from itertools import product
 
 from sqlalchemy import (
     Column,
@@ -25,6 +26,7 @@ from sqlalchemy.orm import (
     relationship,
     validates,
     backref,
+    joinedload_all,
 )
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -35,10 +37,11 @@ from zope.interface import implementer
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
 from clld.db.versioned import Versioned
 from clld import interfaces
-from clld.util import DeclEnum
+from clld.util import DeclEnum, cached_property
 from clld.lib import bibtex
 from clld.lib import coins
 from clld.web.util.htmllib import HTML
+from clld.web.icon import ICONS
 
 
 #-----------------------------------------------------------------------------
@@ -218,10 +221,11 @@ class Dataset(Base,
     def get_stats(self, resources, **filters):
         res = OrderedDict()
         for rsc in resources:
-            query = DBSession.query(rsc.model)
-            if rsc.name in filters:
-                query = query.filter(filters[rsc.name])
-            res[rsc.name] = query.count()
+            if rsc.name != 'combination':
+                query = DBSession.query(rsc.model)
+                if rsc.name in filters:
+                    query = query.filter(filters[rsc.name])
+                res[rsc.name] = query.count()
         return res
 
     def formatted_editors(self):
@@ -331,6 +335,60 @@ class Parameter(Base,
     __table_args__ = (UniqueConstraint('name'),)
     domain = relationship(
         'DomainElement', backref='parameter', order_by=DomainElement.number)
+
+
+@implementer(interfaces.ICombination)
+class Combination(object):
+    """A combination of parameters
+    """
+    delimiter = '_'
+
+    def __init__(self, *parameters):
+        self.id = self.delimiter.join(map(str, [p.id for p in parameters]))
+        self.name = ' / '.join(p.name for p in parameters)
+        self.parameters = parameters
+
+    @classmethod
+    def mapper_name(cls):
+        return str('combination')
+
+    @classmethod
+    def get(cls, id_, **kw):
+        params = []
+        for pid in id_.split(cls.delimiter):
+            params.append(
+                DBSession.query(Parameter)\
+                .filter(Parameter.id == pid)\
+                .options(joinedload_all(Parameter.domain))\
+                .one())
+        return cls(*params)
+
+    @cached_property()
+    def domain(self):
+        return list(product(*[p.domain for p in self.parameters]))
+
+    @cached_property()
+    def values(self):
+        def _filter(query, operation):
+            q = query.filter(Parameter.pk == self.parameters[0].pk)
+            return getattr(q, operation)(
+                *[query.filter(Parameter.pk == p.pk) for p in self.parameters[1:]])
+
+        # determine relevant languages, i.e. languages having a value for all parameters:
+        languages = _filter(
+            DBSession.query(Language.pk).join(ValueSet).join(Parameter),
+            'intersect').subquery()
+
+        # value query:
+        return _filter(
+            DBSession.query(Value)
+            .join(Value.valueset)
+            .join(ValueSet.parameter)
+            .filter(ValueSet.language_pk.in_(languages))
+            .options(
+                joinedload_all(Value.domainelement),
+                joinedload_all(Value.valueset, ValueSet.language)),
+            'union').all()
 
 
 class Source_data(Base, Versioned, DataMixin):

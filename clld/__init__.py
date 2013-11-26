@@ -30,4 +30,5 @@ RESOURCES = [
     Resource('unitparameter', common.UnitParameter, interfaces.IUnitParameter),
     Resource('unit', common.Unit, interfaces.IUnit),
     Resource('unitvalue', common.UnitValue, interfaces.IUnitValue),
+    Resource('combination', common.Combination, interfaces.ICombination, with_index=False),
 ]
