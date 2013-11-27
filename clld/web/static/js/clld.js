@@ -423,9 +423,9 @@ CLLD.Map = function(eid, layers, options) {
         }
     }
 
-    this.icon = function(feature, size) {
+    this.icon = function(feature, size, url) {
         return L.icon({
-            iconUrl: feature.properties.icon,
+            iconUrl: url == undefined ? feature.properties.icon : url,
             iconSize: [size, size],
             iconAnchor: [Math.floor(size/2), Math.floor(size/2)],
             popupAnchor: [0, 0]
