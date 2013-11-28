@@ -7,18 +7,15 @@ from pyramid.httpexceptions import (
     HTTPNotAcceptable,
     HTTPFound,
     HTTPNotFound,
-    HTTPMultipleChoices,
-    HTTPMovedPermanently,
     HTTPGone,
 )
 from pyramid.interfaces import IRoutesMapper
 from pyramid.renderers import render, render_to_response
 
 from clld.interfaces import IRepresentation, IIndex, IMetadata
-from clld import RESOURCES
 from clld.web.adapters import get_adapter, get_adapters
 from clld.web.util.multiselect import MultiSelect
-from clld.db.models.common import Language, Combination
+from clld.db.models.common import Combination
 from clld.web.maps import CombinedMap
 from clld.lib.clld_api import resourcemap
 
@@ -27,8 +24,7 @@ class ParameterMultiSelect(MultiSelect):
     def __init__(self, req, name, eid, collection=None, url=None, selected=None):
         MultiSelect.__init__(self, req, name, eid, url='x')
         if not req.registry.settings['clld.parameters']:
-            for app in ['wals', 'apics', #'ewave'
-                        ]:
+            for app in ['wals', 'apics', 'ewave']:
                 req.registry.settings['clld.parameters'][app] = resourcemap(app, 'parameter')
 
         self.data = []
@@ -73,12 +69,18 @@ def xpartial(func, *args, **kw):
 
 
 def redirect(cls, location, ctx, req):
+    """can be used with xpartial to register views that simply redirect
+
+    >>> view = xpartial(HTTPFound, lambda req: req.route_url('...'))
+    """
     if callable(location):
         location = location(req)
     raise cls(location=location)
 
 
 def gone(ctx, req):
+    """view callable
+    """
     raise HTTPGone()
 
 
@@ -151,7 +153,11 @@ def js(req):
 
 def select_combination(ctx, req):
     if 'parameters' in req.params:
-        id_ = Combination.delimiter.join(req.params['parameters'].split(','))
+        ids = req.params.getall('parameters')
+        if len(ids) > 1:
+            id_ = Combination.delimiter.join(ids)
+        else:
+            id_ = Combination.delimiter.join(req.params['parameters'].split(','))
         return HTTPFound(req.route_url('combination', id=id_))
     return HTTPNotFound
 
@@ -165,10 +171,14 @@ def combined(ctx, req):
 
 
 def _raise(req):
+    """view callable to test error reporting in running apps.
+    """
     raise ValueError('test')
 
 
 def _ping(req):
+    """view to test aliveness of apps.
+    """
     return {'status': 'ok'}
 
 
