@@ -60,10 +60,10 @@ class MultiSelect(Component):
 class CombinationMultiSelect(MultiSelect):
     def __init__(self, req, name='parameters', eid='ms-parameters', combination=None,
                  **kw):
-        if 'parameters' in req.params:
-            id_ = Combination.delimiter.join(req.params['parameters'].split(','))
-            if not combination or (combination and id_ != combination.id):
-                raise HTTPFound(req.route_url('combination', id=id_))
+        #if 'parameters' in req.params:
+        #    id_ = Combination.delimiter.join(req.params['parameters'].split(','))
+        #    if not combination or (combination and id_ != combination.id):
+        #        raise HTTPFound(req.route_url('combination', id=id_))
         kw['collection'] = self.query().all()
         if combination:
             kw['selected'] = combination.parameters

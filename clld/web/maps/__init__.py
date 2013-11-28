@@ -209,6 +209,9 @@ class CombinationMap(Map):
                 GeoJsonMultiple(None).render(self.ctx.multiple, self.req, dump=False),
                 marker=HTML.img(src=icon_url, height='20', width='20'))
 
+    def get_options(self):
+        return {'icon_size': 25, 'hash': True}
+
 
 class _GeoJson(GeoJsonLanguages):
     def feature_iterator(self, ctx, req):

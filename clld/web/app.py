@@ -35,7 +35,8 @@ from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.views import (
-    index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone, combined,
+    index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
+    combined, select_combination,
 )
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap, resourcemap
@@ -423,7 +424,7 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
     config.add_route('resourcemap', '/resourcemap.json')
     config.add_view(resourcemap, route_name='resourcemap', renderer='jsonp')
-
+    config.add_route_and_view('select_combination', '/_select_combination', select_combination)
     #config.add_route_and_view('combined', '/combined', combined, renderer='combined.mako')
 
     # TODO: remove google site verification for personal account! should be configurable!

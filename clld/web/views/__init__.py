@@ -18,7 +18,7 @@ from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld import RESOURCES
 from clld.web.adapters import get_adapter, get_adapters
 from clld.web.util.multiselect import MultiSelect
-from clld.db.models.common import Language
+from clld.db.models.common import Language, Combination
 from clld.web.maps import CombinedMap
 from clld.lib.clld_api import resourcemap
 
@@ -147,6 +147,13 @@ def js(req):
         pattern = param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
         res.append('CLLD.routes[%s] = %s;' % tuple(map(dumps, [route.name, pattern])))
     return Response('\n'.join(res), content_type="text/javascript")
+
+
+def select_combination(ctx, req):
+    if 'parameters' in req.params:
+        id_ = Combination.delimiter.join(req.params['parameters'].split(','))
+        return HTTPFound(req.route_url('combination', id=id_))
+    return HTTPNotFound
 
 
 def combined(ctx, req):
