@@ -276,7 +276,7 @@ class DataTable(Component):
             if kw.get(attr):
                 setattr(self, attr, kw[attr])
             elif attr in req.params:
-                setattr(self, attr, _model.get(req.params[attr]))
+                setattr(self, attr, _model.get(req.params[attr], default=None))
             else:
                 setattr(self, attr, None)
 
