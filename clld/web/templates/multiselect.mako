@@ -1,7 +1,7 @@
-% if not obj.options['multiple'] and obj.collection:
-<select name="${obj.name}" multiple data-placeholder="select ${obj.name}" id="${obj.eid}" class="${obj.options.get('class', '')}">
+% if not 'multiple' in obj.options and obj.collection:
+<select name="${obj.name}" data-placeholder="select ${obj.name}" id="${obj.eid}" class="${obj.options.get('class', '')}">
 % for item in obj.collection:
-    <option value="${item.id}">${item}</option>
+    <option value="${item.id}">${getattr(item, 'label', item)}</option>
 % endfor
 </select>
 % else:

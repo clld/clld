@@ -42,7 +42,7 @@ from clld.web.views.sitemap import robots, sitemapindex, sitemap, resourcemap
 from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
-from clld.web.maps import Map, ParameterMap, LanguageMap
+from clld.web.maps import Map, ParameterMap, LanguageMap, CombinationMap
 from clld.web.icon import ICONS, MapMarker
 from clld.web import assets
 
@@ -457,6 +457,7 @@ def get_configurator(pkg, *utilities, **kw):
     config.register_map('languages', Map)
     config.register_map('language', LanguageMap)
     config.register_map('parameter', ParameterMap)
+    config.register_map('combination', CombinationMap)
 
     config.include('clld.web.adapters')
 

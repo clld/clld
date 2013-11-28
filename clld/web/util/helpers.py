@@ -242,6 +242,14 @@ def external_link(url, label=None, inverted=False, **kw):
     return HTML.a(icon('share', inverted=inverted), ' ', label or url, **kw)
 
 
+def link_to_map(language):
+    return HTML.a(
+        icon('icon-globe'),
+        title='show %s on map' % language.name,
+        href="#map",
+        onclick=JS_CLLD.mapShowInfoWindow(None, language.id))
+
+
 def gbs_link(source, pages=None):
     if not source or not source.google_book_search_id or not source.jsondata or not source.jsondata.get('gbs'):
         return ''

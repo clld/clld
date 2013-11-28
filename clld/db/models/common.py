@@ -6,7 +6,8 @@ import os
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import date
-from itertools import product
+from itertools import product, groupby
+from collections import OrderedDict
 
 from sqlalchemy import (
     Column,
@@ -41,7 +42,7 @@ from clld.util import DeclEnum, cached_property
 from clld.lib import bibtex
 from clld.lib import coins
 from clld.web.util.htmllib import HTML
-from clld.web.icon import ICONS
+from clld.web.icon import ICONS, ORDERED_ICONS
 
 
 #-----------------------------------------------------------------------------
@@ -337,6 +338,15 @@ class Parameter(Base,
         'DomainElement', backref='parameter', order_by=DomainElement.number)
 
 
+class CombinationDomainElement(object):
+    def __init__(self, combination, domainelements, icon=None):
+        self.number = tuple(de.number for de in domainelements)
+        self.id = '-'.join(map(str, self.number))
+        self.name = ' / '.join(de.name for de in domainelements)
+        self.icon = icon
+        self.languages = []
+
+
 @implementer(interfaces.ICombination)
 class Combination(object):
     """A combination of parameters
@@ -344,9 +354,11 @@ class Combination(object):
     delimiter = '_'
 
     def __init__(self, *parameters):
+        assert len(parameters) < 5
         self.id = self.delimiter.join(map(str, [p.id for p in parameters]))
         self.name = ' / '.join(p.name for p in parameters)
         self.parameters = parameters
+        self.multiple = []
 
     @classmethod
     def mapper_name(cls):
@@ -357,15 +369,37 @@ class Combination(object):
         params = []
         for pid in id_.split(cls.delimiter):
             params.append(
-                DBSession.query(Parameter)\
-                .filter(Parameter.id == pid)\
-                .options(joinedload_all(Parameter.domain))\
+                DBSession.query(Parameter)
+                .filter(Parameter.id == pid)
+                .options(joinedload_all(Parameter.domain))
                 .one())
         return cls(*params)
 
     @cached_property()
     def domain(self):
-        return list(product(*[p.domain for p in self.parameters]))
+        d = OrderedDict()
+        for i, des in enumerate(product(*[p.domain for p in self.parameters])):
+            cde = CombinationDomainElement(
+                self, des, icon=ORDERED_ICONS[i % len(ORDERED_ICONS)])
+            d[cde.number] = cde
+
+        for language, values in groupby(
+            sorted(self.values, key=lambda v: v.valueset.language_pk),
+            lambda i: i.valueset.language,
+        ):
+            # values may contain multiple values for the same parameter, so we have to
+            # group those, too.
+            values_by_parameter = OrderedDict()
+            for p in self.parameters:
+                values_by_parameter[p.pk] = []
+            for v in values:
+                values_by_parameter[v.valueset.parameter_pk].append(v)
+            for i, cv in enumerate(product(*values_by_parameter.values())):
+                d[tuple(v.domainelement.number for v in cv)].languages.append(language)
+                if i > 0:
+                    self.multiple.append(language)
+        self.multiple = set(self.multiple)
+        return d.values()
 
     @cached_property()
     def values(self):

@@ -1,4 +1,6 @@
-from zope.interface import implementer, implements
+from itertools import product
+
+from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
 
 
@@ -45,6 +47,21 @@ COLORS = [
     'ffffff',
 ]
 
+# the following colors show enough mutual contrast to be easily distinguised:
+PREFERED_COLORS = [
+    '0000dd',
+    '009900',
+    '990099',
+    'dd0000',
+    'ffff00',
+    'ffffff',
+    '00ff00',
+    '00ffff',
+    'cccccc',
+    'ff6600',
+]
+SECONDARY_COLORS = [c for c in COLORS if c not in PREFERED_COLORS]
+
 
 @implementer(IIcon)
 class Icon(object):
@@ -62,6 +79,10 @@ class Icon(object):
 
 
 ICONS = map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS])
+ICON_MAP = {icon.name: icon for icon in ICONS}
+ORDERED_ICONS = [ICON_MAP[s+c] for s, c in
+                 list(product(SHAPES, PREFERED_COLORS)) +
+                 list(product(SHAPES, SECONDARY_COLORS))]
 
 
 @implementer(IMapMarker)

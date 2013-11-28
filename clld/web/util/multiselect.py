@@ -1,3 +1,7 @@
+from pyramid.httpexceptions import HTTPFound
+
+from clld.db.meta import DBSession
+from clld.db.models.common import Combination, Parameter
 from clld.web.util.helpers import JS
 from clld.web.util.component import Component
 
@@ -43,7 +47,7 @@ class MultiSelect(Component):
 
         :return: dictionary which can be serialized as JSON for use by the select2 component.
         """
-        return {'id': getattr(obj, 'id', obj.pk), 'text': '%s' % obj}
+        return {'id': getattr(obj, 'id', obj.pk), 'text': '%s' % getattr(obj, 'label', obj)}
 
     def render(self, selected=None):
         """allow the list of selected items to be specified upon rendering, too.
@@ -51,3 +55,28 @@ class MultiSelect(Component):
         if selected:
             self.selected = selected
         return Component.render(self)
+
+
+class CombinationMultiSelect(MultiSelect):
+    def __init__(self, req, name='parameters', eid='ms-parameters', combination=None,
+                 **kw):
+        if 'parameters' in req.params:
+            id_ = Combination.delimiter.join(req.params['parameters'].split(','))
+            if not combination or (combination and id_ != combination.id):
+                raise HTTPFound(req.route_url('combination', id=id_))
+        kw['collection'] = self.query().all()
+        if combination:
+            kw['selected'] = combination.parameters
+        MultiSelect.__init__(self, req, name, eid, **kw)
+
+    @classmethod
+    def query(cls):
+        return DBSession.query(Parameter)
+
+    def format_result(self, obj):
+        return {'id': obj.id, 'text': '%s: %s' % (obj.id, obj.name)}
+
+    def get_options(self):
+        return {
+            'data': [self.format_result(o) for o in self.collection],
+            'multiple': True}

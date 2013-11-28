@@ -4,7 +4,7 @@ from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
 from clld.web.util.component import Component
-from clld.web.adapters import GeoJsonLanguages
+from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement
 from clld.util import cached_property
 
 
@@ -152,9 +152,9 @@ class Map(Component):
             label='Icon size')
 
         item = lambda layer: HTML.a(
-                layer.name,
-                onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
-                href=layer.data if isinstance(layer.data, basestring) else '#')
+            layer.name,
+            onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
+            href=layer.data if isinstance(layer.data, basestring) else '#')
         yield Legend(self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 
 
@@ -175,6 +175,39 @@ class ParameterMap(Map):
 
     def get_default_options(self):
         return {'info_query': {'parameter': self.ctx.pk}, 'hash': True}
+
+
+class GeoJsonMultiple(GeoJson):
+    """Render a collection of languages as geojson feature collection.
+    """
+    def feature_iterator(self, ctx, req):
+        return ctx
+
+    def feature_properties(self, ctx, req, language):
+        return {
+            'icon': req.registry.getUtility(IIcon, 'tff0000').url(req),
+            'icon_size': 10,
+            'zindex': 1000}
+
+
+class CombinationMap(Map):
+    __geojson__ = GeoJsonCombinationDomainElement
+
+    def get_layers(self):
+        for de in self.ctx.domain:
+            if de.languages:
+                yield Layer(
+                    de.id,
+                    de.name,
+                    self.__geojson__(de).render(de, self.req, dump=False),
+                    marker=HTML.img(src=de.icon.url(self.req), height='20', width='20'))
+        if self.ctx.multiple:
+            icon_url = self.req.registry.getUtility(IIcon, 'tff0000').url(self.req)
+            yield Layer(
+                '__multiple__',
+                'Languages with multiple values',
+                GeoJsonMultiple(None).render(self.ctx.multiple, self.req, dump=False),
+                marker=HTML.img(src=icon_url, height='20', width='20'))
 
 
 class _GeoJson(GeoJsonLanguages):

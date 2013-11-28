@@ -141,6 +141,16 @@ class GeoJsonParameter(GeoJson):
         return {'values': list(valueset.values)}
 
 
+class GeoJsonCombinationDomainElement(GeoJson):
+    def feature_iterator(self, ctx, req):
+        return ctx.languages
+
+    def feature_properties(self, ctx, req, language):
+        return {
+            'icon': ctx.icon.url(req) if ctx.icon else '',
+            'zindex': 1000 - len(ctx.languages)}
+
+
 class GeoJsonParameterFlatProperties(GeoJsonParameter):
     extension = 'flat.geojson'
     mimetype = 'application/flat+geojson'

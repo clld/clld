@@ -605,14 +605,14 @@ CLLD.mapToggleLayer = function(eid, layer, ctrl) {
 
 CLLD.mapShowGeojson = function(eid, layer) {
     var map = CLLD.Maps[eid],
-	data = map.layer_geojson[layer];
+        data = map.layer_geojson[layer];
 
     if ($.type(data) === 'string') {
         $.getJSON(data, {layer: layer}, function(_data) {
-	    CLLD.Modal.show('<a href="' + data + '">' + _data.properties.name + '</a>', null, '<pre>' + JSON.stringify(_data, null, 2) + '</pre>');
+            CLLD.Modal.show('<a href="' + data + '">' + _data.properties.name + '</a>', null, '<pre>' + JSON.stringify(_data, null, 2) + '</pre>');
         });
     } else {
-	CLLD.Modal.show(data.properties.name, null, '<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+        CLLD.Modal.show(data.properties.name, null, '<pre>' + JSON.stringify(data, null, 2) + '</pre>');
     }
     return false;
 };
