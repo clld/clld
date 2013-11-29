@@ -74,10 +74,11 @@ class Index(Renderable):
 ADAPTER_COUNTER = 0
 
 
-def adapter_factory(template, mimetype='text/html', extension='html', base=None):
+def adapter_factory(template, mimetype='text/html', extension='html', base=None, **kw):
     global ADAPTER_COUNTER
     base = base or Representation
     extra = dict(mimetype=mimetype, extension=extension, template=template)
+    extra.update(kw)
     cls = type('AdapterFromFactory%s' % ADAPTER_COUNTER, (base,), extra)
     ADAPTER_COUNTER += 1
     return cls

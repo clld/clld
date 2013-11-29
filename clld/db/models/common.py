@@ -544,6 +544,12 @@ class Contribution(Base,
                 sorted(self.contributor_assocs,
                        key=lambda a: (a.ord, a.contributor.id)) if not assoc.primary]
 
+    def formatted_contributors(self):
+        contribs = [' and '.join(c.name for c in self.primary_contributors)]
+        if self.secondary_contributors:
+            contribs.append(' and '.join(c.name for c in self.secondary_contributors))
+        return ' with '.join(contribs)
+
 
 class ValueSet_data(Base, Versioned, DataMixin):
     pass
