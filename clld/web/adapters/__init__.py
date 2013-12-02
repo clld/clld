@@ -149,6 +149,10 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
         adapter = adapters.get(name)
     else:
         # or by content negotiation
+        #
+        # TODO: iterate over req.accept (i.e. over the accepted mimetypes in order of
+        # preference) and match them to what we have to offer (in order of preference).
+        #
         adapter = adapters.get(req.accept.best_match(adapters.keys()))
 
     if isinstance(adapter, list):

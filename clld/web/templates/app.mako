@@ -48,7 +48,7 @@
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
         <%block name="header"></%block>
 
-        <div class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
+        <div id="top" class="navbar navbar-static-top${' navbar-inverse' if request.registry.settings.get('navbar.inverse') else ''}">
             <div class="navbar-inner">
                 <div class="container-fluid">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -88,7 +88,7 @@
         </div>
         % endif
 
-        <div id="top" class="container-fluid">
+        <div class="container-fluid">
             % if ctx and getattr(ctx, 'metadata', None):
             <abbr class="unapi-id" title="${h.urlescape(request.resource_url(ctx))}"></abbr>
             % endif

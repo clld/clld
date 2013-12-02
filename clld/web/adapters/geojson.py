@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from clld.web.adapters.base import Renderable
 from clld import interfaces
 from clld.db.meta import DBSession
-from clld.db.models.common import Parameter, ValueSet, Value
+from clld.db.models.common import ValueSet, Value
 
 
 def _flatten(d, parent_key=''):
