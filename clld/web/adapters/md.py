@@ -9,6 +9,8 @@ from clld.lib import bibtex
 
 
 class Metadata(Representation):
+    rel = 'describedby'
+
     @property
     def unapi_name(self):
         return getattr(self, 'unapi', self.extension)

@@ -18,6 +18,7 @@ class Renderable(object):
     mimetype = 'text/plain'
     extension = None
     send_mimetype = None
+    rel = 'alternate'
 
     def __init__(self, obj):
         self.obj = obj

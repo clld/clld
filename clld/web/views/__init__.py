@@ -84,25 +84,60 @@ def gone(ctx, req):
     raise HTTPGone()
 
 
-def view(interface, ctx, req):
+def view(interface, ctx, req, getadapters=False):
     """renders a resource as pyramid response using the most appropriate adapter
     for the accept header sent.
     """
-    adapter = get_adapter(
-        interface, ctx, req, ext=req.matchdict and req.matchdict.get('ext'))
+    #
+    # if req.matched_route.name.endswith('_alt') -> add rel="canonical" header
+    # else: add rel="alternate" header
+    #
+    adapter, adapters = get_adapter(
+        interface, ctx, req, ext=req.matchdict and req.matchdict.get('ext'), getall=True)
     if not adapter:
         raise HTTPNotAcceptable()
-    return adapter.render_to_response(ctx, req)
+    res = adapter.render_to_response(ctx, req)
+    if getadapters:
+        res = (res, adapters)
+    return res
+
+
+def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="text/html"):
+    if adapter:
+        rel = adapter.rel
+        mimetype = adapter.send_mimetype or adapter.mimetype
+    if mimetype and rel:
+        response.headerlist.append(
+            ('Link', '<%s>; rel="%s"; type="%s"' % (url, rel, mimetype)))
 
 
 def index_view(ctx, req):
+    res, adapters = view(IIndex, ctx, req, getadapters=True)
     if req.is_xhr and 'sEcho' in req.params:
         return datatable_xhr_view(ctx, req)
-    return view(IIndex, ctx, req)
+    if req.matched_route:
+        if req.matched_route.name.endswith('_alt'):
+            _add_link_header(res, req.route_url(req.matched_route.name[:-4]))
+        else:
+            for a in [_a for _a in adapters if _a.rel and _a.extension]:
+                _add_link_header(
+                    res,
+                    req.route_url(req.matched_route.name + '_alt', ext=a.extension),
+                    adapter=a)
+    return res
 
 
 def resource_view(ctx, req):
-    return view(IRepresentation, ctx, req)
+    res, adapters = view(IRepresentation, ctx, req, getadapters=True)
+    if req.matched_route:
+        if req.matched_route.name.endswith('_alt'):
+            _add_link_header(res, req.resource_url(ctx))
+        else:
+            for a in adapters:
+                if a.rel and a.extension:
+                    _add_link_header(
+                        res, req.resource_url(ctx, ext=a.extension), adapter=a)
+    return res
 
 
 def datatable_xhr_view(ctx, req):

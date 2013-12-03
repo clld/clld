@@ -40,7 +40,7 @@ def includeme(config):
         # ... as html snippet (if the template exists)
         specs.append(
             (interface, Representation, 'application/vnd.clld.snippet+xml',
-             'snippet.html', name + '/snippet_html.mako', {}))
+             'snippet.html', name + '/snippet_html.mako', {'rel': None}))
 
         # ... as RDF in various notations
         for notation in RDF_NOTATIONS.values():
@@ -63,30 +63,14 @@ def includeme(config):
     # citeable resources are available as html page listing available metadata formats:
     for _if in [interfaces.IContribution, interfaces.IDataset]:
         specs.append(
-            (_if, Representation, 'application/vnd.clld.md+xml', 'md.html', 'md_html.mako', {}))
+            (_if, Representation, 'application/vnd.clld.md+xml', 'md.html', 'md_html.mako', {'rel': 'describedby'}))
 
-    specs.extend([
-        (
-            interfaces.ILanguage, Index,
-            'application/vnd.google-earth.kml+xml',
-            'kml',
-            'clld:web/templates/language/kml.mako',
-            {'send_mimetype': 'application/xml'}),
-        (
-            interfaces.ILanguage,
-            Representation,
-            'application/vnd.google-earth.kml+xml',
-            'kml',
-            'clld:web/templates/language/kml.pt',
-            {'send_mimetype': 'application/xml'}),
-        (
-            interfaces.IContribution,
-            Index,
-            'text/html',
-            'html',
-            'contribution/index_html.mako',
-            {}),
-    ])
+    specs.append((
+        interfaces.ILanguage, Index,
+        'application/vnd.google-earth.kml+xml',
+        'kml',
+        'clld:web/templates/language/kml.mako',
+        {'send_mimetype': 'application/xml'}))
 
     for i, spec in enumerate(specs):
         interface, base, mimetype, extension, template, extra = spec
@@ -130,7 +114,7 @@ def get_adapters(interface, ctx, req):
     return req.registry.getAdapters([resource], interface)
 
 
-def get_adapter(interface, ctx, req, ext=None, name=None):
+def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
     """
     """
     adapters = dict(get_adapters(interface, ctx, req))
@@ -155,8 +139,12 @@ def get_adapter(interface, ctx, req, ext=None, name=None):
         #
         adapter = adapters.get(req.accept.best_match(adapters.keys()))
 
+    res = None
     if isinstance(adapter, list):
         if adapter:
-            return adapter[0]
-        return None
-    return adapter
+            res = adapter[0]
+    else:
+        res = adapter
+    if getall:
+        res = (res, adapters.values())
+    return res

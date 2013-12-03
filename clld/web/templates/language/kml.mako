@@ -18,6 +18,9 @@
     <Placemark>
       <name>${obj.name}</name>
       <description>
+        <![CDATA[
+        ${h.link(request, obj)}
+        ]]>
       </description>
       <Point><coordinates>${obj.longitude},${obj.latitude}</coordinates></Point>
         <styleUrl>#${obj.id}</styleUrl>
