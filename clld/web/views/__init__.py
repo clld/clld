@@ -112,9 +112,9 @@ def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="tex
 
 
 def index_view(ctx, req):
-    res, adapters = view(IIndex, ctx, req, getadapters=True)
     if req.is_xhr and 'sEcho' in req.params:
         return datatable_xhr_view(ctx, req)
+    res, adapters = view(IIndex, ctx, req, getadapters=True)
     if req.matched_route:
         if req.matched_route.name.endswith('_alt'):
             _add_link_header(res, req.route_url(req.matched_route.name[:-4]))
