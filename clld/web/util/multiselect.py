@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from clld.db.meta import DBSession
 from clld.db.models.common import Parameter
 from clld.web.util.helpers import JS
