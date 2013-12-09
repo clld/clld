@@ -6,9 +6,11 @@
     % if ctx.value_assocs:
     <%util:well title="${_('Datapoints')}">
         <ul>
-            % for va in ctx.value_assocs:
+        % for va in ctx.value_assocs:
+            % if va.value:
             <li>${h.link(request, va.value.valueset, label='%s: %s' % (va.value.valueset.parameter.name, va.value.domainelement.name))}</li>
-            % endfor
+            % endif
+        % endfor
         </ul>
     </%util:well>
     % endif
