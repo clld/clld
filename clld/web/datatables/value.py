@@ -85,17 +85,17 @@ class Values(DataTable):
         if self.parameter:
             return res + [
                 LinkCol(self, 'language',
-                        model_col=Language.name, get_obj=lambda i: i.valueset.language),
+                        model_col=Language.name, get_object=lambda i: i.valueset.language),
                 name_col,
                 RefsCol(self, 'source'),
-                LinkToMapCol(self, 'm', get_obj=lambda i: i.valueset.language),
+                LinkToMapCol(self, 'm', get_object=lambda i: i.valueset.language),
             ]
 
         if self.language:
             return res + [
                 name_col,
                 LinkCol(self, 'parameter', sTitle=self.req.translate('Parameter'),
-                        model_col=Parameter.name, get_obj=lambda i: i.valueset.parameter),
+                        model_col=Parameter.name, get_object=lambda i: i.valueset.parameter),
                 RefsCol(self, 'source'),
                 #
                 # TODO: refs?

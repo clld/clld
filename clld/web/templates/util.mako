@@ -359,7 +359,7 @@ $(document).ready(function() {
     <% lang = lang or ctx %>
     <ul class="inline codes ${style}">
         % for type_ in [h.models.IdentifierType.glottolog, h.models.IdentifierType.iso]:
-            <% codes = ctx.get_identifier_objs(type_) %>
+            <% codes = lang.get_identifier_objs(type_) %>
             % if len(codes) == 1:
             <li>
                 <span class="large label label-info">

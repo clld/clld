@@ -431,7 +431,7 @@ def linked_contributors(req, contribution):
         chunks.append(link(req, c))
 
     for i, c in enumerate(contribution.secondary_contributors):
-        if i == 0:
+        if i == 0 and contribution.primary_contributors:
             chunks.append(' with ')
         if i > 0:
             chunks.append(' and ')
