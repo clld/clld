@@ -18,4 +18,7 @@
     % if ctx.iso_code:
     <lexvo:iso639P3PCode rdf:datatype="xsd:string">${ctx.iso_code}</lexvo:iso639P3PCode>
     % endif
+    % for vs in ctx.valuesets:
+    <dcterms:isReferencedBy rdf:resource="${request.resource_url(vs)}"/>
+    % endfor
 </%block>

@@ -12,4 +12,5 @@
         ${h.rdf.properties_as_xml_snippet(request.resource_url(ctx), ctx.__rdf__(request))|n}
         % endif
     </rdf:Description>
+    <%block name="resources"></%block>
 </rdf:RDF>
