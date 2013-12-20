@@ -193,8 +193,8 @@ def select_combination(ctx, req):
             id_ = Combination.delimiter.join(ids)
         else:
             id_ = Combination.delimiter.join(req.params['parameters'].split(','))
-        return HTTPFound(req.route_url('combination', id=id_))
-    return HTTPNotFound
+        raise HTTPFound(req.route_url('combination', id=id_))
+    raise HTTPNotFound
 
 
 def combined(ctx, req):
