@@ -22,7 +22,7 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
-    'setuptools',
+    'setuptools >= 0.8',
     'Pyramid >= 1.4',
     'pyramid_mako',
     'sqlalchemy>=0.7.9',
