@@ -25,7 +25,7 @@ install_requires = [
     'setuptools >= 0.8',
     'Pyramid >= 1.4',
     'pyramid_mako',
-    'sqlalchemy>=0.7.9',
+    'sqlalchemy==0.8.3',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
     'purl >= 0.5',
@@ -47,6 +47,8 @@ install_requires = [
 
 if not PY3:
     install_requires.extend('xlrd xlwt Babel fabric fabtools pyx==0.12.1'.split())
+else:
+    install_requires.extend('pyx>=0.13'.split())
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
