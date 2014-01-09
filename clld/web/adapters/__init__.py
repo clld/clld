@@ -49,7 +49,10 @@ def includeme(config):
                 Rdf,
                 notation.mimetype,
                 notation.extension,
-                name + '/rdf.mako', {'rdflibname': notation.name}))
+                name + '/rdf.mako',
+                {
+                    'name': 'RDF serialized as %s' % notation.name,
+                    'rdflibname': notation.name}))
 
         # ... as RDF collection index
         rdf_xml = RDF_NOTATIONS['xml']

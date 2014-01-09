@@ -495,3 +495,55 @@ def get_referents(source, exclude=None):
                 joinedload_all(models.ValueSet.language))
         res[obj_cls.mapper_name().lower()] = q.all()
     return res
+
+
+def alt_representations(req, rsc, doc_position='right', exclude=None):
+    exclude = exclude or []
+    exclude.extend(['html', 'snippet.html'])
+    adapters = [a for n, a in req.registry.getAdapters([rsc], interfaces.IRepresentation)
+                if a.extension not in set(exclude)]
+    doc = []
+    for adapter in adapters:
+        if adapter.__doc__:
+            doc.append(HTML.dt(adapter.name or adapter.extension))
+            doc.append(HTML.dd(adapter.__doc__))
+    doc = HTML.div(
+        HTML.p(
+            """You may download alternative representations of the data for languoid
+%s by clicking the button """ % rsc.name,
+            icon('download-alt')),
+        HTML.dl(*doc))
+    return HTML.div(HTML.div(
+        button(
+            icon('info-sign', inverted=True),
+            **{'class': ['btn-info'],
+               'id': 'rsc-dl',
+               'data-content': unicode(doc)}),
+        HTML.a(
+            icon('download-alt'),
+            HTML.span(class_="caret"),
+            **{
+                'class_': "btn dropdown-toggle",
+                'data-toggle': "dropdown",
+                'href': "#",
+                'id': "dt-dl-opener",
+            }
+        ),
+        HTML.ul(
+            *[HTML.li(HTML.a(
+                a.name or a.extension,
+                href="#",
+                onclick="document.location.href = '%s'; return false;" % req.resource_url(rsc, ext=a.extension),
+                id='dt-dl-%s' % a.extension))
+              for a in adapters],
+            **dict(class_="dropdown-menu")),
+        class_='btn-group'),
+        HTML.script(literal("""\
+    $(document).ready(function() {
+        $('#rsc-dl').clickover({
+            html: true,
+            title: 'Alternative representations',
+            placement: '%s',
+            trigger: 'click'
+        });
+    });""" % doc_position)))

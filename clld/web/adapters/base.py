@@ -14,6 +14,7 @@ class Renderable(object):
     >>> r = Renderable(None)
     >>> assert r.label == 'Renderable'
     """
+    name = None
     template = None
     mimetype = 'text/plain'
     extension = None
@@ -58,6 +59,7 @@ class Representation(Renderable):
 class Json(Renderable):
     """
     """
+    name = 'JavaScript Object Notation'
     mimetype = 'application/json'
     extension = 'json'
 
