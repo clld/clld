@@ -100,6 +100,18 @@ class SqliteDb(argparse.Action):  # pragma: no cover
         setattr(namespace, 'engine', create_engine('sqlite:///%s' % values[0]))
 
 
+def index(rsc, req, solr, query_options=None, batch_size=1000):
+    query = DBSession.query(rsc).order_by(rsc.pk)
+    if query_options:
+        query = query.options(*query_options)
+
+    for i in range(0, query.count(), batch_size):
+        solr.update(
+            [p.__solr__(req) for p in query.limit(batch_size).offset(i)],
+            'json',
+            commit=True)
+
+
 def parsed_args(*arg_specs, **kw):  # pragma: no cover
     """pass a truthy value as keyword parameter bootstrap to bootstrap the app.
     """

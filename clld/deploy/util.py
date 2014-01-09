@@ -486,7 +486,8 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
             sudo('sudo -u {0} git clone https://github.com/clld/{0}-pages.git'.format(app.name))
 
     with virtualenv(app.venv):
-        sudo('pip install --use-mirrors -U pip')
+        #sudo('pip install -U setuptools')
+        sudo('pip install pip==1.4.1')
         require.python.package('gunicorn', use_sudo=True)
         for repos in ['clld'] + getattr(app, 'dependencies', []) + [app.name]:
             install_repos(repos)

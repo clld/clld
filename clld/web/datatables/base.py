@@ -104,6 +104,8 @@ class Col(object):
         if isinstance(self.model_col_type, Boolean):
             if not hasattr(self, 'choices'):
                 self.choices = ['True', 'False']
+            if not hasattr(self, 'input_size'):
+                self.input_size = 'small'
         elif isinstance(self.model_col_type, (Float, Integer)):
             self.js_args.setdefault('sClass', 'right')
             if not hasattr(self, 'input_size'):

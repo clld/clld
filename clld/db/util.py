@@ -1,6 +1,7 @@
 import time
 
 from sqlalchemy.orm import joinedload
+import transaction
 
 from clld.db.meta import DBSession
 from clld.db.models import common
@@ -47,7 +48,7 @@ def get_distinct_values(col, key=None):
     return sorted([r[0] for r in DBSession.query(col).distinct() if r[0]], key=key)
 
 
-def page_query(q, n=1000, verbose=False):
+def page_query(q, n=1000, verbose=False, commit=False):
     """
     http://stackoverflow.com/a/1217947
     """
@@ -58,6 +59,9 @@ def page_query(q, n=1000, verbose=False):
         for elem in q.limit(n).offset(offset):
             r = True
             yield elem
+        if commit:
+            transaction.commit()
+            transaction.begin()
         offset += n
         e = time.time()
         if verbose:

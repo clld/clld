@@ -108,7 +108,7 @@ def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="tex
         mimetype = adapter.send_mimetype or adapter.mimetype
     if mimetype and rel:
         response.headerlist.append(
-            ('Link', '<%s>; rel="%s"; type="%s"' % (url, rel, mimetype)))
+            ('Link', '<%s>; rel="%s"; type="%s"' % tuple(map(str, [url, rel, mimetype]))))
 
 
 def index_view(ctx, req):

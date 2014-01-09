@@ -25,7 +25,7 @@ install_requires = [
     'setuptools >= 0.8',
     'Pyramid >= 1.4',
     'pyramid_mako',
-    'sqlalchemy==0.8.3',
+    'sqlalchemy >= 0.8',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
     'purl >= 0.5',
@@ -43,6 +43,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'newrelic',
+    'paginate',
 ]
 
 if not PY3:

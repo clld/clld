@@ -88,7 +88,9 @@ class App(object):
 
 
 APPS = dict((app.name, app) for app in [
-    App('ids', 8893, test=SERVERS[0], production=SERVERS[2]),
+    App('clldportal', 8895, domain='portal.clld.org', production=SERVERS[4]),
+    App('asjp', 8894, domain='asjp.clld.org', test=SERVERS[2], production=SERVERS[0]),
+    App('ids', 8893, domain='ids.clld.org', test=SERVERS[0], production=SERVERS[2]),
     App('valpal', 8892, test=SERVERS[2], production=SERVERS[3]),
     App('waab', 8891, domain="afbo.info", test=SERVERS[0], production=SERVERS[2]),
     App('phoible', 8890, domain='phoible.org', test=SERVERS[1], production=SERVERS[2]),

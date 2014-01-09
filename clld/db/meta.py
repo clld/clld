@@ -33,6 +33,7 @@ from sqlalchemy.orm import (
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.orm.query import Query
+from sqlalchemy.inspection import inspect
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -202,22 +203,33 @@ class Base(UnicodeMixin):
             for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
 
     def __solr__(self, req):
+        cls = inspect(self).class_
+
+        if not is_base(cls):
+            for base in cls.__bases__:
+                if is_base(base):
+                    cls = base
+                    break
+
         res = dict(
             id=getattr(self, 'id', str(self.pk)),
             url=req.resource_url(self),
             dataset=req.dataset.id,
-            rscname=self.mapper_name(),
+            rscname=cls.__name__,
             name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
             active=self.active,
             updated=self.updated.astimezone(UTC).isoformat().split('+')[0] + 'Z',
             created=self.created.astimezone(UTC).isoformat().split('+')[0] + 'Z',
         )
+        suffix_map = [(unicode, '_t'), (int, '_i'), (float, '_f'), (bool, '_b')]
         for om in object_mapper(self).iterate_to_root():
             for col in om.local_table.c:
                 if col.key not in res and col.key != 'polymorphic_type':
                     value = getattr(self, col.key)
-                    if isinstance(value, unicode):
-                        res[col.key + '_t'] = value
+                    for type_, suffix in suffix_map:
+                        if isinstance(value, type_):
+                            res[col.key + suffix] = value
+                            break
         return res
 
     def __unicode__(self):
@@ -253,6 +265,10 @@ class PolymorphicBaseMixin(object):
             'polymorphic_identity': 'base',
             'with_polymorphic': '*',
         }
+
+
+def is_base(cls):
+    return PolymorphicBaseMixin in cls.__bases__
 
 
 class CustomModelMixin(object):

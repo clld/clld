@@ -211,8 +211,8 @@ class Dataset(Base,
     """
     published = Column(Date, default=date.today)
     publisher_name = Column(
-        Unicode, default=u"Max Planck Institute for Evolutionary Anthropology")
-    publisher_place = Column(Unicode, default=u"Leipzig")
+        Unicode, default="Max Planck Institute for Evolutionary Anthropology")
+    publisher_place = Column(Unicode, default="Leipzig")
     publisher_url = Column(String, default="http://www.eva.mpg.de")
     license = Column(
         String, default="http://creativecommons.org/licenses/by/3.0/")
@@ -284,6 +284,15 @@ class Language(Base,
     @property
     def glottocode(self):
         return self.get_identifier(IdentifierType.glottolog)
+
+    def __solr__(self, req):
+        res = Base.__solr__(self, req)
+        res['altname_txt'] = [i.name for i in self.identifiers if i.type == 'name']
+        for attr in ['iso_code', 'glottocode']:
+            value = getattr(self, attr)
+            if value:
+                res.update({attr + '_s': value})
+        return res
 
 
 class DomainElement_data(Base, Versioned, DataMixin):
