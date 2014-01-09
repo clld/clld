@@ -473,6 +473,8 @@ def deploy(app, environment, with_alembic=False, with_blog=False):
         'make',
         'sqlite3',
         'curl',
+        'libxml2-dev',
+        'libxslt-dev',
     ]:
         require.deb.package(pkg)
     require.postgres.user(app.name, app.name)
