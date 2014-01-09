@@ -745,6 +745,16 @@ class Unit(Base,
     language_pk = Column(Integer, ForeignKey('language.pk'))
     language = relationship(Language)
 
+    def __solr__(self, req):
+        res = Base.__solr__(self, req)
+        if self.language:
+            res['language_t'] = self.language.name
+            for attr in ['iso_code', 'glottocode']:
+                value = getattr(self.language, attr)
+                if value:
+                    res.update({attr + '_s': value})
+        return res
+
 
 class UnitDomainElement_data(Base, Versioned, DataMixin):
     pass
