@@ -221,7 +221,7 @@ class Base(UnicodeMixin):
             updated=self.updated.astimezone(UTC).isoformat().split('+')[0] + 'Z',
             created=self.created.astimezone(UTC).isoformat().split('+')[0] + 'Z',
         )
-        suffix_map = [(unicode, '_t'), (int, '_i'), (float, '_f'), (bool, '_b')]
+        suffix_map = [(unicode, '_t'), (bool, '_b'), (int, '_i'), (float, '_f')]
         for om in object_mapper(self).iterate_to_root():
             for col in om.local_table.c:
                 if col.key not in res and col.key != 'polymorphic_type':

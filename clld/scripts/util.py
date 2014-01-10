@@ -106,10 +106,12 @@ def index(rsc, req, solr, query_options=None, batch_size=1000):
         query = query.options(*query_options)
 
     for i in range(0, query.count(), batch_size):
-        solr.update(
+        res = solr.update(
             [p.__solr__(req) for p in query.limit(batch_size).offset(i)],
             'json',
             commit=True)
+        if res.status != 200:
+            print res.raw_content
 
 
 def parsed_args(*arg_specs, **kw):  # pragma: no cover

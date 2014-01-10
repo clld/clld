@@ -718,6 +718,16 @@ class Sentence(Base,
         return relationship(
             'Language', backref=backref('sentences', order_by=cls.language_pk))
 
+    def __solr__(self, req):
+        res = Base.__solr__(self, req)
+        if self.language:
+            res['language_t'] = self.language.name
+            for attr in ['iso_code', 'glottocode']:
+                value = getattr(self.language, attr)
+                if value:
+                    res.update({attr + '_s': value})
+        return res
+
     @property
     def audio(self):
         for f in self._files:
