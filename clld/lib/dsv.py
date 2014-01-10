@@ -54,6 +54,10 @@ def rows(filename=None,
             yield cls(*row) if cls else row
 
 
+#
+# TODO: replace the following with unicsv
+# https://github.com/tswicegood/unicsv
+#
 class UnicodeCsvWriter:
     """A CSV writer which will write rows to CSV file object "fp",
     which is encoded in the given encoding.
