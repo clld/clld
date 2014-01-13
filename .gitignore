@@ -1,4 +1,7 @@
+development.ini
 *.py[cod]
+*.komodoproject
+*/static/download
 
 # C extensions
 *.so
@@ -25,6 +28,8 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+coverage.txt
+yolk.txt
 
 # Mr Developer
 .mr.developer.cfg

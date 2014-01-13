@@ -51,6 +51,7 @@ class GeoJson(Renderable):
     - an icon member in the feature properties.
     - a language.id member in feature properties.
     """
+    name = "GeoJSON"
     extension = 'geojson'
     mimetype = 'application/geojson'
     send_mimetype = 'application/json'
@@ -152,6 +153,10 @@ class GeoJsonCombinationDomainElement(GeoJson):
 
 
 class GeoJsonParameterFlatProperties(GeoJsonParameter):
+    """GeoJSON with flattened feature properties suitable for importing in the tilemill
+    mapping software.
+    """
+    name = "GeoJSON for tilemill"
     extension = 'flat.geojson'
     mimetype = 'application/flat+geojson'
 

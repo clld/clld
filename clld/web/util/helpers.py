@@ -509,8 +509,8 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
             doc.append(HTML.dd(adapter.__doc__))
     doc = HTML.div(
         HTML.p(
-            """You may download alternative representations of the data for languoid
-%s by clicking the button """ % rsc.name,
+            """You may download alternative representations of the data on
+"%s" by clicking the button """ % rsc.name,
             icon('download-alt')),
         HTML.dl(*doc))
     return HTML.div(HTML.div(
