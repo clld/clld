@@ -8,4 +8,6 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     config = get_configurator('{{package}}', settings=settings)
+    config.include('{{package}}.datatables')
+    config.include('{{package}}.adapters')
     return config.make_wsgi_app()
