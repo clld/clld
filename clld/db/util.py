@@ -39,9 +39,7 @@ def compute_number_of_values():
     for valueset in DBSession.query(common.ValueSet).options(
         joinedload(common.ValueSet.values)
     ):
-        d = valueset.jsondata if valueset.jsondata else {}
-        d['_number_of_values'] = len(valueset.values)
-        valueset.jsondata = d
+        valueset.update_jsondata(_number_of_values=len(valueset.values))
 
 
 def get_distinct_values(col, key=None):

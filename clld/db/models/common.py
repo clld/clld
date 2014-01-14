@@ -3,11 +3,9 @@ Common models for all clld apps
 """
 from __future__ import unicode_literals
 import os
-from base64 import b64encode
 from collections import OrderedDict
 from datetime import date
 from itertools import product, groupby
-from collections import OrderedDict
 
 from sqlalchemy import (
     Column,
@@ -17,7 +15,6 @@ from sqlalchemy import (
     Boolean,
     Unicode,
     Date,
-    LargeBinary,
     CheckConstraint,
     UniqueConstraint,
     ForeignKey,
@@ -31,7 +28,6 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from zope.interface import implementer
 
@@ -42,13 +38,9 @@ from clld.util import DeclEnum, cached_property
 from clld.lib import bibtex
 from clld.lib import coins
 from clld.web.util.htmllib import HTML
-from clld.web.icon import ICONS, ORDERED_ICONS
+from clld.web.icon import ORDERED_ICONS
 
 
-#-----------------------------------------------------------------------------
-# We augment mapper classes for basic objects using mixins to add the ability
-# to store arbitrary key-value pairs and files associated with an object.
-#-----------------------------------------------------------------------------
 class Config(Base):
     key = Column(Unicode)
     value = Column(Unicode)
@@ -89,24 +81,17 @@ class IdNameDescriptionMixin(object):
     markup_description = Column(Unicode)
 
 
-#@implementer(interfaces.IFile)
-#class File(Base):
-#    """Model for storage of files in the database.
-#    """
-#    name = Column(Unicode)
-#    mime_type = Column(String)
-#    content = Column(LargeBinary)
-#
-#    @hybrid_property
-#    def id(self):
-#        return self.pk
-#
-#    def data_uri(self):
-#        return 'data:%s;base64,%s' % (self.mime_type, b64encode(self.content))
-
-
+#-----------------------------------------------------------------------------
+# We augment mapper classes for basic objects using mixins to add the ability
+# to store arbitrary key-value pairs and files associated with an object.
+#-----------------------------------------------------------------------------
 class FilesMixin(IdNameDescriptionMixin):
-    """This mixin provides a way to associate files with another model class.
+    """This mixin provides a way to associate files with instances of another model class.
+
+    .. note::
+
+        The file itself is not stored in the database but must be created in the
+        filesystem, e.g. using the create method.
     """
     @classmethod
     def owner_class(cls):
