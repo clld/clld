@@ -23,6 +23,32 @@ from clld.interfaces import IDownload
 from clld.lib import bibtex
 
 
+def glottocodes_by_isocode(dburi, cols=['id']):
+    select = ', '.join('l.%s' % name for name in cols)
+    glottolog = create_engine(dburi)
+    glottocodes = {}
+    for row in glottolog.execute('select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk' % select):
+        glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
+    return glottocodes
+
+
+def add_language_codes(data, lang, isocode, glottocodes=None):
+    def identifier(type_, id_):
+        return data.add(
+            common.Identifier, '%s:%s' % (type_, id_),
+            id='%s:%s' % (type_, id_),
+            name=id_,
+            type=getattr(common.IdentifierType, type_).value)
+
+    if isocode and len(isocode) == 3:
+        DBSession.add(common.LanguageIdentifier(
+            language=lang, identifier=identifier('iso', isocode)))
+
+        if glottocodes and isocode in glottocodes:
+            DBSession.add(common.LanguageIdentifier(
+                language=lang, identifier=identifier('glottolog', glottocodes[isocode])))
+
+
 def bibtex2source(rec):
     year = bibtex.unescape(rec.get('year', 'nd'))
     fields = {}
