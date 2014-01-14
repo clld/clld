@@ -386,6 +386,7 @@ class DataTable(Component):
         """
         """
         return HTML.div(
+            button(icon('info-sign', inverted=True), class_='btn-info %s-cdOpener' % self.eid),
             HTML.a(
                 icon('download-alt'),
                 HTML.span(class_="caret"),
@@ -405,5 +406,4 @@ class DataTable(Component):
                     id='dt-dl-%s' % fmt))
                   for fmt in [a.extension for n, a in self.req.registry.getAdapters([self.model()], IIndex)] if fmt != 'html'],
                 **dict(class_="dropdown-menu")),
-            button(icon('info-sign', inverted=True), class_='btn-info %s-cdOpener' % self.eid),
             class_='btn-group right')

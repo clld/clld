@@ -16,15 +16,7 @@ class Metadata(Representation):
         return getattr(self, 'unapi', self.extension)
 
 
-@implementer(interfaces.IRepresentation, interfaces.IMetadata)
-class BibTex(Metadata):
-    """Render a resource's metadata as BibTex record.
-    """
-    __label__ = 'BibTeX'
-    unapi = 'bibtex'
-    extension = 'md.bib'
-    mimetype = 'text/x-bibtex'
-
+class MetadataFromRec(Metadata):
     def rec(self, ctx, req):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
@@ -50,12 +42,26 @@ class BibTex(Metadata):
             year=str(req.dataset.published.year),
             **data)
 
+
+@implementer(interfaces.IRepresentation, interfaces.IMetadata)
+class BibTex(MetadataFromRec):
+    """Resource metadata as BibTex record.
+    """
+    name = 'BibTeX'
+    __label__ = 'BibTeX'
+    unapi = 'bibtex'
+    extension = 'md.bib'
+    mimetype = 'text/x-bibtex'
+
     def render(self, ctx, req):
         return self.rec(ctx, req).__unicode__()
 
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
-class ReferenceManager(BibTex):
+class ReferenceManager(MetadataFromRec):
+    """Resource metadata in RIS format.
+    """
+    name = 'RIS'
     __label__ = 'RIS'
     unapi = 'ris'
     extension = 'md.ris'
@@ -67,8 +73,9 @@ class ReferenceManager(BibTex):
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class TxtCitation(Metadata):
-    """Render a resource's metadata as plain text string.
+    """Resource metadata formatted as plain text citation.
     """
+    name = "Citation"
     __label__ = 'Text'
     extension = 'md.txt'
     mimetype = 'text/plain'
