@@ -31,8 +31,6 @@ The ``register_datatable`` method of the config object has the following signatu
 
 .. py:function:: register_datatable(route_name, cls)
 
-    Send a message to a recipient
-
     :param str route_name: Name of the route which maps to the view serving the page (see :ref:`sec-resource-routes`).
     :param class cld: Python class inheriting from :py:class:`clld.web.datatables.base.DataTable`.
 

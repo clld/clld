@@ -293,6 +293,10 @@ class DataTable(Component):
         return '%ss' % self.model.mapper_name()
 
     def col_defs(self):
+        """Must be implemented by derived classes.
+
+        :return: list of instances of :py:class:`clld.web.datatables.base.Col`.
+        """
         raise NotImplementedError  # pragma: no cover
 
     @cached_property()
@@ -331,6 +335,8 @@ class DataTable(Component):
 
     def base_query(self, query):
         """Custom DataTables can overwrite this method to add joins, or apply filters.
+
+        :return: ``sqlalchemy.orm.query.Query`` instance.
         """
         return query
 
