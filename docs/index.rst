@@ -13,24 +13,23 @@ The goal of the Cross-Linguistic Linked Data project (CLLD) is to help collectin
 language diversity heritage. This is to be facilitated by developing, providing and
 maintaining interoperable data publication structures.
 
-These publication structures come in three kinds:
-
-1. software, by providing `a framework for lexical/grammatical databases <https://github.com/clld/clld>`_,
-2. organizational, by creating lexical/grammatical database journals,
-3. infrastructural, by providing a `comprehensive language catalogue and bibliography <http://glottolog.org>`_.
+For more information refer to the `project's website at clld.org <http://clld.org>`_.
 
 
-The Software
-------------
+The ``clld`` framework
+----------------------
+
+Underlying all applications built within the project to publish datasets is the ``clld``
+framework - a python package providing functionality to build and maintain CLLD apps.
 
 Design
 ~~~~~~
 
-The main challenge for the CLLD framework is to balance abstraction and concreteness.
+The main challenge for the ``clld`` framework is to balance abstraction and concreteness.
 
 The following goals directed the design:
 
-- There should be a core database model, which allows for as much shared functionality as
+- There must be a core database model, which allows for as much shared functionality as
   possible. In particular, publication of Linked Data and integration with services such
   as `OLAC <http://www.language-archives.org/>`_ must be implemented by the framework.
 - Deployment of CLLD applications must be uniform and easy.
@@ -52,10 +51,10 @@ These constraints led to the following design decisions:
 - Allow UI customization via i18n and templates.
 
 
-The clld package
-~~~~~~~~~~~~~~~~
+Overview
+~~~~~~~~
 
-clld provides
+``clld`` provides
 
 - a common core database model,
 - a pyramid application scaffold,
@@ -75,6 +74,7 @@ Contents:
     :maxdepth: 2
 
     tutorial
+    extending
     resources
     interfaces
     db
@@ -82,18 +82,14 @@ Contents:
     lib
     linkeddata
     protocols
-    extending
     deployment
 
 
 The applications
 ----------------
 
-The following applications are developed on top the clld framework:
-
-- `wals3 <https://github.com/clld/wals3>`_: The application that will serve http://wals.info
-- `glottolog3 <https://github.com/clld/glottolog3>`_: The application serving http://glottolog.org
-
+For a list of applications developed on top the ``clld`` framework see the
+`list of CLLD datasets <http://clld.org/datasets>`_.
 
 
 Indices and tables
