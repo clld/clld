@@ -268,6 +268,8 @@ class PolymorphicBaseMixin(object):
 
 
 def is_base(cls):
+    # replace with inspection?
+    # see http://docs.sqlalchemy.org/en/rel_0_9/orm/mapper_config.html?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
     return PolymorphicBaseMixin in cls.__bases__
 
 

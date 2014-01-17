@@ -17,6 +17,10 @@
     % endfor
     % if ctx.iso_code:
     <lexvo:iso639P3PCode rdf:datatype="xsd:string">${ctx.iso_code}</lexvo:iso639P3PCode>
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/ISO_639:${ctx.iso_code}"/>
+    % endif
+    % if ctx.glottocode:
+    <owl:sameAs rdf:resource="http://glottolog.org/resource/languoid/id/${ctx.glottocode}"/>
     % endif
     % for vs in ctx.valuesets:
     <dcterms:isReferencedBy rdf:resource="${request.resource_url(vs)}"/>
