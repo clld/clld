@@ -28,7 +28,7 @@ layout for a CLLD app::
 
     pcreate -t clld_app myapp
 
-.. notes::
+.. note::
 
     The ``pcreate`` command has been installed with pyramid as a dependency of ``clld``.
 
@@ -83,6 +83,30 @@ The data
 Now you can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
 
     python myapp/scripts/initializedb.py development.ini
+
+Filling the database is done by instantiating model objects and
+`adding them <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#adding-new-objects>`_
+to ``clld.db.meta.DBSession``. (This session is already initialized when your code in ``initializedb.py`` runs.)
+
+The ``data`` object present in the ``main`` function in ``initializedb.py`` is an instance of
+
+.. autoclass:: clld.scripts.util.Data
+    :members:
+
+Thus, you can create objects which you can reference later like
+
+.. code-block:: python
+
+    data.add(common.Language, 'mylangid', id='1', name='French')
+    data.add(common.Unit, 'myunitid', id='1', language=data['Language']['mylangid'])
+
+.. note::
+
+    All model classes derived from :py:class:`clld.db.meta.Base` have an integer primary key
+    ``pk``. This primary key is defined in such a way (at least for
+    `PostgreSQL <http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#sequences-serial>`_
+    and SQLite) that you do not have to specify it when instantiating an object (although you may
+    do so).
 
 
 A note on files

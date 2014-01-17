@@ -1,6 +1,6 @@
 
-Extending the basic functionality of a CLLD app
------------------------------------------------
+Customizing a CLLD app
+----------------------
 
 Extending or customizing the default behaviour of a CLLD app is basically what pyramid
 calls `configuration <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/configuration.html>`_.
@@ -11,6 +11,60 @@ Since the config object is an instance of the pyramid
 `Configurator <http://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator>`_
 this includes all the standard ways to configure pyramid apps, in particular adding
 routes and views to provide additional pages and funtionality with an app.
+
+
+Wording
+~~~~~~~
+
+Most text displayed on the HTML pages of the default app can be customized using a technique
+commonly called `localization <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html>`_.
+I.e. the default is set up in an "internationalized" way, which can be "localized" by providing
+alternative "translations".
+
+These translations are provided in form of a `PO file <http://www.gnu.org/software/gettext/manual/html_node/PO-Files.html>`_
+which can be edited by hand or with tools such as `Poedit <http://www.poedit.net>`_.
+
+The workflow to create alternative translations for core terms of a CLLD app is as follows:
+
+1. Look up the terms available for translation in ``clld/locale/en/LC_MESSAGES/clld.po``.
+   If the term you want to translate is found, go on. Otherwise file an issue at https://github.com/clld/clld/issues
+2. Initialize a localized catalog for your app running::
+
+    python setup.py init_catalog -l en
+
+3. When installing ``clld`` tools have been installed to
+   `extract terms from python code files <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#extracting-messages-from-code-and-templates>`_.
+   To make the term available for extraction, include code like below in ``myapp``.
+
+.. code-block:: python
+
+    # _ is a recognized name for a function to mark translatable strings
+    _ = lambda s: s
+    _('term you wish to translate')
+
+4. Extract terms from your code and update the local ``myapp/locale/en/LC_MESSAGES/clld.po``::
+
+    python setup.py extract_messages
+    python setup.py update_catalog
+
+5. Add a translation by editing ``myapp/locale/en/LC_MESSAGES/clld.po``.
+6. Compile the catalog::
+
+    python setup.py compile_catalog
+
+If you restart your app you should see your translation at places where previously the core term appeared.
+Whenever you want to add translations, you have to go through steps 3--6 above.
+
+
+Templates
+~~~~~~~~~
+
+The default CLLD app comes with a set of `Mako templates <http://makotemplates.org>`_
+(in ``clld/web/templates``) which control the rendering of HTML pages. Each of these can be
+overridden locally by providing a template file with the same path (relative to the ``templates``
+directory); i.e. to override ``clld/web/templates/language/detail_html.mako`` -- the template
+rendered for the details page of languages (see :ref:`sec-resource-templates`) -- you'd have to provide a file
+``myapp/templates/language/detail_html.mako``.
 
 
 Static assets
@@ -105,3 +159,54 @@ in ``myapp.models`` in two ways:
         pk = Column(Integer, ForeignKey('contribution.pk'), primary_key=True)
         # add more Columns and relationships here
 
+
+To give an example, here's how one could model the many-to-many relation between words and
+meanings often encountered in lexical databases:
+
+.. code-block:: python
+
+    from clld import interfaces
+    from clld.db.models import common
+    from clld.db.meta import CustomModelMixin
+
+    @implementer(interfaces.IParameter)
+    class Meaning(common.Parameter, CustomModelMixin):
+        pk = Column(Integer, ForeignKey('parameter.pk'), primary_key=True)
+
+    @implementer(interfaces.IValueSet)
+    class SynSet(common.ValueSet, CustomModelMixin):
+        pk = Column(Integer, ForeignKey('valueset.pk'), primary_key=True)
+
+    @implementer(interfaces.IUnit)
+    class Word(common.Unit, CustomModelMixin):
+        pk = Column(Integer, ForeignKey('unit.pk'), primary_key=True)
+
+    @implementer(interfaces.IValue)
+    class Counterpart(common.Value, CustomModelMixin):
+        """a counterpart relates a meaning with a word
+        """
+        pk = Column(Integer, ForeignKey('value.pk'), primary_key=True)
+
+        word_pk = Column(Integer, ForeignKey('unit.pk'))
+        word = relationship(Word, backref='counterparts')
+
+The definitions of ``Meaning``, ``Synset`` and ``Word`` above are not strictly necessary
+(because they do not add any relations or columns to the base classes) and are only
+added to make the semantics of the model clear.
+
+Now if we have an instance of ``Word``, we can iterate over its meanings like this
+
+.. code-block:: python
+
+    for counterpart in word.counterparts:
+        print counterpart.valueset.parameter.name
+
+
+
+Adding a resource
+~~~~~~~~~~~~~~~~~
+
+You may also want to add new resources in your app, i.e. objects that behave like builtin
+resources in that routes get automatically registered and view and template lookup works
+as explained in :ref:`sec-resource-request`.
+An example for this technique are the families in e.g. `WALS <http://wals.info/languoid/family/khoisan>`_.

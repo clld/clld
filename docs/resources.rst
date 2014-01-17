@@ -91,6 +91,8 @@ function in the app.util which will be looked up and called in a BeforeRender
 event subscriber.
 
 
+.. _sec-resource-request:
+
 Requesting a resource
 ---------------------
 
