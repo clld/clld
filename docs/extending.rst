@@ -22,7 +22,9 @@ production. Note that in this case the code should not contain any URLs relative
 the file, because these may break in production.
 
 Other static content can still be placed in the ``myapp/static`` directory but must be
-explicitely included on pages making use of it, e.g. with template code like::
+explicitely included on pages making use of it, e.g. with template code like:
+
+.. code-block:: html
 
     <link href="${request.static_url('myapp:static/css/introjs.min.css')}" rel="stylesheet">
     <script src="${request.static_url('myapp:static/js/intro.min.js')}"></script>
@@ -73,3 +75,33 @@ Customize query
 ++++++++++++++++
 
 Overwrite :py:meth:`clld.web.datatables.base.DataTable.base_query`.
+
+
+Data model
+~~~~~~~~~~
+
+The core ``clld`` data model can be extended for CLLD apps by defining additional
+`mappings <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#declare-a-mapping>`_
+in ``myapp.models`` in two ways:
+
+- Additional mappings (thus additional database tables) deriving from :py:class:`clld.db.meta.Base`
+  can be defined.
+- Customizations of core models can be defined using joined table inheritance:
+
+.. code-block:: python
+    :emphasize-lines: 7,8,12
+
+    from sqlalchemy import Column, Integer, ForeignKey
+    from zope.interface import implementer
+    from clld.interfaces import IContribution
+    from clld.db.meta import CustomModelMixin
+    from clld.db.models.common import Contribution
+
+    @implementer(IContribution)
+    class Chapter(Contribution, CustomModelMixin):
+        """Contributions in WALS are chapters chapters. These comprise a set of features with
+        corresponding values and a descriptive text.
+        """
+        pk = Column(Integer, ForeignKey('contribution.pk'), primary_key=True)
+        # add more Columns and relationships here
+
