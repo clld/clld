@@ -74,8 +74,8 @@ Contents:
     :maxdepth: 2
 
     tutorial
-    extending
     resources
+    extending
     interfaces
     db
     web
