@@ -102,6 +102,14 @@ Thus, you can create objects which you can reference later like
 
 .. note::
 
+    Using ``data.add`` for all objects may not be a good idea for big datasets, because keeping
+    references to all objects prevents garbage collection and will blow up the memory used
+    for the import process. Some experimentation may be required if you hit this problem.
+    As a general rule: only use ``data.add`` for objects that you actually need to lookup
+    lateron.
+
+.. note::
+
     All model classes derived from :py:class:`clld.db.meta.Base` have an integer primary key
     ``pk``. This primary key is defined in such a way (at least for
     `PostgreSQL <http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#sequences-serial>`_

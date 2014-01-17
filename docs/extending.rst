@@ -210,3 +210,55 @@ You may also want to add new resources in your app, i.e. objects that behave lik
 resources in that routes get automatically registered and view and template lookup works
 as explained in :ref:`sec-resource-request`.
 An example for this technique are the families in e.g. `WALS <http://wals.info/languoid/family/khoisan>`_.
+
+The steps required to add a custom resource are:
+
+1. Define an interface for the resource in ``myapp/interfaces.py``:
+
+.. code-block:: python
+
+    from zope.interface import Interface
+
+    class IFamily(Interface):
+        """marker"""
+
+2. Define a model in ``myapp/models.py``.
+
+.. code-block:: python
+
+    @implementer(myapp.interfaces.IFamily)
+    class Family(Base, common.IdNameDescriptionMixin):
+        pass
+
+3. Register the resource in ``myapp.main``:
+
+.. code-block:: python
+
+    config.register_resource('family', Family, IFamily)
+
+4. Create templates for HTML views, e.g. ``myapp/templates/family/detail_html.mako``,
+5. and register these:
+
+.. code-block:: python
+
+    from clld.web.adapters.base import adapter_factory
+    ...
+    config.register_adapter(adapter_factory('family/detail_html.mako'), IFamily)
+
+
+Custom URLs
+~~~~~~~~~~~
+
+When an established database is ported to CLLD it may be necessary to support legacy URLs
+for its resources (as was the case for WALS). This can be achieved by passing a ``route_patterns``
+dict, mapping route names to custom patterns, in the settings to :py:func:`clld.web.app.get_configurator`
+like in the following example from WALS:
+
+.. code-block:: python
+
+    def main(global_config, **settings):
+        settings['route_patterns'] = {
+            'languages': '/languoid',
+            'language': '/languoid/lect/wals_code_{id:[^/\.]+}',
+        }
+        config = get_configurator('wals3', **dict(settings=settings))
