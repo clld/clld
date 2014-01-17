@@ -202,6 +202,7 @@ Now if we have an instance of ``Word``, we can iterate over its meanings like th
         print counterpart.valueset.parameter.name
 
 
+.. _sec-extending-resource:
 
 Adding a resource
 ~~~~~~~~~~~~~~~~~

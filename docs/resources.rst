@@ -9,7 +9,7 @@ also for single instances, more generally a resource is a type of data implement
 an interface to which behaviour can be attached.
 
 The default resources known in a CLLD app are listed in ``clld.RESOURCES``, but it is
-possible to extend this list when configuring a custom app.
+possible to extend this list when configuring a custom app (see :ref:`sec-extending-resource`).
 
 Resources have the following attributes:
 
@@ -40,8 +40,15 @@ db model derived from the default one using joined table inheritance.
 Adapters
 --------
 
-TODO
+Adapters are basically used to provide representations of a resource. Thus, if we want to
+provide the classification tree of a Glottolog languoid in newick format, we have to write
+and register an adapter. This kind of adapter is generally implemented as subclass of
+:py:class:`clld.web.adapters.base.Representation`.
 
+For the builtin resources a couple of adapters are registered by default:
+
+- a template-based adapter to render the details page,
+- a JSON representation of the resource (based on :py:class:`clld.web.adapters.base.JSON`).
 
 .. _sec-resource-routes:
 
