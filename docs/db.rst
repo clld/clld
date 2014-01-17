@@ -7,6 +7,7 @@ The clld data model includes the following entities commonly found in linguistic
 
 .. automodule:: clld.db.models.common
     :members:
+    :exclude-members: relationship, desc
 
 
 Extensibility
@@ -17,7 +18,8 @@ The core clld data model can be extended by clld apps in two ways:
 - Additional models (thus additional database tables) deriving from :py:class:`clld.db.meta.Base` can be defined.
 - Customizations of core models can be defined using joined table inheritance::
 
-.. code-block::
+.. code-block:: python
+    :emphasize-lines: 7,8,12
 
     from sqlalchemy import Column, Integer, ForeignKey
     from zope.interface import implementer
