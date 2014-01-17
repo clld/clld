@@ -2,6 +2,13 @@
 Extending the basic functionality of a CLLD app
 -----------------------------------------------
 
+Extending or customizing the default behaviour of a CLLD app is basically what pyramid
+calls `configuration <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/configuration.html>`_.
+So, since the ``clld_app`` scaffold is somewhat tuned towards imperative configuration,
+this means calling methods on the config object returned by the call to
+:py:func:`clld.web.app.get_configurator` in the apps ``main`` function.
+
+
 Static assets
 ~~~~~~~~~~~~~
 
@@ -9,6 +16,17 @@ CLLD Apps may provide custom css and js code. If this code is placed in the defa
 locations package/static/project.[css|js], it will automatically be packaged for
 production. Note that in this case the code should not contain any URLs relative to
 the file, because these may break in production.
+
+
+Menu Items
+~~~~~~~~~~
+
+Registering non-default menu items can only be done wholesale, i.e. replacing the whole
+main menu by calling the ``register_menu`` method of the config object.
+
+.. py:function:: register_menu(*items) #*
+
+    :param items: (name, factory) pairs, where factory is a callable that accepts the two parameters (ctx, req) and returns a pair (url, label) to use for the menu link and name is used to compare with the ``active_menu`` attribute of templates.
 
 
 Datatables

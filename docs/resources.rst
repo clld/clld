@@ -1,5 +1,6 @@
 
 .. _sec-resource:
+
 Resources
 =========
 
@@ -26,6 +27,7 @@ via the ``interface`` (as is the case for adapters).
 
 
 .. _sec-resource-models:
+
 Models
 ------
 
@@ -34,6 +36,7 @@ db model derived from the default one using joined table inheritance.
 
 
 .. _sec-resource-adapters:
+
 Adapters
 --------
 
@@ -41,6 +44,7 @@ TODO
 
 
 .. _sec-resource-routes:
+
 Routes
 ------
 
@@ -57,6 +61,7 @@ For each resource the following routes and views (and URLs) are registered by de
 
 
 .. _sec-resource-views:
+
 Views
 -----
 
@@ -64,6 +69,16 @@ clld.web.views
 
 - index
 - detail
+
+
+.. _sec-resource-templates:
+
+Templates
+---------
+
+The views associated with resources may use templates to render the response. In particular
+this is the case for the HTML index and details view.
+
 
 
 Providing custom data for a reources details template
@@ -74,3 +89,30 @@ clld core code, clld applications may need a way to provide additional context
 for the templates. This can be done by implementing an appropriately named
 function in the app.util which will be looked up and called in a BeforeRender
 event subscriber.
+
+
+Requesting a resource
+---------------------
+
+The flow of events when a resource is requested from a CLLD app is as follows
+(we don't give a complete rundown but only highlight the deviations from the general
+`pyramid request processing <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/router.html>`_ flow):
+
+1. When a route for a resource matches, the corresponding factory function is called to
+   obtain the context of the request. For index routes this context object is an instance
+   of a DataTable, for a details route this is an instance of the resource's model class
+   (or a custom specialization of this model).
+
+2. For index routes :py:func:`clld.web.views.index_view` is called, for details routes
+   :py:func:`clld.web.views.resource_view`.
+
+3. Both of these look up the appropriate adapter registered for the context, instantiate it
+   and call its ``render_to_response`` method. The result of this call is returned as
+   ``Response``.
+
+4. If this method uses a `standard template renderer <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/templates.html>`_
+   the listener for the ``BeforeRender`` event will look for a function in ``myapp.util``
+   with a name of ``<resource_name>_<template_basename>``, e.g. ``dataset_detail_html`` for
+   the template ``templates/dataset/detail_html.mako``. If such a function exists, it will
+   be called with the current template variables as keyword parameters. The return value of the
+   function is expected to be a dictionary which will be used to update the template variables.

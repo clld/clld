@@ -265,8 +265,8 @@ def register_adapter(config, cls, from_, to_=None, name=None):
 
 def register_menu(config, *items):
     """
-    :param factory: a callable that accepts the two parameters (ctx, req) and returns\
-    a pair (url, label) to use for the menu link.
+    :param items: (name, factory) pairs, where factory is a callable that accepts the two\
+    parameters (ctx, req) and returns a pair (url, label) to use for the menu link.
     """
     menuitems = OrderedDict()
     for name, factory in items:
