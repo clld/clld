@@ -1,6 +1,9 @@
 
+Getting started
+---------------
+
 Installation
-------------
+~~~~~~~~~~~~
 
 For the time being, the ``clld`` package can only be installed from source. To do so,
 you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_::
@@ -13,7 +16,7 @@ Alternatively, you may want to fork ``clld`` first and then work with your fork.
 
 
 Bootstrapping a CLLD app
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 A CLLD app is a python package implementing a
 `pyramid <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
@@ -21,7 +24,7 @@ web application.
 
 
 The package
-~~~~~~~~~~~
++++++++++++
 
 The ``clld`` package provides a pyramid application scaffold to create the initial package directory
 layout for a CLLD app::
@@ -78,7 +81,7 @@ setting must point to an existing (although empty) database if the ``postgresql`
 
 
 The data
-~~~~~~~~
+++++++++
 
 Now you can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
 
@@ -138,7 +141,7 @@ in a different directory than primary data files.
 
 
 The app
-~~~~~~~
++++++++
 
 You are now ready to run::
 
@@ -148,7 +151,7 @@ and navigate with your browser to http://0.0.0.0:6543 to visit your application.
 
 
 Examples
---------
+~~~~~~~~
 
 A good way explore how to customize a CLLD app is by looking at the code of existing apps.
 These apps are listed at `<http://clld.org/datasets>`_ and each app links to its source code
