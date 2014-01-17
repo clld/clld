@@ -56,9 +56,9 @@ Overview
 
 ``clld`` provides
 
-- a common core database model,
-- a pyramid application scaffold,
-- a core web application implemmented in the pyramid framework,
+- a common core database model :py:mod:`clld.db.models.common`,
+- a `pyramid application scaffold <http://docs.pylonsproject.org/projects/pyramid/en/latest/glossary.html#term-scaffold>`_,
+- a core web application implemmented in the pyramid framework :py:mod:`clld.web.app`,
 - scripts exploiting the core database model,
 - deployment tasks implemented using fabric,
 - libraries for common problems when working with linguistic databases.

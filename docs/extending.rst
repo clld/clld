@@ -7,15 +7,25 @@ calls `configuration <http://docs.pylonsproject.org/projects/pyramid/en/latest/n
 So, since the ``clld_app`` scaffold is somewhat tuned towards imperative configuration,
 this means calling methods on the config object returned by the call to
 :py:func:`clld.web.app.get_configurator` in the apps ``main`` function.
+Since the config object is an instance of the pyramid
+`Configurator <http://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator>`_
+this includes all the standard ways to configure pyramid apps, in particular adding
+routes and views to provide additional pages and funtionality with an app.
 
 
 Static assets
 ~~~~~~~~~~~~~
 
 CLLD Apps may provide custom css and js code. If this code is placed in the default
-locations package/static/project.[css|js], it will automatically be packaged for
+locations ``myapp/static/project.[css|js]``, it will automatically be packaged for
 production. Note that in this case the code should not contain any URLs relative to
 the file, because these may break in production.
+
+Other static content can still be placed in the ``myapp/static`` directory but must be
+explicitely included on pages making use of it, e.g. with template code like::
+
+    <link href="${request.static_url('myapp:static/css/introjs.min.css')}" rel="stylesheet">
+    <script src="${request.static_url('myapp:static/js/intro.min.js')}"></script>
 
 
 Menu Items
