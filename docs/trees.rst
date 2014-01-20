@@ -27,7 +27,7 @@ Then we add the closure table.
 .. code-block:: python
 
     class ClosureTable(Base):
-        __tablename__ = 'closuretable'
+        __table_args__ = (UniqueConstraint('parent_pk', 'child_pk'),)
         parent_pk = Column(Integer, ForeignKey('languoid.pk'))
         child_pk = Column(Integer, ForeignKey('languoid.pk'))
         depth = Column(Integer)
@@ -45,7 +45,6 @@ data.
 
     DBSession.execute('delete from closuretable')
     SQL = ClosureTable.__table__.insert()
-    ltable = Languoid.__table__
 
     # store a mapping of pk to father_pk for all languoids:
     father_map = {r[0]: r[1] for r in DBSession.execute('select pk, father_pk from languoid')}
