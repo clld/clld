@@ -56,6 +56,12 @@ If you restart your app you should see your translation at places where previous
 Whenever you want to add translations, you have to go through steps 3--6 above.
 
 
+Static Pages
+~~~~~~~~~~~~
+
+TODO: reserved route names, ...
+
+
 Templates
 ~~~~~~~~~
 
@@ -201,6 +207,8 @@ Now if we have an instance of ``Word``, we can iterate over its meanings like th
     for counterpart in word.counterparts:
         print counterpart.valueset.parameter.name
 
+A more involved example for the case of tree-structured data is given in :doc:`trees`.
+
 
 .. _sec-extending-resource:
 
@@ -247,6 +255,12 @@ The steps required to add a custom resource are:
     config.register_adapter(adapter_factory('family/detail_html.mako'), IFamily)
 
 
+Custom maps
+~~~~~~~~~~~
+
+TODO
+
+
 Custom URLs
 ~~~~~~~~~~~
 
@@ -263,3 +277,19 @@ like in the following example from WALS:
             'language': '/languoid/lect/wals_code_{id:[^/\.]+}',
         }
         config = get_configurator('wals3', **dict(settings=settings))
+
+
+Downloads
+~~~~~~~~~
+
+TODO
+
+
+Misc Utilities
+~~~~~~~~~~~~~~
+
+http://www.muthukadan.net/docs/zca.html#utility
+
+- IMapMarker
+- ILinkAttrs
+- ICtxFactoryQuery

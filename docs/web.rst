@@ -24,7 +24,8 @@ processing for jquery datatables.
 Adapters
 ~~~~~~~~
 
-TODO
+.. automodule:: clld.web.adapters.base
+    :members:
 
 
 Linked Data
