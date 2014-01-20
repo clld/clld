@@ -144,9 +144,17 @@ The core ``clld`` data model can be extended for CLLD apps by defining additiona
 `mappings <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#declare-a-mapping>`_
 in ``myapp.models`` in two ways:
 
-- Additional mappings (thus additional database tables) deriving from :py:class:`clld.db.meta.Base`
-  can be defined.
-- Customizations of core models can be defined using joined table inheritance:
+1. Additional mappings (thus additional database tables) deriving from :py:class:`clld.db.meta.Base`
+can be defined.
+
+.. note::
+
+    While deriving from :py:class:`clld.db.meta.Base` may add some columns to your table which
+    you don't actually need (e.g. ``created``, ...), it is still important to do so, to
+    ensure custom objects behave the same as core ones.
+
+2. Customizations of core models can be defined using
+`joined table inheritance <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#joined-table-inheritance>`_:
 
 .. code-block:: python
     :emphasize-lines: 7,8,12
@@ -164,6 +172,12 @@ in ``myapp.models`` in two ways:
         """
         pk = Column(Integer, ForeignKey('contribution.pk'), primary_key=True)
         # add more Columns and relationships here
+
+.. note::
+
+    Inheriting from :py:class:`clld.db.meta.CustomModelMixin` takes care of half of the
+    boilerplate code necessary to make inheritance work. The primary key still has to be
+    defined "by hand".
 
 
 To give an example, here's how one could model the many-to-many relation between words and
