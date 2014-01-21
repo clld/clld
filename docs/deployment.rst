@@ -2,7 +2,7 @@
 Deployment of CLLD apps
 -----------------------
 
-The 'clld.deploy' package provides functionality to ease the deployment of CLLD apps. The
+The 'clldfabric' package provides functionality to ease the deployment of CLLD apps. The
 functionality is implemented as fabric tasks.
 
 
@@ -21,5 +21,3 @@ Automation
 We use fabric to automate deployment and other tasks which have to be executed on remote
 hosts.
 
-.. automodule:: clld.deploy.tasks
-    :members:
