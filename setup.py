@@ -47,7 +47,7 @@ install_requires = [
 ]
 
 if not PY3:
-    install_requires.extend('xlrd xlwt Babel fabric fabtools==0.16 pyx==0.12.1'.split())
+    install_requires.extend('xlrd xlwt Babel pyx==0.12.1'.split())
 else:
     install_requires.extend('pyx>=0.13'.split())
 
