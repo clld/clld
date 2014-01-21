@@ -17,18 +17,13 @@ from clld.web.adapters import get_adapter, get_adapters
 from clld.web.util.multiselect import MultiSelect
 from clld.db.models.common import Combination
 from clld.web.maps import CombinedMap
-from clld.lib.clld_api import resourcemap
 
 
 class ParameterMultiSelect(MultiSelect):
     def __init__(self, req, name, eid, collection=None, url=None, selected=None):
         MultiSelect.__init__(self, req, name, eid, url='x')
-        if not req.registry.settings['clld.parameters']:
-            for app in ['wals', 'apics', 'ewave']:
-                req.registry.settings['clld.parameters'][app] = resourcemap(app, 'parameter')
-
         self.data = []
-        for app, rm in req.registry.settings['clld.parameters'].items():
+        for app, rm in req.registry.settings.get('clld.parameters', {}).items():
             for param in rm['resources']:
                 self.data.append({
                     'id': '%s-%s' % (app, param['id']),
