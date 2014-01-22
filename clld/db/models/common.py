@@ -172,6 +172,18 @@ class LanguageSource(Base, Versioned):
     source_pk = Column(Integer, ForeignKey('source.pk'))
 
 
+def _add_solr_language_info(res, obj):
+    if getattr(obj, 'language', None):
+        res['language_t'] = obj.language.name
+        obj = obj.language
+
+    for attr in ['iso_code', 'glottocode']:
+        value = getattr(obj, attr, None)
+        if value:
+            res.update({attr + '_s': value})
+    return res
+
+
 #-----------------------------------------------------------------------------
 # The mapper classes for basic objects of the clld db model are marked as
 # implementers of the related interface.
@@ -273,11 +285,7 @@ class Language(Base,
     def __solr__(self, req):
         res = Base.__solr__(self, req)
         res['altname_txt'] = [i.name for i in self.identifiers if i.type == 'name']
-        for attr in ['iso_code', 'glottocode']:
-            value = getattr(self, attr)
-            if value:
-                res.update({attr + '_s': value})
-        return res
+        return _add_solr_language_info(res, self)
 
 
 class DomainElement_data(Base, Versioned, DataMixin):
@@ -348,10 +356,15 @@ class Combination(object):
     delimiter = '_'
 
     def __init__(self, *parameters):
+        """
+        :param parameters: distinct Parameter instances.
+        """
         assert len(parameters) < 5
+        assert len(set(parameters)) == len(parameters)
         self.id = self.delimiter.join(map(str, [p.id for p in parameters]))
         self.name = ' / '.join(p.name for p in parameters)
         self.parameters = parameters
+        # we keep track of languages with multiple values.
         self.multiple = []
 
     @classmethod
@@ -361,7 +374,7 @@ class Combination(object):
     @classmethod
     def get(cls, id_, **kw):
         params = []
-        for pid in id_.split(cls.delimiter):
+        for pid in set(id_.split(cls.delimiter)):
             params.append(
                 DBSession.query(Parameter)
                 .filter(Parameter.id == pid)
@@ -371,6 +384,11 @@ class Combination(object):
 
     @cached_property()
     def domain(self):
+        """
+        .. note::
+
+            This does only work well with parameters which have a discrete domain.
+        """
         d = OrderedDict()
         for i, des in enumerate(product(*[p.domain for p in self.parameters])):
             cde = CombinationDomainElement(
@@ -391,6 +409,7 @@ class Combination(object):
             for i, cv in enumerate(product(*values_by_parameter.values())):
                 d[tuple(v.domainelement.number for v in cv)].languages.append(language)
                 if i > 0:
+                    # a language with multiple values, store a reference.
                     self.multiple.append(language)
         self.multiple = set(self.multiple)
         return d.values()
@@ -704,14 +723,7 @@ class Sentence(Base,
             'Language', backref=backref('sentences', order_by=cls.language_pk))
 
     def __solr__(self, req):
-        res = Base.__solr__(self, req)
-        if self.language:
-            res['language_t'] = self.language.name
-            for attr in ['iso_code', 'glottocode']:
-                value = getattr(self.language, attr)
-                if value:
-                    res.update({attr + '_s': value})
-        return res
+        return _add_solr_language_info(Base.__solr__(self, req), self)
 
     @property
     def audio(self):
@@ -741,14 +753,7 @@ class Unit(Base,
     language = relationship(Language)
 
     def __solr__(self, req):
-        res = Base.__solr__(self, req)
-        if self.language:
-            res['language_t'] = self.language.name
-            for attr in ['iso_code', 'glottocode']:
-                value = getattr(self.language, attr)
-                if value:
-                    res.update({attr + '_s': value})
-        return res
+        return _add_solr_language_info(Base.__solr__(self, req), self)
 
 
 class UnitDomainElement_data(Base, Versioned, DataMixin):

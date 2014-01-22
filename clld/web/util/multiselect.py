@@ -69,6 +69,9 @@ class MultiSelect(Component):
 
 
 class CombinationMultiSelect(MultiSelect):
+    """
+    >>> ms = CombinationMultiSelect(None)
+    """
     def __init__(self, req, name='parameters', eid='ms-parameters', combination=None,
                  **kw):
         if combination:

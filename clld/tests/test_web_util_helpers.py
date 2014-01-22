@@ -9,6 +9,11 @@ from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
+    def test_alt_representations(self):
+        from clld.web.util.helpers import alt_representations
+
+        alt_representations(self.env['request'], common.Parameter.first())
+
     def test_link(self):
         from clld.web.util.helpers import link
 

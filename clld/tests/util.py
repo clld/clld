@@ -12,10 +12,9 @@ import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
 
-from mock import Mock, MagicMock
+from mock import Mock
 from path import path
 from pyramid.paster import bootstrap
-from pyramid.config import Configurator
 import transaction
 from sqlalchemy import create_engine
 from webtest import TestApp
@@ -31,7 +30,6 @@ import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
 from clld.db.models import common
 from clld.web.adapters import Representation
-from clld.web.adapters.download import N3Dump
 from clld.web.icon import MapMarker
 from clld import interfaces
 
@@ -100,7 +98,7 @@ class TestWithDbAndData(TestWithDb):
             contributors[id_] = common.Contributor(id=id_, name=name, url='http://example.org')
 
         contribution = common.Contribution(id='contribution', name='Contribution')
-        cr = common.ContributionReference(contribution=contribution, source=source)
+        common.ContributionReference(contribution=contribution, source=source)
         assert common.ContributionContributor(
             contribution=contribution,
             primary=True,
@@ -119,12 +117,12 @@ class TestWithDbAndData(TestWithDb):
         language.sources.append(source)
         for i, type_ in enumerate(common.IdentifierType):
             id_ = common.Identifier(type=type_.value, id=type_.value + str(i), name='abc')
-            li = common.LanguageIdentifier(language=language, identifier=id_)
+            common.LanguageIdentifier(language=language, identifier=id_)
 
         for i in range(2, 102):
             _l = common.Language(id='l%s' % i, name='Language %s' % i)
             _i = common.Identifier(type='iso639-3', id='%.3i' % i, name='%.3i' % i)
-            _li = common.LanguageIdentifier(language=_l, identifier=_i)
+            common.LanguageIdentifier(language=_l, identifier=_i)
             DBSession.add(_l)
 
         param = common.Parameter(id='parameter', name='Parameter')
@@ -139,10 +137,17 @@ class TestWithDbAndData(TestWithDb):
             frequency=50,
             confidence='high')
         DBSession.add(value)
+        value2 = common.Value(
+            id='value2',
+            domainelement=de2,
+            valueset=valueset,
+            frequency=50,
+            confidence='high')
+        DBSession.add(value2)
         paramnd = common.Parameter(id='no-domain', name='Parameter without domain')
         valueset = common.ValueSet(
             id='vs2', language=language, parameter=paramnd, contribution=contribution)
-        vr = common.ValueSetReference(valueset=valueset, source=source)
+        common.ValueSetReference(valueset=valueset, source=source)
         value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
         DBSession.add(value)
 

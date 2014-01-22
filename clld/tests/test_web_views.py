@@ -43,6 +43,17 @@ class Tests(TestWithEnv):
         self.set_request_properties(matchdict={'ext': 'x'})
         self.assertRaises(HTTPNotAcceptable, resource_view, ctx, self.env['request'])
 
+    def test_select_combination(self):
+        from clld.web.views import select_combination
+
+        self.assertRaises(HTTPNotFound, select_combination, None, self.env['request'])
+        self.set_request_properties(
+            params={'parameters': 'parameter'})
+        self.assertRaises(HTTPFound, select_combination, None, self.env['request'])
+        self.set_request_properties(
+            params=[('parameters', 'parameter'), ('parameters', 'no-domain')])
+        self.assertRaises(HTTPFound, select_combination, None, self.env['request'])
+
     def test__raise(self):
         from clld.web.views import _raise
 

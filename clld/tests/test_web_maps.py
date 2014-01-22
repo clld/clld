@@ -43,3 +43,12 @@ class Tests(TestWithEnv):
 
         dt = LanguageMap(common.Language.first(), self.env['request'])
         dt.render()
+
+    def test_CombinationMap(self):
+        from clld.web.maps import CombinationMap
+
+        ctx = common.Combination(common.Parameter.first())
+        assert ctx.domain
+        ctx.multiple = [common.Language.first()]
+        dt = CombinationMap(ctx, self.env['request'])
+        dt.render()

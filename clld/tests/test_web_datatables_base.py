@@ -9,6 +9,7 @@ class Tests(TestWithEnv):
     def test_DataTable(self):
         from clld.web.datatables.base import (
             DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IntegerIdCol, IdCol,
+            ExternalLinkCol,
         )
 
         class TestTable(DataTable):
@@ -23,7 +24,8 @@ class Tests(TestWithEnv):
                     Col(self, 'description', format=lambda i: 'x'),
                     IntegerIdCol(self, 'id'),
                     IdCol(self, 'nid',
-                          get_object=lambda i: i, model_col=common.Contributor.id)]
+                          get_object=lambda i: i, model_col=common.Contributor.id),
+                    ExternalLinkCol(self, 'url')]
 
         dt = TestTable(self.env['request'], common.Contributor)
         assert unicode(dt) == 'Contributors'

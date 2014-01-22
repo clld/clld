@@ -12,6 +12,7 @@ class Tests(TestWithApp):
     def test_sitemap(self):
         self.app.get('/sitemap.language.0.xml', status=200)
         self.app.get('/resourcemap.json?rsc=language', status=200)
+        self.app.get('/resourcemap.json?rsc=parameter', status=200)
         self.app.get('/resourcemap.json?rsc=xxx', status=404)
 
     def test_dataset(self):
@@ -29,6 +30,7 @@ class Tests(TestWithApp):
             self.app.get('/%ss' % rsc.name, status=200)
             self.app.get('/%ss.rdf' % rsc.name, status=200)
             self.app.get('/%ss?sEcho=1&iDisplayLength=5' % rsc.name, xhr=True, status=200)
+        self.app.get('/combinations/parameter')
 
     def test_source(self):
         for ext in 'bib en ris mods'.split():

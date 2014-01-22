@@ -202,6 +202,9 @@ class CombinationMap(Map):
                     self.__geojson__(de).render(de, self.req, dump=False),
                     marker=HTML.img(src=de.icon.url(self.req), height='20', width='20'))
         if self.ctx.multiple:
+            # yield another layer which can be used to mark languages with multiple
+            # values, because this may not be visible when markers are stacked on top
+            # of each other.
             icon_url = self.req.registry.getUtility(IIcon, 'tff0000').url(self.req)
             yield Layer(
                 '__multiple__',
@@ -237,7 +240,11 @@ class LanguageMap(Map):
             'sidebar': True}
 
 
-def layers(spec, size, zindex=0):
+#
+# The following code implements a map to overlay geojson for parameters from distinct
+# datasets. It may be used by CrossGram at some point.
+#
+def layers(spec, size, zindex=0):  # pragma: no cover
     app, pid, url = spec
 
     def normalize(geojson):
@@ -270,7 +277,7 @@ def layers(spec, size, zindex=0):
             domain=geojson['properties']['domain'])
 
 
-class CombinedMap(Map):
+class CombinedMap(Map):  # pragma: no cover
     def get_layers(self):
         for i, spec in enumerate(self.ctx):
             for layer in layers(spec, (i+1)*10 + 10, (i+1)*(-1000)):

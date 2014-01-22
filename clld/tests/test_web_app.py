@@ -17,6 +17,7 @@ class Tests(TestWithEnv):
         c = self.env['request'].db.query(Contribution).first()
         self.env['request'].resource_url(c, ext='geojson')
         self.assertEqual(None, self.env['request'].ctx_for_url('/some/path/to/nowhere'))
+        assert self.env['request'].ctx_for_url('/')
         self.env['request'].file_url(Language_files(id='1', object=Language.first()))
         assert self.env['request'].get_datatable('valuesets', ValueSet)
         assert self.env['request'].blog is None

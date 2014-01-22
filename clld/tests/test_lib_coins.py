@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals
 import unittest
 
 from clld.lib.bibtex import Record
@@ -18,3 +20,6 @@ class Tests(unittest.TestCase):
         bib = Record('conference', '1', title='The Title', booktitle='something')
         co = ContextObject.from_bibtex('sid', bib)
         self.assertTrue(isinstance(co.span_attrs(), dict))
+
+        assert ContextObject('äöü', 'äöü').span_attrs()
+        assert ContextObject('äöü'.encode('latin1'), None).span_attrs()

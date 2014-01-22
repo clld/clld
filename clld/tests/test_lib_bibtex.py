@@ -18,8 +18,15 @@ class Tests(unittest.TestCase):
 
         rec = Record(
             'book', '1',
-            title='The Title', editor='ed', booktitle='bt', school='s', issue='i',
-            pages='1-4', publisher='M', note="Revised edition")
+            title='The Title',
+            author='author',
+            editor='ed',
+            booktitle='bt',
+            school='s',
+            issue='i',
+            pages='1-4',
+            publisher='M',
+            note="Revised edition")
         self.assertTrue('@book' in rec.__unicode__())
         self.assertTrue('@book' in rec.__str__())
         self.assertTrue('bt' in rec.text())

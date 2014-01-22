@@ -26,6 +26,7 @@ class Tests(TestWithDb):
         DBSession.flush()
         for lang in DBSession.query(Language).filter(Language.id == 'abc'):
             self.assertEqual(lang.custom, 'c')
+            self.assertTrue('custom_t' in lang.__solr__(None))
             break
 
     def test_Base(self):

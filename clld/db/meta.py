@@ -112,6 +112,16 @@ class JSONEncodedDict(TypeDecorator):
         return value
 
 
+def _solr_timestamp(dt):
+    if not dt:
+        return
+    try:
+        dt = dt.astimezone(UTC)
+    except ValueError:
+        pass
+    return dt.isoformat().split('+')[0] + 'Z'
+
+
 class Base(UnicodeMixin):
     """All our models have an integer primary key which has nothing to do with
     the kind of data stored in a table. 'Natural' candidates for primary keys
@@ -213,14 +223,16 @@ class Base(UnicodeMixin):
 
         res = dict(
             id=getattr(self, 'id', str(self.pk)),
-            url=req.resource_url(self),
-            dataset=req.dataset.id,
+            url=req.resource_url(self) if req else None,
+            dataset=req.dataset.id if req else None,
             rscname=cls.__name__,
             name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
             active=self.active,
-            updated=self.updated.astimezone(UTC).isoformat().split('+')[0] + 'Z',
-            created=self.created.astimezone(UTC).isoformat().split('+')[0] + 'Z',
         )
+        for attr in ['updated', 'created']:
+            value = _solr_timestamp(getattr(self, attr))
+            if value:
+                res[attr] = value
         suffix_map = [(unicode, '_t'), (bool, '_b'), (int, '_i'), (float, '_f')]
         for om in object_mapper(self).iterate_to_root():
             for col in om.local_table.c:

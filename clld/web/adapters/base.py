@@ -57,9 +57,9 @@ class Representation(Renderable):
 
 @implementer(interfaces.IRepresentation)
 class Json(Renderable):
+    """JavaScript Object Notation
     """
-    """
-    name = 'JavaScript Object Notation'
+    name = 'JSON'
     mimetype = 'application/json'
     extension = 'json'
 

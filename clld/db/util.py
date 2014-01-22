@@ -57,7 +57,7 @@ def page_query(q, n=1000, verbose=False, commit=False):
         for elem in q.limit(n).offset(offset):
             r = True
             yield elem
-        if commit:
+        if commit:  # pragma: no cover
             transaction.commit()
             transaction.begin()
         offset += n

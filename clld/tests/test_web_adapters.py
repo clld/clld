@@ -37,6 +37,16 @@ class Tests(TestWithEnv):
         dl.create(self.env['request'], verbose=False)
         os.remove(dl.abspath(self.env['request']))
 
+    def testDownload_url(self):
+        from clld.web.adapters.download import Download
+
+        with patch.multiple(
+                'clld.web.adapters.download',
+                download_asset_spec=Mock(
+                    return_value='clld:web/static/images/favicon.ico')):
+            dl = Download(Source, 'clld', ext='bib')
+            assert dl.url(self.env['request'])
+
     def testDownload2(self):
         from clld.web.adapters.download import CsvDump, N3Dump, RdfXmlDump
 

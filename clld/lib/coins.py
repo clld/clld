@@ -2,6 +2,7 @@
 """
 .. seealso:: http://ocoins.info/
 """
+# note: don't import unicode_literals here!
 import re
 
 from six import PY3
@@ -151,6 +152,18 @@ FIELDS = {
 }
 
 
+def _encoded(value):
+    if not isinstance(value, basestring):
+        value = '%s' % value
+    if isinstance(value, unicode):
+        return value.encode('utf8')
+    try:
+        value.decode('utf8')
+        return value
+    except UnicodeDecodeError:
+        return value.decode('latin1').encode('utf8')
+
+
 class ContextObject(list, UnicodeMixin):
     """
     >>> c = ContextObject('sid', 'journal', ('jtitle', '\xe2'))
@@ -257,26 +270,11 @@ class ContextObject(list, UnicodeMixin):
     def __unicode__(self):
         pairs = [
             ('ctx_ver', 'Z39.88-2004'),
-            ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:' + self.mtx),
-            ('rfr_id', 'info:sid/' + self.sid)]
+            ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:' + _encoded(self.mtx)),
+            ('rfr_id', 'info:sid/' + _encoded(self.sid))]
         for pair in self:
-            value = '%s' % pair[1]
-            if isinstance(value, unicode):
-                value = value.encode('utf8')
-            else:
-                try:
-                    value.decode('utf8')
-                except UnicodeDecodeError:
-                    value = value.decode('latin1')
-                    value = value.encode('utf8')
-            pairs.append((pair[0], value))
-        #
-        # TODO: investigate why this happens at all!!
-        #
-        try:
-            return urlencode(pairs)
-        except UnicodeDecodeError:
-            return ''
+            pairs.append((_encoded(pair[0]), _encoded(pair[1])))
+        return urlencode(pairs)
 
     def span_attrs(self):
         return {'class': 'Z3988', 'title': self.__unicode__()}

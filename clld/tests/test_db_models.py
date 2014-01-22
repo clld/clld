@@ -51,6 +51,7 @@ class Tests(TestWithDb):
         d = Language(id='abc')
         assert d.glottocode is None
         assert d.iso_code is None
+        assert d.__solr__(None)
 
     def test_Source(self):
         from clld.db.models.common import Source
@@ -92,6 +93,12 @@ class Tests(TestWithDb):
         DBSession.refresh(l)
         self.assertEqual(l.datadict()['abstract'], 'c')
 
+    def test_Unit(self):
+        from clld.db.models.common import Unit, Language
+
+        u = Unit(name='unit', language=Language(name='language'))
+        assert u.__solr__(None)
+
     def test_UnitValue(self):
         from clld.db.models.common import UnitParameter, UnitValue, UnitDomainElement
 
@@ -126,10 +133,22 @@ class MoreTests(TestWithDbAndData):
         from clld.db.models.common import Contribution
 
         c = DBSession.query(Contribution).first()
-        self.assertTrue(c.primary_contributors)
-        self.assertTrue(c.secondary_contributors)
+        assert c.formatted_contributors()
 
     def test_Value(self):
         from clld.db.models.common import Value
 
         self.assertTrue('valueset' in Value.first().__json__(None))
+
+    def test_Sentence(self):
+        from clld.db.models.common import Sentence
+
+        self.assertTrue('language_t' in Sentence.first().__solr__(None))
+
+    def test_Combination(self):
+        from clld.db.models.common import Combination, Parameter
+
+        p = Parameter.first()
+        c = Combination.get(Combination.delimiter.join(2*[p.id]))
+        assert c.values
+        assert c.domain

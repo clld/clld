@@ -23,7 +23,9 @@ from clld.interfaces import IDownload
 from clld.lib import bibtex
 
 
-def glottocodes_by_isocode(dburi, cols=['id']):
+def glottocodes_by_isocode(dburi, cols=['id']):  # pragma: no cover
+    """query a local glottolog database.
+    """
     select = ', '.join('l.%s' % name for name in cols)
     glottolog = create_engine(dburi)
     glottocodes = {}
@@ -137,7 +139,7 @@ def index(rsc, req, solr, query_options=None, batch_size=1000):
             'json',
             commit=True)
         if res.status != 200:
-            print res.raw_content
+            print res.raw_content  # pragma: no cover
 
 
 def parsed_args(*arg_specs, **kw):  # pragma: no cover

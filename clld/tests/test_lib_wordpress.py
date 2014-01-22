@@ -38,3 +38,4 @@ class Tests(unittest.TestCase):
             'categoryName': 'n', 'categoryId': '1'}])))
         client.get_categories()
         client.get_categories(name='n')
+        client.set_categories([{'name': 'n', 'description': 'desc'}])
