@@ -7,9 +7,11 @@ functionality to gather information about iso-639-3 codes from sil.org
 #http://www-01.sil.org/iso639-3/iso-639-3_20130531.tab
 #CREATE TABLE [ISO_639-3] (
 #Id      char(3) NOT NULL,  -- The three-letter 639-3 identifier
-#Part2B  char(3) NULL,      -- Equivalent 639-2 identifier of the bibliographic applications
+#Part2B  char(3) NULL,      -- Equivalent 639-2 identifier of the bibliographic
+#                              applications
 #                           -- code set, if there is one
-#Part2T  char(3) NULL,      -- Equivalent 639-2 identifier of the terminology applications code
+#Part2T  char(3) NULL,      -- Equivalent 639-2 identifier of the terminology applications
+#                              code
 #                           -- set, if there is one
 #Part1   char(2) NULL,      -- Equivalent 639-1 identifier, if there is one
 #Scope   char(1) NOT NULL,  -- I(ndividual), M(acrolanguage), S(pecial)
@@ -42,12 +44,12 @@ functionality to gather information about iso-639-3 codes from sil.org
 #Ret_Reason  char(1)      NOT NULL,     -- code for retirement: C (change), D (duplicate),
 #                                       -- N (non-existent), S (split), M (merge)
 #Change_To   char(3)      NULL,         -- in the cases of C, D, and M, the identifier
-#                                       -- to which all instances of this Id should be changed
+#                                       -- to which all instances of this Id should be
+#                                          changed
 #Ret_Remedy  varchar(300) NULL,         -- The instructions for updating an instance
 #                                       -- of the retired (split) identifier
 #Effective   date         NOT NULL)     -- The date the retirement became effective
 #"""
-from collections import namedtuple
 import re
 
 import requests
@@ -56,7 +58,9 @@ from bs4 import BeautifulSoup as bs
 from clld.lib import dsv
 
 
-TAB_NAME_PATTERN = re.compile('iso-639-3(?P<name>_Name_Index|\-macrolanguages|_Retirements)?(_(?P<date>[0-9]{8}))?\.tab$')
+TAB_NAME_PATTERN = re.compile(
+    'iso-639-3(?P<name>_Name_Index|\-macrolanguages|_Retirements)'
+    '?(_(?P<date>[0-9]{8}))?\.tab$')
 
 
 def get(path):

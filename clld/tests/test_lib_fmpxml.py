@@ -9,7 +9,7 @@ class Tests(unittest.TestCase):
     def test_Result(self):
         from clld.lib.fmpxml import Result
 
-        r = Result(file(TESTS_DIR.joinpath('fmpxmlresult.xml')).read())
+        Result(file(TESTS_DIR.joinpath('fmpxmlresult.xml')).read())
 
     def test_normalize_markup(self):
         from clld.lib.fmpxml import normalize_markup

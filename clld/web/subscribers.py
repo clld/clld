@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from six import PY3
 from pyramid.i18n import get_localizer, TranslationStringFactory
 

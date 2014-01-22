@@ -2,7 +2,6 @@ from mock import Mock
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
-from clld.db.meta import DBSession
 
 
 class Tests(TestWithEnv):

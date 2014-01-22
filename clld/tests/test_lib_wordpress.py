@@ -21,7 +21,8 @@ class Tests(unittest.TestCase):
             client.get_post_id_from_path('/post')
 
         with patch('clld.lib.wordpress.requests',
-                   self._requests('<input type="hidden" name="comment_post_ID" value="1" />')):
+                   self._requests('<input type="hidden" name="comment_post_ID" value="1" '
+                                  '/>')):
             client.get_post_id_from_path('/post')
 
         client.server = MagicMock()

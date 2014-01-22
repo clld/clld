@@ -1,17 +1,15 @@
 """
 client for the xmlrpc API of a wordpress blog
 
-note: we ignore blog_id altogether, see
-http://joseph.randomnetworks.com/archives/2008/06/10/blog-id-in-wordpress-and-xml-rpc-blog-apis/
-thus, rely on identifying the appropriate blog by xmlrpc endpoint.
+.. note::
+
+    we ignore blog_id altogether, see
+    http://joseph.randomnetworks.com/archives/2008/06/10/\
+    blog-id-in-wordpress-and-xml-rpc-blog-apis/
+    thus, rely on identifying the appropriate blog by xmlrpc endpoint.
 """
 import re
 import xmlrpclib
-import urllib
-import urlparse
-from datetime import datetime
-from time import strptime
-from xml.etree import cElementTree as et
 
 import requests
 
@@ -107,7 +105,7 @@ class Client(object):
         for cat in categories:
             if cat['name'] not in existing_categories:
                 struct = dict(name=cat['name'])
-                for attr in ['parent_id','description','slug']:
+                for attr in ['parent_id', 'description', 'slug']:
                     if attr in cat:
                         struct[attr] = cat[attr]
                 cat_map[cat['name']] = int(
@@ -131,7 +129,9 @@ class Client(object):
         res = requests.get(path)
         if res.status_code != 200:
             return None
-        m = re.search('\<input type\="hidden" name\="comment_post_ID" value\="(?P<id>[0-9]+)" \/\>', res.text)
+        m = re.search(
+            '\<input type\="hidden" name\="comment_post_ID" value\="(?P<id>[0-9]+)" \/\>',
+            res.text)
         if m:
             return int(m.group('id'))
         else:

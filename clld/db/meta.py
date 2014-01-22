@@ -2,7 +2,7 @@
 We provide some infrastructure to build extensible database models.
 """
 from copy import copy
-from datetime import datetime, date
+from datetime import datetime
 try:
     import simplejson as json
 except ImportError:
@@ -281,7 +281,8 @@ class PolymorphicBaseMixin(object):
 
 def is_base(cls):
     # replace with inspection?
-    # see http://docs.sqlalchemy.org/en/rel_0_9/orm/mapper_config.html?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
+    # see http://docs.sqlalchemy.org/en/rel_0_9/orm/mapper_config.html
+    #?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
     return PolymorphicBaseMixin in cls.__bases__
 
 

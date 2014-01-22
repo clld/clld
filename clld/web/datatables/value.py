@@ -45,7 +45,8 @@ class RefsCol(Col):
     __kw__ = dict(bSearchable=False, bSortable=False)
 
     def format(self, item):
-        return ', '.join(filter(None, [item.valueset.source, linked_references(self.dt.req, item.valueset)]))
+        return ', '.join(filter(
+            None, [item.valueset.source, linked_references(self.dt.req, item.valueset)]))
 
 
 class Values(DataTable):
@@ -84,8 +85,10 @@ class Values(DataTable):
 
         if self.parameter:
             return res + [
-                LinkCol(self, 'language',
-                        model_col=Language.name, get_object=lambda i: i.valueset.language),
+                LinkCol(self,
+                        'language',
+                        model_col=Language.name,
+                        get_object=lambda i: i.valueset.language),
                 name_col,
                 RefsCol(self, 'source'),
                 LinkToMapCol(self, 'm', get_object=lambda i: i.valueset.language),
@@ -94,8 +97,11 @@ class Values(DataTable):
         if self.language:
             return res + [
                 name_col,
-                LinkCol(self, 'parameter', sTitle=self.req.translate('Parameter'),
-                        model_col=Parameter.name, get_object=lambda i: i.valueset.parameter),
+                LinkCol(self,
+                        'parameter',
+                        sTitle=self.req.translate('Parameter'),
+                        model_col=Parameter.name,
+                        get_object=lambda i: i.valueset.parameter),
                 RefsCol(self, 'source'),
                 #
                 # TODO: refs?

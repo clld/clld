@@ -9,8 +9,7 @@ import logging
 from functools import partial
 
 import transaction
-from sqlalchemy import engine_from_config, create_engine, Integer
-from sqlalchemy.sql.expression import cast
+from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy.orm import joinedload
 from path import path
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
@@ -29,7 +28,9 @@ def glottocodes_by_isocode(dburi, cols=['id']):  # pragma: no cover
     select = ', '.join('l.%s' % name for name in cols)
     glottolog = create_engine(dburi)
     glottocodes = {}
-    for row in glottolog.execute('select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk' % select):
+    for row in glottolog.execute(
+        'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk' % select
+    ):
         glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
     return glottocodes
 
@@ -172,7 +173,8 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
         args.log.info('using bind %s' % engine)
     args.data_file = partial(data_file, args.module)
     args.module_dir = path(args.module.__file__).dirname()
-    args.migrations_dir = path(args.module.__file__).dirname().joinpath('..', 'migrations')
+    args.migrations_dir = path(
+        args.module.__file__).dirname().joinpath('..', 'migrations')
     return args
 
 
@@ -262,8 +264,10 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
                 log.info('%s' % sorted(list(words(stitle))))
                 log.info('%s' % sorted(list(iwords)))
             if needs_check:
-                log.info('------- %s -> %s' % (source.id, item['volumeInfo'].get('industryIdentifiers')))
-                log.info('%s %s' % (item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
+                log.info('------- %s -> %s' % (
+                    source.id, item['volumeInfo'].get('industryIdentifiers')))
+                log.info('%s %s' % (
+                    item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
                 log.info(stitle)
                 log.info(item['volumeInfo'].get('publishedDate'))
                 log.info(source.year)

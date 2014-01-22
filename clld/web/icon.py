@@ -80,7 +80,7 @@ class Icon(object):
 
 ICONS = map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS])
 ICON_MAP = {icon.name: icon for icon in ICONS}
-ORDERED_ICONS = [ICON_MAP[s+c] for s, c in
+ORDERED_ICONS = [ICON_MAP[s + c] for s, c in
                  list(product(SHAPES, PREFERED_COLORS)) +
                  list(product(SHAPES, SECONDARY_COLORS))]
 

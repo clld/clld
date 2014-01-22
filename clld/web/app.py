@@ -27,6 +27,7 @@ from pyramid.renderers import JSON, JSONP
 from purl import URL
 
 import clld
+assert clld
 from clld.config import get_config
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
@@ -36,7 +37,7 @@ from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
-    combined, select_combination,
+    select_combination,
 )
 from clld.web.views.olac import olac, OlacConfig
 from clld.web.views.sitemap import robots, sitemapindex, sitemap, resourcemap
@@ -46,6 +47,7 @@ from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap, CombinationMap
 from clld.web.icon import ICONS, MapMarker
 from clld.web import assets
+assert assets
 
 
 class ClldRequest(Request):
@@ -424,8 +426,8 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('sitemap', '/sitemap.{rsc}.{n}.xml', sitemap)
     config.add_route('resourcemap', '/resourcemap.json')
     config.add_view(resourcemap, route_name='resourcemap', renderer='jsonp')
-    config.add_route_and_view('select_combination', '/_select_combination', select_combination)
-    #config.add_route_and_view('combined', '/combined', combined, renderer='combined.mako')
+    config.add_route_and_view(
+        'select_combination', '/_select_combination', select_combination)
 
     # TODO: remove google site verification for personal account! should be configurable!
     config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')
@@ -439,7 +441,8 @@ def get_configurator(pkg, *utilities, **kw):
     for rsc in RESOURCES:
         name, model = rsc.name, rsc.model
         factory = partial(ctx_factory, model, 'index')
-        config.add_route_and_view(rsc.plural, '/%s' % rsc.plural, index_view, factory=factory)
+        config.add_route_and_view(
+            rsc.plural, '/%s' % rsc.plural, index_view, factory=factory)
         config.register_datatable(
             rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
         config.register_adapter(

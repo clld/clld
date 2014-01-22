@@ -20,4 +20,7 @@ class Tests(unittest.TestCase):
     def test_get_classification(self):
         from clld.lib.ethnologue import get_classification
 
-        res = get_classification('group', '<li><a href="/subgroups/sid">S Name (1)</a><a href="/language/abc">[abc]</a></li>')
+        get_classification(
+            'group',
+            '<li><a href="/subgroups/sid">S Name (1)</a><a href="/language/abc">[abc]</a>'
+            '</li>')

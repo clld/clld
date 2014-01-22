@@ -17,6 +17,7 @@ else:
 
 try:
     import newrelic.agent
+    assert newrelic.agent
     NEWRELIC = True
 except ImportError:  # pragma: no cover
     NEWRELIC = False
@@ -26,6 +27,7 @@ from sqlalchemy.orm import joinedload_all
 from markupsafe import Markup
 from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
+assert get_current_request
 from pyramid.interfaces import IRoutesMapper
 
 from clld import interfaces
@@ -34,6 +36,8 @@ from clld.web.util.htmllib import HTML, literal
 from clld.db.meta import DBSession
 from clld.db.models import common as models
 from clld.web.adapters import get_adapter, get_adapters
+assert get_adapter
+assert get_adapters
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 from clld.lib import rdf
@@ -147,9 +151,9 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
     def degminsec(dec, hemispheres):
         _dec = abs(dec)
         degrees = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec)))*60
+        _dec = (_dec - int(floor(_dec))) * 60
         minutes = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec)))*60
+        _dec = (_dec - int(floor(_dec))) * 60
         seconds = _dec
         if no_seconds:
             if seconds > 30:
@@ -181,7 +185,8 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
                         degminsec(obj.latitude, 'NS'), degminsec(obj.longitude, 'EW'))),
                     HTML.br(),
                     HTML.span(
-                        '{0.latitude:.2f}, {0.longitude:.2f}'.format(obj), class_='geo'))),
+                        '{0.latitude:.2f}, {0.longitude:.2f}'.format(obj),
+                        class_='geo'))),
             class_="table table-condensed"))
 
 
@@ -251,7 +256,8 @@ def link_to_map(language):
 
 
 def gbs_link(source, pages=None):
-    if not source or not source.google_book_search_id or not source.jsondata or not source.jsondata.get('gbs'):
+    if not source or not source.google_book_search_id \
+            or not source.jsondata or not source.jsondata.get('gbs'):
         return ''
     if source.jsondata['gbs']['accessInfo']['viewability'] in ['NO_PAGES']:
         return ''
@@ -261,7 +267,8 @@ def gbs_link(source, pages=None):
         if match:
             pg = 'PA' + match.group('startpage')
     return HTML.a(
-        HTML.img(src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"),
+        HTML.img(src="https://www.google.com/intl/en/googlebooks/images/"
+                 "gbs_preview_button1.gif"),
         href="http://books.google.com/books?id=%s&lpg=PP1&pg=%s" % (
             source.google_book_search_id, pg)
     )
@@ -367,12 +374,12 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             HTML.div(
                 HTML.div(sentence.original_script, class_='original-script')
                 if sentence.original_script else '',
-                HTML.div(literal(sentence.markup_text or sentence.name), class_='object-language'),
+                HTML.div(literal(sentence.markup_text or sentence.name),
+                         class_='object-language'),
                 HTML.div(*units, **{'class': 'gloss-box'}) if units else '',
                 HTML.div(sentence.description, class_='translation')
                 if sentence.description else '',
                 alt_translation(sentence),
-                #HTML.small(literal(sentence.comment)) if sentence.comment and fmt == 'long' else '',
                 class_='body',
             ),
             class_="sentence",
@@ -533,7 +540,8 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
             *[HTML.li(HTML.a(
                 a.name or a.extension,
                 href="#",
-                onclick="document.location.href = '%s'; return false;" % req.resource_url(rsc, ext=a.extension),
+                onclick="document.location.href = '%s'; return false;"
+                        % req.resource_url(rsc, ext=a.extension),
                 id='dt-dl-%s' % a.extension))
               for a in adapters],
             **dict(class_="dropdown-menu")),

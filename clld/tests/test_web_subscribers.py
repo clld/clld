@@ -1,5 +1,3 @@
-import unittest
-
 from mock import Mock
 
 from clld.tests.util import TestWithEnv

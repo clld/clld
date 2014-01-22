@@ -31,7 +31,8 @@ class Unitvalues(DataTable):
 
         if self.unitparameter:
             #query = query.join(common.Contribution, common.Unit)
-            return query.filter(common.UnitValue.unitparameter_pk == self.unitparameter.pk)
+            return query.filter(
+                common.UnitValue.unitparameter_pk == self.unitparameter.pk)
 
         if self.contribution:
             #query = query.join(common.Unit, common.UnitParameter)

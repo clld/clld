@@ -1,5 +1,5 @@
 from clld.web.datatables.base import DataTable, Col, LinkCol
-from clld.web.util.helpers import linked_contributors, cite_button, JSModal
+from clld.web.util.helpers import linked_contributors, cite_button
 
 
 class ContributorsCol(Col):

@@ -1,5 +1,3 @@
-import unittest
-
 from zope.interface import Interface
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
@@ -57,7 +55,7 @@ class Tests(TestWithEnv):
         assert 'app:main.use' in config.registry.settings
 
     def test_get_configurator(self):
-        from clld.web.app import get_configurator, menu_item
+        from clld.web.app import get_configurator
 
         class IF(Interface):
             """" """""

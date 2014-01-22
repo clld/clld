@@ -38,7 +38,6 @@ def download_dir(pkg):
 @implementer(IDownload)
 class Download(object):
     """
-    >>> from clld.db.models.common import Source
     >>> from mock import Mock
     >>> dl = Download(Source, 'clld', ext='x')
     >>> assert dl.asset_spec(Mock()).startswith('clld:')
@@ -96,14 +95,17 @@ class Download(object):
                 if not filename:
                     fp = StringIO()
                     self.before(req, fp)
-                    for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
+                    for i, item in enumerate(
+                            page_query(self.query(req), verbose=verbose)):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
                     fp.seek(0)
                     zipfile.writestr(self.name, fp.read())
                 else:
                     zipfile.write(filename, self.name)
-                zipfile.writestr('README.txt', """
+                zipfile.writestr(
+                    'README.txt',
+                    """
 {0} data download
 {1}
 
@@ -113,10 +115,12 @@ Data of {0} is published under the following license:
 It should be cited as
 
 {3}
-""".format(req.dataset.name,
-           '='*(len(req.dataset.name.encode('utf8')) + len(' data download')),
-           req.dataset.license,
-           TxtCitation(None).render(req.dataset, req).encode('utf8')))
+""".format(
+                    req.dataset.name,
+                    '=' * (len(req.dataset.name.encode('utf8'))
+                           + len(' data download')),
+                    req.dataset.license,
+                    TxtCitation(None).render(req.dataset, req).encode('utf8')))
         if p.exists():
             p.remove()
         tmp.move(p)
@@ -125,7 +129,8 @@ It should be cited as
         q = DBSession.query(self.model).filter(self.model.active == True)
         if self.model == Language:
             q = q.options(
-                joinedload_all(Language.languageidentifier, LanguageIdentifier.identifier),
+                joinedload_all(
+                    Language.languageidentifier, LanguageIdentifier.identifier),
                 #joinedload(Language.sources)
             )
         if self.model == Source:

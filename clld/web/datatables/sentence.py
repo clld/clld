@@ -51,9 +51,16 @@ class Sentences(DataTable):
             LinkCol(self, 'name', sTitle='Primary text', sClass="object-language"),
             TsvCol(self, 'analyzed', sTitle='Analyzed text'),
             TsvCol(self, 'gloss', sClass="gloss"),
-            Col(self, 'description', sTitle=self.req.translate('Translation'), sClass="translation"),
+            Col(self,
+                'description',
+                sTitle=self.req.translate('Translation'),
+                sClass="translation"),
             TypeCol(self, 'type'),
-            LinkCol(self, 'language', model_col=Language.name, get_obj=lambda i: i.language),
+            LinkCol(
+                self,
+                'language',
+                model_col=Language.name,
+                get_obj=lambda i: i.language),
             DetailsRowLinkCol(self, 'd'),
         ]
 

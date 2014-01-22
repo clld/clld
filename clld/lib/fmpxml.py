@@ -72,7 +72,8 @@ class Result(object):
                 if data:
                     val = data[0].text
                 else:  # pragma: no cover
-                    assert '::' in name  # make sure this is a derived value from a different table.
+                    # make sure this is a derived value from a different table.
+                    assert '::' in name
                     val = None
                 if val and type_ == 'NUMBER':
                     try:

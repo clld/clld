@@ -8,6 +8,10 @@ class Languages(DataTable):
             IdCol(self, 'id'),
             LinkCol(self, 'name'),
             LinkToMapCol(self, 'm'),
-            Col(self, 'latitude', sDescription='<small>The geographic latitude</small>'),
-            Col(self, 'longitude', sDescription='<small>The geographic longitude</small>'),
+            Col(self,
+                'latitude',
+                sDescription='<small>The geographic latitude</small>'),
+            Col(self,
+                'longitude',
+                sDescription='<small>The geographic longitude</small>'),
         ]

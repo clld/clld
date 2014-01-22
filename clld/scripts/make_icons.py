@@ -44,7 +44,8 @@ def pyxColor(string):
     >>> assert pyxColor('ffffff')
     """
     assert len(string) == 6
-    colorTuple = tuple(int('0x' + c, 16) for c in [string[i:i+2] for i in range(0, 6, 2)])
+    colorTuple = tuple(
+        int('0x' + c, 16) for c in [string[i:i + 2] for i in range(0, 6, 2)])
     return color.rgb(*[i / 255.0 for i in colorTuple])
 
 

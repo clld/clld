@@ -95,7 +95,8 @@ class TestWithDbAndData(TestWithDb):
             'c': 'c Name',
             'd': 'd Name'}
         for id_, name in contributors.items():
-            contributors[id_] = common.Contributor(id=id_, name=name, url='http://example.org')
+            contributors[id_] = common.Contributor(
+                id=id_, name=name, url='http://example.org')
 
         contribution = common.Contribution(id='contribution', name='Contribution')
         common.ContributionReference(contribution=contribution, source=source)

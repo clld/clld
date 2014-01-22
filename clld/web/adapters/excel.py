@@ -65,7 +65,8 @@ class Values(ExcelAdapter):
         for obj in [item.valueset.parameter, item.valueset.language]:
             res.append(hyperlink(req.resource_url(obj), obj.__unicode__()))
         res.extend([item.frequency or '', item.confidence or ''])
-        res.append(';'.join(filter(None, [r.source.name for r in item.valueset.references if r.source])))
+        res.append(';'.join(filter(
+            None, [r.source.name for r in item.valueset.references if r.source])))
         return res
 
 

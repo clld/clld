@@ -1,14 +1,11 @@
 """
 functionality to gather information to link to ethnologue.com
 """
-from collections import namedtuple
 import re
 import time
 
 import requests
 from bs4 import BeautifulSoup as bs
-
-from clld.lib import dsv
 
 
 def get(path):
@@ -50,7 +47,9 @@ def get_classification(group, doc):
         """
         for a in node.find_all('a', href=True):
             if a['href'].startswith('/language/'):
-                yield a.text.split(']')[0].split('[')[1].strip(), list(a.parent.stripped_strings)[0]
+                yield (
+                    a.text.split(']')[0].split('[')[1].strip(),
+                    list(a.parent.stripped_strings)[0])
 
     def parse_subgroups(node):
         for a in node.find_all('a', href=True):
@@ -64,7 +63,9 @@ def get_classification(group, doc):
                 root = p
                 break
         assert root
-        return [aa['href'][len(prefix):] for aa in parse_subgroups(root)], list(parse_languages(root))
+        return (
+            [aa['href'][len(prefix):] for aa in parse_subgroups(root)],
+            list(parse_languages(root)))
 
     for a in parse_subgroups(bs(doc)):
         id_ = a['href'][len(prefix):]
@@ -76,7 +77,10 @@ def get_classification(group, doc):
             print a.text
             raise
         subfamilies, languages = parse_classification(a)
-        if ext != len(languages) and id_ not in ['mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16', 'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern']:  # pragma: no cover
+        if ext != len(languages) and id_ not in [
+            'mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16',
+            'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern'
+        ]:  # pragma: no cover
             print group
             print id_
             print ext, len(languages)

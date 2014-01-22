@@ -9,7 +9,8 @@ from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 import dateutil.parser
 
 
-DATETIME_ISO_FORMAT = re.compile('[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]+')
+DATETIME_ISO_FORMAT = re.compile(
+    '[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]+')
 
 
 def parse_json_with_datetime(d):

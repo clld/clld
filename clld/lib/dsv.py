@@ -26,7 +26,8 @@ def rows(filename=None,
     """
     >>> assert list(rows(__file__))
     >>> from clld.tests.util import TESTS_DIR
-    >>> assert list(rows(TESTS_DIR.joinpath('test.tab'), namedtuples=True, encoding='utf8'))
+    >>> l = list(rows(TESTS_DIR.joinpath('test.tab'), namedtuples=True, encoding='utf8'))
+    >>> assert l
     """
     assert filename or content
     assert not (filename and content)

@@ -4,7 +4,9 @@ from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
 from clld.web.util.component import Component
-from clld.web.adapters.geojson import GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement
+from clld.web.adapters.geojson import (
+    GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement,
+)
 from clld.util import cached_property
 
 
@@ -23,7 +25,14 @@ class Layer(object):
 class Legend(object):
     """Object holding all data necessary to render a navpill with a dropdown above a map.
     """
-    def __init__(self, map_, name, items, label=None, stay_open=False, item_attrs=None, pull_right=False):
+    def __init__(self,
+                 map_,
+                 name,
+                 items,
+                 label=None,
+                 stay_open=False,
+                 item_attrs=None,
+                 pull_right=False):
         self.map = map_
         self.name = name
         self.label = label or name.capitalize()
@@ -115,7 +124,8 @@ class Map(Component):
                             class_="stay-open",
                             type="checkbox",
                             checked="checked",
-                            onclick=helpers.JS_CLLD.mapToggleLayer(self.eid, layer.id, helpers.JS("this"))),
+                            onclick=helpers.JS_CLLD.mapToggleLayer(
+                                self.eid, layer.id, helpers.JS("this"))),
                         getattr(layer, 'marker', ''),
                         layer.name,
                         class_="checkbox inline stay-open",
@@ -155,7 +165,8 @@ class Map(Component):
             layer.name,
             onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
             href=layer.data if isinstance(layer.data, basestring) else '#')
-        yield Legend(self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
+        yield Legend(
+            self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 
 
 class ParameterMap(Map):
@@ -166,12 +177,15 @@ class ParameterMap(Map):
                     de.id,
                     de.name,
                     self.req.resource_url(
-                        self.ctx, ext='geojson', _query=dict(domainelement=str(de.id), **self.req.query_params)
+                        self.ctx, ext='geojson',
+                        _query=dict(domainelement=str(de.id), **self.req.query_params)
                     ),
                     marker=helpers.map_marker_img(self.req, de, marker=self.map_marker))
         else:
             yield Layer(
-                self.ctx.id, self.ctx.name, self.req.resource_url(self.ctx, ext='geojson'))
+                self.ctx.id,
+                self.ctx.name,
+                self.req.resource_url(self.ctx, ext='geojson'))
 
     def get_default_options(self):
         return {'info_query': {'parameter': self.ctx.pk}, 'hash': True}
@@ -263,7 +277,8 @@ def layers(spec, size, zindex=0):  # pragma: no cover
             yield Layer(
                 '-'.join([id_, de['id']]),
                 '%s: %s - %s' % (app, geojson['properties']['name'], de['name']),
-                normalize(requests.get(url + '.geojson?domainelement=' + de['id']).json()),
+                normalize(
+                    requests.get(url + '.geojson?domainelement=' + de['id']).json()),
                 size=size,
                 link=url,
                 marker=HTML.img(src=de['icon'], width=size, height=size))
@@ -280,7 +295,7 @@ def layers(spec, size, zindex=0):  # pragma: no cover
 class CombinedMap(Map):  # pragma: no cover
     def get_layers(self):
         for i, spec in enumerate(self.ctx):
-            for layer in layers(spec, (i+1)*10 + 10, (i+1)*(-1000)):
+            for layer in layers(spec, (i + 1) * 10 + 10, (i + 1) * (-1000)):
                 yield layer
 
     def get_options(self):

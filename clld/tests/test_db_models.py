@@ -149,6 +149,6 @@ class MoreTests(TestWithDbAndData):
         from clld.db.models.common import Combination, Parameter
 
         p = Parameter.first()
-        c = Combination.get(Combination.delimiter.join(2*[p.id]))
+        c = Combination.get(Combination.delimiter.join(2 * [p.id]))
         assert c.values
         assert c.domain

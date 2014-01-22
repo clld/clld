@@ -7,6 +7,7 @@ intialize_db and making sure all db changes are done via alembic migrations.
 from subprocess import call
 from importlib import import_module
 import pkg_resources
+assert pkg_resources
 import re
 from tempfile import mktemp
 
@@ -70,7 +71,6 @@ def inserts(iterator):
 
 
 def convert_dump(i, o):  # pragma: no cover
-    _insert = False
     with file(o, 'w') as fp:
         fp.write('.echo OFF\n.bail ON\n')
         fp.write('BEGIN;\n')
@@ -87,7 +87,7 @@ def postgres2sqlite(name):  # pragma: no cover
     call("pg_dump  -f {0} --data-only --inserts {1}".format(pg_sql, name), shell=True)
     convert_dump(pg_sql, sqlite_sql)
     engine = create_engine('sqlite:////{0}'.format(sqlite))
-    m = import_module('{0}.models'.format(name))
+    import_module('{0}.models'.format(name))
     Base.metadata.create_all(engine)
     call('sqlite3 -bail -init {0} {1} ".exit"'.format(sqlite_sql, sqlite), shell=True)
     if pg_sql.exists():

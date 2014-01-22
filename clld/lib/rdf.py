@@ -8,6 +8,9 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import (
     Namespace, DC, DCTERMS, DOAP, FOAF, OWL, RDF, RDFS, SKOS, VOID, XMLNS,
 )
+# make flake8 happy, but still have the following importable from here:
+assert DOAP
+assert XMLNS
 
 from clld.util import encoded
 

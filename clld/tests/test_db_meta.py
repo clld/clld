@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.orm.exc import NoResultFound
 
 from clld.tests.util import TestWithDb
 from clld.db.models.common import Language

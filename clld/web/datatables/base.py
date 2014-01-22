@@ -330,7 +330,7 @@ class DataTable(Component):
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
             'sAjaxSource': self.req.route_url(
-            '%ss' % self.model.mapper_name().lower(), _query=query_params),
+                '%ss' % self.model.mapper_name().lower(), _query=query_params),
         }
 
     def base_query(self, query):
@@ -392,7 +392,9 @@ class DataTable(Component):
         """
         """
         return HTML.div(
-            button(icon('info-sign', inverted=True), class_='btn-info %s-cdOpener' % self.eid),
+            button(
+                icon('info-sign', inverted=True),
+                class_='btn-info %s-cdOpener' % self.eid),
             HTML.a(
                 icon('download-alt'),
                 HTML.span(class_="caret"),
@@ -408,8 +410,12 @@ class DataTable(Component):
                 *[HTML.li(HTML.a(
                     fmt,
                     href="#",
-                    onclick="document.location.href = CLLD.DataTable.current_url('%s', '%s'); return false;" % (self.eid, fmt),
+                    onclick="document.location.href = CLLD.DataTable.current_url"
+                    "('%s', '%s'); return false;" % (self.eid, fmt),
                     id='dt-dl-%s' % fmt))
-                  for fmt in [a.extension for n, a in self.req.registry.getAdapters([self.model()], IIndex)] if fmt != 'html'],
+                  for fmt in
+                  [a.extension for n, a in
+                   self.req.registry.getAdapters([self.model()], IIndex)]
+                  if fmt != 'html'],
                 **dict(class_="dropdown-menu")),
             class_='btn-group right')

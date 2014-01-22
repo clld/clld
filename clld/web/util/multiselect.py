@@ -56,9 +56,11 @@ class MultiSelect(Component):
         """
         called for each matching result.
 
-        :return: dictionary which can be serialized as JSON for use by the select2 component.
+        :return: dict which can be serialized as JSON for use by the select2 component.
         """
-        return {'id': getattr(obj, 'id', obj.pk), 'text': '%s' % getattr(obj, 'label', obj)}
+        return {
+            'id': getattr(obj, 'id', obj.pk),
+            'text': '%s' % getattr(obj, 'label', obj)}
 
     def render(self, selected=None):
         """allow the list of selected items to be specified upon rendering, too.

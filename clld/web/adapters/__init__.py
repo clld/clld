@@ -1,4 +1,4 @@
-from zope.interface import implementer, implementedBy
+from zope.interface import implementedBy
 
 from clld import RESOURCES
 from clld import interfaces
@@ -7,6 +7,7 @@ from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
 from clld.web.adapters.excel import ExcelAdapter
+assert ExcelAdapter
 from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
@@ -65,8 +66,13 @@ def includeme(config):
 
     # citeable resources are available as html page listing available metadata formats:
     for _if in [interfaces.IContribution, interfaces.IDataset]:
-        specs.append(
-            (_if, Representation, 'application/vnd.clld.md+xml', 'md.html', 'md_html.mako', {'rel': 'describedby'}))
+        specs.append((
+            _if,
+            Representation,
+            'application/vnd.clld.md+xml',
+            'md.html',
+            'md_html.mako',
+            {'rel': 'describedby'}))
 
     specs.append((
         interfaces.ILanguage, Index,
@@ -122,7 +128,9 @@ def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
     """
     adapters = dict(get_adapters(interface, ctx, req))
 
-    if not ext and not name and (not req.accept or ('*/*' in str(req.accept) and not 'q=' in str(req.accept))):
+    if not ext and not name and (
+        not req.accept or ('*/*' in str(req.accept) and not 'q=' in str(req.accept))
+    ):
         # force text/html in case there are no specific criteria to decide
         # or we suspect some weird IE accept header.
         # see also http://www.gethifi.com/blog/browser-rest-http-accept-headers

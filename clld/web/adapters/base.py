@@ -1,4 +1,4 @@
-from zope.interface import implementer, implementedBy
+from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
 

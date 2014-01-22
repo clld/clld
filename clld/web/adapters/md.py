@@ -1,7 +1,4 @@
-import datetime
-from string import Template as StringTemplate
-
-from zope.interface import implementer, implementedBy, providedBy
+from zope.interface import implementer
 
 from clld import interfaces
 from clld.web.adapters.base import Representation

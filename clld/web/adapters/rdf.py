@@ -1,6 +1,3 @@
-from zope.interface import implementer, implementedBy
-
-from clld import interfaces
 from clld.web.adapters.base import Representation, Index
 from clld.lib.rdf import convert
 from clld.util import xmlchars

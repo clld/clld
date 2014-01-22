@@ -10,14 +10,10 @@ SVG_PIE_TEMPLATE = """\
 %(paths)s
 </svg>"""
 
-SVG_PATH_TEMPLATE = '    <path fill="%s" d="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>'
-SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>'
-
-#<polygon points="200,10 250,190 160,210" fill="%s" stroke="black" stroke-width="1" transform="translate(0.5, 0.5)"/>
-#    "s": path.rect(8, 8, 24, 24),  # square -> 6.8,6.8 27.2,6.8 27.2,27.2 6.8,27.2
-#    "t": polygon((2, 4), (38, 4), (20, 35)),  # triangle (pyramid) ->
-#    "f": polygon((2, 36), (38, 36), (20, 5)),  # inverted pyramid
-#    "d": polygon((20, 2), (38, 20), (20, 38), (2, 20)),  # diamond
+SVG_PATH_TEMPLATE = '    <path fill="%s" d="%s" stroke="black" stroke-width="1" '\
+                    'transform="translate(0.5, 0.5)"/>'
+SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="black" '\
+                      'stroke-width="1" transform="translate(0.5, 0.5)"/>'
 
 
 def pie(data, colors, width=34):
@@ -31,20 +27,14 @@ def pie(data, colors, width=34):
         paths = [SVG_CIRCLE_TEMPLATE % (colors[0], width / 2.0, width / 2.0, radius)]
     else:
         total = reduce(add, data)
-        max_value = max(data)
         percent_scale = 100.0 / total
         prev_percent = 0
-        rad_mult = 3.6 * (math.pi/180)
+        rad_mult = 3.6 * (math.pi / 180)
         paths = []
         for index, value in enumerate(data):
             percent = percent_scale * value
             radians = prev_percent * rad_mult
-            x_start = radius+(math.sin(radians) * radius)
-            y_start = radius-(math.cos(radians) * radius)
-            radians = (prev_percent+percent) * rad_mult
-            x_end = radius+(math.sin(radians) * radius)
-            y_end = radius-(math.cos(radians) * radius)
-            percent_greater_fifty = int(percent>=50)
+            radians = (prev_percent + percent) * rad_mult
             path = ' '.join((
                 "M%(radius)s,%(radius)s",
                 "L%(x_start)s,%(y_start)s",
@@ -52,7 +42,13 @@ def pie(data, colors, width=34):
                 "0,",
                 "%(percent_greater_fifty)s,1,",
                 "%(x_end)s %(y_end)s Z"))
-            paths.append(SVG_PATH_TEMPLATE % (colors[index], path % vars()))
+            paths.append(SVG_PATH_TEMPLATE % (colors[index], path % dict(
+                radius=radius,
+                x_start=radius + (math.sin(radians) * radius),
+                y_start=radius - (math.cos(radians) * radius),
+                percent_greater_fifty=int(percent >= 50),
+                x_end=radius + (math.sin(radians) * radius),
+                y_end=radius - (math.cos(radians) * radius))))
 
             half_percent = prev_percent + percent / 2
             radians = half_percent * rad_mult

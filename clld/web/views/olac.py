@@ -58,7 +58,7 @@ Institution = namedtuple('Institution', 'name url location')
 
 
 def timestamp(dt=None):
-    return str(dt or datetime.utcnow()).split('.')[0].replace(' ', 'T')+'Z'
+    return str(dt or datetime.utcnow()).split('.')[0].replace(' ', 'T') + 'Z'
 
 
 def date(dt=None):
@@ -148,7 +148,8 @@ class OlacConfig(object):
             'archiveURL': 'http://%s/' % req.dataset.domain,
             'participants': [
                 Participant("Admin", 'Robert Forkel', 'robert_forkel@eva.mpg.de'),
-            ] + [Participant("Editor", ed.contributor.name, ed.contributor.email or req.dataset.contact) for ed in req.dataset.editors],
+            ] + [Participant("Editor", ed.contributor.name, ed.contributor.email
+                             or req.dataset.contact) for ed in req.dataset.editors],
             'institution': Institution(
                 req.dataset.publisher_name,
                 req.dataset.publisher_url,

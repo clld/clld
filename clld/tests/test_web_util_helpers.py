@@ -37,7 +37,8 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import gbs_link
 
         gbs_link(MagicMock(), pages='34')
-        gbs_link(MagicMock(jsondata=dict(gbs=dict(accessInfo=dict(viewability='NO_PAGES')))))
+        gbs_link(MagicMock(jsondata=dict(
+            gbs=dict(accessInfo=dict(viewability='NO_PAGES')))))
 
     def test_map_marker_img(self):
         from clld.web.util.helpers import map_marker_img

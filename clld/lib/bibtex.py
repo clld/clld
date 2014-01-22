@@ -235,29 +235,29 @@ unpublished
 
 
 FIELDS = [
-    'address',  # Publisher's address (usually just the city, but can be the full address for lesser-known publishers)
+    'address',  # Publisher's address
     'annote',  # An annotation for annotated bibliography styles (not typical)
-    'author',  # The name(s) of the author(s) (in the case of more than one author, separated by and)
+    'author',  # The name(s) of the author(s) (separated by and)
     'booktitle',  # The title of the book, if only part of it is being cited
     'chapter',  # The chapter number
     'crossref',  # The key of the cross-referenced entry
     'edition',  # The edition of a book, long form (such as "First" or "Second")
     'editor',  # The name(s) of the editor(s)
-    'eprint',  # A specification of an electronic publication, often a preprint or a technical report
+    'eprint',  # A specification of electronic publication, preprint or technical report
     'howpublished',  # How it was published, if the publishing method is nonstandard
-    'institution',  # The institution that was involved in the publishing, but not necessarily the publisher
+    'institution',  # institution involved in the publishing,not necessarily the publisher
     'journal',  # The journal or magazine the work was published in
-    'key',  # A hidden field used for specifying or overriding the alphabetical order of entries (when the "author" and "editor" fields are missing). Note that this is very different from the key (mentioned just after this list) that is used to cite or cross-reference the entry.
+    'key',  # A hidden field used for specifying or overriding the orderalphabetical order
     'month',  # The month of publication (or, if unpublished, the month of creation)
     'note',  # Miscellaneous extra information
-    'number',  # The "(issue) number" of a journal, magazine, or tech-report, if applicable. (Most publications have a "volume", but no "number" field.)
+    'number',  # The "(issue) number" of a journal, magazine, or tech-report
     'organization',  # The conference sponsor
     'pages',  # Page numbers, separated either by commas or double-hyphens.
     'publisher',  # The publisher's name
     'school',  # The school where the thesis was written
-    'series',  # The series of books the book was published in (e.g. "The Hardy Boys" or "Lecture Notes in Computer Science")
+    'series',  # The series of books the book was published in
     'title',  # The title of the work
-    'type',  # The field overriding the default type of publication (e.g. "Research Note" for techreport, "{PhD} dissertation" for phdthesis, "Section" for inbook/incollection)
+    'type',  # The field overriding the default type of publication
     'url',  # The WWW address
     'volume',  # The volume of a journal or multi-volume book
     'year',
@@ -438,7 +438,8 @@ class Record(OrderedDict, _Convertable):
         .. seealso::
 
             http://celxj.org/downloads/UnifiedStyleSheet.pdf
-            https://github.com/citation-style-language/styles/blob/master/unified-style-linguistics.csl
+            https://github.com/citation-style-language/styles/blob/master/\
+            unified-style-linguistics.csl
         """
         genre = getattr(self.genre, 'value', self.genre)
         if self.get('editor'):
