@@ -60,7 +60,9 @@ class Sentences(DataTable):
                 self,
                 'language',
                 model_col=Language.name,
-                get_obj=lambda i: i.language),
+                get_obj=lambda i: i.language,
+                bSortable=not self.language,
+                bSearchable=not self.language),
             DetailsRowLinkCol(self, 'd'),
         ]
 
