@@ -99,9 +99,7 @@ def resourcemap(req):
                 .join(common.Language.languageidentifier)\
                 .join(common.LanguageIdentifier.identifier)\
                 .filter(common.Language.active == True)\
-                .filter(common.Identifier.type.in_([
-                    common.IdentifierType.iso.value,
-                    common.IdentifierType.glottolog.value]))\
+                .filter(common.Identifier.type != 'name')\
                 .order_by(common.Language.id)
             for lang, codes in groupby(q, lambda r: (r[0], r[1], r[2], r[3])):
                 res['resources'].append({
@@ -110,7 +108,8 @@ def resourcemap(req):
                     'latitude': lang[2],
                     'longitude': lang[3],
                     'identifiers': [
-                        {'type': c.type, 'identifier': c.name} for c in codes]})
+                        {'type': c.type, 'identifier': c.name.lower()
+                         if c.type.startswith('WALS') else c.name} for c in codes]})
             return res
         if rsc == 'parameter':
             for id, name in DBSession.query(
