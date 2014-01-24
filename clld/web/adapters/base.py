@@ -44,8 +44,13 @@ class Renderable(object):
             res.content_type += '; charset=%s' % self.charset
         return res
 
+    def template_context(self, ctx, req):
+        return {}
+
     def render(self, ctx, req):
-        return pyramid_render(self.template, {'ctx': ctx}, request=req)
+        context = self.template_context(ctx, req)
+        context.setdefault('ctx', ctx)
+        return pyramid_render(self.template, context, request=req)
 
 
 @implementer(interfaces.IRepresentation)
