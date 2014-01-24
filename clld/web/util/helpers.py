@@ -555,3 +555,21 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
             trigger: 'click'
         });
     });""" % doc_position)))
+
+
+def partitioned(items, n=3):
+    """
+    >>> assert list(partitioned(range(10)))[0] == [0, 1, 2, 3]
+    """
+    max_items_per_bucket, rem = divmod(len(items), n)
+    if rem:
+        max_items_per_bucket += 1
+    bucket = []
+
+    for item in items:
+        if len(bucket) >= max_items_per_bucket:
+            yield bucket
+            bucket = []
+        bucket.append(item)
+
+    yield bucket
