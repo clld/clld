@@ -254,6 +254,27 @@ class LanguageMap(Map):
             'sidebar': True}
 
 
+class GeoJsonSelectedLanguages(GeoJsonLanguages):
+    def feature_iterator(self, ctx, req):
+        return self.obj
+
+
+class SelectedLanguagesMap(Map):
+    def __init__(self, ctx, req, languages, geojson_impl=None, **kw):
+        self.geojson_impl = geojson_impl or GeoJsonSelectedLanguages
+        self.languages = languages
+        Map.__init__(self, ctx, req, **kw)
+
+    def get_options(self):
+        return {'icon_size': 20, 'hash': True, 'show_labels': len(self.languages) < 100}
+
+    def get_layers(self):
+        yield Layer(
+            'languages',
+            'Languages',
+            self.geojson_impl(self.languages).render(self.ctx, self.req, dump=False))
+
+
 #
 # The following code implements a map to overlay geojson for parameters from distinct
 # datasets. It may be used by CrossGram at some point.
