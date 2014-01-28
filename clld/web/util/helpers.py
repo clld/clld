@@ -227,6 +227,10 @@ def link(req, obj, **kw):
     if get_link_attrs:
         kw = get_link_attrs(req, obj, **kw)
 
+    if 'class_' in kw:
+        kw['class'] = kw['class_']
+        del kw['class_']
+
     rsc = None
     rsc_name = kw.pop('rsc', None)
     for _rsc in RESOURCES:
@@ -235,7 +239,8 @@ def link(req, obj, **kw):
             break
     assert rsc
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
-    kw.setdefault('class', rsc.interface.__name__[1:])
+    kw['class'] = ' '.join(
+        filter(None, kw.get('class', '').split() + [rsc.interface.__name__[1:]]))
     label = kw.pop('label', unicode(obj))
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
