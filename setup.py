@@ -44,6 +44,7 @@ install_requires = [
     'python-dateutil',
     'newrelic',
     'paginate',
+    'unicsv',
 ]
 
 if not PY3:

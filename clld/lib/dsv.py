@@ -6,6 +6,8 @@ import codecs
 import cStringIO
 from collections import namedtuple
 
+import unicsv
+
 
 def normalize_name(s):
     """
@@ -55,39 +57,11 @@ def rows(filename=None,
             yield cls(*row) if cls else row
 
 
-#
-# TODO: replace the following with unicsv
-# https://github.com/tswicegood/unicsv
-#
-class UnicodeCsvWriter:
-    """A CSV writer which will write rows to CSV file object "fp",
-    which is encoded in the given encoding.
+def namedtuples_from_csv(fp):
+    reader = unicsv.UnicodeCSVDictReader(fp)
+    c = namedtuple('Row', map(normalize_name, reader.fieldnames))
+    for d in reader:
+        yield c(**d)
 
-    >>> fp = cStringIO.StringIO()
-    >>> writer = UnicodeCsvWriter(fp)
-    >>> writer.writerows([[1, u'\xef']])
-    """
 
-    def __init__(self, fp, dialect=csv.excel, encoding="utf-8", **kw):
-        # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
-        self.writer = csv.writer(self.queue, dialect=dialect, **kw)
-        self.stream = fp
-        self.encoder = codecs.getincrementalencoder(encoding)()
-
-    def writerow(self, row):
-        self.writer.writerow(
-            [s.encode("utf-8") if hasattr(s, 'encode') else s for s in row])
-        # Fetch UTF-8 output from the queue ...
-        data = self.queue.getvalue()
-        data = data.decode("utf-8")
-        # ... and reencode it into the target encoding
-        data = self.encoder.encode(data)
-        # write to the target stream
-        self.stream.write(data)
-        # empty queue
-        self.queue.truncate(0)
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
+UnicodeCsvWriter = unicsv.UnicodeCSVWriter
