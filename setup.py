@@ -23,7 +23,7 @@ except IOError:
 
 install_requires = [
     'setuptools >= 0.8',
-    'Pyramid >= 1.4',
+    'Pyramid >= 1.5a4',
     'pyramid_mako',
     'sqlalchemy >= 0.8',
     'Mako >= 0.3.6', # strict_undefined
