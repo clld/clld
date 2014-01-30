@@ -110,6 +110,11 @@ class JSNamespace(object):
 JS_CLLD = JSNamespace('CLLD')
 
 
+def text_citation(req, ctx):
+    citation = get_adapter(interfaces.IRepresentation, ctx, req, ext='md.txt')
+    return citation.render(ctx, req)
+
+
 def get_downloads(req):
     for k, items in groupby(
         sorted(
