@@ -484,6 +484,7 @@ def get_configurator(pkg, *utilities, **kw):
     home_comp = OrderedDict()
     for name, template in [
         ('introduction', False),
+        ('about', False),
         ('terms', False),
         ('glossary', False),
         ('history', False),
