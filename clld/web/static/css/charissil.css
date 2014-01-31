@@ -1,0 +1,28 @@
+/* use Charis SIL - Regular in .woff format */
+@font-face {
+  font-family: CharisSILW;
+  src: url(../fonts/CharisSIL-R.woff);
+}
+/* use Charis SIL - Italic in .woff format */
+@font-face {
+  font-family: CharisSILW;
+  font-style: italic;
+  src: url(../fonts/CharisSIL-I.woff);
+}
+
+@font-face {
+    font-family: CharisSILW;
+    font-weight: bold;
+    src: url(../fonts/CharisSIL-B.woff);
+}
+
+@font-face {
+    font-family: CharisSILW;
+    font-weight: bold;
+    font-style: italic;
+    src: url(../fonts/CharisSIL-BI.woff);
+}
+
+.charissil {
+    font-family: CharisSILW, sans-serif;
+}
