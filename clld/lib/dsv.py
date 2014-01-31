@@ -1,5 +1,5 @@
 """
-support for reading and writing deimiter-separated value files.
+support for reading and writing delimiter-separated value files.
 """
 import csv
 import codecs
