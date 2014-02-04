@@ -173,6 +173,11 @@ class LanguageSource(Base, Versioned):
 
 
 def _add_solr_language_info(res, obj):
+    """
+    :param res: Solr document, i.e. a dict to which new keys will be added.
+    :param obj: object which is searched for language information.
+    :return: mutated dict res
+    """
     if getattr(obj, 'language', None):
         res['language_t'] = obj.language.name
         obj = obj.language
@@ -217,6 +222,11 @@ class Dataset(Base,
     contact = Column(String)
 
     def get_stats(self, resources, **filters):
+        """
+        :param resources:
+        :param filters:
+        :return:
+        """
         res = OrderedDict()
         for rsc in resources:
             if rsc.name != 'combination':
