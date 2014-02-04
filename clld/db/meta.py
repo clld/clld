@@ -9,16 +9,7 @@ except ImportError:
     import json
 
 from pytz import UTC
-from sqlalchemy import (
-    Column,
-    Integer,
-    DateTime,
-    String,
-    Boolean,
-    desc,
-    exc,
-    event,
-)
+import sqlalchemy
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.declarative import (
     declarative_base,
@@ -41,7 +32,7 @@ from clld.db.versioned import versioned_session
 from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 
-@event.listens_for(Pool, "checkout")
+@sqlalchemy.event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor = dbapi_connection.cursor()
     try:
@@ -53,7 +44,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
         # raise DisconnectionError - pool will try
         # connecting again up to three times before raising.
-        raise exc.DisconnectionError()
+        raise sqlalchemy.exc.DisconnectionError()
     cursor.close()
 
 
@@ -137,18 +128,18 @@ class Base(UnicodeMixin):
         """
         return cls.__name__.lower()
 
-    pk = Column(Integer, primary_key=True)
-    created = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated = Column(
-        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+    pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    created = sqlalchemy.Column(sqlalchemy.DateTime(timezone=True), default=datetime.utcnow)
+    updated = sqlalchemy.Column(
+        sqlalchemy.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # The active flag is meant as an easy way to mark records as obsolete or inactive,
     # without actually deleting them. A custom Query class could then be used which
     # filters out inactive records.
-    active = Column(Boolean, default=True)
+    active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
 
     # To allow storage of key,value pairs with typed values:
-    jsondata = Column(JSONEncodedDict)
+    jsondata = sqlalchemy.Column(JSONEncodedDict)
 
     def update_jsondata(self, **kw):
         d = copy(self.jsondata) or {}
@@ -201,7 +192,7 @@ class Base(UnicodeMixin):
 
         history_class = model.__history_mapper__.class_
         return DBSession.query(history_class).filter(history_class.pk == self.pk)\
-            .order_by(desc(history_class.version))
+            .order_by(sqlalchemy.desc(history_class.version))
 
     def __json__(self, req):
         cols = []
@@ -268,7 +259,7 @@ class PolymorphicBaseMixin(object):
     models with project specific attributes. This mixin class prepares
     models to serve as base classes for inheritance.
     """
-    polymorphic_type = Column(String(20))
+    polymorphic_type = sqlalchemy.Column(sqlalchemy.String(20))
 
     @declared_attr
     def __mapper_args__(cls):

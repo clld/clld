@@ -18,10 +18,15 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import link
 
         link(self.env['request'], common.Language(id='id', name='Name'))
-        link(self.env['request'], common.Value.first())
+        link(self.env['request'], common.Value.first(), class_='right')
 
         with self.utility(Mock(return_value={}), ILinkAttrs):
             link(self.env['request'], common.Value.first())
+
+    def test_text_citation(self):
+        from clld.web.util.helpers import text_citation
+
+        text_citation(self.env['request'], common.Contribution.first())
 
     def test_get_referents(self):
         from clld.web.util.helpers import get_referents

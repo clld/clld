@@ -264,7 +264,7 @@ def _add_header(headers, name, value):
     """
     if isinstance(headers, dict):
         headers[name] = value
-    else:
+    else:  # pragma: no cover
         headers.append((name, value))
     return headers
 

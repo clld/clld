@@ -1,9 +1,6 @@
 """
 support for reading and writing delimiter-separated value files.
 """
-import csv
-import codecs
-import cStringIO
 from collections import namedtuple
 
 import unicsv

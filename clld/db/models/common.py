@@ -985,6 +985,9 @@ class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
     value = relationship(Value, backref='sentence_assocs')
     sentence = relationship(Sentence, backref='value_assocs', order_by=Sentence.id)
 
+#
+# TODO: UnitValueSentence!
+#
 
 class UnitParameterUnit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
     unit_pk = Column(Integer, ForeignKey('unit.pk'))
