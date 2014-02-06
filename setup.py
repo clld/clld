@@ -3,6 +3,7 @@ import sys
 
 from setuptools import setup, find_packages
 
+
 py_version = sys.version_info[:2]
 
 PY3 = py_version[0] == 3

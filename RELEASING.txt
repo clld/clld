@@ -1,11 +1,9 @@
 Releasing clld
 ==============
 
-- Do any necessary branch merges (e.g. master to branch, branch to master).
+- Start a release
 
-- On release branch:
-
-  $ git pull
+  $ git flow release start <release number>
 
 - Do platform test via tox:
 
@@ -28,17 +26,30 @@ Releasing clld
 
 - Update translations (using a py3 env with babel patched for py3 compatibility).
 
+  $ python setup.py compile_catalog
+
+- Change clld/__init__.py to the new version number.
+
 - Change setup.py version to the new version number.
 
 - Change docs/conf.py version to the new version number.
 
 - Change CHANGES.txt heading to reflect the new version number.
 
-- Create a release tag.
+- Create a release tag:
+
+  $ git flow release finish <release number>
+
+- Push to github:
+
+  $ git push origin matching
+
+- Test pypi package:
+
+  $ make_package.sh
 
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
 
   $ python setup.py sdist register upload
 
-- Publish new version of docs.
