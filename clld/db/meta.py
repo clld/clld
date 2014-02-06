@@ -129,9 +129,12 @@ class Base(UnicodeMixin):
         return cls.__name__.lower()
 
     pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    created = sqlalchemy.Column(sqlalchemy.DateTime(timezone=True), default=datetime.utcnow)
+    created = sqlalchemy.Column(
+        sqlalchemy.DateTime(timezone=True), default=datetime.utcnow)
     updated = sqlalchemy.Column(
-        sqlalchemy.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+        sqlalchemy.DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow)
 
     # The active flag is meant as an easy way to mark records as obsolete or inactive,
     # without actually deleting them. A custom Query class could then be used which
