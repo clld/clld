@@ -3,12 +3,7 @@ import re
 from functools import partial
 
 from pyramid.response import Response
-from pyramid.httpexceptions import (
-    HTTPNotAcceptable,
-    HTTPFound,
-    HTTPNotFound,
-    HTTPGone,
-)
+import pyramid.httpexceptions
 from pyramid.interfaces import IRoutesMapper
 from pyramid.renderers import render, render_to_response
 
@@ -33,7 +28,7 @@ def xpartial(func, *args, **kw):
 def redirect(cls, location, ctx, req):
     """can be used with xpartial to register views that simply redirect
 
-    >>> view = xpartial(HTTPFound, lambda req: req.route_url('...'))
+    >>> view = xpartial(pyramid.httpexceptions.HTTPFound, lambda req: req.route_url('.'))
     """
     if callable(location):
         location = location(req)
@@ -43,7 +38,7 @@ def redirect(cls, location, ctx, req):
 def gone(ctx, req):
     """view callable
     """
-    raise HTTPGone()
+    raise pyramid.httpexceptions.HTTPGone()
 
 
 def view(interface, ctx, req, getadapters=False):
@@ -57,7 +52,7 @@ def view(interface, ctx, req, getadapters=False):
     adapter, adapters = get_adapter(
         interface, ctx, req, ext=req.matchdict and req.matchdict.get('ext'), getall=True)
     if not adapter:
-        raise HTTPNotAcceptable()
+        raise pyramid.httpexceptions.HTTPNotAcceptable()
     res = adapter.render_to_response(ctx, req)
     if getadapters:
         res = (res, adapters)
@@ -155,8 +150,8 @@ def select_combination(ctx, req):
             id_ = Combination.delimiter.join(ids)
         else:
             id_ = Combination.delimiter.join(req.params['parameters'].split(','))
-        raise HTTPFound(req.route_url('combination', id=id_))
-    raise HTTPNotFound
+        raise pyramid.httpexceptions.HTTPFound(req.route_url('combination', id=id_))
+    raise pyramid.httpexceptions.HTTPNotFound
 
 
 def _raise(req):
@@ -178,7 +173,7 @@ def unapi(req):
     if id_:
         obj = req.ctx_for_url(id_)
         if not obj:
-            return HTTPNotFound()
+            return pyramid.httpexceptions.HTTPNotFound()
 
     format_ = req.params.get('format')
     if not format_:
@@ -195,7 +190,7 @@ def unapi(req):
         return Response(body, **kw)
 
     if not id_:
-        return HTTPNotFound()
+        return pyramid.httpexceptions.HTTPNotFound()
 
     adapter = None
     for _n, _a in get_adapters(IMetadata, obj, req):
@@ -203,8 +198,9 @@ def unapi(req):
             adapter = _a
             break
     if not adapter:
-        return HTTPNotAcceptable()
-    return HTTPFound(location=req.resource_url(obj, ext=adapter.extension))
+        return pyramid.httpexceptions.HTTPNotAcceptable()
+    return pyramid.httpexceptions.HTTPFound(
+        location=req.resource_url(obj, ext=adapter.extension))
 
 
 #

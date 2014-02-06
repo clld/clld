@@ -8,11 +8,12 @@ py_version = sys.version_info[:2]
 PY3 = py_version[0] == 3
 
 if PY3:
-    if py_version < (3, 2):
-        raise RuntimeError('clld requires Python 3.2 or better')
+    raise RuntimeError('clld requires Python 2.7')
+    #if py_version < (3, 2):
+    #    raise RuntimeError('clld requires Python 3.2 or better')
 else:
-    if py_version < (2, 6):
-        raise RuntimeError('clld requires Python 2.6 or better')
+    if py_version < (2, 7):
+        raise RuntimeError('clld requires Python 2.7 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -77,16 +78,16 @@ testing_extras = tests_require + [
 
 setup(name='clld',
       version='0.1',
-      description=('Python library for the Words of the World project'),
+      description=(
+          'Python library supporting the development of cross-linguistic databases'),
       long_description='',
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
+        #"Programming Language :: Python :: 3",
+        #"Programming Language :: Python :: 3.2",
+        #"Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
@@ -94,8 +95,8 @@ setup(name='clld',
       keywords='web pyramid',
       author="Robert Forkel, MPI EVA",
       author_email="xrotwang+clld@googlemail.com",
-      url="http://",
-      license="BSD",
+      url="http://clld.org",
+      license="Apache Software License",
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,

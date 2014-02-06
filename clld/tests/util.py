@@ -263,9 +263,9 @@ def _add_header(headers, name, value):
     >>> assert _add_header(headers, 'n', 'v') == {'n': 'v'}
     """
     if isinstance(headers, dict):
-        headers[name] = value
+        headers[name] = str(value)
     else:  # pragma: no cover
-        headers.append((name, value))
+        headers.append((name, str(value)))
     return headers
 
 
