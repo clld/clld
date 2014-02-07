@@ -91,7 +91,7 @@ def get_taburls():
 def get_tab(name):
     """generator for entries in a tab file specified by name.
     """
-    return dsv.rows(content=get(get_taburls()[name]), namedtuples=True)
+    return dsv.reader(get(get_taburls()[name]).split('\n'), namedtuples=True)
 
 
 def _text(e):
