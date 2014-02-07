@@ -298,19 +298,20 @@ LGR_ABBRS = {
 }
 
 
-def slug(s, remove_whitespace=True):
+def slug(s, remove_whitespace=True, lowercase=True):
     """
     :return: A condensed version of the string s, containing only lowercase alphanumeric \
     characters.
     """
     res = ''.join((c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn'))
-    res = res.lower()
+    if lowercase:
+        res = res.lower()
     for c in string.punctuation:
         res = res.replace(c, '')
     res = re.sub('\s+', '' if remove_whitespace else ' ', res)
     res = res.encode('ascii', 'ignore').decode('ascii')
-    assert re.match('[ a-z0-9]*$', res)
+    assert re.match('[ A-Za-z0-9]*$', res)
     return res
 
 

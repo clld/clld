@@ -1,64 +1,89 @@
+# coding: utf8
 """
-support for reading and writing delimiter-separated value files.
+Support for reading and writing delimiter-separated value files.
 """
+from __future__ import unicode_literals
 from collections import namedtuple
+from cStringIO import StringIO
+import keyword
+from string import ascii_letters
 
 import unicsv
 
+from clld.util import slug
+
 
 def normalize_name(s):
-    """
+    """This function is called to convert ASCII strings to something that can pass as
+    python attribute name, to be used with namedtuples.
+
     >>> assert normalize_name('class') == 'class_'
     >>> assert normalize_name('a-name') == 'a_name'
+    >>> assert normalize_name('a näme') == 'a_name'
+    >>> assert normalize_name('Name') == 'Name'
+    >>> assert normalize_name('') == '_'
+    >>> assert normalize_name('1') == '_1'
     """
-    if s == 'class':
-        return 'class_'
-    return s.replace('-', '_').replace('.', '_')
+    s = s.replace('-', '_').replace('.', '_').replace(' ', '_')
+    if s in keyword.kwlist:
+        return s + '_'
+    s = '_'.join(slug(ss, lowercase=False) for ss in s.split('_'))
+    if not s:
+        s = '_'
+    if s[0] not in ascii_letters + '_':
+        s = '_' + s
+    return s
 
 
-def rows(filename=None,
-         content=None,
-         delimiter='\t',
-         namedtuples=False,
-         encoding=None,
-         newline='\n'):
+def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw):
     """
-    >>> assert list(rows(__file__))
-    >>> from clld.tests.util import TESTS_DIR
-    >>> l = list(rows(TESTS_DIR.joinpath('test.tab'), namedtuples=True, encoding='utf8'))
-    >>> assert l
+    :param lines_or_file: Content to be read. Either a file handle, a file path or a list\
+    of strings.
+    :param namedtuples: Yield namedtuples.
+    :param dicts: Yield dicts.
+    :param encoding: Encoding of the content.
+    :param kw: Keyword parameters are passed through to csv.reader. Note that as opposed\
+    to csv.reader delimiter defaults to '\t' not ','.
     """
-    assert filename or content
-    assert not (filename and content)
-    cls = None
-    fields = []
+    # Either namedtuples or dicts can be chosen as output format.
+    assert not (namedtuples and dicts)
 
-    if filename:
-        with open(filename, 'r') as fp:
-            content = fp.read()
+    # for backward compatibility with the rows function:
+    kw.setdefault('delimiter', '\t')
 
-    if encoding:
-        content = content.decode(encoding)
+    # We make sure format parameters for the underlying reader have the correct type.
+    for name in 'delimiter quotechar escapechar'.split():
+        c = kw.get(name)
+        if c and isinstance(c, unicode):
+            kw[name] = str(c)
 
-    for i, line in enumerate(content.split(newline)):
-        if not line.strip():
-            continue
-        row = [s.strip() for s in line.split(delimiter)]
-        if namedtuples and i == 0:
-            fields = row
-            cls = namedtuple('Row', map(normalize_name, row))
-        else:
-            if fields:
-                while len(row) < len(fields):
-                    row.append(None)
-            yield cls(*row) if cls else row
+    if isinstance(lines_or_file, basestring):
+        # If a file name or path object is passed, we read the whole thing into a list of
+        # lines, to make sure the file handle is closed right away.
+        with open(lines_or_file, mode='rU') as fp:
+            lines_or_file = [l[:-1] if l and l[-1] == str('\n') else l for l in fp]
+    if isinstance(lines_or_file, list):
+        # unicsv.UnicodeCSVReader does not support reading from arbitrary iterables such
+        # as lists, but insists on calling a 'read' method.
+        if encoding is None or (lines_or_file and isinstance(lines_or_file[0], unicode)):
+            lines_or_file = [l.encode('utf8') for l in lines_or_file]
+            encoding = 'utf8'
+        lines_or_file = StringIO(str('\n').join(lines_or_file))
 
-
-def namedtuples_from_csv(fp):
-    reader = unicsv.UnicodeCSVDictReader(fp)
-    c = namedtuple('Row', map(normalize_name, reader.fieldnames))
-    for d in reader:
-        yield c(**d)
+    if dicts or namedtuples:
+        impl = unicsv.UnicodeCSVDictReader
+    else:
+        impl = unicsv.UnicodeCSVReader
+    res = impl(lines_or_file, encoding=encoding, **kw)
+    if namedtuples:
+        class_ = namedtuple('Row', map(normalize_name, res.fieldnames))
+        for d in res:
+            for n in res.fieldnames:
+                d.setdefault(n, None)
+            yield class_(**{normalize_name(k): v for k, v in d.items()})
+    else:
+        for d in res:
+            yield d
 
 
 UnicodeCsvWriter = unicsv.UnicodeCSVWriter
