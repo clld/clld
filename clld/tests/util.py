@@ -195,7 +195,6 @@ class TestWithEnv(TestWithDbAndData):
     def setUp(self):
         if self.__setup_db__:
             TestWithDbAndData.setUp(self)
-
         global ENV
 
         if ENV is None:

@@ -43,6 +43,7 @@ Releasing clld
 - Push to github:
 
   $ git push origin matching
+  $ git push --tags
 
 - Test pypi package:
 

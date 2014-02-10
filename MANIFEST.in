@@ -1,2 +1,2 @@
 include *.txt *.ini *.cfg *.rst
-recursive-include clld *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+recursive-include clld *.ico *.png *.css *.gif *.jpg *.txt *.mak *.mako *.js *.html *.xml *.woff *.tab *.ini *.mo *.py_tmpl *.ini_tmpl *.swf *.bib *.pot *.in_tmpl *.txt_tmpl *.mako_tmpl

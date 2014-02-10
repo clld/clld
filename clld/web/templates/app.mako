@@ -18,10 +18,7 @@
               href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
               type="image/x-icon" />
 
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.css" />
-        <!--[if lte IE 8]>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.ie.css" />
-        <![endif]-->
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
 
         % for asset in assets['css'].urls():
         <link href="${request.static_url(asset[1:])}" rel="stylesheet">
@@ -29,7 +26,7 @@
 
         % if request.registry.settings.get('clld.environment') == 'production':
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script src="http://cdn.leafletjs.com/leaflet-0.6/leaflet.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
         % endif
 
         % for asset in assets['js'].urls():
@@ -126,8 +123,13 @@
                 <%block name="footer">
                     <div class="row-fluid" style="padding-top: 15px; border-top: 1px solid black;">
                         <div class="span3">
-                            <a href="http://www.eva.mpg.de" title="Max Planck Institute for Evolutionary Anthropology, Leipzig">
-                                <img width="80" src="${request.static_url('clld:web/static/images/minerva.png')}" />
+                            <a href="${request.dataset.publisher_url}"
+                               title="${request.dataset.publisher_name}, ${request.dataset.publisher_place}">
+                            % if request.registry.settings.get('clld.publisher_logo'):
+                                <img width="80" src="${request.static_url(request.registry.settings['clld.publisher_logo'])}" />
+                            % else:
+                                ${request.dataset.publisher_name}, ${request.dataset.publisher_place}
+                            % endif
                             </a>
                         </div>
                         <div class="span6" style="text-align: center;">
@@ -156,11 +158,13 @@
                         <div class="span3" style="text-align: right;">
                             <a href="${request.route_url('legal')}">disclaimer</a>
                             <br/>
-                            <a href="https://github.com/clld/${request.registry.settings['clld.pkg']}">
+                            % if request.registry.settings.get('clld.github_repos'):
+                            <a href="https://github.com/${request.registry.settings['clld.github_repos']}">
                                 <i class="icon-share">&nbsp;</i>
                                 Application source on<br/>
                                 <img height="25" src="${request.static_url('clld:web/static/images/GitHub_Logo.png')}" />
                             </a>
+                            % endif
                         </div>
                     </div>
                 </%block>

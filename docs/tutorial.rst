@@ -33,10 +33,6 @@ A CLLD app is a python package implementing a
 `pyramid <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
 web application.
 
-
-The package
-+++++++++++
-
 The ``clld`` package provides a pyramid application scaffold to create the initial package directory
 layout for a CLLD app::
 
@@ -91,10 +87,19 @@ The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.h
 setting must point to an existing (although empty) database if the ``postgresql`` dialect is chosen.
 
 
-The data
-++++++++
+How do the basic concepts fit to the implementation?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now you can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
+The dataset
++++++++++++
+
+Each CLLD app is assumed to serve a dataset. This dataset is assumed to have a publisher
+and a license. Information about the publisher and the license should be part of the data,
+as well as other metadata about the dataset, will be looked up in the database, since
+they are regarded as essential part of the data itself.
+
+``clld`` supports scripted initial creation of a suitable database for this dataset.
+You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
 
     python myapp/scripts/initializedb.py development.ini
 

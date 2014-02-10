@@ -1,6 +1,8 @@
 # coding: utf8
 """
 Support for reading and writing delimiter-separated value files.
+
+.. seealso:: http://en.wikipedia.org/wiki/Delimiter-separated_values
 """
 from __future__ import unicode_literals
 from collections import namedtuple
@@ -44,6 +46,7 @@ def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw)
     :param encoding: Encoding of the content.
     :param kw: Keyword parameters are passed through to csv.reader. Note that as opposed\
     to csv.reader delimiter defaults to '\t' not ','.
+    :return: A generator over the rows.
     """
     # Either namedtuples or dicts can be chosen as output format.
     assert not (namedtuples and dicts)

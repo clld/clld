@@ -22,16 +22,34 @@ from clld.interfaces import IDownload
 from clld.lib import bibtex
 
 
-def glottocodes_by_isocode(dburi, cols=['id']):  # pragma: no cover
-    """query a local glottolog database.
+def glottocodes_by_isocode(dburi, cols=['id']):
+    """Query Glottolog
+
+    :dburi: If not None, sqlalchemy dburi for a glottolog database. If None, \
+    glottolog.org will be queried.
+    :cols: list of column/attribute names for which information should be gathered.
+    :return: dict mapping iso639-3 codes to glottolog data.
     """
-    select = ', '.join('l.%s' % name for name in cols)
-    glottolog = create_engine(dburi)
     glottocodes = {}
-    for row in glottolog.execute(
-        'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk' % select
-    ):
-        glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
+    if dburi:
+        select = ', '.join('l.%s' % name for name in cols)
+        glottolog = create_engine(dburi)
+        for row in glottolog.execute(
+            'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk'
+                        % select
+        ):
+            glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
+    else:
+        conv = defaultdict(lambda: lambda x: x, latitude=float, longitude=float)
+        res = requests.get("http://glottolog.org/resourcemap.json?rsc=language")
+        for rsc in res.json()['resources']:
+            for id_ in rsc.get('identifiers', []):
+                if id_['type'] == 'iso639-3':
+                    row = [conv[col](rsc.get(col)) if rsc.get(col) is not None else None
+                           for col in cols]
+                    glottocodes[id_['identifier']] = row[0] if len(row) == 1 \
+                        else tuple(row)
+                    break
     return glottocodes
 
 
@@ -149,6 +167,7 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config_uri", action=ExistingConfig, help="ini file providing app config")
+    parser.add_argument("--glottolog-dburi", default=None)
     parser.add_argument("--module", default=None)
     parser.add_argument(
         "--sqlite", nargs=1, action=SqliteDb, help="sqlite db file")

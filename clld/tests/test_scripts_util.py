@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import unittest
+from json import loads
 
 from sqlalchemy.orm import joinedload
 from path import path
@@ -21,6 +22,56 @@ class Tests(unittest.TestCase):
 
         parsed_args(args=[path(clld.__file__).dirname().joinpath('tests', 'test.ini')])
 
+    def test_glottocodes_by_isocode(self):
+        from clld.scripts.util import glottocodes_by_isocode
+
+        ce = Mock(return_value=Mock(execute=lambda *args: [('iso', 'abcd1234')]))
+
+        with patch('clld.scripts.util.create_engine', ce):
+            assert glottocodes_by_isocode('dburi')['iso'] == 'abcd1234'
+
+        json = """{
+            "properties": {
+                "dataset": "glottolog",
+                "uri_template": "http://glottolog.org/resource/languoid/id/{id}"
+            },
+            "resources": [
+                {
+                    "id": "aant1238",
+                    "identifiers": [
+                        {
+                            "identifier": "tbg-aan",
+                            "type": "multitree"
+                        }
+                    ],
+                    "latitude": null,
+                    "longitude": null,
+                    "name": "Aantantara"
+                },
+                {
+                    "id": "aari1239",
+                    "identifiers": [
+                        {
+                            "identifier": "aiw",
+                            "type": "iso639-3"
+                        },
+                        {
+                            "identifier": "aiw",
+                            "type": "multitree"
+                        }
+                    ],
+                    "latitude": 5.95034,
+                    "longitude": 36.5721,
+                    "name": "Aari"
+                }]}"""
+        class Req(Mock):
+            def get(self, *args):
+                return Mock(json=Mock(return_value=loads(json)))
+
+        with patch('clld.scripts.util.requests', Req()):
+            assert glottocodes_by_isocode(None, cols=['id', 'latitude'])['aiw'][0] ==\
+                   'aari1239'
+
     def test_Data(self):
         from clld.db.models.common import Language
         from clld.scripts.util import Data
@@ -41,6 +92,7 @@ class Tests(unittest.TestCase):
 
 class Tests2(TestWithEnv):
     def test_index(self):
+        from clld.db.meta import DBSession
         from clld.db.models.common import Language
         from clld.scripts.util import index
 
