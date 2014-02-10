@@ -81,6 +81,10 @@ locations ``myapp/static/project.[css|js]``, it will automatically be packaged f
 production. Note that in this case the code should not contain any URLs relative to
 the file, because these may break in production.
 
+Additionally, you may provide the logo of the publisher of the dataser as a PNG image.
+If this file is located at ``myapp/static/publisher_logo.png`` it will be picked up
+automatically by the default application footer template.
+
 Other static content can still be placed in the ``myapp/static`` directory but must be
 explicitely included on pages making use of it, e.g. with template code like:
 
