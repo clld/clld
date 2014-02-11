@@ -106,6 +106,7 @@ You can edit ``clld/scripts/initializedb.py`` to fill the database with your dat
 Filling the database is done by instantiating model objects and
 `adding them <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#adding-new-objects>`_
 to ``clld.db.meta.DBSession``. (This session is already initialized when your code in ``initializedb.py`` runs.)
+For more information about database objects read the chapter :ref:`db_objects`.
 
 The ``data`` object present in the ``main`` function in ``initializedb.py`` is an instance of
 
@@ -164,6 +165,15 @@ You are now ready to run::
     pserve --reload development.ini
 
 and navigate with your browser to http://0.0.0.0:6543 to visit your application.
+
+
+Deployment
+~~~~~~~~~~
+
+TODO:
+clld.environment == 'production',
+webassets need to be built.
+gunicorn + nginx
 
 
 Examples

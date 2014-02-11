@@ -42,6 +42,11 @@ from clld.web.icon import ORDERED_ICONS
 
 
 class Config(Base):
+    """Model class to allow storage of key-value pairs of configuration data in the
+    database. This model is also (ab-)used to implement a mechanism linking database
+    objects of all types without enforcing referential intagrity, e.g. to model chains
+    of superseding objects, where referred objects may become obsolete themselves.
+    """
     key = Column(Unicode)
     value = Column(Unicode)
 
@@ -49,6 +54,11 @@ class Config(Base):
 
     @staticmethod
     def replacement_key(model, id_):
+        """
+        :param model: Model class or instance.
+        :param id_: Identifier of a class instance.
+        :return: ``str`` representation identifying a database object.
+        """
         mapper_name = model if isinstance(model, basestring) else model.mapper_name()
         return '__%s_%s__' % (mapper_name, id_)
 
@@ -64,6 +74,14 @@ class Config(Base):
 
     @classmethod
     def add_replacement(cls, replaced, replacement, model=None, session=None):
+        """Method to register a replacement relation.
+
+        :param replaced: db object or identifier of the object to be replaced.
+        :param replacement: db object or identifier of the superseding object.
+        :param model: If only an identifier is passed as ``replaced`` or ``replacement``\
+        the corresponding model class must be passed as ``model``.
+        :param session: Db session the relation is added to.
+        """
         session = session or DBSession
         value = getattr(replacement, 'id', replacement) if replacement else cls.gone
         session.add(cls(
@@ -72,12 +90,27 @@ class Config(Base):
 
 
 class IdNameDescriptionMixin(object):
-    """id is to be used as string identifier which can be used for sorting and as
-    URL part.
+    """Mixin for 'visible' objects, i.e. anything that has to be displayed (to humans or
+    machines); in particular all :doc:`resources` fall into this category.
+
+    .. note::
+
+        Only one of :py:attr:`clld.db.models.common.IdNameDescriptionMixin.description`
+        or :py:attr:`clld.db.models.common.IdNameDescriptionMixin.markup_description`
+        should be supplied, since these are used mutually exclusively.
     """
+    #: A ``str`` identifier of an object which can be used for sorting and as part of a
+    #: URL path; thus should be limited to characters valid in URLs, and should not
+    #: contain '.' or '/' since this may trip up route matching.
     id = Column(String, unique=True)
+
+    #: A human readable 'identifier' of the object.
     name = Column(Unicode)
+
+    #: A description of the object.
     description = Column(Unicode)
+
+    #: A description of the object containing HTML markup.
     markup_description = Column(Unicode)
 
 
@@ -97,7 +130,10 @@ class FilesMixin(IdNameDescriptionMixin):
     def owner_class(cls):
         return cls.__name__.split('_')[0]
 
+    #: Ordinal to control sorting of files associated with one db object.
     ord = Column(Integer, default=1)
+
+    #: Mime-type of the file content.
     mime_type = Column(String)
 
     @declared_attr
@@ -106,9 +142,15 @@ class FilesMixin(IdNameDescriptionMixin):
 
     @property
     def relpath(self):
+        """OS file path of the file relative to the application's file-system directory.
+        """
         return os.path.join(self.owner_class().lower(), str(self.object.id), str(self.id))
 
     def create(self, dir_, content):
+        """Write ``content`` to a file using ``dir_`` as file-system directory.
+
+        :return: File-system path of the file that was created.
+        """
         p = dir_.joinpath(self.relpath)
         p.dirname().makedirs_p()
         with open(p, 'wb') as fp:
@@ -117,15 +159,13 @@ class FilesMixin(IdNameDescriptionMixin):
 
 
 class HasFilesMixin(object):
-    """Adds a convenience method to retrieve a dict of associated files.
-
-    .. note::
-
-        It is the responsibility of the programmer to make sure conversion to a dict makes
-        sense, i.e. the names of associated files are actually unique.
+    """Mixin for model classes which may have associated files.
     """
     @property
     def files(self):
+        """
+        :return: ``dict`` of associated files keyed by ``id``.
+        """
         return dict((f.id, f) for f in self._files)
 
     @declared_attr
@@ -155,10 +195,14 @@ class HasDataMixin(object):
 
     .. note::
 
-        It is the responsibility of the programmer to make sure conversion to a dict makes
-        sense, i.e. the keys in data are actually unique.
+        It is the responsibility of the programmer to make sure conversion to a ``dict``
+        makes sense, i.e. the keys in data are actually unique, thus usable as dictionary
+        keys.
     """
     def datadict(self):
+        """
+        :return: ``dict`` of associated key-value pairs.
+        """
         return dict((d.key, d.value) for d in self.data)
 
     @declared_attr

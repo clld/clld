@@ -12,6 +12,7 @@ virtualenv testapp
 cd testapp
 . bin/activate
 pip install "$VENVS/cheesecake/clld/dist/clld-$1.tar.gz"
+#pip install "clld==$1"
 pcreate -t clld_app testapp
 cd testapp
 python setup.py develop

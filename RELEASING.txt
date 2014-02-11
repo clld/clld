@@ -47,10 +47,10 @@ Releasing clld
 
 - Test pypi package:
 
-  $ make_package.sh
+  $ ./build.sh
 
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
 
-  $ python setup.py sdist register upload
+  $ ./pypi.sh
 

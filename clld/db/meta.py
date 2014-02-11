@@ -34,12 +34,21 @@ from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 @sqlalchemy.event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
+    """Implements
+    `pessimistic disconnect handling <http://docs.sqlalchemy.org/en/rel_0_9/core/\
+    pooling.html#disconnect-handling-pessimistic>`_.
+
+    .. note::
+
+        Our implementation is mildly dialect specific, but works for sqlite and
+        PostgreSQL. For oracle, the 'ping' query should read *SELECT 1 FROM DUAL* or
+        similar.
+    """
     cursor = dbapi_connection.cursor()
     try:
         cursor.execute("SELECT 1")
     except:  # pragma: no cover
-        # optional - dispose the whole pool
-        # instead of invalidating one at a time
+        # dispose the whole pool instead of invalidating one at a time
         connection_proxy._pool.dispose()
 
         # raise DisconnectionError - pool will try
@@ -49,13 +58,13 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
 
 class ActiveOnlyQuery(Query):  # pragma: no cover
-    """
-    from a sqlalchemy recipe
-    TODO: include URL
+    """Implements a
+    `pre-filtering query <http://www.sqlalchemy.org/trac/wiki/UsageRecipes/\
+    PreFilteredQuery>`_ that filters on the :py:attr:`clld.db.meta._Base.active` flag.
     """
     def get(self, ident):
         # override get() so that the flag is always checked in the
-        # DB as opposed to pulling from the identity map. - this is optional.
+        # DB as opposed to pulling from the identity map.
         return Query.get(self.populate_existing(), ident)
 
     def __iter__(self):
@@ -85,10 +94,6 @@ VersionedDBSession = scoped_session(versioned_session(
 
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
-
-    Usage::
-
-        JSONEncodedDict(255)
     """
     impl = VARCHAR
 
@@ -113,11 +118,8 @@ def _solr_timestamp(dt):
     return dt.isoformat().split('+')[0] + 'Z'
 
 
-class Base(UnicodeMixin):
-    """All our models have an integer primary key which has nothing to do with
-    the kind of data stored in a table. 'Natural' candidates for primary keys
-    should be marked with unique constraints instead. This adds flexibility
-    when it comes to database changes.
+class _Base(UnicodeMixin):
+    """The declarative base for all our models.
     """
     @declared_attr
     def __tablename__(cls):
@@ -128,29 +130,51 @@ class Base(UnicodeMixin):
         """
         return cls.__name__.lower()
 
+    #: All our models have an integer primary key which has nothing to do with
+    #: the kind of data stored in a table. 'Natural' candidates for primary keys
+    #: should be marked with unique constraints instead. This adds flexibility
+    #: when it comes to database changes.
     pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    #: To allow for timestamp-based versioning - as opposed or in addition to the version
+    #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
+    #: a timestamp for creation or an object.
     created = sqlalchemy.Column(
         sqlalchemy.DateTime(timezone=True), default=datetime.utcnow)
+
+    #: Timestamp for latest update of an object.
     updated = sqlalchemy.Column(
         sqlalchemy.DateTime(timezone=True),
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
 
-    # The active flag is meant as an easy way to mark records as obsolete or inactive,
-    # without actually deleting them. A custom Query class could then be used which
-    # filters out inactive records.
+    #: The active flag is meant as an easy way to mark records as obsolete or inactive,
+    #: without actually deleting them. A custom Query class could then be used which
+    #: filters out inactive records.
     active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
 
-    # To allow storage of key,value pairs with typed values:
+    #: To allow storage of arbitrary key,value pairs with typed values, each model
+    #: provides a column to store JSON encoded dicts.
     jsondata = sqlalchemy.Column(JSONEncodedDict)
 
     def update_jsondata(self, **kw):
+        """Since we use the simple
+        `JSON encoded dict recipe <http://docs.sqlalchemy.org/en/rel_0_9/core/types.html\
+        #marshal-json-strings>`_
+        without mutation tracking, we provide a convenience method to update
+        """
         d = copy(self.jsondata) or {}
         d.update(**kw)
         self.jsondata = d
 
     @classmethod
     def mapper_name(cls):
+        """To make implementing model class specific behavior across the technology
+        boundary easier - e.g. specifying CSS classes - we provide a string representation
+        of the model class.
+
+        :rtype: str
+        """
         return class_mapper(cls).class_.__name__
 
     @property
@@ -159,7 +183,7 @@ class Base(UnicodeMixin):
 
     @property
     def replacement_id(self):
-        """This property is meant to allow automatically redirecting to a 'better' version
+        """This property is used to allow automatically redirecting to a 'better' version
         of a resource.
         """
         if not self.active:
@@ -167,7 +191,12 @@ class Base(UnicodeMixin):
 
     @classmethod
     def get(cls, value, key=None, default=NO_DEFAULT, session=None):
-        """A convenience method.
+        """Convenient method to query a model where exactly one result is expected, e.g.
+        to retrieve an instance by primary key or id.
+
+        :param value: The value used in the filter expression of the query.
+        :param str key: The key or attribute name to be used in the filter expression. If\
+        None is passed, defaults to *pk* if value is ``int`` otherwise to *id*.
         """
         session = session or DBSession
         if key is None:
@@ -198,6 +227,10 @@ class Base(UnicodeMixin):
             .order_by(sqlalchemy.desc(history_class.version))
 
     def __json__(self, req):
+        """
+        :param req: pyramid Request object.
+        :return: ``dict`` suitable for serialization as JSON.
+        """
         cols = []
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
@@ -207,6 +240,18 @@ class Base(UnicodeMixin):
             for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
 
     def __solr__(self, req):
+        """
+        :param req: pyramid Request object.
+        :return: ``dict`` suitable as JSON encoded \
+        `Solr <https://lucene.apache.org/solr/>`_ document.
+
+        .. note::
+
+            The document returned by this method does only make sense when used with an
+            appropriate Solr schema. In particular we rely on name conventions for
+            `dynamic fields <https://cwiki.apache.org/confluence/display/solr/\
+            Dynamic+Fields>`_.
+        """
         cls = inspect(self).class_
 
         if not is_base(cls):
@@ -240,7 +285,7 @@ class Base(UnicodeMixin):
 
     def __unicode__(self):
         """
-        :return: a human readable label for the object
+        :return: A human readable label for the object.
         """
         r = getattr(self, 'name', None)
         if not r:
@@ -254,11 +299,11 @@ class Base(UnicodeMixin):
             object_mapper(self).class_.__name__, getattr(self, 'id', self.pk))
 
 
-Base = declarative_base(cls=Base)
+Base = declarative_base(cls=_Base)
 
 
 class PolymorphicBaseMixin(object):
-    """We use joined table inheritance to allow projects to augment base clld
+    """We use joined table inheritance to allow projects to augment base ``clld``
     models with project specific attributes. This mixin class prepares
     models to serve as base classes for inheritance.
     """
@@ -274,6 +319,11 @@ class PolymorphicBaseMixin(object):
 
 
 def is_base(cls):
+    """
+    :param cls: Model class.
+    :return: ``bool`` signaling whether ``cls`` is a base class or derived, i.e.\
+    customized.
+    """
     # replace with inspection?
     # see http://docs.sqlalchemy.org/en/rel_0_9/orm/mapper_config.html
     #?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
@@ -281,7 +331,7 @@ def is_base(cls):
 
 
 class CustomModelMixin(object):
-    """Mixin for inheriting classes in our joined table inheritance scheme.
+    """Mixin for customized classes in our joined table inheritance scheme.
 
     .. note::
 

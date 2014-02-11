@@ -344,6 +344,8 @@ class Data(defaultdict):
         self.defaults = kw
 
     def add(self, model, key, **kw):
+        if '.' in kw.get('id', ''):
+            raise ValueError('Object id contains illegal character "."')
         if kw.keys() == ['_obj']:
             # if a single keyword parameter _obj is passed, we take it to be the object
             # which should be added to the session.

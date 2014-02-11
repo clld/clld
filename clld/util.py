@@ -67,7 +67,11 @@ def dict_merged(d, _filter=None, **kw):
 
 
 class NoDefault(object):
-    pass
+    """
+    >>> assert repr(NoDefault())
+    """
+    def __repr__(self):
+        return '<NoDefault>'
 
 NO_DEFAULT = NoDefault()
 
