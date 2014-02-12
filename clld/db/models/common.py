@@ -256,12 +256,10 @@ class Dataset(Base,
     have exactly one Dataset object.
     """
     published = Column(Date, default=date.today)
-    publisher_name = Column(
-        Unicode, default="Max Planck Institute for Evolutionary Anthropology")
-    publisher_place = Column(Unicode, default="Leipzig")
-    publisher_url = Column(String, default="http://www.eva.mpg.de")
-    license = Column(
-        String, default="http://creativecommons.org/licenses/by/3.0/")
+    publisher_name = Column(Unicode)
+    publisher_place = Column(Unicode)
+    publisher_url = Column(String)
+    license = Column(String, default="http://creativecommons.org/licenses/by/3.0/")
     domain = Column(String, nullable=False)
     contact = Column(String)
 
