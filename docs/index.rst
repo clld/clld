@@ -75,6 +75,7 @@ Contents:
 
     tutorial
     resources
+    datamodeling
     extending
     interfaces
     db
