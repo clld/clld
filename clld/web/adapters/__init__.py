@@ -2,7 +2,7 @@ from zope.interface import implementedBy
 
 from clld import RESOURCES
 from clld import interfaces
-from clld.web.adapters.base import Index, Representation, Json
+from clld.web.adapters.base import Index, Representation, Json, SolrDoc
 from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
@@ -26,6 +26,9 @@ def includeme(config):
         cls = type('Json%s' % rsc.model.mapper_name(), (Json,), {})
         config.registry.registerAdapter(
             cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)
+        cls = type('Solr%s' % rsc.model.mapper_name(), (SolrDoc,), {})
+        config.registry.registerAdapter(
+            cls, (interface,), interfaces.IRepresentation, name=SolrDoc.mimetype)
 
         if rsc.with_index:
             # ... as html index
