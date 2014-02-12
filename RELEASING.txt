@@ -1,10 +1,6 @@
 Releasing clld
 ==============
 
-- Start a release
-
-  $ git flow release start <release number>
-
 - Do platform test via tox:
 
   $ tox -r
@@ -13,7 +9,7 @@ Releasing clld
 
 - Make sure all scaffold tests pass (Py 2.7, 3.2):
 
-  $ python clld/scaffolds/tests.py
+  $ ./venvs/clld/clld/build.sh "<prev-rel-no>"
 
 - Make sure javascript tests pass with coverage at 100%::
 
@@ -27,6 +23,10 @@ Releasing clld
 - Update translations (using a py3 env with babel patched for py3 compatibility).
 
   $ python setup.py compile_catalog
+
+- Start a release
+
+  $ git flow release start <release number>
 
 - Change clld/__init__.py to the new version number.
 
@@ -47,10 +47,10 @@ Releasing clld
 
 - Test pypi package:
 
-  $ make_package.sh
+  $ ./build.sh
 
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
 
-  $ python setup.py sdist register upload
+  $ ./pypi.sh
 

@@ -115,6 +115,12 @@ class Tests(TestWithEnv):
         adapter = Json(None)
         adapter.render({'hello': 'world'}, self.env['request'])
 
+    def test_SolrDoc(self):
+        from clld.web.adapters.base import SolrDoc
+
+        adapter = SolrDoc(None)
+        adapter.render(Language.first(), self.env['request'])
+
     def test_get_adapter(self):
         from clld.web.adapters import get_adapter
 

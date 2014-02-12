@@ -72,6 +72,18 @@ class Json(Renderable):
         return pyramid_render('json', ctx, request=req)
 
 
+class SolrDoc(Json):
+    """Document for indexing with Solr encoded in JSON
+    """
+    name = 'Solr JSON'
+    send_mimetype = Json.mimetype
+    mimetype = 'application/vnd.clld.solr+json'
+    extension = 'solr.json'
+
+    def render(self, ctx, req):
+        return pyramid_render('json', ctx.__solr__(req), request=req)
+
+
 @implementer(interfaces.IIndex)
 class Index(Renderable):
     """Base class for adapters implementing IIndex

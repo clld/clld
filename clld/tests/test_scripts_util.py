@@ -82,6 +82,7 @@ class Tests(unittest.TestCase):
             d.add(Language, 'l', id='l', name='l')
             assert session
             d.add(Language, 'l2', _obj=5)
+            self.assertRaises(ValueError, d.add, Language, 'l3', id='l.3')
 
     def test_add_language_codes(self, ):
         from clld.db.models.common import Language

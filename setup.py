@@ -19,7 +19,7 @@ else:
 here = os.path.abspath(os.path.dirname(__file__))
 try:
     README = open(os.path.join(here, 'README.rst')).read()
-    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+    CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 except IOError:
     README = CHANGES = ''
 
@@ -78,7 +78,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.3',
+      version='0.4',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description='',

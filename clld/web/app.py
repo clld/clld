@@ -527,8 +527,7 @@ def get_configurator(pkg, *utilities, **kw):
         config.add_settings({'clld.favicon_hash': fh.hexdigest()})
 
     if pkg_dir.joinpath('locale').exists():
-        config.add_translation_dirs('%s:locale' % config.package_name)
-        config.add_translation_dirs('clld:locale')
+        config.add_translation_dirs('%s:locale' % config.package_name, 'clld:locale')
 
     if pkg_dir.joinpath('static/publisher_logo.png').exists():  # pragma: no cover
         config.add_settings(
