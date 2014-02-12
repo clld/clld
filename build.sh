@@ -3,7 +3,8 @@ VENVS=~/venvs
 cd $VENVS/cheesecake
 . bin/activate
 cd clld
-#git pull origin
+git checkout develop
+git pull origin develop
 python setup.py sdist
 cheesecake_index --path="dist/clld-$1.tar.gz" --with-pep8
 
