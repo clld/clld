@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.5.1
+~~~~~
+
+Bugfix release, fixing a critical js bug, where a reserved word was used as property name.
+
+
 0.5
 ~~~
 
