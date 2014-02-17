@@ -85,6 +85,7 @@ Contents:
     protocols
     deployment
     trees
+    advanced
 
 
 The applications

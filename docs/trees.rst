@@ -1,4 +1,6 @@
 
+.. _sec-trees:
+
 Handling Trees
 --------------
 

@@ -336,6 +336,18 @@ CLLD.DataTable = (function(){
 
 CLLD.Maps = {};
 
+CLLD.MapIcons = {
+    default: function(feature, size) {
+        return L.icon({
+            iconUrl: feature.properties.icon,
+            iconSize: [size, size],
+            iconAnchor: [Math.floor(size/2), Math.floor(size/2)],
+            popupAnchor: [0, 0]
+        });
+    }
+}
+
+
 /*
  * Manager for a leaflet map
  *
@@ -404,7 +416,6 @@ CLLD.Map = function(eid, layers, options) {
         if (layer.feature.properties.popup) {
             _openPopup(layer, layer.feature.properties.popup);
         } else {
-
             $.get(
                 CLLD.route_url(
                     map.options.info_route,
@@ -423,14 +434,7 @@ CLLD.Map = function(eid, layers, options) {
         }
     }
 
-    this.icon = function(feature, size, url) {
-        return L.icon({
-            iconUrl: url == undefined ? feature.properties.icon : url,
-            iconSize: [size, size],
-            iconAnchor: [Math.floor(size/2), Math.floor(size/2)],
-            popupAnchor: [0, 0]
-        });
-    }
+    this.icon = CLLD.MapIcons[this.options.icons == undefined ? 'default' : this.options.icons];
 
     var _onEachFeature = function(feature, layer) {
         var size = 30,

@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.5
+~~~
+
+- New hook which allows using custom leaflet map markers with clld maps.
+- Fixed bug where wrong order of inclusion of translation dirs would make customized
+  translations impossible.
+
+
 0.4
 ~~~
 
