@@ -73,6 +73,8 @@ rendered for the details page of languages (see :ref:`sec-resource-templates`) -
 ``myapp/templates/language/detail_html.mako``.
 
 
+.. _sec-static-assets:
+
 Static assets
 ~~~~~~~~~~~~~
 
@@ -276,7 +278,27 @@ The steps required to add a custom resource are:
 Custom maps
 ~~~~~~~~~~~
 
-TODO
+The appearance of maps in ``clld`` apps depends on two factors which can be tweaked for
+customization: the code that renders the map and the GeoJSON data which is passed to this
+code.
+
+
+.. _sec-geojson:
+
+GeoJSON adapters
+++++++++++++++++
+
+GeoJSON in ``clld`` is just another type of representation of a resource, thus it is
+created by a suitable adapter, usually derived from
+:py:class:`clld.web.adapters.geojson.GeoJSON`.
+
+
+Map classes
++++++++++++
+
+Maps in ``clld`` are implemented as subclasses of :py:class:`clld.web.maps.Map`. These
+classes tie together behavior implemented in javascript (based on leaflet) with Python
+code used to assemble the map data, options and legends.
 
 
 Custom URLs
