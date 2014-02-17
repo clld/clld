@@ -21,7 +21,7 @@ CLLD.url = function(path, query) {
     }
 
     return url;
-}
+};
 
 
 CLLD.route_url = function(route, data, query) {
@@ -35,7 +35,7 @@ CLLD.route_url = function(route, data, query) {
     }
 
     return CLLD.url(path, query);
-}
+};
 
 
 CLLD.TreeView = (function(){
@@ -86,7 +86,7 @@ CLLD.Feed = (function(){
         feed.setNumEntries(spec.numEntries == undefined ? 4 : spec.numEntries);
         feed.load(function(result) {
             if (!result.error) {
-                var title = spec.title == undefined ? result.feed.title : spec.title
+                var title = spec.title == undefined ? result.feed.title : spec.title;
                 //var content = '<h3><a href="'+result.feed.link+'">'+title+'</a></h3>';
                 if (spec.linkTitle) {
                     title = '<a href="'+spec.url+'">'+title+'</a>';
@@ -101,7 +101,7 @@ CLLD.Feed = (function(){
                 $('#'+spec.eid).html(content);
             }
         });
-    }
+    };
 
     return {
         init: _init
@@ -118,7 +118,7 @@ CLLD.Modal = (function(){
 	    $('#ModalBody').html(html);
 	}
         $('#Modal').modal('show');
-    }
+    };
 
     return {
         show: _show
@@ -337,7 +337,7 @@ CLLD.DataTable = (function(){
 CLLD.Maps = {};
 
 CLLD.MapIcons = {
-    default: function(feature, size) {
+    base: function(feature, size) {
         return L.icon({
             iconUrl: feature.properties.icon,
             iconSize: [size, size],
@@ -345,7 +345,7 @@ CLLD.MapIcons = {
             popupAnchor: [0, 0]
         });
     }
-}
+};
 
 
 /*
@@ -432,9 +432,9 @@ CLLD.Map = function(eid, layers, options) {
                 'html'
             );
         }
-    }
+    };
 
-    this.icon = CLLD.MapIcons[this.options.icons == undefined ? 'default' : this.options.icons];
+    this.icon = CLLD.MapIcons[this.options.icons == undefined ? 'base' : this.options.icons];
 
     var _onEachFeature = function(feature, layer) {
         var size = 30,
@@ -538,11 +538,11 @@ CLLD.Map = function(eid, layers, options) {
     if (options.on_init) {
         options.on_init(this);
     }
-}
+};
 
 CLLD.map = function(eid, layers, options) {
     return new CLLD.Map(eid, layers, options);
-}
+};
 
 CLLD.mapToggleLabels = function(eid, ctrl){
     var display = $(ctrl).prop('checked'),
@@ -565,7 +565,7 @@ CLLD.mapGetMap = function(eid) {
         return CLLD.Maps[eid];
     }
     return undefined;
-}
+};
 
 CLLD.mapShowInfoWindow = function(eid, layer) {
     var map = CLLD.mapGetMap(eid);
@@ -626,20 +626,22 @@ CLLD.mapShowGeojson = function(eid, layer) {
  * see https://developers.google.com/books/docs/dynamic-links
  */
 CLLD.process_gbs_info = function(booksInfo) {
-    var target, info;
+    var target, info, id_;
 
-    for (id in booksInfo) {
-        target = $('#' + id.replace(':', '-'));
-        info = booksInfo[id];
+    for (id_ in booksInfo) {
+        if (booksInfo.hasOwnProperty(id_)) {
+            target = $('#' + id_.replace(':', '-'));
+            info = booksInfo[id_];
 
-        if (info.preview == "full" || info.preview == "partial") {
-            target.after('<div><a title="preview at Google Books" href="' + info.preview_url + '"><img src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/></a></div>');
-        } else {
-            target.after('<div><a title="info at Google Books" href="' + info.info_url + '"><i class="icon-share"> </i> info at Google Books</a></div>');
+            if (info.preview == "full" || info.preview == "partial") {
+                target.after('<div><a title="preview at Google Books" href="' + info.preview_url + '"><img src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/></a></div>');
+            } else {
+                target.after('<div><a title="info at Google Books" href="' + info.info_url + '"><i class="icon-share"> </i> info at Google Books</a></div>');
+            }
+            if (info.thumbnail_url) {
+                target.before('<div style="float: right;"><a title="info at Google Books" href="' + info.info_url + '"><img class="gbs-thumbnail" src="' + info.thumbnail_url + '"/></a></div>');
+            }
+            target.show();
         }
-        if (info.thumbnail_url) {
-            target.before('<div style="float: right;"><a title="info at Google Books" href="' + info.info_url + '"><img class="gbs-thumbnail" src="' + info.thumbnail_url + '"/></a></div>');
-        }
-        target.show();
     }
-}
+};
