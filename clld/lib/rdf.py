@@ -35,7 +35,7 @@ NAMESPACES = {
     "skos": SKOS,
     "dc": DC,
     "gold": Namespace("http://purl.org/linguistics/gold/"),
-    "lexvo": Namespace("http://lexvo.org/ontology"),
+    "lexvo": Namespace("http://lexvo.org/ontology#"),
     "vcard": Namespace("http://www.w3.org/2001/vcard-rdf/3.0#"),
     "bibo": Namespace("http://purl.org/ontology/bibo/"),
     "owl": OWL,
