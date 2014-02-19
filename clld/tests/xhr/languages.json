@@ -1,0 +1,23 @@
+{
+    "type": "FeatureCollection",
+    "properties": {"layer": "l"},
+    "features": [
+        {
+            "geometry": {"type": "Point", "coordinates": [-55.6, 5.833333]},
+            "type": "Feature",
+            "properties": {
+                "language": {
+                    "region": "Caribbean",
+                    "active": true,
+                    "version": 1,
+                    "longitude": -55.6,
+                    "latitude": 5.833333,
+                    "pk": 1,
+                    "id": "1",
+                    "lexifier": "English",
+                    "name": "Early Sranan"
+                },
+                "icon": "http://apics-online.info/clld-static/icons/cff6600.png"}
+        }
+    ]
+}

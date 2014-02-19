@@ -26,6 +26,7 @@ pip-log.txt
 
 # Unit test / coverage reports
 .coverage
+.jscoverage
 .tox
 nosetests.xml
 coverage.txt
@@ -35,3 +36,4 @@ yolk.txt
 .mr.developer.cfg
 .project
 .pydevproject
+.idea

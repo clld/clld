@@ -1,5 +1,12 @@
-/*
- *
+/**
+ * Main JavaScript library for the clld framework.
+ * @module clld
+ */
+
+/**
+ * We define one object which serves as namespace for the package.
+ * @namespace
+ * @type {{routes: {}, base_url: string, query_params: {}}}
  */
 CLLD = {
     'routes': {},
@@ -7,7 +14,12 @@ CLLD = {
     'query_params': {}
 };
 
-
+/**
+ * Create a URL relative to the apps base URL.
+ * @param {string} path - path component of the URL.
+ * @param {{}} query - dictionary of URL query parameters.
+ * @returns {string}
+ */
 CLLD.url = function(path, query) {
     var url = CLLD.base_url + path,
         sep = '?';
@@ -23,7 +35,13 @@ CLLD.url = function(path, query) {
     return url;
 };
 
-
+/**
+ * Create a URL for a route within the app.
+ * @param {string} route - route name.
+ * @param {{}} data - dictionary providing to data so substitute in the route pattern.
+ * @param query
+ * @returns {string|*}
+ */
 CLLD.route_url = function(route, data, query) {
     var key,
         path = CLLD.routes[route];
@@ -125,11 +143,25 @@ CLLD.Modal = (function(){
     }
 })();
 
-
+/**
+ * Dictionary to store references to DataTable objects.
+ *
+ * @type {{}}
+ */
 CLLD.DataTables = {};
 
+/**
+ * DataTable wraps jquery DataTables objects.
+ */
 CLLD.DataTable = (function(){
 
+    /**
+     * Initialize a DataTable.
+     * 
+     * @public
+     * @name DataTable#init
+     * @function
+     */    
     var _init = function(eid, toolbar, options) {
         var col;
 
@@ -348,7 +380,7 @@ CLLD.MapIcons = {
 };
 
 
-/*
+/**
  * Manager for a leaflet map
  *
  * qw remove the attribution control by default. see
@@ -364,7 +396,7 @@ CLLD.Map = function(eid, layers, options) {
         {
             center: [5.5, 152.58],
             scrollWheelZoom: false,
-            maxZoom: options.max_zoom == undefined ? 6 : options.max_zoom,
+            maxZoom: this.options.max_zoom == undefined ? 6 : this.options.max_zoom,
             fullscreenControl: true,
             attributionControl: false
         }
@@ -535,8 +567,8 @@ CLLD.Map = function(eid, layers, options) {
             this.options.zoom == undefined ? 5 : this.options.zoom);
     }
 
-    if (options.on_init) {
-        options.on_init(this);
+    if (this.options.on_init) {
+        this.options.on_init(this);
     }
 };
 
