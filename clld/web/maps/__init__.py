@@ -11,10 +11,21 @@ from clld.util import cached_property
 
 
 class Layer(object):
-    """A layer in our terminology is a FeatureCollection in geojson and a FeatureGroup
+    """A layer in our terminology is a
+    `FeatureCollection <http://geojson.org/geojson-spec.html#feature-collection-objects>`_
+    in geojson and a
+    `geoJson layer <http://leafletjs.com/reference.html#geojson>`_
     in leaflet, i.e. a bunch of points on the map.
     """
     def __init__(self, id_, name, data, **kw):
+        """
+        :param id_: Map-wide unique string identifying the layer.
+        :param name: Human readable name of the layer.
+        :param data: A GeoJSON FeatureCollection either specified as corresponding Python\
+        dict or as URL which will serve the appropriate GeoJSON.
+        :param kw: Additional keyword parameters are made available to the Layer as \
+        instance attributes.
+        """
         self.id = id_
         self.name = name
         self.data = data
@@ -82,6 +93,11 @@ class Map(Component):
     __template__ = 'clld:web/templates/map.mako'
 
     def __init__(self, ctx, req, eid='map'):
+        """
+        :param ctx: context object of the current request.
+        :param req: current pyramid request object.
+        :param eid: Page-unique DOM-node ID.
+        """
         self.req = req
         self.ctx = ctx
         self.eid = eid
@@ -89,9 +105,17 @@ class Map(Component):
 
     @cached_property()
     def layers(self):
+        """
+        .. note:: Since layers may be costly to compute, we cache them per map instance.
+
+        :return: list of :py:class:`clld.web.maps.Layer` instances.
+        """
         return list(self.get_layers())
 
     def get_layers(self):
+        """
+        :return: list or generator of :py:class:`clld.web.maps.Layer` instances.
+        """
         route_params = {'ext': 'geojson'}
         if not IDataTable.providedBy(self.ctx):
             route_params['id'] = self.ctx.id
@@ -170,6 +194,8 @@ class Map(Component):
 
 
 class ParameterMap(Map):
+    """Map displaying markers for valuesets associated with a parameter instance.
+    """
     def get_layers(self):
         if self.ctx.domain:
             for de in self.ctx.domain:

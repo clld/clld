@@ -55,8 +55,8 @@ class ClldRequest(Request):
     """
     @reify
     def purl(self):
-        """For more convenient URL manipulations, we provide a PURL-variant of the current
-        request's URL.
+        """For more convenient URL manipulations, we provide the current request's URL
+        as `purl.URL <http://purl.readthedocs.org/en/latest/#purl.URL>`_ instance.
         """
         return URL(self.url)
 
@@ -66,6 +66,9 @@ class ClldRequest(Request):
 
     @reify
     def query_params(self):
+        """
+        :return: dict of the query parameters of the request URL.
+        """
         return {k: v[0] for k, v in self.purl.query_params().items()}
 
     @property
@@ -81,21 +84,44 @@ class ClldRequest(Request):
 
     @reify
     def dataset(self):
-        """Properties of the dataset an application serves are used in various places,
-        so we want to have a reference to it.
+        """Properties of the :py:class:`clld.db.models.common.Dataset` object an
+        application serves are used in various places, so we want to have a reference to
+        it.
         """
         return self.db.query(common.Dataset).first()
 
     def get_datatable(self, name, model, **kw):
+        """
+        :param name: Name under which the datatable class was registered.
+        :param model: model class to pass as initialization parameter to the datatable.
+        :param kw:
+            Keyword parameters are passed through to the initialization of the datatable.
+        :return:
+            :py:class:`clld.web.datatables.base.DataTable` instance, if a datatable was
+            registered for ``name``.
+        """
         dt = self.registry.getUtility(interfaces.IDataTable, name)
         return dt(self, model, **kw)
+
+    def get_map(self, name=None):
+        """
+        :param name: Name under which the map was registered.
+        :return:
+            :py:class:`clld.web.maps.Map` instance, if a map was registered else ``None``.
+        """
+        if name is None and self.matched_route:
+            name = self.matched_route.name
+        if name:
+            map_ = self.registry.queryUtility(interfaces.IMap, name=name)
+            if map_:
+                return map_(self.context, self)
 
     def _route(self, obj, rsc, **kw):
         """Determines the name of the canonical route for a resource instance. The
         resource may be specified as object or as mapper class and id.
 
-        :return: pair (route_name, kw) suitable as arguments for the Request.route_url \
-        method.
+        :return:
+            pair (route_name, kw) suitable as arguments for the Request.route_url method.
         """
         if rsc is None:
             for _rsc in RESOURCES:
@@ -117,7 +143,7 @@ class ClldRequest(Request):
         """Method to reverse URL generation for resources, i.e. given a URL, tries to
         determine the associated resource.
 
-        :return: model instance or None
+        :return: model instance or ``None``.
         """
         mapper = self.registry.getUtility(IRoutesMapper)
         _path = URL(url).path()
@@ -134,6 +160,15 @@ class ClldRequest(Request):
                         return rsc.model.get(info['match']['id'], default=None)
 
     def resource_url(self, obj, rsc=None, **kw):
+        """
+        :param obj:
+            A resource or the id of a resource; in the latter case ``rsc`` must be passed.
+        :param rsc: A registered :py:class:`clld.Resource`.
+        :param kw:
+            Keyword parameters are passed through to
+            `pyramid.request.Request.route_url <http://docs.pylonsproject.org/projects/pyramid/en/1.0-branch/api/request.html#pyramid.request.Request.route_url>`_
+        :return: URL
+        """
         route, kw = self._route(obj, rsc, **kw)
         return self.route_url(route, **kw)
 

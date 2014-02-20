@@ -27,7 +27,7 @@ install_requires = [
     'setuptools >= 0.8',
     'Pyramid >= 1.5a4',
     'pyramid_mako',
-    'sqlalchemy >= 0.8',
+    'sqlalchemy >= 0.9.3',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
     'purl >= 0.5',
@@ -78,7 +78,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.5.1',
+      version='0.6',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description='',

@@ -1,6 +1,10 @@
 Releasing clld
 ==============
 
+- Start devpi
+
+  $ devpi-ctl start all
+
 - Do platform test via tox:
 
   $ tox -r
@@ -56,5 +60,5 @@ Releasing clld
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
 
-  $ ./pypi.sh
+  $ ./pypi.sh <release number>
 

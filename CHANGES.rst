@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.6
+~~~
+
+New API to access registered maps using a method of the request object.
+
+
 0.5.1
 ~~~~~
 

@@ -257,7 +257,22 @@ class DetailsRowLinkCol(Col):
 class DataTable(Component):
     """DataTables are used to manage (sort, filter, display) lists of instances of one
     model class.
-    """
+
+    Often datatables are used to display only a pre-filtered set of items which are
+    related to some other entity in the system. This scenario is supported as follows:
+    For each model class listed in
+    :py:attr:`clld.web.datatables.base.DataTable.__constraints__` an appropriate object
+    specified either by keyword parameter or as request parameter will be looked up at
+    datatable initialization, and placed into a datatable attribute named after the model
+    class in lowercase. These attributes will be used when creating the URL for the data
+    request, to make sure the same pre-filtering is applied.
+
+    .. note::
+
+         The actual filtering has to be done in a custom implementation of
+         :py:meth:`clld.web.datatables.base.DataTable.base_query`.
+
+     """
     __template__ = 'clld:web/templates/datatable.mako'
     __constraints__ = []
 

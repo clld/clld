@@ -5,10 +5,17 @@ from clld.util import cached_property
 
 
 class Component(object):
+    """Virtual base class for page components, i.e. objects that can be rendered as HTML
+    and typically define behavior using a corresponding JavaScript object which accepts
+    an options object upon initialization.
+    """
     __template__ = None
 
     @cached_property()
     def options(self):
+        """
+        :return: JSON serializable dict
+        """
         opts = self.get_default_options()
         opts.update(self.get_options() or {})
         return opts
@@ -18,7 +25,15 @@ class Component(object):
             self.__template__, {'obj': self}, request=getattr(self, 'req', None)))
 
     def get_options(self):
+        """Override this method to define final-class-specific options.
+
+        :return: JSON serializable dict
+        """
         return {}
 
     def get_default_options(self):
+        """Override this method to define default (i.e. valid across subclasses) options.
+
+        :return: JSON serializable dict
+        """
         return {}

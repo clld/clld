@@ -1,0 +1,29 @@
+server: http://localhost:4224
+
+serve:
+  - clld/tests/xhr/*
+
+load:
+  - clld/web/static/js/jquery-1.8.2.js
+  - clld/web/static/js/bootstrap.js
+  - clld/web/static/js/bootstrapx-clickover.js
+  - clld/web/static/js/jquery.dataTables.js
+  - clld/web/static/js/leaflet-src.js
+  - clld/web/static/js/oms.min.js
+  - clld/web/static/js/leaflet-hash.js
+  - clld/web/static/js/leaflet-providers.js
+  - clld/web/static/js/leaflet.label.js
+  - clld/web/static/js/select2.js
+  - clld/tests/fixture.js
+  - clld/web/static/js/clld.js
+  - clld/tests/test_clld.js
+
+test:
+  - clld/tests/test_clld.js
+
+plugin:
+  - name: "coverage"
+    jar: "lib/jstestdriver/coverage.jar"
+    module: "com.google.jstestdriver.coverage.CoverageModule"
+
+timeout: 90

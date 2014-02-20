@@ -127,8 +127,22 @@ The ``register_datatable`` method of the config object has the following signatu
 
 .. py:function:: register_datatable(route_name, cls)
 
-    :param str route_name: Name of the route which maps to the view serving the page (see :ref:`sec-resource-routes`).
+    :param str route_name: Name of the route which maps to the view serving the data (see :ref:`sec-resource-routes`).
     :param class cld: Python class inheriting from :py:class:`clld.web.datatables.base.DataTable`.
+
+Datatables are always registered for the routes serving the data. Often they are
+displayed on the corresponding resource's index page, but sometimes you will want to
+display a datatable on some other page, e.g. a list of parameter values on the
+parameter detail's page. This can be done be inserting a call to
+:py:meth:`clld.web.app.ClldRequest.get_datatable` to create a datatable instance which can
+then be rendered calling its ``render`` method.
+
+As an example, the code to render a values datatable restricted to the values for a
+particular parameter instance ``param`` would look like
+
+.. code-block:: python
+
+    request.get_datatable('values', h.models.Value, parameter=param).render()
 
 
 Customize column definitions
@@ -278,9 +292,12 @@ The steps required to add a custom resource are:
 Custom maps
 ~~~~~~~~~~~
 
-The appearance of maps in ``clld`` apps depends on two factors which can be tweaked for
-customization: the code that renders the map and the GeoJSON data which is passed to this
-code.
+The appearance of :ref:`sec-maps` in ``clld`` apps depends on various factors which can be
+tweaked for customization:
+
+- the Python code that renders the HTML for the map,
+- the GeoJSON data which is passed as map layers,
+- the JavaScript code implementing the map.
 
 
 .. _sec-geojson:
@@ -299,6 +316,27 @@ Map classes
 Maps in ``clld`` are implemented as subclasses of :py:class:`clld.web.maps.Map`. These
 classes tie together behavior implemented in javascript (based on leaflet) with Python
 code used to assemble the map data, options and legends.
+
+The following :py:attr:`clld.web.maps.Map.options` are recognized:
+
+============= ============== ============================= =================================================================
+name          type           default                       description
+============= ============== ============================= =================================================================
+sidebar       ``bool``       ``False``                     whether the map is rendered in the sidebar
+showlabels    ``bool``       ``False``                     whether labels are shown by default
+no_showlabels ``bool``       ``False``                     whether the control to show labels should be hidden
+no_popup      ``bool``       ``False``                     whether clicking on markers opens an info window
+no_link       ``bool``       ``False``                     whether clicking on markers links to the language page
+info_route    ``str``        ``'language_alt'``            name of the route to query for info window contents
+info_query    ``dict``       ``{}``                        query parameters to pass when requesting info window content
+hash          ``bool``       ``False``                     whether map state should be tracked via URL fragment
+max_zoom      ``int``        ``6``                         maximal zoom level allowed for the map
+zoom          ``int``        ``5``                         zoom level of the map
+center        ``(lat, lon)`` ``None``                      center of the map
+icon_size     ``int``        ``20`` if sidebar else ``30`` size of marker icons in pixels
+icons         ``str``        ``'base'``                    name of a javascript marker factory function
+on_init       ``str``        ``None``                      name of a javascript function to call when initialization is done
+============= ============== ============================= =================================================================
 
 
 Custom URLs
