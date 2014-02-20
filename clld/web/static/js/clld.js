@@ -305,6 +305,9 @@ CLLD.DataTable = (function(){
         });
 
         var dl = '<p>You may use the download button <i class="icon-download-alt"> </i> to download the currently selected items in various formats.</p>';
+        dl += '<p>Columns containing numeric data may be filtered giving upper or lower ';
+        dl += 'bounds in the form "&lt;5" or ranges in the form ';
+        dl += '"-2..20".</p>';
         if (options.sDescription) {
             dl += options.sDescription;
         }
