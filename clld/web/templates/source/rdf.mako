@@ -1,4 +1,5 @@
 <%inherit file="../resource_rdf.mako"/>
+<%! from clld.lib import rdf %>
 <%! from clld.lib.bibo import TYPE_MAP, ADD_FIELD_MAP, FIELD_MAP %>
 <%block name="properties">
     <rdf:type rdf:resource="${str(h.rdf.NAMESPACES['bibo']) + (TYPE_MAP.get(ctx.type) or 'bibo:Document').split(':')[1]}"/>
@@ -20,7 +21,7 @@
         % if getattr(ctx, field, None):
             % if isinstance(spec, tuple):
     <${spec[0]} rdf:parseType="Resource">
-        <rdf:type rdf:resource="${spec[1][0]}"/>
+        <rdf:type rdf:resource="${rdf.url_for_qname(spec[1][0])}"/>
         <${spec[1][1]}>${getattr(ctx, field)|h.xmlchars}</${spec[1][1]}>
     </${spec[0]}>
             % else:

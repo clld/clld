@@ -1,0 +1,69 @@
+# coding: utf8
+from __future__ import unicode_literals
+import re
+from cStringIO import StringIO
+import json
+
+from pyramid.renderers import render
+from rdflib import Graph, URIRef
+import html5lib
+
+from clld.tests.util import TestWithEnv, Route
+from clld import RESOURCES
+from clld.lib import rdf
+
+
+_RESOURCES = [_rsc for _rsc in RESOURCES if _rsc.name != 'testresource']
+
+
+class Tests(TestWithEnv):
+    def test_detail_html(self):
+        self.set_request_properties(matched_route=Route(), map=None)
+        for rsc in _RESOURCES:
+            if not hasattr(rsc.model, 'first'):
+                continue
+            res = render(
+                '%s/detail_html.mako' % rsc.name,
+                dict(ctx=rsc.model.first()),
+                request=self.env['request'])
+            html5lib.parse(res)
+
+    def test_index_html(self):
+        self.set_request_properties(matched_route=Route(), map=None)
+        for rsc in _RESOURCES:
+            if not hasattr(rsc.model, 'first') or not rsc.with_index:
+                continue
+            dt = self.env['request'].get_datatable(rsc.name + 's', rsc.model)
+            res = render(
+                '%s/index_html.mako' % rsc.name,
+                dict(ctx=dt),
+                request=self.env['request'])
+            html5lib.parse(res)
+
+    def test_json(self):
+        for rsc in _RESOURCES:
+            if not hasattr(rsc.model, 'first'):
+                continue
+            res = render(
+                'json',
+                dict(ctx=rsc.model.first()),
+                request=self.env['request'])
+            json.loads(res)
+
+    def test_rdf(self):
+        qname_as_resource = re.compile('rdf:[a-z]+=\"\w+:\w+\"')
+        for rsc in _RESOURCES:
+            if not hasattr(rsc.model, 'first'):
+                continue
+            ctx = rsc.model.first()
+            res = render(
+                '%s/rdf.mako' % rsc.name, dict(ctx=ctx), request=self.env['request'])
+            assert not qname_as_resource.search(res)
+            g = Graph()
+            g.load(StringIO(res))
+            for predicate in ['void:inDataset', 'skos:prefLabel']:
+                if predicate == 'void:inDataset' and rsc.name == 'dataset':
+                    continue
+                subject = URIRef(self.env['request'].resource_url(ctx))
+                predicate = URIRef(rdf.url_for_qname(predicate))
+                assert (subject, predicate, None) in g
