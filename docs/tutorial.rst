@@ -81,10 +81,31 @@ This will create a python package ``myapp`` with the following layout::
     └── setup.py
 
 
+Running
+
+    cd myapp
+    python setup.py develop
+
+will install your app as Python package in development mode, i.e. will create a link to
+your app's code in the ``site-packages`` directory.
+
 Now edit the `configuration file <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html>`_,
 ``myapp/development.ini`` providing a setting ``sqlalchemy.url`` in the ``[app:main]`` section.
 The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_ given in this
 setting must point to an existing (although empty) database if the ``postgresql`` dialect is chosen.
+
+Running
+
+    python myapp/scripts/initializedb.py development.ini
+
+will then create the database for your app. Whenever you edit the database initialization
+script, you have to re-run the above command.
+
+.. note::
+
+    If you are using PostgreSQL as rdbms the above command will not automatically drop
+    an existing database, so before running it, you have to drop and re-create and empty
+    database "by hand".
 
 
 How do the basic concepts fit to the implementation?
