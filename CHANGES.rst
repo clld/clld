@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.7
+~~~
+
+Added support for range-operators when filtering DataTables on numeric columns.
+Fixed a couple of bugs in the serializations of the RDF data.
+
+
 0.6
 ~~~
 

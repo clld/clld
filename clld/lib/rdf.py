@@ -6,7 +6,7 @@ from cStringIO import StringIO
 
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import (
-    Namespace, DC, DCTERMS, DOAP, FOAF, OWL, RDF, RDFS, SKOS, VOID, XMLNS,
+    Namespace, DC, DCTERMS, DOAP, FOAF, OWL, RDF, RDFS, SKOS, VOID, XMLNS, XSD,
 )
 # make flake8 happy, but still have the following importable from here:
 assert DOAP
@@ -39,7 +39,34 @@ NAMESPACES = {
     "vcard": Namespace("http://www.w3.org/2001/vcard-rdf/3.0#"),
     "bibo": Namespace("http://purl.org/ontology/bibo/"),
     "owl": OWL,
+    "xsd": XSD,
 }
+
+
+def expand_prefix(p):
+    """
+    >>> assert expand_prefix('noprefix:lname') == 'noprefix:lname'
+    >>> assert expand_prefix('rdf:nolname') == 'rdf:nolname'
+    >>> assert expand_prefix('nocolon') == 'nocolon'
+
+    :param p: a qualified name in prefix:localname notation or a URL.
+    :return: a string URL or a URIRef
+    """
+    if isinstance(p, basestring) and ':' in p:
+        prefix, name = p.split(':', 1)
+        if prefix in NAMESPACES:
+            try:
+                return getattr(NAMESPACES[prefix], name)
+            except Exception:
+                pass
+    return p
+
+
+def url_for_qname(qname):
+    """
+    >>> assert url_for_qname('dcterms:title') == 'http://purl.org/dc/terms/title'
+    """
+    return str(expand_prefix(qname))
 
 
 class ClldGraph(Graph):
@@ -55,15 +82,16 @@ class ClldGraph(Graph):
 def properties_as_xml_snippet(subject, props):
     """somewhat ugly way to get at a snippet of an rdf-xml serialization of properties
     of a subject.
+
+    >>> p = properties_as_xml_snippet('http://example.org', [('dcterms:title', 'ttt')])
+    >>> assert 'ttt' in p
     """
     if isinstance(subject, basestring):
         subject = URIRef(subject)
     g = ClldGraph()
     if props:
         for p, o in props:
-            if ':' in p:
-                prefix, name = p.split(':')
-                p = getattr(NAMESPACES[prefix], name)
+            p = expand_prefix(p)
             if isinstance(o, basestring):
                 if o.startswith('http://') or o.startswith('https://'):
                     o = URIRef(o)

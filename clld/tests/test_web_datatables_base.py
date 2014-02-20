@@ -34,7 +34,7 @@ class Tests(TestWithEnv):
         self.handle_dt(TestTable, common.Contributor)
 
         self.set_request_properties(params={
-            'sSearch_0': '> 1',
+            'sSearch_0': '1..1000000',
             'sSearch_4': 'True',
             'sSearch_6': 'e',
             'iSortingCols': '1',

@@ -28,6 +28,11 @@ def filter_number(col, qs, type_=None, qs_weight=1):
     :param qs: a string, providing a filter criterion.
     :return: sqlalchemy filter expression.
     """
+    if '..' in qs:
+        min_, max_ = qs.split('..', 1)
+        return (
+            filter_number(col, '>=' + min_, type_=type_, qs_weight=qs_weight),
+            filter_number(col, '<=' + max_, type_=type_, qs_weight=qs_weight))
     op = col.__eq__
     match = OPERATOR_PATTERN.match(qs)
     if match:
@@ -287,6 +292,7 @@ class DataTable(Component):
         self.eid = eid or self.__class__.__name__
         self.count_all = None
         self.count_filtered = None
+        self.filters = []
 
         for _model in self.__constraints__:
             attr = self.attr_from_constraint(_model)
@@ -363,14 +369,24 @@ class DataTable(Component):
             DBSession.query(self.model).filter(self.model.active == True))
         self.count_all = query.count()
 
+        _filters = []
         for name, val in self.req.params.items():
             if val and name.startswith('sSearch_'):
                 try:
-                    clause = self.cols[int(name.split('_')[1])].search(val)
+                    colindex = int(name.split('_')[1])
+                    col = self.cols[colindex]
+                    clauses = col.search(val)
                 except (ValueError, IndexError):  # pragma: no cover
-                    clause = None
-                if clause is not None:
-                    query = query.filter(clause)
+                    clauses = None
+                if clauses is not None:
+                    if not isinstance(clauses, (tuple, list)):
+                        clauses = [clauses]
+                    for clause in clauses:
+                        if clause is not None:
+                            query = query.filter(clause)
+                            _filters.append((colindex, col.js_args['sTitle'], val))
+        for colindex, coltitle, qs in sorted(set(_filters)):
+            self.filters.append((coltitle, qs))
 
         self.count_filtered = query.count()
 

@@ -1,25 +1,8 @@
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-         xmlns:void="http://rdfs.org/ns/void#"
-         xmlns:foaf="http://xmlns.com/foaf/0.1/"
-         xmlns:frbr="http://purl.org/vocab/frbr/core#"
-         xmlns:dcterms="http://purl.org/dc/terms/"
-         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-         xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
-         xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
-         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-         xmlns:dc="http://purl.org/dc/elements/1.1/"
-         xmlns:gold="http://purl.org/linguistics/gold/"
-         xmlns:lexvo="http://lexvo.org/ontology"
-         xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#"
-         xmlns:bibo="http://purl.org/ontology/bibo/"
-         xmlns:owl="http://www.w3.org/2002/07/owl#">
+<rdf:RDF  ${h.rdf_namespace_attrs()|n}>
     <%! from clld.lib.rdf import FORMATS %>
     <%! from clld import RESOURCES %>
     <% TxtCitation = h.get_adapter(h.interfaces.IRepresentation, ctx, request, ext='md.txt') %>
     <void:Dataset rdf:about="${request.route_url('dataset')}">
-        ##
-        ## TODO: license, publisher, subject, ...
-        ##
         <rdfs:label xml:lang="en">${request.dataset.name}</rdfs:label>
         <skos:prefLabel xml:lang="en">${request.dataset.name}</skos:prefLabel>
         <dcterms:title xml:lang="en">${request.dataset.name}</dcterms:title>
@@ -41,7 +24,7 @@
         ##<dcterms:creator>Glottolog 2.0</dcterms:creator>
         % for ed in request.dataset.editors:
         <dcterms:contributor rdf:parseType="Resource">
-            <rdf:type rdf:resource="foaf:Person"/>
+            <rdf:type rdf:resource="${h.rdf.url_for_qname('foaf:Person')}"/>
             <foaf:name>${ed.contributor}</foaf:name>
         </dcterms:contributor>
         % endfor

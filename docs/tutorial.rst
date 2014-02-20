@@ -81,7 +81,7 @@ This will create a python package ``myapp`` with the following layout::
     └── setup.py
 
 
-Running
+Running::
 
     cd myapp
     python setup.py develop
@@ -94,7 +94,7 @@ Now edit the `configuration file <http://docs.pylonsproject.org/projects/pyramid
 The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_ given in this
 setting must point to an existing (although empty) database if the ``postgresql`` dialect is chosen.
 
-Running
+Running::
 
     python myapp/scripts/initializedb.py development.ini
 
