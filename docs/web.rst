@@ -7,6 +7,7 @@ The request object
 i.e. the request object available in view code or templates is an instance of
 :py:class:`clld.web.app.ClldRequest`.
 
+
 .. autoclass:: clld.web.app.ClldRequest
     :members:
 
