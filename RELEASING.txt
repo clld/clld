@@ -1,6 +1,10 @@
 Releasing clld
 ==============
 
+- Start devpi
+
+  $ devpi-ctl start all
+
 - Do platform test via tox:
 
   $ tox -r
