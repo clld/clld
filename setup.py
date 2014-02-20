@@ -57,8 +57,8 @@ else:
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     'pep8',
-    'html5lib',
     'mock',
+    'html5lib',
     'selenium',
 ]
 
@@ -79,7 +79,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.6',
+      version='0.7',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description='',

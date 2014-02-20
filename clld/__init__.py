@@ -4,7 +4,7 @@ from clld.db.models import common
 from clld import interfaces
 
 
-__version__ = "0.6"
+__version__ = "0.7"
 _Resource = namedtuple('Resource', 'name model interface with_index')
 
 
