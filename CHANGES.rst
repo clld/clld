@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.8
+~~~
+
+Added support for common tasks in Alembic migration scripts.
+Fixed a bug in the RDF serialization of parameters with domain.
+
+
 0.7
 ~~~
 

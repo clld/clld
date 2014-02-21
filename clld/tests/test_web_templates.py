@@ -11,6 +11,7 @@ import html5lib
 from clld.tests.util import TestWithEnv, Route
 from clld import RESOURCES
 from clld.lib import rdf
+from clld.db.models.common import Parameter
 
 
 _RESOURCES = [_rsc for _rsc in RESOURCES if _rsc.name != 'testresource']
@@ -67,3 +68,6 @@ class Tests(TestWithEnv):
                 subject = URIRef(self.env['request'].resource_url(ctx))
                 predicate = URIRef(rdf.url_for_qname(predicate))
                 assert (subject, predicate, None) in g
+        p = Parameter.get('parameter')
+        res = render('parameter/rdf.mako', dict(ctx=p), request=self.env['request'])
+        assert p.domain[0].name in res
