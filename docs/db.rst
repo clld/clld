@@ -112,4 +112,16 @@ Migrations
 ~~~~~~~~~~
 
 Migrations provide a mechanism to update the database model (or the data) in a controlled
-and repeatable way. CLLD apps use alembic to implement migrations.
+and repeatable way. ``clld`` apps use
+`Alembic <http://alembic.readthedocs.org/en/latest/>`_ to implement migrations.
+
+Since a migration may change the database schema, it is generally not possible to fully
+use ORM mechanisms in migration scripts. Instead, migration scripts typically construct
+SQL to be sent to the database "by hand", or using SQLAlchemy's
+`SQL expression language <http://docs.sqlalchemy.org/en/latest/core/tutorial.html>`_.
+Now dropping down to these lower levels of database access makes scripts verbose and
+error prone. Thus, ``clld`` provides a module with helpers for Alembic migration scripts.
+
+.. automodule:: clld.db.migration
+    :members:
+    :exclude-members: base_select
