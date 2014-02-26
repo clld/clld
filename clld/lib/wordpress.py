@@ -1,5 +1,5 @@
 """
-client for the xmlrpc API of a wordpress blog
+Client for the xmlrpc API of a wordpress blog.
 
 .. note::
 

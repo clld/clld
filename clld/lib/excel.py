@@ -1,3 +1,6 @@
+"""
+Functionality to support reading and writing of excel files.
+"""
 from six import PY3
 if not PY3:
     import xlwt
@@ -21,7 +24,13 @@ def hyperlink(url, label=None):
 
 
 def rows(sheet, as_dict=False):
-    """
+    """Read data from an excel sheet.
+
+    :param as_dict:
+        If ``True`` rows will be converted to ``dict``s using the content of the first row
+        as keys.
+    :return: Generator for the rows in the specified sheet.
+
     >>> wb = xlwt.Workbook()
     >>> ws = wb.add_sheet('1')
     >>> d = {'a': 1}

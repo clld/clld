@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.8.1
+~~~~~
+
+Enhanced test utilities.
+Better docs.
+
+
 0.8
 ~~~
 

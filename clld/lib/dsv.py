@@ -1,6 +1,6 @@
 # coding: utf8
 """
-Support for reading and writing delimiter-separated value files.
+Support for reading delimiter-separated value files.
 
 .. seealso:: http://en.wikipedia.org/wiki/Delimiter-separated_values
 """

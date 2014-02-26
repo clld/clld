@@ -1,9 +1,10 @@
 """
-functionality supporting the creation of bibliographical data using the
+Functionality supporting the creation of bibliographical data using the
 Bibliographic Ontology
 
 .. seealso:: http://bibliontology.com/
 """
+#: Map BibTeX entry types to the corresponding bibo types.
 TYPE_MAP = {
     "book": "bibo:Book",
     "booklet": "bibo:Book",

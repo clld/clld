@@ -1,3 +1,4 @@
+<%inherit file="../snippet.mako"/>
 <%namespace name="util" file="../util.mako"/>
 
 <textarea class="input-block-level" id="md-${ctx.pk}">${ctx.bibtex().text()}</textarea>
