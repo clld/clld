@@ -1,1 +1,1 @@
-## TODO
+<%inherit file="../snippet.mako"/>

@@ -1,3 +1,4 @@
+<%inherit file="../snippet.mako"/>
 <%namespace name="util" file="../util.mako"/>
 
 % if ctx.description:
