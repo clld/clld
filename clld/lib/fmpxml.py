@@ -131,6 +131,10 @@ class Client(object):
         return Result(xml)
 
     def get(self, what):
+        """
+        :param what: Name of the layout from which to retrieve data.
+        :return: ``list`` of ``dict``s representing the data of the layout.
+        """
         items = []
         batch = self._get_batch(what)
         items.extend(batch.items)

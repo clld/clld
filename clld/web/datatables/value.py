@@ -103,9 +103,6 @@ class Values(DataTable):
                         model_col=Parameter.name,
                         get_object=lambda i: i.valueset.parameter),
                 RefsCol(self, 'source'),
-                #
-                # TODO: refs?
-                #
             ]
 
         return res + [

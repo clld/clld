@@ -1,5 +1,5 @@
 """
-functionality to gather information to link to ethnologue.com
+Functionality to gather information to link to ethnologue.com
 """
 import re
 import time
@@ -15,6 +15,10 @@ def get(path):
 
 
 def get_subgroups():
+    """Parses subgroups from ethnologue's language family pages.
+
+    :return: dict
+    """
     prefix = '/subgroups/'
 
     def parse_subgroups(doc):

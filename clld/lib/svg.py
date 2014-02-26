@@ -18,6 +18,8 @@ SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="blac
 
 def pie(data, colors, width=34):
     """
+    :return: SVG representation of the data as pie chart.
+
     >>> assert pie([2, 7], ['eee', '111'])
     >>> assert pie([100], ['eee'])
     """
