@@ -484,14 +484,14 @@ def get_configurator(pkg, *utilities, **kw):
         config.register_adapter(
             getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), rsc.interface)
 
-        kw = dict(factory=partial(ctx_factory, model, 'rsc'))
+        _kw = dict(factory=partial(ctx_factory, model, 'rsc'))
         if model == common.Dataset:
             pattern = '/'
-            kw['alt_route_pattern'] = '/void.{ext}'
+            _kw['alt_route_pattern'] = '/void.{ext}'
         else:
             pattern = '/%s/{id:[^/\.]+}' % rsc.plural
 
-        config.add_route_and_view(name, pattern, resource_view, **kw)
+        config.add_route_and_view(name, pattern, resource_view, **_kw)
 
     # maps
     config.register_map('languages', Map)
@@ -587,4 +587,5 @@ def get_configurator(pkg, *utilities, **kw):
 
     for utility, interface in utilities:
         config.registry.registerUtility(utility, interface)
+
     return config
