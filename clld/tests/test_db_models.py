@@ -57,30 +57,30 @@ class Tests(TestWithDb):
         from clld.db.models.common import Source
 
         d = Source(id='abc')
-        d.gbs_identifier
+        self.assertIsNone(d.gbs_identifier)
         d = Source(id='abc', jsondata={'gbs': {'volumeInfo': {}}})
-        d.gbs_identifier
+        self.assertIsNone(d.gbs_identifier)
         d = Source(
             id='abc',
             jsondata={
                 'gbs': {
                     'volumeInfo': {
                         'industryIdentifiers': [{'type': 'x', 'identifier': 'y'}]}}})
-        d.gbs_identifier
+        self.assertEquals(d.gbs_identifier, 'y')
         d = Source(
             id='abc',
             jsondata={
                 'gbs': {
                     'volumeInfo': {
                         'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': ''}]}}})
-        d.gbs_identifier
+        self.assertEquals(d.gbs_identifier, 'ISBN:')
         d = Source(
             id='abc',
             jsondata={
                 'gbs': {
                     'volumeInfo': {
                         'industryIdentifiers': [{'type': 'ISBN_13', 'identifier': ''}]}}})
-        d.gbs_identifier
+        self.assertEquals(d.gbs_identifier, 'ISBN:')
         d.bibtex()
 
     def test_Data(self):

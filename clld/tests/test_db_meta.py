@@ -34,23 +34,13 @@ class Tests(TestWithDb):
         VersionedDBSession.add(l)
         VersionedDBSession.flush()
         VersionedDBSession.expunge(l)
-        #print('pk: %s' % l.pk)
-        #transaction.commit()
-        #transaction.begin()
-        #l = VersionedDBSession.query(Language).get(1)
-        #print(l)
-        #l.name = 'New name'
-        #print('pk: %s' % l.pk)
-        #transaction.commit()
-        #transaction.begin()
         l = Language.get('abc')
-        #print(l.version)
         self.assertEqual(l.name, 'Name')
-        l.history()
+        assert not list(l.history())
 
         # a bit of a hack to test the human readable representations.
         # we exploit the fact, that on py2, string and unicode comparison does type
-        # coercion, while on py3, the two methods should actualy return the same string.
+        # coercion, while on py3, the two methods should actually return the same string.
         self.assertEqual(l.__str__(), l.__unicode__())
         Language().__str__()
 
