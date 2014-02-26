@@ -12,3 +12,5 @@ Code is at github_.
 .. _readthedocs: http://clld.readthedocs.org/
 .. _github: https://github.com/clld/clld
 
+.. image:: https://travis-ci.org/clld/clld.png   :target: https://travis-ci.org/clld/clld
+

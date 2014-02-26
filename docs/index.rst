@@ -9,7 +9,7 @@ Cross-Linguistic Linked Data
 The Project
 -----------
 
-The goal of the Cross-Linguistic Linked Data project (CLLD) is to help collecting the world's
+The goal of the Cross-Linguistic Linked Data project (CLLD) is to help record the world's
 language diversity heritage. This is to be facilitated by developing, providing and
 maintaining interoperable data publication structures.
 
@@ -48,7 +48,7 @@ These constraints led to the following design decisions:
   and support of the
   `Zope component architecture (zca) <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/zca.html>`_.
 - Use `zca <http://www.muthukadan.net/docs/zca.html>`_ for pluggable functionality.
-- Allow UI customization via i18n and templates.
+- Allow UI customization via i18n and overrideable templates.
 
 
 Overview
@@ -58,14 +58,12 @@ Overview
 
 - a common core database model :py:mod:`clld.db.models.common`,
 - a `pyramid application scaffold <http://docs.pylonsproject.org/projects/pyramid/en/latest/glossary.html#term-scaffold>`_,
-- a core web application implemmented in the pyramid framework :py:mod:`clld.web.app`,
+- a core web application implemented in the pyramid framework :py:mod:`clld.web.app`,
 - scripts exploiting the core database model,
-- deployment tasks implemented using fabric,
 - libraries for common problems when working with linguistic databases.
 
-Online documentation: http://clld.readthedocs.org/
-
-Source code and issue tracker: https://github.com/clld/clld
+Online documentation is at `readthedocs <http://clld.readthedocs.org/>`_,
+source code and issue tracker at `GitHub <https://github.com/clld/clld>`_.
 
 
 Contents:
@@ -91,7 +89,7 @@ Contents:
 The applications
 ----------------
 
-For a list of applications developed on top the ``clld`` framework see the
+For examples of applications developed on top of the ``clld`` framework see the
 `list of CLLD datasets <http://clld.org/datasets>`_.
 
 

@@ -114,10 +114,9 @@ How do the basic concepts fit to the implementation?
 The dataset
 +++++++++++
 
-Each CLLD app is assumed to serve a dataset. This dataset is assumed to have a publisher
+Each ``clld`` app is assumed to serve a dataset. This dataset is assumed to have a publisher
 and a license. Information about the publisher and the license should be part of the data,
-as well as other metadata about the dataset, will be looked up in the database, since
-they are regarded as essential part of the data itself.
+as well as other metadata about the dataset.
 
 ``clld`` supports scripted initial creation of a suitable database for this dataset.
 You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
@@ -161,8 +160,8 @@ Thus, you can create objects which you can reference later like
 A note on files
 +++++++++++++++
 
-A clld app may have static data files associated with its resources (e.g. soundfiles).
-The clld framework is designed to store these files in the filesystem and just keep
+A ``clld`` app may have static data files associated with its resources (e.g. soundfiles).
+The ``clld`` framework is designed to store these files in the filesystem and just keep
 references to them in the database. While this does require a more complex import
 and export process, it helps keeping the database small, and allows serving the static
 files directly from a webserver instead of having to go through the web application
@@ -174,7 +173,7 @@ when a file's "create" method is called, or its URL is calculated.
 
 Note that there's an additional category of static files - downloads - which are treated
 differently because they are not considered primary but derived data which can be
-recreated anytime. To separate these concerns physically, downloads are typically stored
+recreated at any time. To separate these concerns physically, downloads are typically stored
 in a different directory than primary data files.
 
 
@@ -200,6 +199,6 @@ gunicorn + nginx
 Examples
 ~~~~~~~~
 
-A good way explore how to customize a CLLD app is by looking at the code of existing apps.
+A good way explore how to customize a ``clld`` app is by looking at the code of existing apps.
 These apps are listed at `<http://clld.org/datasets>`_ and each app links to its source code
 repository on `GitHub <https://github.com/clld>`_ (in the site footer).

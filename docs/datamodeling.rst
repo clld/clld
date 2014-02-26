@@ -2,6 +2,34 @@
 Data modeling
 -------------
 
+This chapter describes how to model cross-linguistic data using the core resources
+available in the ``clld`` framework. While it is possible to extend the core data model
+in various ways, sticking to core resources for comparable concepts will ensure
+re-usability of the data, because all of the data publication mechanisms implemented
+in ``clld`` will be available.
+
+
+Dataset
+~~~~~~~
+
+Each ``clld`` app is assumed to serve a cross-linguistic dataset. The
+:py:class:`clld.db.models.common.Dataset` object holds metadata about the dataset, e.g.
+the publisher and license and relations to editors.
+
+
+Languages
+~~~~~~~~~
+
+Languages are the core objects which are described in datasets served by ``clld`` apps.
+:py:class:`clld.db.models.common.Language`s - like most other objects - are at the most
+basic level described by a name, an optional description and an optional geographical
+coordinate.
+
+To allow identification of languages across apps or even domains, languages can be
+associated with any number of alternative
+:py:class:`clld.db.models.common.Identifier`s; typically glottocodes or iso 639-3
+codes or alternative names.
+
 
 Parameters
 ~~~~~~~~~~
