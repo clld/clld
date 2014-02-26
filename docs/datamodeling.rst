@@ -21,13 +21,13 @@ Languages
 ~~~~~~~~~
 
 Languages are the core objects which are described in datasets served by ``clld`` apps.
-:py:class:`clld.db.models.common.Language`s - like most other objects - are at the most
+:py:class:`clld.db.models.common.Language` - like most other objects - are at the most
 basic level described by a name, an optional description and an optional geographical
 coordinate.
 
 To allow identification of languages across apps or even domains, languages can be
 associated with any number of alternative
-:py:class:`clld.db.models.common.Identifier`s; typically glottocodes or iso 639-3
+:py:class:`clld.db.models.common.Identifier`; typically glottocodes or iso 639-3
 codes or alternative names.
 
 

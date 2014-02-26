@@ -1,5 +1,5 @@
 """Functionality to retrieve data from a FileMaker server using the
-'Custom Web Publishing with XML' protocol.
+*Custom Web Publishing with XML* protocol.
 
 .. seealso:: http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
@@ -133,7 +133,7 @@ class Client(object):
     def get(self, what):
         """
         :param what: Name of the layout from which to retrieve data.
-        :return: ``list`` of ``dict``s representing the data of the layout.
+        :return: ``list`` of ``dict`` representing the data of the layout.
         """
         items = []
         batch = self._get_batch(what)
