@@ -7,7 +7,8 @@ from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
 from tempfile import mkdtemp
-from xml.etree import cElementTree as et
+from xml.etree import cElementTree as ElementTree
+from json import loads
 import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
@@ -269,6 +270,8 @@ def _add_header(headers, name, value):
 
 
 class ExtendedTestApp(TestApp):
+    parsed_body = None
+
     def get(self, *args, **kw):
         if kw.pop('xhr', False):
             kw['headers'] = _add_header(
@@ -277,7 +280,37 @@ class ExtendedTestApp(TestApp):
         if accept:
             kw['headers'] = _add_header(
                 kw.pop('headers', {}), 'accept', str(accept))
-        return super(ExtendedTestApp, self).get(*args, **kw)
+        kw.setdefault('status', 200)
+        body_parser = kw.pop('_parse_body', None)
+        res = super(ExtendedTestApp, self).get(*args, **kw)
+        if body_parser and res.status_int < 300:
+            self.parsed_body = body_parser(res.body)
+        return res
+
+    def get_html(self, *args, **kw):
+        from html5lib import parse
+
+        docroot = kw.pop('docroot', None)
+        res = self.get(*args, _parse_body=parse, **kw)
+        assert self.parsed_body.childNodes
+        assert self.parsed_body.childNodes[0].name == 'html'
+        if docroot:
+            assert self.parsed_body.childNodes[0].childNodes[1].childNodes[0].name \
+                   == docroot
+        return res
+
+    def get_json(self, *args, **kw):
+        return self.get(*args, _parse_body=loads, **kw)
+
+    def get_xml(self, *args, **kw):
+        return self.get(*args, _parse_body=ElementTree.fromstring, **kw)
+
+    def get_dt(self, _path, *args, **kw):
+        if 'sEcho=' not in _path:
+            sep = '&' if '?' in _path else '?'
+            _path = _path + sep + 'sEcho=1'
+        kw.setdefault('xhr', True)
+        return self.get_json(_path, *args, **kw)
 
 
 class TestWithApp(TestWithEnv):
@@ -407,7 +440,6 @@ class DataTable(PageObject):  # pragma: no cover
         assert table
         tr = table.find_element_by_tag_name('tbody').find_element_by_tag_name('tr')
         res = [td.text.strip() for td in tr.find_elements_by_tag_name('td')]
-        print res
         return res
 
     def filter(self, name, value):
@@ -494,7 +526,7 @@ class XmlResponse(object):
     ns = None
 
     def __init__(self, response):
-        self.root = et.fromstring(response.body)
+        self.root = ElementTree.fromstring(response.body)
 
     def findall(self, name):
         if not name.startswith('{') and self.ns:
