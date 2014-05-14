@@ -36,6 +36,18 @@ CLLD.url = function(path, query) {
 };
 
 /**
+ * Reload the current page with updated query parameters.
+ */
+CLLD.reload = function (query) {
+    var url, current = document.location;
+    url = current.pathname;
+    if (current.search) {
+        query = $.extend({}, JSON.parse('{"' + decodeURI(current.search.replace('?', '').replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}'), query)
+    }
+    document.location.href = url + '?' + $.param(query);
+}
+
+/**
  * Create a URL for a route within the app.
  * @param {string} route - route name.
  * @param {{}} data - dictionary providing to data so substitute in the route pattern.

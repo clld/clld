@@ -11,8 +11,13 @@ class Tests(TestWithEnv):
         class MockRoute(Mock):
             name = 'language'
 
-        self.set_request_properties(matched_route=MockRoute())
+        self.set_request_properties(
+            matched_route=MockRoute(), params=dict(z=3, lat=1, lng=1))
 
+        dt = Map(common.Parameter.first(), self.env['request'])
+        dt.render()
+
+        self.set_request_properties(params=dict(z='abc'))
         dt = Map(common.Parameter.first(), self.env['request'])
         dt.render()
 

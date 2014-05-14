@@ -583,3 +583,29 @@ def partitioned(items, n=3):
         bucket.append(item)
 
     yield bucket
+
+
+def icons(req, param):
+    """
+    Creates an HTML snippet listing available icons.
+
+    :param req: current request
+    :param param: parameter name
+    :return: HTML element
+    """
+    iconlist = req.registry.queryUtility(interfaces.IIconList)
+    td = lambda icon: HTML.td(
+        HTML.img(
+            src=icon.url(req),
+            height='20',
+            width='20'),
+        onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
+    rows = [
+        HTML.tr(*map(td, icons)) for c, icons in
+        groupby(sorted(iconlist, key=lambda i: i.name), lambda i: i.name[0])]
+    return HTML.div(
+        HTML.table(
+            HTML.tbody(*rows),
+            class_="table table-condensed"
+        ),
+        button('Close', **{'data-dismiss': 'clickover'}))

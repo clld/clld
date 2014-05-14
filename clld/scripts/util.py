@@ -38,7 +38,8 @@ def glottocodes_by_isocode(dburi, cols=['id']):
             'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk'
                         % select
         ):
-            glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
+            if row[0]:
+                glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
     else:
         conv = defaultdict(lambda: lambda x: x, latitude=float, longitude=float)
         res = requests.get("http://glottolog.org/resourcemap.json?rsc=language")

@@ -18,6 +18,7 @@ class Component(object):
         """
         opts = self.get_default_options()
         opts.update(self.get_options() or {})
+        opts.update(self.get_options_from_req() or {})
         return opts
 
     def render(self):
@@ -33,6 +34,13 @@ class Component(object):
 
     def get_default_options(self):
         """Override this method to define default (i.e. valid across subclasses) options.
+
+        :return: JSON serializable dict
+        """
+        return {}
+
+    def get_options_from_req(self):
+        """Override this method to define options derived from request properties.
 
         :return: JSON serializable dict
         """

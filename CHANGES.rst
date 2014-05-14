@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.9
+~~~
+
+* Support for icon selection.
+* Map configuration via URL parameters.
+* Upgraded JqTree lib.
+
+
 0.8.1
 ~~~~~
 

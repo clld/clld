@@ -14,6 +14,11 @@ class Tests(TestWithEnv):
 
         alt_representations(self.env['request'], common.Parameter.first())
 
+    def test_icons(self):
+        from clld.web.util.helpers import icons
+
+        self.assert_(icons(self.env['request'], 'param'))
+
     def test_link(self):
         from clld.web.util.helpers import link
 

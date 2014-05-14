@@ -323,7 +323,7 @@ The following :py:attr:`clld.web.maps.Map.options` are recognized:
 name          type           default                       description
 ============= ============== ============================= =================================================================
 sidebar       ``bool``       ``False``                     whether the map is rendered in the sidebar
-showlabels    ``bool``       ``False``                     whether labels are shown by default
+show_labels   ``bool``       ``False``                     whether labels are shown by default
 no_showlabels ``bool``       ``False``                     whether the control to show labels should be hidden
 no_popup      ``bool``       ``False``                     whether clicking on markers opens an info window
 no_link       ``bool``       ``False``                     whether clicking on markers links to the language page

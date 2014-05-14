@@ -390,3 +390,21 @@ $(document).ready(function() {
         ${caller.body()}
     </div>
 </%def>
+
+###
+### icon-select element
+###
+<%def name="iconselect(id, param, tag='td', placement='left')">
+    <${tag} title="click to select a different map marker"
+            style="cursor: pointer;"
+            id="${id}"
+            data-toggle="popover"
+            data-placement="${placement}">
+             ${caller.body()}
+        <script>
+$(document).ready(function() {
+    $('#${id}').clickover({'html': true, 'content': '${h.icons(request, param)}'});
+});
+        </script>
+    </${tag}>
+</%def>

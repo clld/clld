@@ -177,6 +177,11 @@ class IIcon(Interface):
         """
 
 
+class IIconList(Interface):
+    """utility listing all available icons ordered by preference.
+    """
+
+
 class IFrequencyMarker(Interface):
     """utility
     """
