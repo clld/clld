@@ -103,6 +103,18 @@ class Map(Component):
         self.eid = eid
         self.map_marker = req.registry.getUtility(IMapMarker)
 
+    def get_options_from_req(self):
+        params = self.req.params
+        res = {}
+        try:
+            if 'lat' in params and 'lng' in params:
+                res['center'] = map(float, [params['lat'], params['lng']])
+            if 'z' in params:
+                res['zoom'] = int(params['z'])
+        except (ValueError, TypeError):
+            pass
+        return res
+
     @cached_property()
     def layers(self):
         """
