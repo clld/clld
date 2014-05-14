@@ -1,4 +1,4 @@
-from itertools import product
+from itertools import product, groupby
 
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
@@ -78,8 +78,13 @@ class Icon(object):
         return req.static_url(self.asset_spec)
 
 
+#: a list of all available icons:
 ICONS = map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS])
+
+#: a dictionary mapping icon names to icon objects:
 ICON_MAP = {icon.name: icon for icon in ICONS}
+
+#: a list of icons ordered by preference:
 ORDERED_ICONS = [ICON_MAP[s + c] for s, c in
                  list(product(SHAPES, PREFERED_COLORS)) +
                  list(product(SHAPES, SECONDARY_COLORS))]
@@ -91,3 +96,4 @@ class MapMarker(object):
     """
     def __call__(self, ctx, req):
         return req.registry.getUtility(IIcon, 'cff6600').url(req)
+

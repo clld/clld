@@ -45,7 +45,7 @@ from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap, CombinationMap
-from clld.web.icon import ICONS, MapMarker
+from clld.web.icon import ICONS, ORDERED_ICONS, MapMarker
 from clld.web import assets
 assert assets
 
@@ -183,10 +183,13 @@ class ClldRequest(Request):
         route, kw = self._route(obj, rsc, **kw)
         return self.route_path(route, **kw)
 
+    def file_ospath(self, file_):
+        if 'clld.files' in self.registry.settings:
+            return self.registry.settings['clld.files'].joinpath(file_.relpath)
+
     def file_url(self, file_):
         if 'clld.files' in self.registry.settings:
-            abspath = self.registry.settings['clld.files'].joinpath(file_.relpath)
-            return self.static_url(abspath)
+            return self.static_url(self.file_ospath(file_))
 
 
 def menu_item(resource, ctx, req, label=None):
@@ -503,6 +506,7 @@ def get_configurator(pkg, *utilities, **kw):
 
     for icon in ICONS:
         config.registry.registerUtility(icon, interfaces.IIcon, name=icon.name)
+    config.registry.registerUtility(ORDERED_ICONS, interfaces.IIconList)
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
 
     #
