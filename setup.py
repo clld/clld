@@ -25,14 +25,14 @@ except IOError:
 
 install_requires = [
     'setuptools >= 0.8',
-    'Pyramid >= 1.5a4',
+    'pyramid >= 1.5a4',
     'pyramid_mako',
     'sqlalchemy >= 0.9.3',
     'Mako >= 0.3.6', # strict_undefined
     'PasteDeploy >= 1.5.0', # py3 compat
     'purl >= 0.5',
     'path.py',
-    'pyramid-exclog',
+    'pyramid_exclog',
     'zope.sqlalchemy',
     'WebTest',
     'six',
@@ -47,18 +47,18 @@ install_requires = [
     'newrelic',
     'paginate',
     'unicsv',
+    'html5lib==0.95', # our tests rely on the childNodes attribute
 ]
 
 if not PY3:
-    install_requires.extend('xlrd xlwt Babel pyx==0.12.1'.split())
+    install_requires.extend('xlrd xlwt Babel PyX==0.12.1'.split())
 else:
-    install_requires.extend('pyx>=0.13'.split())
+    install_requires.extend('PyX>=0.13'.split())
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     'pep8',
     'mock',
-    'html5lib',
     'selenium',
 ]
 
