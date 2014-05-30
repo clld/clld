@@ -35,6 +35,7 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
+from clld.web.adapters.download import N3Dump
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
     select_combination,
@@ -350,6 +351,9 @@ def register_resource(config, name, model, interface, with_index=False):
             '/%ss' % name,
             index_view,
             factory=partial(ctx_factory, model, 'index'))
+    #
+    # TODO: register download!?
+    #
 
 
 def register_download(config, download):
@@ -495,6 +499,16 @@ def get_configurator(pkg, *utilities, **kw):
             pattern = '/%s/{id:[^/\.]+}' % rsc.plural
 
         config.add_route_and_view(name, pattern, resource_view, **_kw)
+
+        #
+        # TODO: make these downloads optional!
+        #
+        #if rsc.with_rdfdump:
+        #    config.register_download(
+        #        N3Dump(
+        #            model,
+        #            config.package_name,
+        #            description="%s as RDF" % rsc.plural.capitalize()))
 
     # maps
     config.register_map('languages', Map)

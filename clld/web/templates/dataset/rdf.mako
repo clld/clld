@@ -1,6 +1,7 @@
 <rdf:RDF  ${h.rdf_namespace_attrs()|n}>
     <%! from clld.lib.rdf import FORMATS %>
     <%! from clld import RESOURCES %>
+    <% rscs = [rsc for rsc in RESOURCES if rsc.name != 'testresource'] %>
     <% TxtCitation = h.get_adapter(h.interfaces.IRepresentation, ctx, request, ext='md.txt') %>
     <void:Dataset rdf:about="${request.route_url('dataset')}">
         <rdfs:label xml:lang="en">${request.dataset.name}</rdfs:label>
@@ -16,7 +17,7 @@
         % for format in FORMATS.values():
         <void:feature rdf:resource="${format.uri}"/>
         % endfor
-        % for rsc in RESOURCES:
+        % for rsc in rscs:
             % if rsc.name in request.registry.settings.get('sitemaps', []) and rsc.with_index:
         <void:subset rdf:resource="${request.route_url(rsc.name + 's')}"/>
             % endif
@@ -33,7 +34,7 @@ ${TxtCitation.render(request.dataset, request)}
         </dcterms:bibliographicCitation>
         <dcterms:subject rdf:resource="http://dbpedia.org/resource/Linguistics"/>
     </void:Dataset>
-% for rsc in RESOURCES:
+% for rsc in rscs:
     <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
     % if not dls:
         % if rsc.name in request.registry.settings.get('sitemaps', []) and rsc.with_index:

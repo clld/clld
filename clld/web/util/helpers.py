@@ -45,6 +45,27 @@ from clld.util import xmlchars
 assert xmlchars
 
 
+def get_valueset(req, ctx):
+    param = req.params.get('parameter')
+    if param is None:  # pragma: no cover
+        return
+
+    try:
+        param = int(param)
+    except ValueError:  # pragma: no cover
+        pass
+
+    query = DBSession.query(models.ValueSet)\
+         .filter(models.ValueSet.language_pk == ctx.pk)
+
+    if isinstance(param, int):
+        query = query.filter(models.ValueSet.parameter_pk == param)
+    else:  # pragma: no cover
+        query = query.join(models.Parameter).filter(models.Parameter.id == param)
+
+    return query.first()
+
+
 def get_url_template(req, route, relative=True):
     if isinstance(route, basestring):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)

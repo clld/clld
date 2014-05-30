@@ -71,17 +71,17 @@ def add_language_codes(data, lang, isocode, glottocodes=None):
                 language=lang, identifier=identifier('glottolog', glottocodes[isocode])))
 
 
-def bibtex2source(rec):
+def bibtex2source(rec, cls=common.Source):
     year = bibtex.unescape(rec.get('year', 'nd'))
     fields = {}
     jsondata = {}
     for field in bibtex.FIELDS:
         if field in rec:
             value = bibtex.unescape(rec[field])
-            container = fields if hasattr(common.Source, field) else jsondata
+            container = fields if hasattr(cls, field) else jsondata
             container[field] = value
 
-    return common.Source(
+    return cls(
         id=slug(rec.id),
         name=('%s %s' % (bibtex.unescape(
             rec.get('author', rec.get('editor', ''))), year)).strip(),

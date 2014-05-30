@@ -14,6 +14,7 @@ ${map.render()}
             <tbody>
                 % for language in langs:
                 <tr>
+                    <td><input title="check to display marker on map" type="checkbox" class="marker-toggle" id="marker-toggle-${language.id}" checked="checked"/></td>
                     <td>${h.link_to_map(language)}</td>
                     <td>${h.link(request, language)}</td>
                 </tr>
@@ -23,3 +24,11 @@ ${map.render()}
     </div>
     % endfor
 </div>
+<script>
+    $(window).load(function() {
+        $('.marker-toggle').click(function(e) {
+            CLLD.mapToggleLanguages('${map.eid}');
+            e.stopPropagation();
+        });
+    });
+</script>

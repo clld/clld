@@ -52,6 +52,8 @@ class Tests(TestWithEnv):
             json.loads(res)
 
     def test_rdf(self):
+        global RESOURCES
+        RESOURCES = _RESOURCES
         qname_as_resource = re.compile('rdf:[a-z]+=\"\w+:\w+\"')
         for rsc in _RESOURCES:
             if not hasattr(rsc.model, 'first'):

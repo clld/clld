@@ -107,7 +107,7 @@ def properties_as_xml_snippet(subject, props):
             res.append(line)
         if line.strip().startswith('<rdf:Description'):
             in_desc = True
-    return '\n'.join(res)
+    return '\n'.join(res).decode('utf8')
 
 
 def convert(string, from_, to_):
