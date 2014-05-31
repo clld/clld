@@ -9,6 +9,12 @@ from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
+    def test_get_valueset(self):
+        from clld.web.util.helpers import get_valueset
+
+        self.set_request_properties(params=dict(parameter='1'))
+        get_valueset(self.env['request'], common.Language.first())
+
     def test_alt_representations(self):
         from clld.web.util.helpers import alt_representations
 

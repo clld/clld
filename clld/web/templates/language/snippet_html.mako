@@ -3,7 +3,8 @@
 
 % if request.params.get('parameter'):
     ## called for the info windows on parameter maps
-    <% valueset = h.DBSession.query(h.models.ValueSet).filter(h.models.ValueSet.parameter_pk == int(request.params['parameter'])).filter(h.models.ValueSet.language_pk == ctx.pk).first() %>
+    ##<% valueset = h.DBSession.query(h.models.ValueSet).filter(h.models.ValueSet.parameter_pk == int(request.params['parameter'])).filter(h.models.ValueSet.language_pk == ctx.pk).first() %>
+    <% valueset = h.get_valueset(request, ctx) %>
     <h3>${h.link(request, ctx)}</h3>
     % if valueset:
         <h4>${_('Value')}</h4>

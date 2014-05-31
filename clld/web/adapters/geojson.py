@@ -54,7 +54,7 @@ class GeoJson(Renderable):
     name = "GeoJSON"
     extension = 'geojson'
     mimetype = 'application/geojson'
-    send_mimetype = 'application/json'
+    send_mimetype = 'application/json' # application/vnd.geo+json
 
     def _featurecollection_properties(self, ctx, req):
         """we return the layer index passed in the request, to make sure the features are
@@ -121,10 +121,10 @@ class GeoJsonParameter(GeoJson):
     def featurecollection_properties(self, ctx, req):
         marker = req.registry.getUtility(interfaces.IMapMarker)
         return {
-            'name': ctx.name,
+            'name': getattr(ctx, 'name', 'Values'),
             'domain': [
                 {'icon': marker(de, req), 'id': de.id, 'name': de.name}
-                for de in ctx.domain]}
+                for de in getattr(ctx, 'domain', [])]}
 
     def feature_iterator(self, ctx, req):
         q = DBSession.query(ValueSet).join(Value).filter(ValueSet.parameter_pk == ctx.pk)\

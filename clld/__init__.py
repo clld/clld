@@ -4,8 +4,8 @@ from clld.db.models import common
 from clld import interfaces
 
 
-__version__ = "0.9"
-_Resource = namedtuple('Resource', 'name model interface with_index')
+__version__ = "0.10"
+_Resource = namedtuple('Resource', 'name model interface with_index with_rdfdump')
 
 
 class _ExtendedResource(_Resource):
@@ -14,8 +14,8 @@ class _ExtendedResource(_Resource):
         return self.name + 's'
 
 
-def Resource(name, model, interface, with_index=True):
-    return _ExtendedResource(name, model, interface, with_index)
+def Resource(name, model, interface, with_index=True, with_rdfdump=True):
+    return _ExtendedResource(name, model, interface, with_index, with_rdfdump)
 
 
 RESOURCES = [
@@ -32,5 +32,9 @@ RESOURCES = [
     Resource('unit', common.Unit, interfaces.IUnit),
     Resource('unitvalue', common.UnitValue, interfaces.IUnitValue),
     Resource(
-        'combination', common.Combination, interfaces.ICombination, with_index=False),
+        'combination',
+        common.Combination,
+        interfaces.ICombination,
+        with_index=False,
+        with_rdfdump=False),
 ]

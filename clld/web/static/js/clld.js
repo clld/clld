@@ -647,6 +647,13 @@ CLLD.mapFilterMarkers = function(eid, show){
     });
 };
 
+CLLD.mapToggleLanguages = function(eid){
+    CLLD.mapFilterMarkers(eid, function(marker){
+        var checkbox = $('#marker-toggle-'+marker.feature.properties.language.id);
+        return checkbox.length && checkbox.prop('checked');
+    })
+}
+
 CLLD.mapToggleLayer = function(eid, layer, ctrl) {
     var map = CLLD.Maps[eid];
     map.layer_map[layer].eachLayer(function(l){

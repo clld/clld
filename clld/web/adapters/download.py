@@ -77,7 +77,7 @@ class Download(object):
 
     def create(self, req, filename=None, verbose=True):
         p = self.abspath(req)
-        if not p.dirname().exists():
+        if not p.dirname().exists():  # pragma: no cover
             p.dirname().mkdir()
         tmp = path('%s.tmp' % p)
 
@@ -85,7 +85,12 @@ class Download(object):
             # we do not create archives with a readme for rdf downloads, because each
             # RDF entity points to the dataset and the void description of the dataset
             # covers all relevant metadata.
-            with closing(GzipFile(tmp, 'w')) as fp:
+            #
+            # TODO: write test for the file name things!?
+            #
+            with closing(GzipFile(
+                    filename=tmp.splitext()[0].splitext()[0], fileobj=open(tmp, 'wb')
+            )) as fp:
                 self.before(req, fp)
                 for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                     self.dump(req, fp, item, i)
@@ -101,7 +106,7 @@ class Download(object):
                     self.after(req, fp)
                     fp.seek(0)
                     zipfile.writestr(self.name, fp.read())
-                else:
+                else:  # pragma: no cover
                     zipfile.write(filename, self.name)
                 zipfile.writestr(
                     'README.txt',
@@ -121,13 +126,13 @@ It should be cited as
                            + len(' data download')),
                     req.dataset.license,
                     TxtCitation(None).render(req.dataset, req).encode('utf8')))
-        if p.exists():
+        if p.exists():  # pragma: no cover
             p.remove()
         tmp.move(p)
 
     def query(self, req):
         q = DBSession.query(self.model).filter(self.model.active == True)
-        if self.model == Language:
+        if self.model == Language:  # pragma: no cover
             q = q.options(
                 joinedload_all(
                     Language.languageidentifier, LanguageIdentifier.identifier),
@@ -151,7 +156,7 @@ It should be cited as
         pass
 
 
-class CsvDump(Download):
+class CsvDump(Download):  # pragma: no cover
     ext = 'csv'
 
     def __init__(self, model, pkg, fields=None, **kw):
@@ -180,7 +185,7 @@ class CsvDump(Download):
         self.writer.writerow(self.row(req, fp, item, index))
 
 
-class N3Dump(Download):
+class N3Dump(Download):  # pragma: no cover
     ext = 'n3'
 
     def dump_rendered(self, req, fp, item, index, rendered):
@@ -191,7 +196,7 @@ class N3Dump(Download):
         fp.write(body)
 
 
-class RdfXmlDump(Download):
+class RdfXmlDump(Download):  # pragma: no cover
     ext = 'rdf'
 
     def before(self, req, fp):
