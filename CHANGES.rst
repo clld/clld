@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.10
+~~~~
+
+* Better support for RDF dumps.
+* Support for deselcting languages in map view.
+
+
 0.9
 ~~~
 
