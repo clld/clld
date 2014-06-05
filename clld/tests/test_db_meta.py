@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.orm.exc import NoResultFound
+from nose.tools import assert_almost_equal
 
 from clld.tests.util import TestWithDb
 from clld.db.models.common import Language
@@ -28,6 +29,43 @@ class Tests(TestWithDb):
             self.assertEqual(lang.custom, 'c')
             self.assertTrue('custom_t' in lang.__solr__(None))
             break
+
+    def test_CsvMixin(self):
+        l1 = Language(id='abc', name='Name', latitude=12.4)
+        DBSession.add(l1)
+        DBSession.flush()
+        l1 = Language.csv_query(DBSession).first()
+        cols = l1.csv_head()
+        row = l1.to_csv()
+        l2 = Language.from_csv(row)
+        assert_almost_equal(l1.latitude, l2.latitude)
+        row[cols.index('latitude')] = '3,5'
+        l2 = Language.from_csv(row)
+        self.assertLess(l2.latitude, l1.latitude)
+
+    def test_CsvMixin2(self):
+        from clld.db.meta import CsvMixin
+
+        class B(object):
+            id = 5
+
+        class A(CsvMixin):
+            b = None
+            bs = None
+
+            def __init__(self, b=None):
+                if b:
+                    self.b = b
+                    self.bs = [b, b]
+
+            def csv_head(self):
+                return ['b__id', 'bs__ids']
+
+        a = A(B())
+        self.assertEquals(a.to_csv(), [5, "5,5"])
+        a = A.from_csv(['5', "5,5"])
+        assert a.b is None
+        assert a.bs is None
 
     def test_Base(self):
         l = Language(id='abc', name='Name')
