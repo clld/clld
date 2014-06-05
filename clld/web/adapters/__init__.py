@@ -8,6 +8,7 @@ from clld.web.adapters.geojson import (
 )
 from clld.web.adapters.excel import ExcelAdapter
 assert ExcelAdapter
+from clld.web.adapters import csv
 from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
@@ -36,6 +37,11 @@ def includeme(config):
                 (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
             specs.append(
                 (interface, Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
+            config.registry.registerAdapter(
+                getattr(csv, rsc.name.capitalize() + 's', csv.CsvAdapter),
+                (interface,),
+                interfaces.IIndex,
+                name=csv.CsvAdapter.mimetype)
 
         # ... as html details page
         specs.append(

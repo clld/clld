@@ -24,6 +24,9 @@ class Tests(TestCase):
             check(reader(StringIO(str(lt).join(encoded_lines))))
         check(reader(TESTS_DIR.joinpath('csv.txt'), delimiter=','))
 
+        res = list(reader(str(TESTS_DIR.joinpath('csv.txt')), lineterminator="#"))
+        self.assertEquals(len(res), 2)
+
         res = list(reader(TESTS_DIR.joinpath('test.tab'), namedtuples=True))
         assert res[0].a_name == 'b'
         # Missing column values should be set to None:

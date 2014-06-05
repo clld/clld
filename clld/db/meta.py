@@ -29,7 +29,7 @@ from sqlalchemy.inspection import inspect
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from clld.db.versioned import versioned_session
-from clld.util import NO_DEFAULT, UnicodeMixin, format_json
+from clld.util import NO_DEFAULT, UnicodeMixin, format_json, cached_property
 
 
 @sqlalchemy.event.listens_for(Pool, "checkout")
@@ -118,7 +118,77 @@ def _solr_timestamp(dt):
     return dt.isoformat().split('+')[0] + 'Z'
 
 
-class _Base(UnicodeMixin):
+class CsvMixin(object):
+    """
+    Mixin providing methods to control serialization and deserialization of an object as
+    row in a csv file.
+    """
+    #: base name of the csv file
+    __csv_name__ = None
+
+    def csv_head(self):
+        """
+        :return: List of column names.
+        """
+        cols = []
+        for om in object_mapper(self).iterate_to_root():
+            cols.extend(col.key for col in om.local_table.c)
+        return sorted([col for col in set(cols) if col not in [
+            'active', 'version', 'created', 'updated', 'polymorphic_type']])
+
+    def value_to_csv(self, attr, ctx=None, req=None):
+        """Convert one value to a representation suitable for csv writer.
+
+        :param attr: Name of the attribute from which to convert the value.
+        :return: Object suitable for serialization with csv writer.
+        """
+        rel = None
+        if attr.endswith('__ids') or attr.endswith('__id'):
+            attr = attr.split('__')
+            rel = attr[-1]
+            attr = '__'.join(attr[:-1])
+        prop = getattr(self, attr, '')
+        if rel == 'id':
+            return prop.id
+        elif rel == 'ids':
+            return ','.join('%s' % o.id for o in prop)
+        return prop
+
+    def to_csv(self, ctx=None, req=None, cols=None):
+        """
+        :return: list of values to be passed to csv.writer.writerow
+        """
+        return [self.value_to_csv(attr, ctx, req) for attr in cols or self.csv_head()]
+
+    @classmethod
+    def value_from_csv(cls, attr, value):
+        if not value:
+            return None
+        col = getattr(cls, attr)
+        if hasattr(col, 'property') and hasattr(col.property, 'columns'):
+            if isinstance(col.property.columns[0].type, sqlalchemy.Integer):
+                return int(value)
+            if isinstance(col.property.columns[0].type, sqlalchemy.Float):
+                if isinstance(value, basestring):
+                    value = value.replace(',', '.')
+                return float(value)
+        return value
+
+    @classmethod
+    def from_csv(cls, row, data=None, cols=None):
+        obj = cls()
+        cols = cols or obj.csv_head()
+        for i, k in enumerate(cols):
+            if not (k.endswith('__id') or k.endswith('__ids')):
+                setattr(obj, k, cls.value_from_csv(k, row[i]) or None)
+        return obj
+
+    @classmethod
+    def csv_query(cls, session):
+        return session.query(cls).order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
+
+
+class _Base(UnicodeMixin, CsvMixin):
     """The declarative base for all our models.
     """
     @declared_attr

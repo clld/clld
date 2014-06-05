@@ -30,7 +30,7 @@ class ExcelAdapter(Index):
         for i, col in enumerate(self.header(ctx, req)):
             ws.write(0, i, col)
 
-        for j, item in enumerate(ctx.get_query(limit=1000)):
+        for j, item in enumerate(ctx.get_query(limit=2000)):
             for i, col in enumerate(self.row(ctx, req, item)):
                 ws.write(j + 1, i, col)
 

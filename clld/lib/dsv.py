@@ -63,15 +63,19 @@ def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw)
     if isinstance(lines_or_file, basestring):
         # If a file name or path object is passed, we read the whole thing into a list of
         # lines, to make sure the file handle is closed right away.
-        with open(lines_or_file, mode='rU') as fp:
-            lines_or_file = [l[:-1] if l and l[-1] == str('\n') else l for l in fp]
+        if 'lineterminator' in kw:
+            with open(lines_or_file, mode='r') as fp:
+                lines_or_file = fp.read().split(str(kw['lineterminator']))
+        else:
+            with open(lines_or_file, mode='rU') as fp:
+                lines_or_file = [l[:-1] if l and l[-1] == str('\n') else l for l in fp]
     if isinstance(lines_or_file, list):
         # unicsv.UnicodeCSVReader does not support reading from arbitrary iterables such
         # as lists, but insists on calling a 'read' method.
         if encoding is None or (lines_or_file and isinstance(lines_or_file[0], unicode)):
             lines_or_file = [l.encode('utf8') for l in lines_or_file]
             encoding = 'utf8'
-        lines_or_file = StringIO(str('\n').join(lines_or_file))
+        lines_or_file = StringIO(str('\n').join(filter(None, lines_or_file)))
 
     if dicts or namedtuples:
         impl = unicsv.UnicodeCSVDictReader
