@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.11
+~~~~
+
+* Support serialization/deserialization of objects as rows in csv files.
+
+
 0.10
 ~~~~
 
