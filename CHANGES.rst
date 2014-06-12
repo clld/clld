@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.12
+~~~~
+
+* Added GeoJson adapter for the case where a parameter may have multiple valuesets for the same language.
+* Integrate results from searches on Internet Archive into source views.
+
+
 0.11
 ~~~~
 

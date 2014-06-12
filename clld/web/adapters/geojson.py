@@ -1,4 +1,5 @@
 from json import loads
+from itertools import groupby
 
 from zope.interface import implementer
 from pyramid.renderers import render as pyramid_render
@@ -126,20 +127,38 @@ class GeoJsonParameter(GeoJson):
                 {'icon': marker(de, req), 'id': de.id, 'name': de.name}
                 for de in getattr(ctx, 'domain', [])]}
 
-    def feature_iterator(self, ctx, req):
-        q = DBSession.query(ValueSet).join(Value).filter(ValueSet.parameter_pk == ctx.pk)\
+    def get_query(self, ctx, req):
+        return DBSession.query(ValueSet)\
+            .join(Value)\
+            .filter(ValueSet.parameter_pk == ctx.pk)\
             .options(joinedload(ValueSet.values), joinedload(ValueSet.language))
+
+    def feature_iterator(self, ctx, req):
         de = req.params.get('domainelement')
         if de:
             return [vs for vs in ctx.valuesets
                     if vs.values and vs.values[0].domainelement.id == de]
-        return q
+        return self.get_query(ctx, req)
 
     def get_language(self, ctx, req, valueset):
         return valueset.language
 
     def feature_properties(self, ctx, req, valueset):
         return {'values': list(valueset.values)}
+
+
+class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
+    """GeoJSON adapter for parameters with multiple valuesets per language.
+    """
+    def feature_iterator(self, ctx, req):
+        q = self.get_query(ctx, req)
+        return groupby(q.order_by(ValueSet.language_pk), lambda vs: vs.language)
+
+    def get_language(self, ctx, req, pair):
+        return pair[0]
+
+    def feature_properties(self, ctx, req, pair):
+        return {}
 
 
 class GeoJsonCombinationDomainElement(GeoJson):

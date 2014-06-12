@@ -22,6 +22,10 @@ ${ctx.coins(request)|n}
             </p>
             % endif
             ${util.gbs_links(filter(None, [ctx.gbs_identifier]))}
+            % if ctx.jsondatadict.get('internetarchive_id'):
+                <hr />
+                <iframe src='https://archive.org/stream/${ctx.jsondatadict.get('internetarchive_id')}?ui=embed#mode/1up' width='680px' height='750px' frameborder='1' ></iframe>
+            % endif
         </div>
         <div id="tab2" class="tab-pane"><pre>${bibrec}</pre></div>
         <div id="tab3" class="tab-pane"><pre>${bibrec.format('ris')}</pre></div>

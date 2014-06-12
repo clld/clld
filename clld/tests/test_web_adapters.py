@@ -94,6 +94,13 @@ class Tests(TestWithEnv):
         self.assertTrue(
             '{' in adapter.render(Parameter.get('parameter'), self.env['request']))
 
+    def test_GeoJsonParameterMultipleValueSets(self):
+        from clld.web.adapters.geojson import GeoJsonParameterMultipleValueSets
+
+        adapter = GeoJsonParameterMultipleValueSets(None)
+        self.assertTrue(
+            '{' in adapter.render(Parameter.get('no-domain'), self.env['request']))
+
     def test_GeoJsonParameterFlatProperties(self):
         from clld.web.adapters import GeoJsonParameterFlatProperties
 
