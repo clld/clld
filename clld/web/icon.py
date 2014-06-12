@@ -94,6 +94,9 @@ ORDERED_ICONS = [ICON_MAP[s + c] for s, c in
 class MapMarker(object):
     """The default map marker is an orange circle
     """
-    def __call__(self, ctx, req):
-        return req.registry.getUtility(IIcon, 'cff6600').url(req)
+    def get_icon(self, ctx, req):
+        return 'cff6600'
 
+    def __call__(self, ctx, req):
+        icon = self.get_icon(ctx, req) or 'cff6600'
+        return req.registry.getUtility(IIcon, icon).url(req)
