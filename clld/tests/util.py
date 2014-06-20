@@ -6,6 +6,7 @@ import time
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
+from itertools import chain
 from tempfile import mkdtemp
 from xml.etree import cElementTree as ElementTree
 from json import loads
@@ -459,7 +460,7 @@ class DataTable(PageObject):  # pragma: no cover
         """Triggers a table sort by clicking on the th Element specified by label.
         """
         sort = None
-        for e in self.e.find_elements_by_xpath("//th[@class='sorting']"):
+        for e in self.e.find_elements_by_xpath("//th[@role='columnheader']"):
             if e.text.strip().startswith(label):
                 sort = e
         assert sort
