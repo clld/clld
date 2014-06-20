@@ -105,9 +105,9 @@ def get_documentation(code):
     assert code in soup.find_all('h1', limit=1)[0].text
 
     info = {}
-    table = soup.find_all('table', limit=1)[0]
-    for tr in table.find_all('tr'):
-        tds = tr.find_all('td')
-        assert len(tds) == 2
-        info[_text(tds[0])] = _text(tds[1])
+    for table in soup.find_all('table'):
+        for tr in table.find_all('tr'):
+            tds = tr.find_all('td')
+            if len(tds) == 2:
+                info[_text(tds[0]).replace(':', '')] = _text(tds[1])
     return info
