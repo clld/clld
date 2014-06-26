@@ -442,6 +442,9 @@ class Record(OrderedDict, _Convertable):
             unified-style-linguistics.csl
         """
         genre = getattr(self.genre, 'value', self.genre)
+        pages_at_end = genre in [
+            'book', 'phdthesis', 'mastersthesis', 'misc', 'techreport']
+
         if self.get('editor'):
             editors = self['editor']
             affix = 'eds' if ' and ' in editors or '&' in editors else 'ed'
@@ -452,7 +455,9 @@ class Record(OrderedDict, _Convertable):
         res = [self.get('author', editors), self.get('year', 'n.d')]
         if genre == 'book':
             res.append(self.get('booktitle') or self.get('title'))
-            res.append(', '.join(filter(None, [self.get('series'), self.get('volume')])))
+            series = ', '.join(filter(None, [self.get('series'), self.get('volume')]))
+            if series:
+                res.append('(%s.)' % series)
         elif genre == 'misc':
             # in case of misc records, we use the note field in case a title is missing.
             res.append(self.get('title') or self.get('note'))
@@ -489,18 +494,22 @@ class Record(OrderedDict, _Convertable):
             if self.get('issue'):
                 res.append("(%s)" % self['issue'])
 
-            if self.get('pages'):
+            if not pages_at_end and self.get('pages'):
                 res.append(self['pages'])
 
         if self.get('publisher'):
             res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
+
+        if pages_at_end and self.get('pages'):
+            res.append(self['pages'] + 'pp')
 
         note = self.get('note')
         if note and note not in res:
             res.append('(%s)' % note)
 
         return ' '.join(
-            map(lambda a: a + ('' if a.endswith('.') else '.'), filter(None, res)))
+            map(lambda a: a + ('' if (a.endswith('.') or a.endswith('.)')) else '.'),
+                filter(None, res)))
 
 
 class IDatabase(Interface):
