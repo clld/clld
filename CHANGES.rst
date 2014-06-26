@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.12.1
+~~~~~~
+
+Bugfix release:
+
+* fixes a bug when EnumSymbols were compared with None.
+
+
 0.12
 ~~~~
 
