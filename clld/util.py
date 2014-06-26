@@ -136,7 +136,7 @@ class EnumSymbol(UnicodeMixin):
         return self.value
 
     def __cmp__(self, other):
-        return cmp(self.value, other.value)
+        return cmp(self.value, getattr(other, 'value', None))
 
     def __json__(self, request=None):
         return self.value
