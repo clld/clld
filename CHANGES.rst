@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.12.2
+~~~~~~
+
+Bugfix release
+
+* linearization of sources better aligned with unified stylesheet.
+
+
 0.12.1
 ~~~~~~
 
