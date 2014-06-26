@@ -45,7 +45,6 @@ def ia_func(command, args, sources=None):  # pragma: no cover
                     try:
                         data = json.load(fp)
                     except ValueError:
-                        log.warn('no JSON object found in: %s' % filepath)
                         continue
                 if not data['response']['numFound']:
                     continue

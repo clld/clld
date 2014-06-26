@@ -71,21 +71,33 @@ def get_classification(group, doc):
             [aa['href'][len(prefix):] for aa in parse_subgroups(root)],
             list(parse_languages(root)))
 
-    for a in parse_subgroups(bs(doc)):
+    doc = bs(doc)
+
+    subgroups = []
+    for a in parse_subgroups(doc):
         id_ = a['href'][len(prefix):]
+        subgroups.append(id_)
         #print group, id_
-        try:
-            name = psubgroupname.match(a.text).group('name').strip()
-            ext = int(pext.search(a.text).group('ext').strip())
-        except:  # pragma: no cover
-            print a.text
-            raise
+        name = psubgroupname.match(a.text).group('name').strip()
+        ext = int(pext.search(a.text).group('ext').strip())
         subfamilies, languages = parse_classification(a)
         if ext != len(languages) and id_ not in [
             'mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16',
-            'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern'
+            'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern',
+            'narrow-bantu',
+            'northwest-1',
+            'b-2',
+            'teke-b74',
+            'eastern-14',
+            'nubian',
+            'central-27',
+            'niloti',
+            'southern-21',
         ]:  # pragma: no cover
             print group
             print id_
             print ext, len(languages)
-        res[id_] = (name, subfamilies, languages)
+        res[id_] = (name, [sf for sf in subfamilies if sf != id_], languages)
+        # what if there are no subfamilies?
+    res[group] = (getattr(doc.find('h1'), 'text', None), subgroups, list(parse_languages(doc)))
+    return res
