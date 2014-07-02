@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.12.3
+~~~~~~
+
+Minor feature
+
+* allow zoom option for maps to be used as default zoom when used in combination with bounds.
+
+
 0.12.2
 ~~~~~~
 
