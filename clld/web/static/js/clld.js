@@ -521,7 +521,11 @@ CLLD.Map = function(eid, layers, options) {
             }
         }
         if (bounds) {
-            map.map.fitBounds(bounds);
+            if (map.options.zoom){
+                map.map.fitBounds(bounds, {maxZoom: map.options.zoom});
+            } else {
+                map.map.fitBounds(bounds);
+            }
         } else {
             map.map.fitWorld();
         }
