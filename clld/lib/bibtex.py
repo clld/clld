@@ -487,8 +487,12 @@ class Record(OrderedDict, _Convertable):
             if editors and self.get('author'):
                 res.append("In %s" % editors)
 
-            for attr in ['school', 'journal', 'volume']:
-                if self.get(attr):
+            for attr in [
+                'school',
+                'journal',
+                'volume' if genre != 'book' else None,
+            ]:
+                if attr and self.get(attr):
                     res.append(self.get(attr))
 
             if self.get('issue'):
