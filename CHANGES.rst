@@ -2,6 +2,20 @@
 Changes
 -------
 
+0.12.4
+~~~~~~
+
+Minor feature
+
+* bootstrap-slider.js upgraded
+
+Bugfixes
+
+* fixed bug where volume would appear twice in linearization of bibtex record;
+* fixed bug where selecting more than 4 parameters for combination would result in HTTP 500 rather than a warning.
+
+
+
 0.12.3
 ~~~~~~
 
