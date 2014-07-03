@@ -52,6 +52,29 @@ class Tests(unittest.TestCase):
         self.assertTrue(rec.genre == EntryType.misc)
         self.assertTrue('Something' in rec.text())
 
+    def test_linearization(self):
+        from clld.lib.bibtex import Record
+
+        for bib, txt in [
+            (
+                """@book{Dayley-1985,
+  address    = {Berkeley},
+  author     = {Dayley, Jon P.},
+  iso_code   = {tzt; tzj},
+  olac_field = {general_linguistics; semantics; morphology; typology; syntax},
+  publisher  = {University of California Press},
+  series     = {University of California Publications in Linguistics},
+  title      = {Tzutujil Grammar},
+  volume     = {107},
+  wals_code  = {tzu},
+  year       = {1985}
+}
+                """,
+                "Dayley, Jon P. 1985. Tzutujil Grammar. (University of California Publications in Linguistics, 107.) Berkeley: University of California Press."),
+        ]:
+            rec = Record.from_string(bib)
+            self.assertEqual(rec.text(), txt)
+
     def test_Database(self):
         from clld.lib.bibtex import Record, Database
 

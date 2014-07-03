@@ -90,4 +90,5 @@ class CombinationMultiSelect(MultiSelect):
     def get_options(self):
         return {
             'data': [self.format_result(p) for p in self.query()],
-            'multiple': True}
+            'multiple': True,
+            'maximumSelectionSize': 4}
