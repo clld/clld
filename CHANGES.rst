@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.12.5
+~~~~~~
+
+Minor release to get the source code up to pep8 compliance.
+
+
 0.12.4
 ~~~~~~
 
