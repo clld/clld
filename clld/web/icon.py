@@ -1,4 +1,4 @@
-from itertools import product, groupby
+from itertools import product
 
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker

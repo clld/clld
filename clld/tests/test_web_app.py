@@ -3,7 +3,6 @@ from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 from purl import URL
 
-from clld import RESOURCES
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
 from clld.tests.util import TestWithEnv, Route, TESTS_DIR
 from clld.interfaces import IMapMarker
@@ -72,4 +71,3 @@ class Tests(TestWithEnv):
         config.register_download(N3Dump(Language, 'clld'))
         config.add_301('/301pattern', 'http://example.org')
         config.add_410('/410pattern')
-

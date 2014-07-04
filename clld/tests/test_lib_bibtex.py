@@ -70,7 +70,33 @@ class Tests(unittest.TestCase):
   year       = {1985}
 }
                 """,
-                "Dayley, Jon P. 1985. Tzutujil Grammar. (University of California Publications in Linguistics, 107.) Berkeley: University of California Press."),
+                "Dayley, Jon P. 1985. Tzutujil Grammar. (University of California "
+                "Publications in Linguistics, 107.) Berkeley: University of California "
+                "Press."),
+            (
+                """@book{318762,
+  address    = {Vancouver},
+  author     = {Cook, Eung-Do},
+  pages      = {670},
+  publisher  = {UBC Press},
+  series     = {First Nations Languages Series},
+  title      = {A Tsilhqút'ín Grammar},
+  year       = {2013}
+}
+                """,
+                "Cook, Eung-Do. 2013. A Tsilhqút'ín Grammar. (First Nations Languages "
+                "Series.) Vancouver: UBC Press. 670pp."),
+            (
+                """@inbook{316361,
+  author     = {Healey, Alan},
+  booktitle  = {New Guinea area languages and language study},
+  pages      = {223-232},
+  title      = {History of research in Austronesian languages: Admiralty Islands area},
+  volume     = {2}
+}
+                """,
+                "Healey, Alan. n.d. History of research in Austronesian languages: "
+                "Admiralty Islands area. 2. 223-232.")
         ]:
             rec = Record.from_string(bib)
             self.assertEqual(rec.text(), txt)

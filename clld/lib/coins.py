@@ -252,26 +252,6 @@ class ContextObject(list, UnicodeMixin):
             else:
                 data.append(('au', author))
 
-        #annote: An annotation for annotated bibliography styles (not typical)
-        #chapter: The chapter number
-        #crossref: The key of the cross-referenced entry
-        #editor: The name(s) of the editor(s)
-        #eprint: A specification of an electronic publication, often a preprint or a
-        #       technical report
-        #howpublished: How it was published, if the publishing method is nonstandard
-        #institution: The institution that was involved in the publishing, but not
-        #             necessarily the publisher
-        #key: A hidden field used for specifying or overriding the alphabetical order of
-        #     entries (when the "author" and "editor" fields are missing). Note that this
-        #     is very different from the key (mentioned just after this list) that is used
-        #     to cite or cross-reference the entry.
-        #month: The month of publication (or, if unpublished, the month of creation)
-        #note: Miscellaneous extra information
-        #organization: The conference sponsor
-        #type: The field overriding the default type of publication (e.g. "Research Note"
-        #      for techreport, "{PhD} dissertation" for phdthesis, "Section" for
-        #      inbook/incollection)
-
         return cls(sid, mtx, *data)
 
     def __unicode__(self):

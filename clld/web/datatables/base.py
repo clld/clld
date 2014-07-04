@@ -437,7 +437,6 @@ class DataTable(Component):
                 }
             ),
             HTML.ul(
-                #HTML.li(HTML.a('csv', href="#")),
                 *[HTML.li(HTML.a(
                     fmt,
                     href="#",

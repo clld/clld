@@ -55,7 +55,7 @@ class GeoJson(Renderable):
     name = "GeoJSON"
     extension = 'geojson'
     mimetype = 'application/geojson'
-    send_mimetype = 'application/json' # application/vnd.geo+json
+    send_mimetype = 'application/json'  # application/vnd.geo+json
 
     def _featurecollection_properties(self, ctx, req):
         """we return the layer index passed in the request, to make sure the features are

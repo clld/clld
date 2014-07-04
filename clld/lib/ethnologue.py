@@ -77,7 +77,6 @@ def get_classification(group, doc):
     for a in parse_subgroups(doc):
         id_ = a['href'][len(prefix):]
         subgroups.append(id_)
-        #print group, id_
         name = psubgroupname.match(a.text).group('name').strip()
         ext = int(pext.search(a.text).group('ext').strip())
         subfamilies, languages = parse_classification(a)
@@ -99,5 +98,8 @@ def get_classification(group, doc):
             print ext, len(languages)
         res[id_] = (name, [sf for sf in subfamilies if sf != id_], languages)
         # what if there are no subfamilies?
-    res[group] = (getattr(doc.find('h1'), 'text', None), subgroups, list(parse_languages(doc)))
+    res[group] = (
+        getattr(doc.find('h1'), 'text', None),
+        subgroups,
+        list(parse_languages(doc)))
     return res

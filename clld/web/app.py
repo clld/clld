@@ -35,7 +35,6 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
-from clld.web.adapters.download import N3Dump
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
     select_combination,
@@ -167,7 +166,8 @@ class ClldRequest(Request):
         :param rsc: A registered :py:class:`clld.Resource`.
         :param kw:
             Keyword parameters are passed through to
-            `pyramid.request.Request.route_url <http://docs.pylonsproject.org/projects/pyramid/en/1.0-branch/api/request.html#pyramid.request.Request.route_url>`_
+            `pyramid.request.Request.route_url <http://docs.pylonsproject.org/projects/\
+            pyramid/en/1.0-branch/api/request.html#pyramid.request.Request.route_url>`_
         :return: URL
         """
         route, kw = self._route(obj, rsc, **kw)
@@ -503,7 +503,7 @@ def get_configurator(pkg, *utilities, **kw):
         #
         # TODO: make these downloads optional!
         #
-        #if rsc.with_rdfdump:
+        # if rsc.with_rdfdump:
         #    config.register_download(
         #        N3Dump(
         #            model,

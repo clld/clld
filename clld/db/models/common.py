@@ -99,25 +99,26 @@ class IdNameDescriptionMixin(object):
         or :py:attr:`clld.db.models.common.IdNameDescriptionMixin.markup_description`
         should be supplied, since these are used mutually exclusively.
     """
-    #: A ``str`` identifier of an object which can be used for sorting and as part of a
-    #: URL path; thus should be limited to characters valid in URLs, and should not
-    #: contain '.' or '/' since this may trip up route matching.
     id = Column(String, unique=True)
+    """A ``str`` identifier of an object which can be used for sorting and as part of a
+    URL path; thus should be limited to characters valid in URLs, and should not contain
+    '.' or '/' since this may trip up route matching.
+    """
 
-    #: A human readable 'identifier' of the object.
     name = Column(Unicode)
+    """A human readable 'identifier' of the object."""
 
-    #: A description of the object.
     description = Column(Unicode)
+    """A description of the object."""
 
-    #: A description of the object containing HTML markup.
     markup_description = Column(Unicode)
+    """A description of the object containing HTML markup."""
 
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # We augment mapper classes for basic objects using mixins to add the ability
 # to store arbitrary key-value pairs and files associated with an object.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class FilesMixin(IdNameDescriptionMixin):
     """This mixin provides a way to associate files with instances of another model class.
 
@@ -130,11 +131,11 @@ class FilesMixin(IdNameDescriptionMixin):
     def owner_class(cls):
         return cls.__name__.split('_')[0]
 
-    #: Ordinal to control sorting of files associated with one db object.
     ord = Column(Integer, default=1)
+    """Ordinal to control sorting of files associated with one db object."""
 
-    #: Mime-type of the file content.
     mime_type = Column(String)
+    """Mime-type of the file content."""
 
     @declared_attr
     def object_pk(cls):
@@ -233,10 +234,10 @@ def _add_solr_language_info(res, obj):
     return res
 
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # The mapper classes for basic objects of the clld db model are marked as
 # implementers of the related interface.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class Dataset_data(Base, Versioned, DataMixin):
     pass
 
@@ -311,7 +312,6 @@ class Language(Base,
     """Languages are the main objects of discourse. We attach a geo-coordinate
     to them to be able to put them on maps.
     """
-    #__table_args__ = (UniqueConstraint('name'),)
     latitude = Column(
         Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
     longitude = Column(
@@ -363,11 +363,11 @@ class DomainElement(Base,
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
 
-    # the number is used to sort domain elements within the domain of one parameter
     number = Column(Integer)
+    """the number is used to sort domain elements within the domain of one parameter"""
 
-    # abbreviated name, e.g. as label for map legends
     abbr = Column(Unicode)
+    """abbreviated name, e.g. as label for map legends"""
 
 
 class Parameter_data(Base, Versioned, DataMixin):
@@ -566,7 +566,7 @@ class Source(Base,
 
     def bibtex(self):
         exclude = ['gbs', 'glottolog_ref_id']
-        kw = {k: self.jsondatadict[k] for k in self.jsondatadict if not k in exclude}
+        kw = {k: self.jsondatadict[k] for k in self.jsondatadict if k not in exclude}
         kw.update(self.__bibtex__())
         return bibtex.Record.from_object(self, **kw)
 
@@ -679,9 +679,9 @@ class Value(Base,
     # Values may be taken from a domain.
     domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
 
-    # Languages may have multiple values for the same parameter. Their relative
-    # frequency can be stored here.
     frequency = Column(Float)
+    """Languages may have multiple values for the same parameter. Their relative
+    frequency can be stored here."""
     confidence = Column(Unicode)
 
     domainelement = relationship('DomainElement', backref='values')
@@ -749,10 +749,18 @@ class Sentence(Base,
                HasDataMixin,
                HasFilesMixin):
     """Sentence of a language serving as example for some statement.
+
+    ..notes::
+
+        Columns inherited from IdNameDescriptionMixin are interpreted as follows:
+
+            name: The text of the sentence in object language
+            description: A translation of the sentence
+
+        Columns with a name prefix of 'markup_' can be used to store data containing HTML
+        markup. These attributes should take precedence over their non-prefixed
+        counterparts when rendering a Sentence.
     """
-    #: Inherited from IdNameDescriptionMixin:
-    #: name: The text of the sentence in object language
-    #: description: A translation of the sentence
     analyzed = Column(Unicode)
     gloss = Column(Unicode)
     type = Column(Unicode)
@@ -761,8 +769,6 @@ class Sentence(Base,
     original_script = Column(Unicode)
     xhtml = Column(Unicode)
 
-    #: The following columns store data which contains markup and should be looked at
-    #: first, when rendering a sentence:
     markup_text = Column(Unicode)
     markup_analyzed = Column(Unicode)
     markup_gloss = Column(Unicode)
@@ -899,9 +905,9 @@ class UnitValue(Base,
             if self.unitdomainelement else self.name or self.id
 
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Non-core mappers and association tables
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
     __table_args__ = (UniqueConstraint('id', 'language_pk'),)
 

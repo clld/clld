@@ -6,7 +6,6 @@ import time
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 import unittest
 import re
-from itertools import chain
 from tempfile import mkdtemp
 from xml.etree import cElementTree as ElementTree
 from json import loads
@@ -297,7 +296,7 @@ class ExtendedTestApp(TestApp):
         assert self.parsed_body.childNodes[0].name == 'html'
         if docroot:
             assert self.parsed_body.childNodes[0].childNodes[1].childNodes[0].name \
-                   == docroot
+                == docroot
         return res
 
     def get_json(self, *args, **kw):
@@ -510,7 +509,6 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
     def tearDownClass(cls):
         cls.browser.quit()
         cls.server.quit()
-        #cls.downloads.rmtree()
 
     def url(self, path):
         assert path.startswith('/')

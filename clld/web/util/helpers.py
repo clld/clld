@@ -56,7 +56,7 @@ def get_valueset(req, ctx):
         pass
 
     query = DBSession.query(models.ValueSet)\
-         .filter(models.ValueSet.language_pk == ctx.pk)
+        .filter(models.ValueSet.language_pk == ctx.pk)
 
     if isinstance(param, int):
         query = query.filter(models.ValueSet.parameter_pk == param)
