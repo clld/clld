@@ -26,16 +26,13 @@ class Unitvalues(DataTable):
             .options(joinedload(common.UnitValue.unit))
 
         if self.unit:
-            #query = query.join(common.UnitParameter, common.Contribution)
             return query.filter(common.UnitValue.unit_pk == self.unit.pk)
 
         if self.unitparameter:
-            #query = query.join(common.Contribution, common.Unit)
             return query.filter(
                 common.UnitValue.unitparameter_pk == self.unitparameter.pk)
 
         if self.contribution:
-            #query = query.join(common.Unit, common.UnitParameter)
             return query.filter(common.UnitValue.contribution_pk == self.contribution.pk)
 
         return query

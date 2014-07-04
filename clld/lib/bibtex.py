@@ -98,7 +98,7 @@ SYMBOLS = {
     r'\textschwa{}': u'\u0259',
     r'\textsubdot{o}': u'\u1ecd',
     r'\textrhooktopd{}': u'\u0257',
-    #r'\eurosign{}': u'\u20ac',
+    # r'\eurosign{}': u'\u20ac',
     r'\eurosign{}': u'\u2021',
     r'\textquestiondown': u'\xbf',
     r'\textquotedblleft': u'\u201c',
@@ -125,7 +125,7 @@ SYMBOLS = {
     r'\oslash{}': u'\u00f8',
     r'\Oslash{}': u'\u00d8',
     r'\textdoublebarpipe{}': u'\u01c2',
-    #r'\dots': '',
+    # r'\dots': '',
     r'\Aa{}': u'\xc5',
     u'\\Aa{}Rsj\xd6': u'\xc5rsj\xf6',
 

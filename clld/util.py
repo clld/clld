@@ -204,17 +204,6 @@ class DeclEnumType(SchemaType, TypeDecorator):
         return self.enum.from_string(value.strip())
 
 
-#def flatten_dict(d, parent_key='', sep='_'):
-#    items = []
-#    for k, v in d.items():
-#        new_key = parent_key + sep + k if parent_key else k
-#        if isinstance(v, collections.MutableMapping):
-#            items.extend(flatten_dict(v, parent_key=new_key, sep=sep).items())
-#        else:
-#            items.append((new_key, v))
-#    return dict(items)
-
-
 # Standard abbreviations according to the Leipzig Glossing Rules
 # see http://www.eva.mpg.de/lingua/resources/glossing-rules.php
 LGR_ABBRS = {

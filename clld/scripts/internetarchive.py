@@ -11,7 +11,9 @@ from clld.db.models import common
 from clld.db.meta import DBSession
 
 
-API_URL = 'https://archive.org/advancedsearch.php?fl[]=creator&fl[]=identifier&fl[]=title&fl[]=year&sort[]=&sort[]=&sort[]=&rows=5&page=1&output=json&callback&save=yes&q='
+API_URL = 'https://archive.org/advancedsearch.php?fl[]=creator&fl[]=identifier&' \
+    'fl[]=title&fl[]=year&sort[]=&sort[]=&sort[]=&rows=5&page=1&output=json&callback&' \
+    'save=yes&q='
 
 
 def ia(**kw):  # pragma: no cover
@@ -33,9 +35,11 @@ def ia_func(command, args, sources=None):  # pragma: no cover
         sources = DBSession.query(common.Source)\
             .order_by(common.Source.id)\
             .options(joinedload(common.Source.data))
-    if callable(sources):
-        sources = sources()
+    else:
+        if callable(sources):
+            sources = sources()
 
+    i = 0
     for i, source in enumerate(sources):
         filepath = args.data_file('ia', 'source%s.json' % source.id)
 
@@ -97,6 +101,7 @@ def ia_func(command, args, sources=None):  # pragma: no cover
                     log.warn("limit reached")
                     break
     if command == 'update':
-        log.info('assigned internet archive identifiers for %s out of %s sources' % (count, i))
+        log.info('assigned internet archive identifiers for %s out of %s sources'
+                 % (count, i))
     elif command == 'download':
         log.info('queried internet archive for %s sources' % count)

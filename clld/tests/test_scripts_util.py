@@ -64,13 +64,14 @@ class Tests(unittest.TestCase):
                     "longitude": 36.5721,
                     "name": "Aari"
                 }]}"""
+
         class Req(Mock):
             def get(self, *args):
                 return Mock(json=Mock(return_value=loads(json)))
 
         with patch('clld.scripts.util.requests', Req()):
-            assert glottocodes_by_isocode(None, cols=['id', 'latitude'])['aiw'][0] ==\
-                   'aari1239'
+            assert glottocodes_by_isocode(
+                None, cols=['id', 'latitude'])['aiw'][0] == 'aari1239'
 
     def test_Data(self):
         from clld.db.models.common import Language
@@ -93,7 +94,6 @@ class Tests(unittest.TestCase):
 
 class Tests2(TestWithEnv):
     def test_index(self):
-        from clld.db.meta import DBSession
         from clld.db.models.common import Language
         from clld.scripts.util import index
 

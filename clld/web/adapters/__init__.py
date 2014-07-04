@@ -138,7 +138,7 @@ def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
     adapters = dict(get_adapters(interface, ctx, req))
 
     if not ext and not name and (
-        not req.accept or ('*/*' in str(req.accept) and not 'q=' in str(req.accept))
+        not req.accept or ('*/*' in str(req.accept) and 'q=' not in str(req.accept))
     ):
         # force text/html in case there are no specific criteria to decide
         # or we suspect some weird IE accept header.

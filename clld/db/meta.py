@@ -29,7 +29,7 @@ from sqlalchemy.inspection import inspect
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from clld.db.versioned import versioned_session
-from clld.util import NO_DEFAULT, UnicodeMixin, format_json, cached_property
+from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 
 @sqlalchemy.event.listens_for(Pool, "checkout")
@@ -396,7 +396,7 @@ def is_base(cls):
     """
     # replace with inspection?
     # see http://docs.sqlalchemy.org/en/rel_0_9/orm/mapper_config.html
-    #?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
+    # ?highlight=polymorphic_identity#sqlalchemy.orm.mapper.Mapper.polymorphic_identity
     return PolymorphicBaseMixin in cls.__bases__
 
 

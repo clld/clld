@@ -19,6 +19,19 @@ from clld.db.util import page_query
 from clld.util import format_size
 
 
+README = """
+{0} data download
+{1}
+
+Data of {0} is published under the following license:
+{2}
+
+It should be cited as
+
+{3}
+"""
+
+
 def pkg_name(pkg):
     return pkg if isinstance(pkg, basestring) else pkg.__name__
 
@@ -110,22 +123,13 @@ class Download(object):
                     zipfile.write(filename, self.name)
                 zipfile.writestr(
                     'README.txt',
-                    """
-{0} data download
-{1}
-
-Data of {0} is published under the following license:
-{2}
-
-It should be cited as
-
-{3}
-""".format(
-                    req.dataset.name,
-                    '=' * (len(req.dataset.name.encode('utf8'))
-                           + len(' data download')),
-                    req.dataset.license,
-                    TxtCitation(None).render(req.dataset, req).encode('utf8')))
+                    README.format(
+                        req.dataset.name,
+                        '=' * (
+                            len(req.dataset.name.encode('utf8'))
+                            + len(' data download')),
+                        req.dataset.license,
+                        TxtCitation(None).render(req.dataset, req).encode('utf8')))
         if p.exists():  # pragma: no cover
             p.remove()
         tmp.move(p)
@@ -136,7 +140,6 @@ It should be cited as
             q = q.options(
                 joinedload_all(
                     Language.languageidentifier, LanguageIdentifier.identifier),
-                #joinedload(Language.sources)
             )
         if self.model == Source:
             q = q.options(joinedload(Source.languages))
@@ -221,4 +224,3 @@ class Sqlite(Download):
         print '| when the app is started.'
         print '+---------------------------------------------+'
         return
-        #super(Sqlite, self).create(req, filename=postgres2sqlite(self.pkg))

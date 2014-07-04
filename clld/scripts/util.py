@@ -36,7 +36,7 @@ def glottocodes_by_isocode(dburi, cols=['id']):
         glottolog = create_engine(dburi)
         for row in glottolog.execute(
             'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk'
-                        % select
+            % select
         ):
             if row[0]:
                 glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
