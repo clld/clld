@@ -1,5 +1,8 @@
+from __future__ import unicode_literals, division, absolute_import, print_function
 import math
 from operator import add
+
+from six.moves import reduce
 
 
 SVG_PIE_TEMPLATE = """\

@@ -1,5 +1,6 @@
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.types import Integer
+from six import text_type
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
@@ -28,7 +29,7 @@ class Tests(TestWithEnv):
                     ExternalLinkCol(self, 'url')]
 
         dt = TestTable(self.env['request'], common.Contributor)
-        assert unicode(dt) == 'Contributors'
+        assert text_type(dt) == 'Contributors'
         assert repr(dt) == 'Contributors'
 
         self.handle_dt(TestTable, common.Contributor)

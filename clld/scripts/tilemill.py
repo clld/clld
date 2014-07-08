@@ -1,14 +1,17 @@
 """
 jumpstart a tilemill project based on a dataset from a clld app.
 """
+from __future__ import unicode_literals, division, absolute_import, print_function
 import sys
 import os
 from zipfile import ZipFile
 import json
-from urlparse import urlparse
-from urllib import urlopen
 from base64 import b64encode
 from cgi import escape
+
+from six import text_type, PY3
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import urlparse
 
 
 def layer(project, param, url):
@@ -74,7 +77,8 @@ def legend(param):
     """
     def row(de):
         if de['icon']:
-            src = 'data:image/png;base64,%s' % b64encode(urlopen(de['icon']).read())
+            src = 'data:image/png;base64,%s' \
+                  % text_type(b64encode(urlopen(de['icon']).read()))
             img = '<img src="%s" height="20" width="20" />' % src
         else:
             img = ''
@@ -153,7 +157,10 @@ def main(url):
 
     if not url.endswith('.geojson'):
         url += '.geojson'
-    param = json.loads(urlopen(url).read())
+    c = urlopen(url).read()
+    if PY3:  # pragma: no cover
+        c = c.decode('utf8')
+    param = json.loads(c)
 
     project_name = '%s-%s' % (
         urlparts.hostname.replace('.', '-'),

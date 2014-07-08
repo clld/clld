@@ -9,9 +9,9 @@ py_version = sys.version_info[:2]
 PY3 = py_version[0] == 3
 
 if PY3:
-    raise RuntimeError('clld requires Python 2.7')
-    #if py_version < (3, 2):
-    #    raise RuntimeError('clld requires Python 3.2 or better')
+    #raise RuntimeError('clld requires Python 2.7')
+    if py_version < (3, 4):
+        raise RuntimeError('clld requires Python 3.4 or better')
 else:
     if py_version < (2, 7):
         raise RuntimeError('clld requires Python 2.7 or better')
@@ -33,6 +33,7 @@ install_requires = [
     'purl >= 0.5',
     'path.py',
     'pyramid_exclog',
+    'pytz',
     'zope.sqlalchemy',
     'WebTest',
     'six',
@@ -46,12 +47,14 @@ install_requires = [
     'python-dateutil',
     'newrelic',
     'paginate',
-    'unicsv',
-    'html5lib==0.95', # our tests rely on the childNodes attribute
+    #'unicsv',
+    'html5lib==0.999', # our tests rely on the childNodes attribute
+    'xlrd',
+    'xlwt-future',
 ]
 
 if not PY3:
-    install_requires.extend('xlrd xlwt Babel PyX==0.12.1'.split())
+    install_requires.extend('Babel PyX==0.12.1'.split())
 else:
     install_requires.extend('PyX>=0.13'.split())
 

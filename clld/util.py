@@ -1,10 +1,10 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function, division, absolute_import
 import re
 import unicodedata
 import string
 from datetime import date, datetime
 
-from six import PY3
+from six import PY3, string_types, text_type, add_metaclass, binary_type
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 import dateutil.parser
 
@@ -17,11 +17,11 @@ def parse_json_with_datetime(d):
     """
     converts iso formatted timestamps found as values in the dict d to datetime objects.
 
-    >>> assert parse_json_with_datetime(dict(d='2012-12-12T20:12:12.12'))['d'].year
+    :return: A shallow copy of d with converted timestamps.
     """
     res = {}
     for k, v in d.items():
-        if isinstance(v, basestring) and DATETIME_ISO_FORMAT.match(v):
+        if isinstance(v, string_types) and DATETIME_ISO_FORMAT.match(v):
             v = dateutil.parser.parse(v)
         res[k] = v
     return res
@@ -33,29 +33,23 @@ def format_json(value):
     return value
 
 
-def dict_append(d, k, v):
-    """
-    Assumes d is a dictionary with lists as values. Appends v to the list for key k.
+def nfilter(seq):
+    """Replacement for python 2's filter(None, seq)
 
-    >>> d = {}
-    >>> dict_append(d, 1, 1)
-    >>> assert d[1] == [1]
-    >>> dict_append(d, 1, 2)
-    >>> assert d[1] == [1, 2]
+    :return: a list filtered from seq containing only truthy items.
     """
-    if k in d:
-        d[k].append(v)
-    else:
-        d[k] = [v]
+    return [e for e in seq if e]
+
+
+def to_binary(s, encoding='utf8'):
+    if PY3:  # pragma: no cover
+        return s if isinstance(s, binary_type) else binary_type(s, encoding=encoding)
+    return binary_type(s)
 
 
 def dict_merged(d, _filter=None, **kw):
     """Updates dictionary d with the items passed as keyword parameters if the value
     passes _filter.
-
-    >>> assert dict_merged(None, a=1) == {'a': 1}
-    >>> assert dict_merged(None, a=1, _filter=lambda i: i != 1) == {}
-    >>> assert dict_merged(None, a=None) == {}
     """
     if not _filter:
         _filter = lambda s: s is not None
@@ -67,9 +61,6 @@ def dict_merged(d, _filter=None, **kw):
 
 
 class NoDefault(object):
-    """
-    >>> assert repr(NoDefault())
-    """
     def __repr__(self):
         return '<NoDefault>'
 
@@ -77,9 +68,9 @@ NO_DEFAULT = NoDefault()
 
 
 def xmlchars(text):
-    invalid = range(0x9)
+    invalid = list(range(0x9))
     invalid.extend([0xb, 0xc])
-    invalid.extend(range(0xe, 0x20))
+    invalid.extend(list(range(0xe, 0x20)))
     return re.sub('|'.join('\\x%0.2X' % i for i in invalid), '', text)
 
 
@@ -135,8 +126,8 @@ class EnumSymbol(UnicodeMixin):
     def __unicode__(self):
         return self.value
 
-    def __cmp__(self, other):
-        return cmp(self.value, getattr(other, 'value', None))
+    def __lt__(self, other):
+        return self.value < getattr(other, 'value', None)
 
     def __json__(self, request=None):
         return self.value
@@ -157,10 +148,9 @@ class EnumMeta(type):
         return iter(sorted(cls._reg.values()))
 
 
+@add_metaclass(EnumMeta)
 class DeclEnum(object):
     """Declarative enumeration."""
-
-    __metaclass__ = EnumMeta
     _reg = {}
 
     @classmethod
@@ -172,7 +162,7 @@ class DeclEnum(object):
 
     @classmethod
     def values(cls):
-        return cls._reg.keys()
+        return list(cls._reg.keys())
 
     @classmethod
     def db_type(cls):
@@ -183,7 +173,7 @@ class DeclEnumType(SchemaType, TypeDecorator):
     def __init__(self, enum):
         self.enum = enum
         self.impl = Enum(
-            *enum.values(),
+            *list(enum.values()),
             name="ck%s" % re.sub(
                 '([A-Z])', lambda m: "_" + m.group(1).lower(), enum.__name__))
 
@@ -309,8 +299,22 @@ def slug(s, remove_whitespace=True, lowercase=True):
 
 
 def encoded(string, encoding='utf8'):
-    assert isinstance(string, basestring)
-    return string.encode(encoding) if isinstance(string, unicode) else string
+    """
+    :param string: six.binary_type or six.text_type
+    :param encoding: encoding which the object is forced to
+    :return: six.binary_type
+    """
+    assert isinstance(string, string_types) or isinstance(string, binary_type)
+    if isinstance(string, text_type):
+        return string.encode(encoding)
+    try:
+        # make sure the string can be decoded in the specified encoding ...
+        string.decode(encoding)
+        return string
+    except UnicodeDecodeError:
+        # ... if not use latin1 as best guess to decode the string before encoding as
+        # specified.
+        return string.decode('latin1').encode(encoding)
 
 
 class cached_property(object):
@@ -340,18 +344,6 @@ class cached_property(object):
         del instance._cache[<property name>]
 
     inspired by the recipe by Christopher Arndt in the PythonDecoratorLibrary
-
-    >>> import random
-    >>> class C(object):
-    ...     @cached_property()
-    ...     def attr(self):
-    ...         return random.randint(1, 100000)
-    ...
-    >>> c = C()
-    >>> call1 = c.attr
-    >>> assert call1 == c.attr
-    >>> del c._cache['attr']
-    >>> assert call1 != c.attr
     """
     def __call__(self, fget):
         self.fget = fget

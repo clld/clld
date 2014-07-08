@@ -1,9 +1,9 @@
 # coding: utf8
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division, print_function, absolute_import
 import re
-from cStringIO import StringIO
 import json
 
+from six.moves import cStringIO as StringIO
 from pyramid.renderers import render
 from rdflib import Graph, URIRef
 import html5lib

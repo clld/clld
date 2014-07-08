@@ -20,6 +20,8 @@ from __future__ import generators
 import codecs
 import re
 
+from six import text_type, Iterator, unichr
+
 
 def register():
     """Enable encodings of the form 'latex+x' where x describes another encoding.
@@ -62,14 +64,14 @@ def _registry(encoding):
         def decode(self, input, errors='strict'):
             """Convert latex source string to unicode."""
             if encoding:
-                input = unicode(input, encoding, errors)
+                input = text_type(input, encoding, errors)
 
             # Note: we may get buffer objects here.
             # It is not permussable to call join on buffer objects
             # but we can make them joinable by calling unicode.
             # This should always be safe since we are supposed
             # to be producing unicode output anyway.
-            x = map(unicode, _unlatex(input))
+            x = map(text_type, _unlatex(input))
             return u''.join(x), len(input)
 
     class StreamWriter(Codec, codecs.StreamWriter):
@@ -86,7 +88,7 @@ def _tokenize(tex):  # pragma: no cover
     start = 0
     try:
         # skip quickly across boring stuff
-        pos = _stoppers.finditer(tex).next().span()[0]
+        pos = next(_stoppers.finditer(tex)).span()[0]
     except StopIteration:
         yield tex
         return
@@ -127,7 +129,7 @@ def _tokenize(tex):  # pragma: no cover
                     pos += 1
 
 
-class _unlatex:  # pragma: no cover
+class _unlatex(Iterator):  # pragma: no cover
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
     def __iter__(self):
         """Turn self into an iterator.  It already is one, nothing to do."""
@@ -145,7 +147,7 @@ class _unlatex:  # pragma: no cover
         t = self.tex
         return p < len(t) and t[p] or None
 
-    def next(self):
+    def __next__(self):
         """Find and return another piece of converted output."""
         if self.pos >= len(self.tex):
             raise StopIteration
@@ -484,7 +486,7 @@ for _i in range(0x0020, 0x007f):
         latex_equivalents[_i] = chr(_i)
 
 # Characters that should be ignored and not output in tokenization
-_ignore = set([chr(i) for i in range(32) + [127]]) - set('\t\n\r')
+_ignore = set([chr(i) for i in list(range(32)) + [127]]) - set('\t\n\r')
 
 # Regexp of chars not in blacklist, for quick start of tokenize
 _stoppers = re.compile('[\x00-\x1f!$\\-?\\{~\\\\`\']')

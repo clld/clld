@@ -47,8 +47,8 @@ class Tests(TestWithEnv):
     def test_olac_list(self):
         from clld.web.views.olac import OlacConfig
 
-        assert self.with_params(
-            verb='ListIdentifiers', metadataPrefix='olac').findall('header')
+        res = self.with_params(verb='ListIdentifiers', metadataPrefix='olac')
+        self.assertTrue(res.findall('header'))
 
         OlacConfig()
 

@@ -2,16 +2,13 @@
 """
 .. seealso:: http://ocoins.info/
 """
-# note: don't import unicode_literals here!
+from __future__ import unicode_literals
 import re
 
-from six import PY3
-if PY3:  # pragma: no cover
-    from urllib.parse import urlencode
-else:
-    from urllib import urlencode
+from six import string_types, binary_type
+from six.moves.urllib.parse import urlencode
 
-from clld.util import UnicodeMixin
+from clld.util import UnicodeMixin, encoded, to_binary
 
 
 FIELDS = {
@@ -153,31 +150,21 @@ FIELDS = {
 
 
 def _encoded(value):
-    if not isinstance(value, basestring):
+    if not isinstance(value, binary_type) and not isinstance(value, string_types):
         value = '%s' % value
-    if isinstance(value, unicode):
-        return value.encode('utf8')
-    try:
-        value.decode('utf8')
-        return value
-    except UnicodeDecodeError:
-        return value.decode('latin1').encode('utf8')
+    return encoded(value)
 
 
 class ContextObject(list, UnicodeMixin):
     """
-    >>> c = ContextObject('sid', 'journal', ('jtitle', '\xe2'))
-    >>> assert '%C3%A2' in c.span_attrs()['title']
-    >>> c = ContextObject('sid', 'journal', ('jtitle', u'\xe2'))
-    >>> assert '%C3%A2' in c.span_attrs()['title']
+    A Context Object which knows how to render it's metadata as HTML span tags.
     """
     def __init__(self, sid, mtx, *data):
         self.sid = sid
         self.mtx = mtx
         list.__init__(self)
         for key, val in data:
-            validator = FIELDS[self.mtx].get(key, FIELDS['any'].get(key)) \
-                or (lambda v: '%s' % v)
+            validator = FIELDS[self.mtx].get(key, FIELDS['any'].get(key)) or _encoded
             key = 'rft.' + key if not key.startswith('rft') else key
             self.append((key, validator(val)))
 
@@ -256,9 +243,10 @@ class ContextObject(list, UnicodeMixin):
 
     def __unicode__(self):
         pairs = [
-            ('ctx_ver', 'Z39.88-2004'),
-            ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:' + _encoded(self.mtx)),
-            ('rfr_id', 'info:sid/' + _encoded(self.sid))]
+            (to_binary('ctx_ver'), to_binary('Z39.88-2004')),
+            (to_binary('rft_val_fmt'),
+             to_binary('info:ofi/fmt:kev:mtx:') + _encoded(self.mtx)),
+            (to_binary('rfr_id'), to_binary('info:sid/') + _encoded(self.sid))]
         for pair in self:
             pairs.append((_encoded(pair[0]), _encoded(pair[1])))
         return urlencode(pairs)

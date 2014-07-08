@@ -219,11 +219,8 @@ def olac_with_cfg(req, cfg):
                 or ('until' in args and not TIMESTAMP_PATTERN.match(args['until']))):
             return error("badArgument")
 
-        if filter(
-            lambda arg: arg not in [
-                'from', 'until', 'metadataPrefix', 'set', 'resumptionToken'],
-            args,
-        ):
+        if [arg for arg in args if arg not in [
+                'from', 'until', 'metadataPrefix', 'set', 'resumptionToken']]:
             return error("badArgument")
 
         if 'set' in args:

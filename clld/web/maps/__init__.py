@@ -1,4 +1,6 @@
+from __future__ import unicode_literals, division, print_function, absolute_import
 import requests
+from six import string_types
 
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
@@ -108,7 +110,7 @@ class Map(Component):
         res = {}
         try:
             if 'lat' in params and 'lng' in params:
-                res['center'] = map(float, [params['lat'], params['lng']])
+                res['center'] = list(map(float, [params['lat'], params['lng']]))
             if 'z' in params:
                 res['zoom'] = int(params['z'])
         except (ValueError, TypeError):
@@ -200,7 +202,7 @@ class Map(Component):
         item = lambda layer: HTML.a(
             layer.name,
             onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
-            href=layer.data if isinstance(layer.data, basestring) else '#')
+            href=layer.data if isinstance(layer.data, string_types) else '#')
         yield Legend(
             self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 

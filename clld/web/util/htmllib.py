@@ -154,14 +154,7 @@ context.
 
 If you _really_ want tags without training slashes (e.g., ``<br>`)`, you can
 abuse ``_closed=False`` to produce them.
-
 """
-from __future__ import unicode_literals
-try:
-    from urllib import quote as url_escape
-except ImportError:  # pragma: no cover
-    from urllib.parse import quote as url_escape
-
 import markupsafe
 try:
     from markupsafe import escape_silent as escape
@@ -198,7 +191,7 @@ class literal(markupsafe.Markup):
         return super(literal, cls).escape(s)
 
 
-__all__ = ["HTML", "escape", "literal", "url_escape"]
+__all__ = ["HTML", "escape", "literal"]
 
 # Not included in __all__ because for specialized purposes only:
 # "format_attrs".

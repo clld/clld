@@ -8,6 +8,7 @@ try:
 except ImportError:
     import json
 
+from six import string_types, text_type
 from pytz import UTC
 import sqlalchemy
 from sqlalchemy.pool import Pool
@@ -169,7 +170,7 @@ class CsvMixin(object):
             if isinstance(col.property.columns[0].type, sqlalchemy.Integer):
                 return int(value)
             if isinstance(col.property.columns[0].type, sqlalchemy.Float):
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     value = value.replace(',', '.')
                 return float(value)
         return value
@@ -342,7 +343,7 @@ class _Base(UnicodeMixin, CsvMixin):
             value = _solr_timestamp(getattr(self, attr))
             if value:
                 res[attr] = value
-        suffix_map = [(unicode, '_t'), (bool, '_b'), (int, '_i'), (float, '_f')]
+        suffix_map = [(text_type, '_t'), (bool, '_b'), (int, '_i'), (float, '_f')]
         for om in object_mapper(self).iterate_to_root():
             for col in om.local_table.c:
                 if col.key not in res and col.key != 'polymorphic_type':

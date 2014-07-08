@@ -1,4 +1,4 @@
-from cStringIO import StringIO
+from six.moves import cStringIO as StringIO
 
 from clld.web.adapters.base import Index
 from clld.lib.dsv import UnicodeCsvWriter

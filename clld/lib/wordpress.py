@@ -9,8 +9,8 @@ Client for the xmlrpc API of a wordpress blog.
     thus, rely on identifying the appropriate blog by xmlrpc endpoint.
 """
 import re
-import xmlrpclib
 
+from six.moves import xmlrpc_client
 import requests
 
 
@@ -44,7 +44,7 @@ class Client(object):
                 url += '/'
             url += XMLRPC_PATH
         self.service_url = url
-        self.server = xmlrpclib.Server(self.service_url)
+        self.server = xmlrpc_client.Server(self.service_url)
         self.base_url = self.service_url.replace(XMLRPC_PATH, '')
 
     def get_post(self, id):  # pragma: no cover
@@ -66,7 +66,6 @@ class Client(object):
                     tags='',
                     custom_fields=None,
                     **kwargs):
-        published = [xmlrpclib.False, xmlrpclib.True][int(published)]
         struct = dict(title=title, description=content)
         if date:
             struct['date_created_gmt'] = date

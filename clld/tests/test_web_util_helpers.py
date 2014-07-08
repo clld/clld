@@ -1,6 +1,8 @@
 # coding: utf8
 from __future__ import unicode_literals
+
 from mock import Mock, patch, MagicMock
+from six import text_type
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
@@ -122,7 +124,7 @@ class Tests(TestWithEnv):
     def test_format_coordinates(self):
         from clld.web.util.helpers import format_coordinates
 
-        r = unicode(format_coordinates(Mock(latitude=5.333333333333, longitude=-9.999)))
+        r = text_type(format_coordinates(Mock(latitude=5.333333333333, longitude=-9.999)))
         assert "5°20" in r
         assert "10°W" in r
         format_coordinates(Mock(latitude=5.333, longitude=-9.99), no_seconds=False)

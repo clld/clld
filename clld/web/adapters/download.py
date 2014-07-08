@@ -1,8 +1,9 @@
+from __future__ import unicode_literals, division, absolute_import, print_function
 from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
-from cStringIO import StringIO
 from contextlib import closing
 
+from six import string_types, BytesIO, text_type
 from path import path
 from zope.interface import implementer
 from pyramid.path import AssetResolver
@@ -33,7 +34,7 @@ It should be cited as
 
 
 def pkg_name(pkg):
-    return pkg if isinstance(pkg, basestring) else pkg.__name__
+    return pkg if isinstance(pkg, string_types) else pkg.__name__
 
 
 def abspath(asset_spec):
@@ -111,7 +112,7 @@ class Download(object):
         else:
             with ZipFile(tmp, 'w', ZIP_DEFLATED) as zipfile:
                 if not filename:
-                    fp = StringIO()
+                    fp = BytesIO()
                     self.before(req, fp)
                     for i, item in enumerate(
                             page_query(self.query(req), verbose=verbose)):
@@ -153,7 +154,9 @@ class Download(object):
         self.dump_rendered(req, fp, item, index, adapter.render(item, req))
 
     def dump_rendered(self, req, fp, item, index, rendered):
-        fp.write(rendered.encode('utf8'))
+        if isinstance(rendered, text_type):
+            rendered = rendered.encode('utf8')
+        fp.write(rendered)
 
     def after(self, req, fp):
         pass
@@ -178,10 +181,10 @@ class CsvDump(Download):  # pragma: no cover
     def before(self, req, fp):
         self.writer = UnicodeCsvWriter(fp)
         self.writer.writerow(
-            [f if isinstance(f, basestring) else f[1] for f in self.get_fields(req)])
+            [f if isinstance(f, string_types) else f[1] for f in self.get_fields(req)])
 
     def row(self, req, fp, item, index):
-        return [getattr(item, f if isinstance(f, basestring) else f[0])
+        return [getattr(item, f if isinstance(f, string_types) else f[0])
                 for f in self.get_fields(req)]
 
     def dump(self, req, fp, item, index):
@@ -217,10 +220,10 @@ class Sqlite(Download):
     ext = 'sqlite'
 
     def create(self, req):  # pragma: no cover
-        print '+---------------------------------------------+'
-        print '| This download must be created "by hand".'
-        print '| Make sure a suitable file is available at'
-        print '|', self.abspath(req)
-        print '| when the app is started.'
-        print '+---------------------------------------------+'
+        print('+---------------------------------------------+')
+        print('| This download must be created "by hand".')
+        print('| Make sure a suitable file is available at')
+        print('|', self.abspath(req))
+        print('| when the app is started.')
+        print('+---------------------------------------------+')
         return

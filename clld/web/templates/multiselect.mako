@@ -10,6 +10,6 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("#${obj.eid}").select2(${h.dumps(obj.options)|n});
-        $("#${obj.eid}").select2('data', ${h.dumps(map(obj.format_result, obj.selected or []))|n});
+        $("#${obj.eid}").select2('data', ${h.dumps(list(map(obj.format_result, obj.selected or [])))|n});
     });
 </script>
