@@ -1,7 +1,7 @@
-from six.moves import cStringIO as StringIO
+from __future__ import unicode_literals, print_function, division, absolute_import
 
 from clld.web.adapters.base import Index
-from clld.lib.dsv import UnicodeCsvWriter
+from clld.lib.dsv import UnicodeWriter
 
 
 class CsvAdapter(Index):
@@ -11,17 +11,13 @@ class CsvAdapter(Index):
     mimetype = 'text/csv'
 
     def render(self, ctx, req):
-        out = StringIO()
-        writer = UnicodeCsvWriter(out)
-
-        for i, item in enumerate(ctx.get_query(limit=2000)):
-            if i == 0:
-                cols = item.csv_head()
-                writer.writerow(cols)
-            writer.writerow(item.to_csv(ctx=ctx, req=req, cols=cols))
-
-        out.seek(0)
-        return out.read()
+        with UnicodeWriter() as writer:
+            for i, item in enumerate(ctx.get_query(limit=2000)):
+                if i == 0:
+                    cols = item.csv_head()
+                    writer.writerow(cols)
+                writer.writerow(item.to_csv(ctx=ctx, req=req, cols=cols))
+            return writer.read()
 
     def render_to_response(self, ctx, req):
         res = super(CsvAdapter, self).render_to_response(ctx, req)

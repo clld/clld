@@ -12,24 +12,19 @@ The original implementations were largely copied from
 
 .. seealso:: http://en.wikipedia.org/wiki/Delimiter-separated_values
 """
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division, absolute_import, print_function
 import codecs
 import csv
-import fnmatch
 from collections import namedtuple
 import keyword
 from string import ascii_letters
 
-from six import string_types, text_type
-from six.moves import cStringIO as StringIO
-#import unicsv
+from six import (
+    string_types, text_type, PY3, PY2, Iterator, binary_type, BytesIO, StringIO,
+)
+from path import path
 
-from clld.util import slug, nfilter, to_binary
-
-
-EIGHT_BIT_ENCODINGS = [
-    'utf-8', 'u8', 'utf', 'utf8', 'latin-1', 'iso-8859-1', 'iso8859-1', '8859',
-    'cp819', 'latin', 'latin1', 'l1']
+from clld.util import slug, to_binary, encoded
 
 
 class UTF8Recoder(object):  # pragma: no cover
@@ -46,116 +41,151 @@ class UTF8Recoder(object):  # pragma: no cover
         return self.reader.next().encode('utf-8')
 
 
-class UnicodeCSVReader(object):  # pragma: no cover
-    """
-    A CSV reader which will read rows from a file in a given encoding.
-    """
-    def __init__(self, f, encoding='utf-8', maxfieldsize=None, **kwargs):
-        f = UTF8Recoder(f, encoding)
+class UnicodeWriter(object):
+    def __init__(self, f=None, encoding='utf8', **kw):
+        self.f = f
+        self.encoding = encoding
+        self.kw = kw
+        self._close = False
 
-        self.reader = csv.reader(f, **kwargs)
-
-        if maxfieldsize:
-            csv.field_size_limit(maxfieldsize)
-
-    def next(self):
-        try:
-            row = self.reader.next()
-        except csv.Error as e:
-            # Terrible way to test for this exception, but there is no subclass
-            if fnmatch.fnmatch(str(e), 'field large[rt] than field limit *'):
-                raise ValueError
+    def __enter__(self):
+        if isinstance(self.f, string_types) or isinstance(self.f, path):
+            if PY3:  # pragma: no cover
+                self.f = open(self.f, 'wt', encoding=self.encoding, newline='')
             else:
-                raise e
+                self.f = open(self.f, 'wb')
+            self._close = True
+        elif self.f is None:
+            self.f = StringIO(newline='') if PY3 else BytesIO()
 
-        return [text_type(s, 'utf-8') for s in row]
-
-    def __iter__(self):
+        self.writer = csv.writer(self.f, **self.kw)
         return self
 
-    @property
-    def line_num(self):
-        return self.reader.line_num
+    def read(self):
+        if hasattr(self.f, 'seek'):
+            self.f.seek(0)
+        if hasattr(self.f, 'read'):
+            res = self.f.read()
+            if PY3:  # pragma: no cover
+                res = res.encode('utf8')
+            return res
 
-
-class UnicodeCSVWriter(object):  # pragma: no cover
-    """
-    A CSV writer which will write rows to a file in the specified encoding.
-
-    NB: Optimized so that eight-bit encodings skip re-encoding. See:
-        https://github.com/onyxfish/csvkit/issues/175
-    """
-    def __init__(self, f, encoding='utf-8', **kwargs):
-        self.encoding = encoding
-        self._eight_bit = (self.encoding.lower().replace('_', '-') in
-                EIGHT_BIT_ENCODINGS)
-
-        if self._eight_bit:
-            self.writer = csv.writer(f, **kwargs)
-        else:
-            # Redirect output to a queue for reencoding
-            self.queue = StringIO()
-            self.writer = csv.writer(self.queue, **kwargs)
-            self.stream = f
-            self.encoder = codecs.getincrementalencoder(encoding)()
+    def __exit__(self, type, value, traceback):
+        if self._close:
+            self.f.close()
 
     def writerow(self, row):
-        if self._eight_bit:
-            self.writer.writerow([text_type(s if s != None else '')
-                    .encode(self.encoding) for s in row])
-        else:
-            self.writer.writerow([text_type(s if s != None else '')
-                    .encode('utf-8') for s in row])
-            # Fetch UTF-8 output from the queue...
-            data = self.queue.getvalue()
-            data = data.decode('utf-8')
-            # ...and reencode it into the target encoding
-            data = self.encoder.encode(data)
-            # write to the file
-            self.stream.write(data)
-            # empty the queue
-            self.queue.truncate(0)
+        if not PY3:
+            row = ['' if s is None else encoded('%s' % s, self.encoding) for s in row]
+        self.writer.writerow(row)
 
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
 
 
-class UnicodeCSVDictReader(csv.DictReader):  # pragma: no cover
-    """
-    Defer almost all implementation to :class:`csv.DictReader`, but wraps our unicode reader instead
-    of :func:`csv.reader`.
-    """
-    def __init__(self, f, fieldnames=None, restkey=None, restval=None, *args, **kwargs):
-        reader = UnicodeCSVReader(f, *args, **kwargs)
+class UnicodeReader(Iterator):
+    def __init__(self, f, **kw):
+        self.f = f
+        self.encoding = kw.pop('encoding', 'utf8')
+        self.newline = kw.pop('lineterminator', None)
+        self.kw = kw
+        self._close = False
 
-        if 'encoding' in kwargs:
-            kwargs.pop('encoding')
+    def __enter__(self):
+        if isinstance(self.f, string_types) or isinstance(self.f, path):
+            if PY3:  # pragma: no cover
+                self.f = open(self.f, 'rt', encoding=self.encoding, newline=self.newline or '')
+            else:
+                self.f = open(self.f, 'rU')
+            self._close = True
+        elif hasattr(self.f, 'read'):
+            if PY2:
+                self.f = UTF8Recoder(self.f, self.encoding)
+        else:
+            lines = []
+            for line in self.f:
+                if PY2 and isinstance(line, text_type):
+                    line = line.encode(self.encoding)
+                elif PY3 and isinstance(line, binary_type):  # pragma: no cover
+                    line = line.decode(self.encoding)
+                lines.append(line)
+            self.f = lines
+        self.reader = csv.reader(self.f, **self.kw)
+        return self
 
-        csv.DictReader.__init__(self, f, fieldnames, restkey, restval, *args, **kwargs)
+    def __next__(self):
+        row = next(self.reader)
+        return [s if isinstance(s, text_type) else s.decode(self.encoding) for s in row]
 
-        self.reader = reader
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._close:
+            self.f.close()
+
+    def __iter__(self):
+        return self
 
 
-class UnicodeCSVDictWriter(csv.DictWriter):  # pragma: no cover
-    """
-    Defer almost all implementation to :class:`csv.DictWriter`, but wraps our unicode writer instead
-    of :func:`csv.writer`.
-    """
-    def __init__(self, f, fieldnames, writeheader=False, restval="", extrasaction="raise", *args, **kwds):
-        self.fieldnames = fieldnames
-        self.restval = restval
+class UnicodeDictReader(UnicodeReader):
+    def __init__(self, f, fieldnames=None, restkey=None, restval=None, **kw):
+        self._fieldnames = fieldnames   # list of keys for the dict
+        self.restkey = restkey          # key to catch long rows
+        self.restval = restval          # default value for short rows
+        self.line_num = 0
+        UnicodeReader.__init__(self, f, **kw)
 
-        if extrasaction.lower() not in ("raise", "ignore"):
-            raise ValueError("extrasaction (%s) must be 'raise' or 'ignore'" %
-                   extrasaction)
+    @property
+    def fieldnames(self):
+        if self._fieldnames is None:
+            try:
+                self._fieldnames = UnicodeReader.__next__(self)
+            except StopIteration:
+                pass
+        self.line_num = self.reader.line_num
+        return self._fieldnames
 
-        self.extrasaction = extrasaction
+    def __next__(self):
+        if self.line_num == 0:
+            # Used only for its side effect.
+            self.fieldnames
+        row = UnicodeReader.__next__(self)
+        self.line_num = self.reader.line_num
 
-        self.writer = UnicodeCSVWriter(f, *args, **kwds)
+        # unlike the basic reader, we prefer not to return blanks,
+        # because we will typically wind up with a dict full of None
+        # values
+        while row == []:
+            row = UnicodeReader.__next__(self)
+        return self.item(row)
 
-        if writeheader:
-            self.writerow(dict(zip(self.fieldnames, self.fieldnames)))
+    def item(self, row):
+        d = dict(zip(self.fieldnames, row))
+        lf = len(self.fieldnames)
+        lr = len(row)
+        if lf < lr:
+            d[self.restkey] = row[lf:]
+        elif lf > lr:
+            for key in self.fieldnames[lr:]:
+                d[key] = self.restval
+        return d
+
+
+class NamedTupleReader(UnicodeDictReader):
+    def __init__(self, f, **kw):
+        self._cls = None
+        UnicodeDictReader.__init__(self, f, **kw)
+
+    @property
+    def cls(self):
+        if self._cls is None:
+            self._cls = namedtuple('Row', list(map(normalize_name, self.fieldnames)))
+        return self._cls
+
+    def item(self, row):
+        d = UnicodeDictReader.item(self, row)
+        for name in self.fieldnames:
+            d.setdefault(name, None)
+        return self.cls(**{normalize_name(k): v for k, v in d.items()})
 
 
 def normalize_name(s):
@@ -193,44 +223,17 @@ def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw)
     # We make sure format parameters for the underlying reader have the correct type.
     for name in 'delimiter quotechar escapechar'.split():
         c = kw.get(name)
-        if c and isinstance(c, text_type):
+        if c and PY2 and isinstance(c, text_type):
             kw[name] = to_binary(c)
 
-    if isinstance(lines_or_file, string_types):
-        # If a file name or path object is passed, we read the whole thing into a list of
-        # lines, to make sure the file handle is closed right away.
-        if 'lineterminator' in kw:
-            with open(lines_or_file, mode='r') as fp:
-                lines_or_file = fp.read().split(str(kw['lineterminator']))
-        else:
-            with open(lines_or_file, mode='rU') as fp:
-                lines_or_file = [l[:-1] if l and l[-1] == str('\n') else l for l in fp]
-    if isinstance(lines_or_file, list):
-        # unicsv.UnicodeCSVReader does not support reading from arbitrary iterables such
-        # as lists, but insists on calling a 'read' method.
-        if encoding is None \
-                or (lines_or_file and isinstance(lines_or_file[0], text_type)):
-            lines_or_file = [l.encode('utf8') for l in lines_or_file]
-            encoding = 'utf8'
-        lines_or_file = StringIO(str('\n').join(nfilter(lines_or_file)))
-
-    if dicts or namedtuples:
-        impl = UnicodeCSVDictReader
-        #impl = unicsv.UnicodeCSVDictReader
-    else:
-        impl = UnicodeCSVReader
-        #impl = unicsv.UnicodeCSVReader
-    res = impl(lines_or_file, encoding=encoding, **kw)
     if namedtuples:
-        class_ = namedtuple('Row', map(normalize_name, res.fieldnames))
-        for d in res:
-            for n in res.fieldnames:
-                d.setdefault(n, None)
-            yield class_(**{normalize_name(k): v for k, v in d.items()})
+        _reader = NamedTupleReader
+    elif dicts:
+        _reader = UnicodeDictReader
     else:
-        for d in res:
-            yield d
+        _reader = UnicodeReader
 
+    with _reader(lines_or_file, encoding=encoding, **kw) as r:
+        for item in r:
+            yield item
 
-UnicodeCsvWriter = UnicodeCSVWriter
-#UnicodeCsvWriter = unicsv.UnicodeCSVWriter

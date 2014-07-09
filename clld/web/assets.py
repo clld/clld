@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function, division, absolute_import
 from webassets import Environment, Bundle
 from path import path
 

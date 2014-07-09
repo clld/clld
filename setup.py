@@ -9,7 +9,6 @@ py_version = sys.version_info[:2]
 PY3 = py_version[0] == 3
 
 if PY3:
-    #raise RuntimeError('clld requires Python 2.7')
     if py_version < (3, 4):
         raise RuntimeError('clld requires Python 3.4 or better')
 else:
@@ -43,11 +42,10 @@ install_requires = [
     'markupsafe',
     'requests',
     'rdflib',
+    'newrelic',
     'colander',
     'python-dateutil',
-    'newrelic',
     'paginate',
-    #'unicsv',
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
@@ -56,7 +54,7 @@ install_requires = [
 if not PY3:
     install_requires.extend('Babel PyX==0.12.1'.split())
 else:
-    install_requires.extend('PyX>=0.13'.split())
+    install_requires.append('PyX>=0.13')
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
@@ -90,9 +88,8 @@ setup(name='clld',
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        #"Programming Language :: Python :: 3",
-        #"Programming Language :: Python :: 3.2",
-        #"Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",

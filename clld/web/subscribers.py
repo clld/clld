@@ -1,21 +1,9 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from six import PY3
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 from clld.web.util import helpers
-
-if PY3:  # pragma: no cover
-    class Environment(dict):
-        debug = False
-
-    class Bundle(object):
-        def urls(self):
-            return []
-
-    environment = Environment(js=Bundle(), css=Bundle())
-else:
-    from clld.web.assets import environment
+from clld.web.assets import environment
 
 
 def add_renderer_globals(module, event):

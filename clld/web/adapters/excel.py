@@ -1,9 +1,5 @@
-from six.moves import cStringIO as StringIO
-from six import PY3
-if not PY3:
-    import xlwt
-else:  # pragma: no cover
-    xlwt = None
+from six import BytesIO
+import xlwt
 
 from clld.web.adapters.base import Index
 from clld.lib.excel import hyperlink
@@ -34,7 +30,7 @@ class ExcelAdapter(Index):
             for i, col in enumerate(self.row(ctx, req, item)):
                 ws.write(j + 1, i, col)
 
-        out = StringIO()
+        out = BytesIO()
         wb.save(out)
         out.seek(0)
         return out.read()
