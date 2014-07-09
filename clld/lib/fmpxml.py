@@ -3,6 +3,7 @@
 
 .. seealso:: http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
+from __future__ import print_function, unicode_literals, division, absolute_import
 import re
 from bs4 import BeautifulSoup as bs
 from logging import getLogger
@@ -10,6 +11,7 @@ log = getLogger(__name__)
 
 from xml.etree import cElementTree as et
 
+from six import text_type
 import requests
 
 
@@ -21,15 +23,6 @@ SC = re.compile("font-variant:\s*small\-caps")
 
 def normalize_markup(s):
     """normalize markup in filemaker data
-
-    >>> assert normalize_markup('') is None
-    >>> assert normalize_markup('<span>bla</span>') == 'bla'
-    >>> s = '<span style="font-style: italic;">bla</span>'
-    >>> assert normalize_markup(s) == s
-    >>> s = '<span style="font-weight: bold;">bla</span>'
-    >>> assert normalize_markup(s) == s
-    >>> s = '<span style="font-variant: small-caps;">bla</span>'
-    >>> assert normalize_markup(s) == s
     """
     if not s:
         return
@@ -49,7 +42,7 @@ def normalize_markup(s):
         else:
             span.replace_with(span.string)
 
-    res = unicode(soup.html.body).replace('<body>', '').replace('</body>', '')
+    res = text_type(soup.html.body).replace('<body>', '').replace('</body>', '')
     return res.replace('<p>', '').replace('</p>', '').strip() or None
 
 
@@ -109,13 +102,13 @@ class Client(object):
 
     def _get_batch(self, what, offset=0):
         if self.verbose:
-            print what, offset  # pragma: no cover
+            print(what, offset)  # pragma: no cover
         key = '%s-%s-%s' % (what, offset, self.limit)
         if key in self.cache.keys():
             xml = self.cache[key]
         else:
             if self.verbose:
-                print '-- from server'  # pragma: no cover
+                print('-- from server')  # pragma: no cover
             log.info('retrieving %s (%s to %s)' % (what, offset, offset + self.limit))
             res = requests.get(
                 'http://%s/fmi/xml/FMPXMLRESULT.xml' % self.host,

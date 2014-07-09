@@ -4,25 +4,21 @@ Functionality to handle bibligraphical data in the BibTeX format.
 
 .. seealso:: http://en.wikipedia.org/wiki/BibTeX
 """
+from __future__ import unicode_literals, division, print_function, absolute_import
 from collections import OrderedDict
 import re
 import codecs
 
 from path import path
 from zope.interface import Interface, implementer
-from six import PY3
+from six import unichr, text_type, binary_type, string_types, PY2
 
-from clld.util import UnicodeMixin, DeclEnum
+from clld.util import UnicodeMixin, DeclEnum, nfilter, to_binary
 from clld.lib.bibutils import convert
 from clld.lib import latex
 
 
 latex.register()
-
-
-if PY3:  # pragma: no cover
-    unicode = str
-    unichr = chr
 
 
 UU_PATTERN = re.compile('\?\[\\\\u(?P<number>[0-9]{3,4})\]')
@@ -32,11 +28,9 @@ def u_unescape(s):
     """
     Unencode Unicode escape sequences
     match all 3/4-digit sequences with unicode character
-    replace all '?[\u....]' with corresponding unicode
+    replace all '?[\\u....]' with corresponding unicode
 
     There are some decimal/octal mismatches in unicode encodings in bibtex
-
-    >>> r = u_unescape(r'?[\u123] ?[\u1234]')
     """
     new = []
     e = 0
@@ -44,10 +38,10 @@ def u_unescape(s):
         new.append(s[e:m.start()])
         e = m.end()
 
-        digits = hex(int(m.group('number')))[2:].rjust(4, '0')
+        digits = hex(int(m.group('number')))[2:].rjust(4, str('0') if PY2 else '0')
         r = False
         try:
-            r = (u'\\u' + digits).decode('unicode_escape')
+            r = (to_binary('\\u') + to_binary(digits)).decode('unicode_escape')
         except (UnicodeDecodeError, TypeError):  # pragma: no cover
             pass
         if r:
@@ -58,10 +52,63 @@ def u_unescape(s):
     return ''.join(new)
 
 
+SYMBOLS = {
+    '\\plusminus{}': '\xb1',
+    '\\middot{}': '\xb7',
+    '\\textopeno{}': "\u0254",
+    '\\dh{}': "\u00f0",
+    '\\DH{}': "\u00d0",
+    '\\textthorn{}': "\u00fe",
+    '\\textless{}': "<",
+    '\\textgreater{}': ">",
+    '\\circ{}': "\u00b0",
+    '\\textltailn{}': "\u0272",
+    '\\textlambda{}': "\u03BB",
+    '\\textepsilon{}': '\u025b',
+    '\\textquestiondown{}': '\xbf',
+    '\\textschwa{}': '\u0259',
+    '\\textsubdot{o}': '\u1ecd',
+    '\\textrhooktopd{}': '\u0257',
+    # '\\eurosign{}': '\u20ac',
+    '\\eurosign{}': '\u2021',
+    '\\textquestiondown': '\xbf',
+    '\\textquotedblleft': '\u201c',
+    '\\textquotedblright': '\u201d',
+    '\\textquoteleft': '\u2018',
+    '\\textquoteright': '\u2019',
+
+    '\\textsubdot{D}': '\u1e0c',
+    '\\textsubdot{E}': '\u1eb8',
+    '\\textsubdot{H}': '\u1e24',
+    '\\textsubdot{I}': '\u1eca',
+    '\\textsubdot{O}': '\u1ecc',
+    '\\textsubdot{T}': '\u1e6c',
+    '\\textsubdot{d}': '\u1e0d',
+    '\\textsubdot{b}': '\u1e05',
+    '\\textsubdot{e}': '\u1eb9',
+    '\\textsubdot{h}': '\u1e25',
+    '\\textsubdot{i}': '\u1ecb',
+    '\\textsubdot{n}': '\u1e47',
+    '\\textsubdot{r}': '\u1e5b',
+    '\\textsubdot{s}': '\u1e63',
+    '\\textsubdot{t}': '\u1e6d',
+    '\\ng{}': '\u014b',
+    '\\oslash{}': '\u00f8',
+    '\\Oslash{}': '\u00d8',
+    '\\textdoublebarpipe{}': '\u01c2',
+    # '\\dots': '',
+    '\\Aa{}': '\xc5',
+    '\\Aa{}Rsj\xd6': '\xc5rsj\xf6',
+
+    '\\guillemotleft': '\xab',
+    '\\guillemotleft{}': '\xab',
+    '\\guillemotright': '\xbb',
+}
+
 RE_XML_ILLEGAL = re.compile(
-    u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' +
-    u'|' +
-    u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' %
+    '([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' +
+    '|' +
+    '([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' %
     (
         unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
         unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
@@ -70,84 +117,29 @@ RE_XML_ILLEGAL = re.compile(
 
 
 def stripctrlchars(string):
-    """remove unicode invalid characters
-
-    >>> stripctrlchars(u'a\u0008\u000ba')
-    u'aa'
-    """
     try:
         return RE_XML_ILLEGAL.sub("", string)
-    except TypeError:  # pragma: no cover
+    except TypeError:
         return string
-
-
-SYMBOLS = {
-    r'\plusminus{}': u'\xb1',
-    r'\middot{}': u'\xb7',
-    r'\textopeno{}': u"\u0254",
-    r'\dh{}': u"\u00f0",
-    r'\DH{}': u"\u00d0",
-    r'\textthorn{}': u"\u00fe",
-    r'\textless{}': u"<",
-    r'\textgreater{}': u">",
-    r'\circ{}': u"\u00b0",
-    r'\textltailn{}': u"\u0272",
-    r'\textlambda{}': u"\u03BB",
-    r'\textepsilon{}': u'\u025b',
-    r'\textquestiondown{}': u'\xbf',
-    r'\textschwa{}': u'\u0259',
-    r'\textsubdot{o}': u'\u1ecd',
-    r'\textrhooktopd{}': u'\u0257',
-    # r'\eurosign{}': u'\u20ac',
-    r'\eurosign{}': u'\u2021',
-    r'\textquestiondown': u'\xbf',
-    r'\textquotedblleft': u'\u201c',
-    r'\textquotedblright': u'\u201d',
-    r'\textquoteleft': u'\u2018',
-    r'\textquoteright': u'\u2019',
-
-    r'\textsubdot{D}': u'\u1e0c',
-    r'\textsubdot{E}': u'\u1eb8',
-    r'\textsubdot{H}': u'\u1e24',
-    r'\textsubdot{I}': u'\u1eca',
-    r'\textsubdot{O}': u'\u1ecc',
-    r'\textsubdot{T}': u'\u1e6c',
-    r'\textsubdot{d}': u'\u1e0d',
-    r'\textsubdot{b}': u'\u1e05',
-    r'\textsubdot{e}': u'\u1eb9',
-    r'\textsubdot{h}': u'\u1e25',
-    r'\textsubdot{i}': u'\u1ecb',
-    r'\textsubdot{n}': u'\u1e47',
-    r'\textsubdot{r}': u'\u1e5b',
-    r'\textsubdot{s}': u'\u1e63',
-    r'\textsubdot{t}': u'\u1e6d',
-    r'\ng{}': u'\u014b',
-    r'\oslash{}': u'\u00f8',
-    r'\Oslash{}': u'\u00d8',
-    r'\textdoublebarpipe{}': u'\u01c2',
-    # r'\dots': '',
-    r'\Aa{}': u'\xc5',
-    u'\\Aa{}Rsj\xd6': u'\xc5rsj\xf6',
-
-    r'\guillemotleft': u'\xab',
-    r'\guillemotleft{}': u'\xab',
-    r'\guillemotright': u'\xbb',
-}
 
 
 def unescape(string):
     """transform latex escape sequences of type \`\ae  into unicode
+
+    :param string: six.text_type or six.binary_type \
+    (which will be decoded using latex+latin1)
+    :return: six.text_type
     """
     def _delatex(s):
         try:
-            t = str(s)
+            t = to_binary(s, encoding='latin1')
             result = t.decode('latex+latin1')
         except UnicodeEncodeError:  # pragma: no cover
             result = string
-        u_result = unicode(result)
+        u_result = text_type(result)
         return u_result
 
-    res = u_unescape(_delatex(stripctrlchars(unicode(string).strip())))
+    res = u_unescape(stripctrlchars(_delatex(string.strip())))
     for symbol in sorted(SYMBOLS.keys(), key=lambda s: len(s)):
         res = res.replace(symbol, SYMBOLS[symbol])
     if '\\' not in res:
@@ -302,15 +294,9 @@ class Record(OrderedDict, _Convertable):
     - retrievable as list with getall
 
     .. note:: Unknown genres are converted to "misc".
-
-    >>> r = Record('article', '1', author=['a', 'b'], editor='a and b')
-    >>> assert r['author'] == 'a and b'
-    >>> assert r.get('author') == r.getall('author')
-    >>> assert r['editor'] == r.get('editor')
-    >>> assert r.getall('editor') == ['a', 'b']
     """
     def __init__(self, genre, id_, *args, **kw):
-        if isinstance(genre, basestring):
+        if isinstance(genre, string_types):
             try:
                 genre = EntryType.from_string(genre.lower())
             except ValueError:
@@ -395,9 +381,9 @@ class Record(OrderedDict, _Convertable):
         :return: list of strings representing the values of the record for field 'key'.
         """
         res = self.get(key, [])
-        if isinstance(res, basestring):
+        if isinstance(res, string_types):
             res = res.split(Record.sep(key))
-        return filter(None, res)
+        return [_f for _f in res if _f]
 
     def __getitem__(self, key):
         """
@@ -406,7 +392,7 @@ class Record(OrderedDict, _Convertable):
         value = OrderedDict.__getitem__(self, key)
         if not isinstance(value, (tuple, list)):
             value = [value]
-        return Record.sep(key).join(filter(None, value))
+        return Record.sep(key).join(nfilter(value))
 
     def __unicode__(self):
         """
@@ -455,7 +441,7 @@ class Record(OrderedDict, _Convertable):
         res = [self.get('author', editors), self.get('year', 'n.d')]
         if genre == 'book':
             res.append(self.get('booktitle') or self.get('title'))
-            series = ', '.join(filter(None, [self.get('series'), self.get('volume')]))
+            series = ', '.join(nfilter([self.get('series'), self.get('volume')]))
             if series:
                 res.append('(%s.)' % series)
         elif genre == 'misc':
@@ -465,7 +451,7 @@ class Record(OrderedDict, _Convertable):
             res.append(self.get('title'))
 
         if genre == 'article':
-            atom = ' '.join(filter(None, [self.get('journal'), self.get('volume')]))
+            atom = ' '.join(nfilter([self.get('journal'), self.get('volume')]))
             if self.get('issue'):
                 atom += '(%s)' % self['issue']
             res.append(atom)
@@ -502,7 +488,7 @@ class Record(OrderedDict, _Convertable):
                 res.append(self['pages'])
 
         if self.get('publisher'):
-            res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
+            res.append(": ".join(nfilter([self.get('address'), self['publisher']])))
 
         if pages_at_end and self.get('pages'):
             res.append(self['pages'] + 'pp')
@@ -513,7 +499,7 @@ class Record(OrderedDict, _Convertable):
 
         return ' '.join(
             map(lambda a: a + ('' if (a.endswith('.') or a.endswith('.)')) else '.'),
-                filter(None, res)))
+                nfilter(res)))
 
 
 class IDatabase(Interface):
@@ -527,7 +513,7 @@ class Database(_Convertable):
     a class to handle bibtex databases, i.e. a container class for Record instances.
     """
     def __init__(self, records):
-        self.records = filter(lambda r: r.genre and r.id, records)
+        self.records = [r for r in records if r.genre and r.id]
         self._keymap = None
 
     def __unicode__(self):

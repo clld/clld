@@ -1,13 +1,15 @@
+from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 import sys
 from distutils.util import strtobool
 from collections import defaultdict
 import argparse
-from urllib import quote_plus
 import json
 import logging
 from functools import partial
 
+from six.moves.urllib.parse import quote_plus
+from six.moves import input
 import transaction
 from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy.orm import joinedload
@@ -92,13 +94,13 @@ def bibtex2source(rec, cls=common.Source):
 
 
 def confirm(question, default=False):  # pragma: no cover
-    """Ask a yes/no question via raw_input() and return their answer.
+    """Ask a yes/no question via input() and return their answer.
 
     "question" is a string that is presented to the user.
     """
     while True:
         sys.stdout.write(question + (" [Y|n] " if default else " [y|N] "))
-        choice = raw_input().lower()
+        choice = input().lower()
         if not choice:
             return default
         try:
@@ -159,7 +161,7 @@ def index(rsc, req, solr, query_options=None, batch_size=1000):
             'json',
             commit=True)
         if res.status != 200:
-            print res.raw_content  # pragma: no cover
+            print(res.raw_content)  # pragma: no cover
 
 
 def parsed_args(*arg_specs, **kw):  # pragma: no cover
@@ -270,7 +272,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
             stitle = source.description or source.title or source.booktitle
             needs_check = False
             year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
-            if not year or year != slug(source.year or unicode('')):
+            if not year or year != slug(source.year or ''):
                 needs_check = True
             twords = words(stitle)
             iwords = words(
@@ -347,7 +349,7 @@ class Data(defaultdict):
     def add(self, model, key, **kw):
         if '.' in kw.get('id', ''):
             raise ValueError('Object id contains illegal character "."')
-        if kw.keys() == ['_obj']:
+        if list(kw.keys()) == ['_obj']:
             # if a single keyword parameter _obj is passed, we take it to be the object
             # which should be added to the session.
             new = kw['_obj']

@@ -5,15 +5,11 @@ from itertools import groupby  # we just import this to have it available in tem
 assert groupby  # appease pyflakes
 import datetime  # we just import this to have it available in templates!
 assert datetime
-from urllib import urlencode
 from base64 import b64encode
 from math import floor
 
-from six import PY3
-if PY3:  # pragma: no cover
-    from urllib.parse import quote
-else:
-    from urllib import quote
+from six import text_type, string_types
+from six.moves.urllib.parse import quote, urlencode
 
 try:
     import newrelic.agent
@@ -67,7 +63,7 @@ def get_valueset(req, ctx):
 
 
 def get_url_template(req, route, relative=True):
-    if isinstance(route, basestring):
+    if isinstance(route, string_types):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
     if route:
         res = '' if relative else req.application_url
@@ -88,7 +84,7 @@ def dumps(obj):
 
 
 def data_uri(filename, mimetype):
-    with open(filename) as fp:
+    with open(filename, mode='rb') as fp:
         content = fp.read()
     return 'data:%s;base64,%s' % (mimetype, b64encode(content))
 
@@ -194,7 +190,7 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
         if not no_seconds and seconds:
             fmt += '{2:0>2f}"'
         fmt += hemispheres[0] if dec > 0 else hemispheres[1]
-        return unicode(fmt).format(degrees, minutes, seconds)
+        return text_type(fmt).format(degrees, minutes, seconds)
 
     if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
         return ''
@@ -267,7 +263,7 @@ def link(req, obj, **kw):
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
     kw['class'] = ' '.join(
         filter(None, kw.get('class', '').split() + [rsc.interface.__name__[1:]]))
-    label = kw.pop('label', unicode(obj))
+    label = kw.pop('label', text_type(obj))
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
 
@@ -454,7 +450,7 @@ def newline2br(text):
 
 def text2html(text, mode='br', sep='\n\n'):
     """
-    >>> assert 'div' in unicode(text2html('chunk', mode='p'))
+    >>> assert 'div' in text_type(text2html('chunk', mode='p'))
     """
     if mode == 'p':
         return HTML.div(*[HTML.p(literal(newline2br(line))) for line in text.split(sep)])
@@ -556,7 +552,7 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
             icon('info-sign', inverted=True),
             **{'class': ['btn-info'],
                'id': 'rsc-dl',
-               'data-content': unicode(doc)}),
+               'data-content': text_type(doc)}),
         HTML.a(
             icon('download-alt'),
             HTML.span(class_="caret"),

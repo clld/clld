@@ -13,6 +13,7 @@ import warnings
 warnings.filterwarnings(
     'ignore', message='At least one scoped session is already present.')
 
+from six import text_type
 from mock import Mock
 from path import path
 from pyramid.paster import bootstrap
@@ -292,15 +293,15 @@ class ExtendedTestApp(TestApp):
 
         docroot = kw.pop('docroot', None)
         res = self.get(*args, _parse_body=parse, **kw)
-        assert self.parsed_body.childNodes
-        assert self.parsed_body.childNodes[0].name == 'html'
+        child_nodes = list(self.parsed_body.getchildren())
+        assert child_nodes
         if docroot:
-            assert self.parsed_body.childNodes[0].childNodes[1].childNodes[0].name \
-                == docroot
+            assert list(child_nodes[1].getchildren())[0].tag.endswith(docroot)
         return res
 
     def get_json(self, *args, **kw):
-        return self.get(*args, _parse_body=loads, **kw)
+        _loads = lambda s: loads(text_type(s, encoding='utf8'))
+        return self.get(*args, _parse_body=_loads, **kw)
 
     def get_xml(self, *args, **kw):
         return self.get(*args, _parse_body=ElementTree.fromstring, **kw)
@@ -525,6 +526,7 @@ class XmlResponse(object):
     ns = None
 
     def __init__(self, response):
+        self.raw = response.body
         self.root = ElementTree.fromstring(response.body)
 
     def findall(self, name):

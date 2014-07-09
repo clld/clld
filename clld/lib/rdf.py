@@ -1,9 +1,10 @@
 """
 This module provides functionality for handling our data as rdf.
 """
+from __future__ import unicode_literals, division, absolute_import, print_function
 from collections import namedtuple
-from cStringIO import StringIO
 
+from six import string_types, BytesIO
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import (
     Namespace, DC, DCTERMS, DOAP, FOAF, OWL, RDF, RDFS, SKOS, VOID, XMLNS, XSD,
@@ -52,7 +53,7 @@ def expand_prefix(p):
     :param p: a qualified name in prefix:localname notation or a URL.
     :return: a string URL or a URIRef
     """
-    if isinstance(p, basestring) and ':' in p:
+    if isinstance(p, string_types) and ':' in p:
         prefix, name = p.split(':', 1)
         if prefix in NAMESPACES:
             try:
@@ -82,17 +83,14 @@ class ClldGraph(Graph):
 def properties_as_xml_snippet(subject, props):
     """somewhat ugly way to get at a snippet of an rdf-xml serialization of properties
     of a subject.
-
-    >>> p = properties_as_xml_snippet('http://example.org', [('dcterms:title', 'ttt')])
-    >>> assert 'ttt' in p
     """
-    if isinstance(subject, basestring):
+    if isinstance(subject, string_types):
         subject = URIRef(subject)
     g = ClldGraph()
     if props:
         for p, o in props:
             p = expand_prefix(p)
-            if isinstance(o, basestring):
+            if isinstance(o, string_types):
                 if o.startswith('http://') or o.startswith('https://'):
                     o = URIRef(o)
                 else:
@@ -100,14 +98,14 @@ def properties_as_xml_snippet(subject, props):
             g.add((subject, p, o))
     res = []
     in_desc = False
-    for line in g.serialize(format='xml').split('\n'):
+    for line in g.serialize(format='xml').decode('utf8').split('\n'):
         if line.strip().startswith('</rdf:Description'):
             break
         if in_desc:
             res.append(line)
         if line.strip().startswith('<rdf:Description'):
             in_desc = True
-    return '\n'.join(res).decode('utf8')
+    return '\n'.join(res)
 
 
 def convert(string, from_, to_):
@@ -115,8 +113,8 @@ def convert(string, from_, to_):
         return encoded(string)
     assert from_ in FORMATS and to_ in FORMATS
     g = Graph()
-    g.parse(StringIO(encoded(string)), format=from_)
-    out = StringIO()
+    g.parse(BytesIO(encoded(string)), format=from_)
+    out = BytesIO()
     g.serialize(out, format=to_)
     out.seek(0)
     return out.read()

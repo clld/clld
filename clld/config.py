@@ -1,8 +1,7 @@
-try:
-    from ConfigParser import ConfigParser
-except ImportError:  # pragma: no cover
-    from configparser import ConfigParser
+from __future__ import unicode_literals, print_function, division, absolute_import
 import codecs
+
+from six.moves.configparser import ConfigParser
 
 
 def get_config(p):

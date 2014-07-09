@@ -1,19 +1,12 @@
 """
 Functionality to support reading and writing of excel files.
 """
-from six import PY3
-if not PY3:
-    import xlwt
-    import xlrd
-else:  # pragma: no cover
-    xlwt = None
-    xlrd = None
+from __future__ import unicode_literals, print_function, division, absolute_import
+
+import xlwt
 
 
 def hyperlink(url, label=None):
-    """
-    >>> assert hyperlink('http://example.org', label='"example"')
-    """
     f = xlwt.Font()
     f.underline = xlwt.Font.UNDERLINE_SINGLE
 
@@ -30,19 +23,6 @@ def rows(sheet, as_dict=False):
         If ``True`` rows will be converted to ``dict``s using the content of the first row
         as keys.
     :return: Generator for the rows in the specified sheet.
-
-    >>> wb = xlwt.Workbook()
-    >>> ws = wb.add_sheet('1')
-    >>> d = {'a': 1}
-    >>> ws.write(0, 0, d.keys()[0])
-    >>> ws.write(1, 0, d.values()[0])
-    >>> from cStringIO import StringIO
-    >>> fp = StringIO()
-    >>> wb.save(fp)
-    >>> fp.seek(0)
-    >>> wb = xlrd.open_workbook(file_contents=fp.read())
-    >>> assert list(rows(wb.sheet_by_name('1'), as_dict=True))[0] == d
-    >>> assert len(list(rows(wb.sheet_by_name('1')))) == 2
     """
     if as_dict:
         # we use the values of the first row as keys:
@@ -54,5 +34,5 @@ def rows(sheet, as_dict=False):
     for j in range(start, sheet.nrows):
         res = [sheet.cell(j, i).value for i in range(sheet.ncols)]
         if as_dict:
-            res = dict(zip(keys, res))
+            res = dict(list(zip(keys, res)))
         yield res

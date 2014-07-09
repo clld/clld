@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function, division, absolute_import
 import time
 
 from sqlalchemy.orm import joinedload
@@ -63,7 +64,7 @@ def page_query(q, n=1000, verbose=False, commit=False):
         offset += n
         e = time.time()
         if verbose:
-            print e - s, offset, 'done'  # pragma: no cover
+            print(e - s, offset, 'done')  # pragma: no cover
         s = e
         if not r:
             break

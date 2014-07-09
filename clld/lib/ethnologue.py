@@ -1,6 +1,7 @@
 """
 Functionality to gather information to link to ethnologue.com
 """
+from __future__ import unicode_literals, print_function
 import re
 import time
 
@@ -27,7 +28,7 @@ def get_subgroups():
                 yield a.text.split('(')[0].strip(), a['href'][len(prefix):]
 
     res = dict(list(parse_subgroups(get('/browse/families'))))
-    ids = res.values()
+    ids = list(res.values())
     res['docs'] = {}
 
     for id_ in ids:
@@ -93,9 +94,9 @@ def get_classification(group, doc):
             'niloti',
             'southern-21',
         ]:  # pragma: no cover
-            print group
-            print id_
-            print ext, len(languages)
+            print(group)
+            print(id_)
+            print(ext, len(languages))
         res[id_] = (name, [sf for sf in subfamilies if sf != id_], languages)
         # what if there are no subfamilies?
     res[group] = (

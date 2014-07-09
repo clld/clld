@@ -1,12 +1,13 @@
 """
 Common models for all clld apps
 """
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function, division, absolute_import
 import os
 from collections import OrderedDict
 from datetime import date
 from itertools import product, groupby
 
+from six import string_types
 from sqlalchemy import (
     Column,
     Float,
@@ -59,7 +60,7 @@ class Config(Base):
         :param id_: Identifier of a class instance.
         :return: ``str`` representation identifying a database object.
         """
-        mapper_name = model if isinstance(model, basestring) else model.mapper_name()
+        mapper_name = model if isinstance(model, string_types) else model.mapper_name()
         return '__%s_%s__' % (mapper_name, id_)
 
     @classmethod
@@ -458,13 +459,13 @@ class Combination(object):
                 values_by_parameter[p.pk] = []
             for v in values:
                 values_by_parameter[v.valueset.parameter_pk].append(v)
-            for i, cv in enumerate(product(*values_by_parameter.values())):
+            for i, cv in enumerate(product(*list(values_by_parameter.values()))):
                 d[tuple(v.domainelement.number for v in cv)].languages.append(language)
                 if i > 0:
                     # a language with multiple values, store a reference.
                     self.multiple.append(language)
         self.multiple = set(self.multiple)
-        return d.values()
+        return list(d.values())
 
     @cached_property()
     def values(self):

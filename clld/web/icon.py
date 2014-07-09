@@ -1,5 +1,7 @@
+from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import product
 
+from six import text_type
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
 
@@ -79,7 +81,7 @@ class Icon(object):
 
 
 #: a list of all available icons:
-ICONS = map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS])
+ICONS = list(map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS]))
 
 #: a dictionary mapping icon names to icon objects:
 ICON_MAP = {icon.name: icon for icon in ICONS}

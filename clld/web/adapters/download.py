@@ -1,13 +1,14 @@
+from __future__ import unicode_literals, division, absolute_import, print_function
 from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
-from cStringIO import StringIO
 from contextlib import closing
 
+from six import string_types, BytesIO, text_type, StringIO, PY3
 from path import path
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
-from clld.lib.dsv import UnicodeCsvWriter
+from clld.lib.dsv import UnicodeWriter
 from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
@@ -16,7 +17,7 @@ from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.db.models.common import Language, Source, LanguageIdentifier
 from clld.db.util import page_query
-from clld.util import format_size
+from clld.util import format_size, to_binary
 
 
 README = """
@@ -33,7 +34,7 @@ It should be cited as
 
 
 def pkg_name(pkg):
-    return pkg if isinstance(pkg, basestring) else pkg.__name__
+    return pkg if isinstance(pkg, string_types) else pkg.__name__
 
 
 def abspath(asset_spec):
@@ -50,11 +51,6 @@ def download_dir(pkg):
 
 @implementer(IDownload)
 class Download(object):
-    """
-    >>> from mock import Mock
-    >>> dl = Download(Source, 'clld', ext='x')
-    >>> assert dl.asset_spec(Mock()).startswith('clld:')
-    """
     ext = None
 
     def __init__(self, model, pkg, **kw):
@@ -102,7 +98,7 @@ class Download(object):
             # TODO: write test for the file name things!?
             #
             with closing(GzipFile(
-                    filename=tmp.splitext()[0].splitext()[0], fileobj=open(tmp, 'wb')
+                    filename=str(tmp.splitext()[0].splitext()[0]), fileobj=tmp.open('wb')
             )) as fp:
                 self.before(req, fp)
                 for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
@@ -111,14 +107,13 @@ class Download(object):
         else:
             with ZipFile(tmp, 'w', ZIP_DEFLATED) as zipfile:
                 if not filename:
-                    fp = StringIO()
+                    fp = self.get_stream()
                     self.before(req, fp)
                     for i, item in enumerate(
                             page_query(self.query(req), verbose=verbose)):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
-                    fp.seek(0)
-                    zipfile.writestr(self.name, fp.read())
+                    zipfile.writestr(self.name, self.read_stream(fp))
                 else:  # pragma: no cover
                     zipfile.write(filename, self.name)
                 zipfile.writestr(
@@ -133,6 +128,13 @@ class Download(object):
         if p.exists():  # pragma: no cover
             p.remove()
         tmp.move(p)
+
+    def get_stream(self):
+        return BytesIO()
+
+    def read_stream(self, fp):
+        fp.seek(0)
+        return fp.read()
 
     def query(self, req):
         q = DBSession.query(self.model).filter(self.model.active == True)
@@ -153,13 +155,15 @@ class Download(object):
         self.dump_rendered(req, fp, item, index, adapter.render(item, req))
 
     def dump_rendered(self, req, fp, item, index, rendered):
-        fp.write(rendered.encode('utf8'))
+        if isinstance(rendered, text_type):
+            rendered = rendered.encode('utf8')
+        fp.write(rendered)
 
     def after(self, req, fp):
         pass
 
 
-class CsvDump(Download):  # pragma: no cover
+class CsvDump(Download):
     ext = 'csv'
 
     def __init__(self, model, pkg, fields=None, **kw):
@@ -170,57 +174,68 @@ class CsvDump(Download):  # pragma: no cover
         self.fields = fields
         self.writer = None
 
+    def get_stream(self):
+        return StringIO(newline='') if PY3 else BytesIO()
+
+    def read_stream(self, fp):
+        res = Download.read_stream(self, fp)
+        if PY3:  # pragma: no cover
+            res = res.encode('utf8')
+        return res
+
     def get_fields(self, req):
         if not self.fields:
             self.fields = ['id', 'name']
         return self.fields
 
     def before(self, req, fp):
-        self.writer = UnicodeCsvWriter(fp)
+        self.writer = UnicodeWriter(fp)
+        self.writer.__enter__()
         self.writer.writerow(
-            [f if isinstance(f, basestring) else f[1] for f in self.get_fields(req)])
+            [f if isinstance(f, string_types) else f[1] for f in self.get_fields(req)])
 
     def row(self, req, fp, item, index):
-        return [getattr(item, f if isinstance(f, basestring) else f[0])
+        return [getattr(item, f if isinstance(f, string_types) else f[0])
                 for f in self.get_fields(req)]
 
     def dump(self, req, fp, item, index):
         self.writer.writerow(self.row(req, fp, item, index))
 
 
-class N3Dump(Download):  # pragma: no cover
+class N3Dump(Download):
     ext = 'n3'
 
     def dump_rendered(self, req, fp, item, index, rendered):
-        header, body = rendered.split('\n\n', 1)
+        header, body = rendered.split(to_binary('\n\n'), 1)
         if index == 0:
             fp.write(header)
-            fp.write('\n\n')
+            fp.write(to_binary('\n\n'))
         fp.write(body)
 
 
-class RdfXmlDump(Download):  # pragma: no cover
+class RdfXmlDump(Download):
     ext = 'rdf'
 
     def before(self, req, fp):
-        fp.write('<rdf:RDF %s>\n' % rdf_namespace_attrs())
+        fp.write(
+            to_binary('<rdf:RDF ') + to_binary(rdf_namespace_attrs()) + to_binary('>\n'))
 
     def after(self, req, fp):
-        fp.write('</rdf:RDF>')
+        fp.write(to_binary('</rdf:RDF>'))
 
     def dump_rendered(self, req, fp, item, index, rendered):
-        body = rendered.split('rdf:Description')[1]
-        fp.write('<rdf:Description%srdf:Description>\n' % body)
+        body = rendered.split(to_binary('rdf:Description'))[1]
+        fp.write(to_binary('<rdf:Description') + body + to_binary('rdf:Description>\n'))
 
 
 class Sqlite(Download):
     ext = 'sqlite'
 
     def create(self, req):  # pragma: no cover
-        print '+---------------------------------------------+'
-        print '| This download must be created "by hand".'
-        print '| Make sure a suitable file is available at'
-        print '|', self.abspath(req)
-        print '| when the app is started.'
-        print '+---------------------------------------------+'
+        print('+---------------------------------------------+')
+        print('| This download must be created "by hand".')
+        print('| Make sure a suitable file is available at')
+        print('|', self.abspath(req))
+        print('| when the app is started.')
+        print('+---------------------------------------------+')
         return

@@ -575,7 +575,8 @@ def get_configurator(pkg, *utilities, **kw):
             favicon['clld.favicon'] = config.package_name + ':static/favicon.ico'
         config.add_settings(favicon)
 
-    with open(abspath_from_asset_spec(config.registry.settings['clld.favicon'])) as fp:
+    with open(abspath_from_asset_spec(
+            config.registry.settings['clld.favicon']), mode='rb') as fp:
         fh = md5()
         fh.update(fp.read())
         config.add_settings({'clld.favicon_hash': fh.hexdigest()})

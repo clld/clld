@@ -1,5 +1,68 @@
 from __future__ import unicode_literals
 from datetime import date
+import random
+
+from six import binary_type
+
+
+def test_parse_json_with_datetime():
+    from clld.util import parse_json_with_datetime
+
+    assert parse_json_with_datetime(dict(d='2012-12-12T20:12:12.12'))['d'].year
+
+
+def test_nfilter():
+    from clld.util import nfilter
+
+    assert nfilter(range(5)) == list(range(1, 5))
+
+
+def test_encoded():
+    from clld.util import encoded
+
+    s = '\xe4'
+    latin1 = binary_type(s.encode('latin1'))
+    utf8 = binary_type(s.encode('utf8'))
+    assert encoded(s) == utf8
+    assert encoded(s, 'latin1') == latin1
+    assert encoded(utf8) == utf8
+    assert encoded(latin1) == utf8
+    assert encoded(latin1, 'latin1') == latin1
+
+
+def test_dict_merged():
+    from clld.util import dict_merged
+
+    assert dict_merged(None, a=1) == {'a': 1}
+    assert dict_merged(None, a=1, _filter=lambda i: i != 1) == {}
+    assert dict_merged(None, a=None) == {}
+
+
+def test_cached_property():
+    from clld.util import cached_property
+
+    class C(object):
+        @cached_property()
+        def attr(self):
+            return random.randint(1, 100000)
+
+    c = C()
+    call1 = c.attr
+    assert call1 == c.attr
+    del c._cache['attr']
+    assert call1 != c.attr
+
+
+def test_NoDefault():
+    from clld.util import NO_DEFAULT
+
+    def f(default=NO_DEFAULT):
+        if default is NO_DEFAULT:
+            return 0
+        return default
+
+    assert f() != f(default=None)
+    assert repr(NO_DEFAULT)
 
 
 def test_slug():

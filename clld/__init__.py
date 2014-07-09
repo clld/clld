@@ -1,10 +1,11 @@
+from __future__ import unicode_literals, print_function, division, absolute_import
 from collections import namedtuple
 
 from clld.db.models import common
 from clld import interfaces
 
 
-__version__ = "0.12.5"
+__version__ = "0.13"
 _Resource = namedtuple('Resource', 'name model interface with_index with_rdfdump')
 
 
