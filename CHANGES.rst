@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.13
+~~~~
+
+clld does now run on python 2.7 and 3.4 from the same code base.
+
+
 0.12.5
 ~~~~~~
 
