@@ -251,7 +251,7 @@ class ContextObject(list, UnicodeMixin):
             pairs.append((_encoded(pair[0]), _encoded(pair[1])))
         try:
             return urlencode(pairs)
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover
             return to_binary('')
 
     def span_attrs(self):
