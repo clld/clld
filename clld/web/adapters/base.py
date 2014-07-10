@@ -41,9 +41,9 @@ class Renderable(object):
     def render_to_response(self, ctx, req):
         res = Response(self.render(ctx, req))
         res.vary = to_binary('Accept')
-        res.content_type = to_binary(self.send_mimetype or self.mimetype)
+        res.content_type = str(self.send_mimetype or self.mimetype)
         if self.charset:
-            res.content_type += to_binary('; charset=') + to_binary(self.charset)
+            res.content_type += str('; charset=') + str(self.charset)
         return res
 
     def template_context(self, ctx, req):
@@ -101,6 +101,6 @@ def adapter_factory(template, mimetype='text/html', extension='html', base=None,
     base = base or Representation
     extra = dict(mimetype=mimetype, extension=extension, template=template)
     extra.update(kw)
-    cls = type(to_binary('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), extra)
+    cls = type(str('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), extra)
     ADAPTER_COUNTER += 1
     return cls
