@@ -35,7 +35,7 @@ install_requires = [
     'pytz',
     'zope.sqlalchemy',
     'WebTest',
-    'six',
+    'six>=1.7.3',  # webassets needs add_metaclass!
     'alembic',
     'webassets',
     'yuicompressor',
