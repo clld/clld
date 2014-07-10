@@ -1,8 +1,10 @@
+from __future__ import unicode_literals
 from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
 
 from clld import interfaces
+from clld.util import to_binary
 
 
 class Renderable(object):
@@ -38,10 +40,10 @@ class Renderable(object):
 
     def render_to_response(self, ctx, req):
         res = Response(self.render(ctx, req))
-        res.vary = 'Accept'
-        res.content_type = self.send_mimetype or self.mimetype
+        res.vary = to_binary('Accept')
+        res.content_type = to_binary(self.send_mimetype or self.mimetype)
         if self.charset:
-            res.content_type += '; charset=%s' % self.charset
+            res.content_type += to_binary('; charset=') + to_binary(self.charset)
         return res
 
     def template_context(self, ctx, req):
@@ -99,6 +101,6 @@ def adapter_factory(template, mimetype='text/html', extension='html', base=None,
     base = base or Representation
     extra = dict(mimetype=mimetype, extension=extension, template=template)
     extra.update(kw)
-    cls = type('AdapterFromFactory%s' % ADAPTER_COUNTER, (base,), extra)
+    cls = type(to_binary('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), extra)
     ADAPTER_COUNTER += 1
     return cls
