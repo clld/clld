@@ -15,6 +15,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(unescape(binary_type("\\ss \xef".encode('latin1'))), 'ß\xef')
         self.assertEqual(unescape("\\ss "), 'ß')
         self.assertEqual(u_unescape('?[\\u123] ?[\\u1234]'), '{ \u04d2')
+        s = '\u2013'
+        self.assertEqual(s, unescape(s))
 
     def test_stripctrlchars(self):
         from clld.lib.bibtex import stripctrlchars
@@ -129,3 +131,4 @@ class Tests(unittest.TestCase):
         db = Database.from_file(TESTS_DIR.joinpath('test.bib'))
         self.assertEqual(len(db), 1)
         assert [r for r in db]
+        self.assertRaises(NotImplementedError, db.format, 'txt')

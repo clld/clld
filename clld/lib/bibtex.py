@@ -11,7 +11,7 @@ import codecs
 
 from path import path
 from zope.interface import Interface, implementer
-from six import unichr, text_type, binary_type, string_types, PY2
+from six import unichr, text_type, string_types, PY2
 
 from clld.util import UnicodeMixin, DeclEnum, nfilter, to_binary
 from clld.lib.bibutils import convert
@@ -37,17 +37,8 @@ def u_unescape(s):
     for m in UU_PATTERN.finditer(s):
         new.append(s[e:m.start()])
         e = m.end()
-
         digits = hex(int(m.group('number')))[2:].rjust(4, str('0') if PY2 else '0')
-        r = False
-        try:
-            r = (to_binary('\\u') + to_binary(digits)).decode('unicode_escape')
-        except (UnicodeDecodeError, TypeError):  # pragma: no cover
-            pass
-        if r:
-            new.append(r)
-        else:
-            new.append(s[m.start():m.end()])  # pragma: no cover
+        new.append((to_binary('\\u') + to_binary(digits)).decode('unicode_escape'))
     new.append(s[e:len(s)])
     return ''.join(new)
 
@@ -134,7 +125,7 @@ def unescape(string):
         try:
             t = to_binary(s, encoding='latin1')
             result = t.decode('latex+latin1')
-        except UnicodeEncodeError:  # pragma: no cover
+        except UnicodeEncodeError:
             result = string
         u_result = text_type(result)
         return u_result
@@ -263,7 +254,7 @@ class _Convertable(UnicodeMixin):
         if fmt == 'txt':
             if hasattr(self, 'text'):
                 return self.text()
-            raise NotImplementedError()  # pragma: no cover
+            raise NotImplementedError('no text method found!')
         if fmt == 'en':
             return convert(self.__unicode__(), 'bib', 'end')
         if fmt == 'ris':

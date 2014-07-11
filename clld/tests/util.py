@@ -24,7 +24,7 @@ from webob.request import environ_add_POST
 from zope.interface import Interface
 try:
     from selenium import webdriver
-    from selenium.webdriver.support.ui import Select
+    from selenium.webdriver.support.ui import Select  # pragma: no cover
 except ImportError:  # pragma: no cover
     webdriver = None
 

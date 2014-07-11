@@ -47,16 +47,6 @@ class Client(object):
         self.server = xmlrpc_client.Server(self.service_url)
         self.base_url = self.service_url.replace(XMLRPC_PATH, '')
 
-    def get_post(self, id):  # pragma: no cover
-        return self.server.metaWeblog.getPost(id, self.user, self.password)
-
-    def get_authors(self):  # pragma: no cover
-        return self.server.wp.getAuthors(0, self.user, self.password)
-
-    def get_recent_posts(self, number_of_posts):  # pragma: no cover
-        return self.server.metaWeblog.getRecentPosts(
-            0, self.user, self.password, number_of_posts)
-
     def create_post(self,
                     title,
                     content,

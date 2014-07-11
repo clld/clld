@@ -18,7 +18,7 @@
     <lexvo:iso639P3PCode rdf:datatype="${h.rdf.url_for_qname('xsd:string')}">${ctx.iso_code}</lexvo:iso639P3PCode>
     <owl:sameAs rdf:resource="http://dbpedia.org/resource/ISO_639:${ctx.iso_code}"/>
     % endif
-    % if ctx.glottocode:
+    % if request.dataset.id != 'glottolog' and ctx.glottocode:
     <owl:sameAs rdf:resource="http://glottolog.org/resource/languoid/id/${ctx.glottocode}"/>
     % endif
     % for vs in ctx.valuesets:

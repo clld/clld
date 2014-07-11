@@ -8,7 +8,8 @@ project to allow re-use when the whole ``csvkit`` package isn't
 required.
 
 The original implementations were largely copied from
-`examples in the csv module documentation <http://docs.python.org/library/csv.html#examples>`_.
+`examples in the csv module documentation <http://docs.python.org/library/csv.html\
+#examples>`_.
 
 .. seealso:: http://en.wikipedia.org/wiki/Delimiter-separated_values
 """
@@ -27,7 +28,7 @@ from path import path
 from clld.util import slug, to_binary, encoded
 
 
-class UTF8Recoder(object):  # pragma: no cover
+class UTF8Recoder(object):
     """
     Iterator that reads an encoded stream and reencodes the input to UTF-8.
     """
@@ -95,7 +96,8 @@ class UnicodeReader(Iterator):
     def __enter__(self):
         if isinstance(self.f, string_types) or isinstance(self.f, path):
             if PY3:  # pragma: no cover
-                self.f = open(self.f, 'rt', encoding=self.encoding, newline=self.newline or '')
+                self.f = open(
+                    self.f, 'rt', encoding=self.encoding, newline=self.newline or '')
             else:
                 self.f = open(self.f, 'rU')
             self._close = True
@@ -236,4 +238,3 @@ def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw)
     with _reader(lines_or_file, encoding=encoding, **kw) as r:
         for item in r:
             yield item
-

@@ -35,7 +35,7 @@ install_requires = [
     'pytz',
     'zope.sqlalchemy',
     'WebTest',
-    'six',
+    'six>=1.7.3',  # webassets needs add_metaclass!
     'alembic',
     'webassets',
     'yuicompressor',
@@ -80,7 +80,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.13',
+      version='0.13.1',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description='',

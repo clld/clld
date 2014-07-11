@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import product
 
-from six import text_type
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
 

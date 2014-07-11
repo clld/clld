@@ -8,16 +8,16 @@ from purl import URL
 # The following code implements functionality to retrieve an CLLD apps resource map.
 # It may be used by CrossGram at some point.
 #
-def url(app, path='/', **query):  # pragma: no cover
+def url(app, path='/', **query):
     u = URL(host=app, path=path, query=query)
     return str(u.query_params(query))
 
 
-def json(app, **kw):  # pragma: no cover
+def json(app, **kw):
     return requests.get(url(app, **kw)).json()
 
 
-def resourcemap(app, type_):  # pragma: no cover
+def resourcemap(app, type_):
     """
     :param app: the domain or host of a CLLD app.
     """

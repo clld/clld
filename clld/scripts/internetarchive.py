@@ -5,7 +5,7 @@ import transaction
 import requests
 from sqlalchemy.orm import joinedload
 from six.moves.urllib.parse import quote_plus
-from six import text_type, binary_type
+from six import text_type
 
 from clld.util import slug
 from clld.scripts.util import parsed_args, confirm

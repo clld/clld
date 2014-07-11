@@ -249,7 +249,10 @@ class ContextObject(list, UnicodeMixin):
             (to_binary('rfr_id'), to_binary('info:sid/') + _encoded(self.sid))]
         for pair in self:
             pairs.append((_encoded(pair[0]), _encoded(pair[1])))
-        return urlencode(pairs)
+        try:
+            return urlencode(pairs)
+        except UnicodeDecodeError:  # pragma: no cover
+            return to_binary('')
 
     def span_attrs(self):
         return {'class': 'Z3988', 'title': self.__unicode__()}
