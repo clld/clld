@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import json
 
 from sqlalchemy.orm.exc import NoResultFound
 from nose.tools import assert_almost_equal
@@ -31,12 +32,15 @@ class Tests(TestWithDb):
             break
 
     def test_CsvMixin(self):
-        l1 = Language(id='abc', name='Name', latitude=12.4)
+        l1 = Language(id='abc', name='Name', latitude=12.4, jsondata=dict(a=None))
         DBSession.add(l1)
         DBSession.flush()
         l1 = Language.csv_query(DBSession).first()
         cols = l1.csv_head()
         row = l1.to_csv()
+        for k, v in zip(cols, row):
+            if k == 'jsondata':
+                self.assertIn('a', json.loads(v))
         l2 = Language.from_csv(row)
         assert_almost_equal(l1.latitude, l2.latitude)
         row[cols.index('latitude')] = '3,5'
