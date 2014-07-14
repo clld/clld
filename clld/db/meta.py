@@ -8,7 +8,7 @@ try:
 except ImportError:
     import json
 
-from six import string_types, text_type
+from six import string_types, text_type, PY2
 from pytz import UTC
 import sqlalchemy
 from sqlalchemy.pool import Pool
@@ -149,6 +149,10 @@ class CsvMixin(object):
             rel = attr[-1]
             attr = '__'.join(attr[:-1])
         prop = getattr(self, attr, '')
+        if attr == 'jsondata':
+            prop = json.dumps(prop)
+            if PY2:
+                prop = prop.decode('utf8')
         if rel == 'id':
             return prop.id
         elif rel == 'ids':
@@ -205,7 +209,7 @@ class _Base(UnicodeMixin, CsvMixin):
     #: the kind of data stored in a table. 'Natural' candidates for primary keys
     #: should be marked with unique constraints instead. This adds flexibility
     #: when it comes to database changes.
-    pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, doc='primary key')
 
     #: To allow for timestamp-based versioning - as opposed or in addition to the version
     #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
