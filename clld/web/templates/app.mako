@@ -53,6 +53,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
+                    <%block name="brand"> </%block>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                         % for name, item in request.registry.getUtility(IMenuItems).items():
