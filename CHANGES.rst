@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.13.3
+~~~~~~
+
+New feature: new block in default app layout to allow for addition of brand links in navbar.
+
+
 0.13.2
 ~~~~~~
 
