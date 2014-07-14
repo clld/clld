@@ -1,5 +1,9 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
+from sqlalchemy import types
+from sqlalchemy.inspection import inspect
+from pyramid.renderers import render as pyramid_render
+
 from clld.web.adapters.base import Index
 from clld.lib.dsv import UnicodeWriter
 
@@ -9,6 +13,7 @@ class CsvAdapter(Index):
     """
     extension = 'csv'
     mimetype = 'text/csv'
+    content_type_params = dict(header='present')
 
     def render(self, ctx, req):
         with UnicodeWriter() as writer:
@@ -23,3 +28,70 @@ class CsvAdapter(Index):
         res = super(CsvAdapter, self).render_to_response(ctx, req)
         res.content_disposition = 'attachment; filename="%s.csv"' % repr(ctx)
         return res
+
+
+class JsonTableSchemaAdapter(Index):
+    """renders DataTables as
+    `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
+
+    .. seealso:: http://csvlint.io/about
+    """
+    extension = 'csv.csvm'
+    mimetype = 'application/csvm+json'
+    send_mimetype = 'application/json'
+    rel = 'describedby'
+
+    type_map = [
+        (types.Integer, 'http://www.w3.org/2001/XMLSchema#int'),
+        (types.Float, 'http://www.w3.org/2001/XMLSchema#float'),
+        (types.Boolean, 'http://www.w3.org/2001/XMLSchema#boolean'),
+        (types.DateTime, 'http://www.w3.org/2001/XMLSchema#dateTime'),
+        (types.Date, 'http://www.w3.org/2001/XMLSchema#date'),
+        (types.Unicode, 'http://www.w3.org/2001/XMLSchema#string'),
+        (types.String, 'http://www.w3.org/2001/XMLSchema#string'),
+    ]
+
+    def render(self, ctx, req):
+        fields = []
+        primary_key = None
+        foreign_keys = []
+        item = ctx.get_query(limit=1).first()
+        if item:
+            cls = inspect(item).class_
+
+            for field in item.csv_head():
+                spec = {
+                    'name': field,
+                    'constraints': {'type': 'http://www.w3.org/2001/XMLSchema#string'}}
+                col = getattr(cls, field, None)
+                if col:
+                    try:
+                        col = col.property.columns[0]
+                    except AttributeError:  # pragma: no cover
+                        col = None
+                if col is not None:
+                    if len(col.foreign_keys) == 1:
+                        fk = list(col.foreign_keys)[0]
+                        foreign_keys.append({
+                            'fields': field,
+                            'reference': {
+                                'datapackage': req.route_url(fk.column.table.name + 's'),
+                                'resource': fk.column.table.name,
+                                'fields': fk.column.name}
+                        })
+                    if col.primary_key:
+                        primary_key = field
+                    for t, s in self.type_map:
+                        if isinstance(col.type, t):
+                            spec['constraints']['type'] = s
+                            break
+                    spec['constraints']['unique'] = bool(col.primary_key or col.unique)
+                    if col.doc:
+                        spec['description'] = col.doc
+                fields.append(spec)
+        doc = {'fields': fields}
+        if primary_key:
+            doc['primaryKey'] = primary_key
+        if foreign_keys:
+            doc['foreignKeys'] = foreign_keys
+        return pyramid_render('json', doc, request=req)

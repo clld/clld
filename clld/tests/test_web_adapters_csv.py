@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+import json
 
 from clld.web import datatables
-from clld.db.models.common import Language
+from clld.db.models.common import Language, ValueSet
 from clld.tests.util import TestWithEnv
 
 
@@ -15,3 +16,17 @@ class Tests(TestWithEnv):
         self.assert_(res.splitlines())
         self.assert_(adapter.render_to_response(
             datatables.Languages(self.env['request'], Language), self.env['request']))
+
+    def test_JsonTableSchemaAdapter(self):
+        from clld.web.adapters.csv import JsonTableSchemaAdapter
+
+        adapter = JsonTableSchemaAdapter(None)
+        res = adapter.render(
+            datatables.Languages(self.env['request'], Language), self.env['request'])
+        self.assertIn('fields', json.loads(res))
+        res = adapter.render(
+            datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
+        self.assertIn('foreignKeys', json.loads(res))
+        res = adapter.render_to_response(
+            datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
+        #self.assertIn('header=present', str(res))

@@ -257,9 +257,9 @@ class Dataset(Base,
     """Each project (e.g. WALS, APiCS) is regarded as one dataset; thus, each app will
     have exactly one Dataset object.
     """
-    published = Column(Date, default=date.today)
-    publisher_name = Column(Unicode)
-    publisher_place = Column(Unicode)
+    published = Column(Date, default=date.today, doc='date of publication')
+    publisher_name = Column(Unicode, doc='publisher')
+    publisher_place = Column(Unicode, doc='place of publication')
     publisher_url = Column(String)
     license = Column(String, default="http://creativecommons.org/licenses/by/3.0/")
     domain = Column(String, nullable=False)
@@ -314,9 +314,13 @@ class Language(Base,
     to them to be able to put them on maps.
     """
     latitude = Column(
-        Float(), CheckConstraint('-90 <= latitude and latitude <= 90'))
+        Float(),
+        CheckConstraint('-90 <= latitude and latitude <= 90'),
+        doc='geographical latitude in WGS84')
     longitude = Column(
-        Float(), CheckConstraint('-180 <= longitude and longitude <= 180 '))
+        Float(),
+        CheckConstraint('-180 <= longitude and longitude <= 180 '),
+        doc='geographical longitude in WGS84')
     identifiers = association_proxy('languageidentifier', 'identifier')
 
     def get_identifier_objs(self, type_):
@@ -364,10 +368,10 @@ class DomainElement(Base,
 
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
 
-    number = Column(Integer)
+    number = Column(Integer, doc='numerical value of the domain element')
     """the number is used to sort domain elements within the domain of one parameter"""
 
-    abbr = Column(Unicode)
+    abbr = Column(Unicode, doc='abbreviated name')
     """abbreviated name, e.g. as label for map legends"""
 
 
@@ -638,7 +642,7 @@ class ValueSet(Base,
     language_pk = Column(Integer, ForeignKey('language.pk'))
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
-    source = Column(Unicode)
+    source = Column(Unicode, doc='textual description of the source for the valueset')
 
     parameter = relationship('Parameter', backref='valuesets')
 
@@ -680,10 +684,13 @@ class Value(Base,
     # Values may be taken from a domain.
     domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
 
-    frequency = Column(Float)
+    frequency = Column(
+        Float,
+        doc='frequency of the value relative to other values for the same language')
     """Languages may have multiple values for the same parameter. Their relative
     frequency can be stored here."""
-    confidence = Column(Unicode)
+    confidence = Column(
+        Unicode, doc='textual assessment of the reliability of the value assignment')
 
     domainelement = relationship('DomainElement', backref='values')
 
