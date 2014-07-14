@@ -2,6 +2,16 @@
 Changes
 -------
 
+0.13.2
+~~~~~~
+
+New feature: Support for JSON table schemas [1] for resource indexes.
+
+[1] http://dataprotocols.org/json-table-schema/
+
+Bugfix: Fixed #26 where JSON data column was not serialized correctly in csv export.
+
+
 0.13.1
 ~~~~~~
 
