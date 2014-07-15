@@ -63,10 +63,13 @@ def main(global_config, **settings):
 
 
 class TestWithDb(unittest.TestCase):
-    def setUp(self):
-        from clld.tests.fixtures import CustomLanguage
+    __with_custom_language__ = True
 
-        assert CustomLanguage
+    def setUp(self):
+        if self.__with_custom_language__:
+            from clld.tests.fixtures import CustomLanguage
+            assert CustomLanguage
+
         engine = create_engine('sqlite://')
         DBSession.configure(bind=engine)
         VersionedDBSession.configure(bind=engine)
