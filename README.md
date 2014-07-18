@@ -9,6 +9,13 @@ Documentation for the code base and its use is available at http://clld.readthed
 [![Coverage Status](https://img.shields.io/coveralls/clld/clld.svg)](https://coveralls.io/r/clld/clld?branch=master)
 
 
+Cite
+----
+
+Version 0.14: 
+[![DOI](https://zenodo.org/badge/5142/clld/clld.png)](http://dx.doi.org/10.5281/zenodo.10941)
+
+
 Contributing
 ------------
 
