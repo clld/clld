@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.14
+~~~~
+
+- upgraded leaflet, jquery, bootstrap and DataTables.
+- support reading dictionaries in standard format (SFM).
+
+
 0.13.3
 ~~~~~~
 
