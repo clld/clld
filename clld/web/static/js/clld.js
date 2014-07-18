@@ -187,7 +187,7 @@ CLLD.DataTable = (function(){
                 var i, ctrl;
                 for (i=0 ; i<oSettings.aoPreSearchCols.length ; i++) {
                     if(oSettings.aoPreSearchCols[i].sSearch.length > 0) {
-                        ctrl = $("tfoot .control")[i];
+                        ctrl = $("thead .control")[i];
                         ctrl = $(ctrl);
                         if (ctrl.length) {
                             ctrl.val(oSettings.aoPreSearchCols[i].sSearch);
@@ -294,8 +294,7 @@ CLLD.DataTable = (function(){
         if (toolbar) {
             $("."+eid+"-toolbar").html(toolbar);
         }
-        //$('#'+eid+' #searchCol').change(function(){CLLD.DataTables[eid].fnFilter($('#'+eid+' .dataTables_filter input').val())});
-        $('#'+eid+' tbody td button.details').live('click', function () {
+        $(document).on('click', '#'+eid+' tbody td button.details', function () {
             var nTr = $(this).parents('tr')[0];
             if (CLLD.DataTables[eid].fnIsOpen(nTr)) {
                 CLLD.DataTables[eid].fnClose(nTr);
@@ -306,14 +305,14 @@ CLLD.DataTable = (function(){
             }
         });
 
-        $("#"+eid+" tfoot input").keyup( function () {
+        $("#"+eid+" thead input").keyup( function () {
             /* Filter on the column (the index) of this element */
-            CLLD.DataTables[eid].fnFilter(this.value, $("#"+eid+" tfoot .control").index(this));
+            CLLD.DataTables[eid].fnFilter(this.value, $("#"+eid+" thead .control").index(this));
         });
 
-        $("#"+eid+" tfoot select").change( function () {
+        $("#"+eid+" thead select").change( function () {
             /* Filter on the column (the index) of this element */
-            CLLD.DataTables[eid].fnFilter($(this).val(), $("#"+eid+" tfoot .control").index(this));
+            CLLD.DataTables[eid].fnFilter($(this).val(), $("#"+eid+" thead .control").index(this));
         });
 
         var dl = '<p>You may use the download button <i class="icon-download-alt"> </i> to download the currently selected items in various formats.</p>';
