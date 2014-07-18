@@ -281,7 +281,12 @@ class Dataset(Base,
         return res
 
     def formatted_editors(self):
-        return ' & '.join(ed.contributor.last_first() for ed in self.editors)
+        _format = lambda eds: ' & '.join(ed.contributor.last_first() for ed in eds)
+        res = _format([e for e in self.editors if e.primary])
+        secondary = [e for e in self.editors if not e.primary]
+        if secondary:
+            res = ' with '.join([res, _format(secondary)])  # pragma: no cover
+        return res
 
     def formatted_name(self):
         return HTML.span(
@@ -1037,7 +1042,7 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
     def dataset(cls):
         return relationship(
             Dataset, backref=backref(
-                'editors', order_by=[cls.primary, cls.ord], lazy=False))
+                'editors', order_by=[desc(cls.primary), cls.ord], lazy=False))
 
 
 class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
