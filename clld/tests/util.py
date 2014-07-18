@@ -463,8 +463,8 @@ class DataTable(PageObject):  # pragma: no cover
         """Triggers a table sort by clicking on the th Element specified by label.
         """
         sort = None
-        for e in self.e.find_elements_by_xpath("//th[@role='columnheader']"):
-            if e.text.strip().startswith(label):
+        for e in self.e.find_elements_by_xpath("//th"):
+            if 'sorting' in e.get_attribute('class') and e.text.strip().startswith(label):
                 sort = e
         assert sort
         sort.click()

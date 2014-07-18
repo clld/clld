@@ -22,7 +22,7 @@ environment.append_path(
 bundles = {
     'js': [
         Bundle(
-            'js/jquery-1.8.2.js',
+            'js/jquery.js',
             'js/leaflet-src.js',
             filters=(skip,)),
         'js/bootstrap.min.js',
@@ -41,11 +41,14 @@ bundles = {
     ],
     'css': [
         Bundle(
+            'css/leaflet.css',
+            filters=(skip,)),
+        Bundle(
             'css/clld.css',
             'css/jqtree.css',
-            'css/leaflet.css',
             'css/leaflet.label.css',
             'css/hint.css',
+            'css/jquery.dataTables.css',
             filters='yui_css'),
         'css/bootstrap.min.css',
         'css/bootstrap-responsive.min.css',

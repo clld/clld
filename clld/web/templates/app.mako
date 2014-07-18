@@ -18,15 +18,15 @@
               href="${request.static_url(request.registry.settings['clld.favicon'], _query=dict(v=request.registry.settings['clld.favicon_hash']))}"
               type="image/x-icon" />
 
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-
         % for asset in assets['css'].urls():
         <link href="${request.static_url(asset[1:])}" rel="stylesheet">
         % endfor
 
         % if request.registry.settings.get('clld.environment') == 'production':
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        ##<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
         % endif
 
         % for asset in assets['js'].urls():
