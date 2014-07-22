@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 import unittest
 from json import loads
+from tempfile import mktemp
+import logging
+logging.disable(logging.WARN)
 
 from sqlalchemy.orm import joinedload
 from path import path
@@ -9,6 +12,7 @@ from mock import patch, Mock
 import clld
 from clld.lib.bibtex import Record
 from clld.tests.util import TestWithEnv
+from clld.db.models.common import Dataset
 
 
 class Tests(unittest.TestCase):
@@ -102,3 +106,19 @@ class Tests2(TestWithEnv):
             self.env['request'],
             Mock(update=Mock(return_value=Mock(status=200))),
             query_options=[joinedload(Language.languageidentifier)])
+
+    def test_freeze(self):
+        from clld.scripts.util import freeze_func
+
+        tmp = path(mktemp())
+        tmp.mkdir()
+        tmp.joinpath('data').mkdir()
+
+        class Args(object):
+            env = self.env
+
+            def data_file(self, *comps):
+                return tmp.joinpath('data', *comps)
+        freeze_func(Args(), dataset=Dataset.first(), test=True)
+        self.assert_(tmp.joinpath('data.zip').exists())
+        tmp.rmtree(ignore_errors=True)
