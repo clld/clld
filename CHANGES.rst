@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.15
+~~~~
+
+- support for full-database dumps to csv via dataset.freeze.
+
+
 0.14
 ~~~~
 
