@@ -1,11 +1,17 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 import time
 
+from sqlalchemy import Integer
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import cast
 import transaction
 
 from clld.db.meta import DBSession
 from clld.db.models import common
+
+
+def as_int(col):
+    return cast(col, Integer)
 
 
 def icontains(col, qs):

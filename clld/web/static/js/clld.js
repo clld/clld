@@ -382,6 +382,9 @@ CLLD.DataTable = (function(){
 
 CLLD.Maps = {};
 
+// Dictionary to register options for map layers (by name)
+CLLD.LayerOptions = {};
+
 CLLD.MapIcons = {
     base: function(feature, size, url) {
         return L.icon({
@@ -416,7 +419,7 @@ CLLD.Map = function(eid, layers, options) {
         }
     );
 
-    var i, hash, layer,
+    var i, hash, layer, opts,
         local_data = false,
         baseLayers = [
         "Thunderforest.Landscape",
@@ -434,17 +437,26 @@ CLLD.Map = function(eid, layers, options) {
         "Esri.WorldShadedRelief",
         "Esri.WorldPhysical"];
 
-    function _openPopup(layer, html) {
+    /**
+     * Open a leaflet popup.
+     *
+     * @param layer  leaflet layer object for which to display the popup.
+     * @param html   The content of the popup.
+     * @param latlng An optional (lat, lon) pair to anchor the popup.
+     * @private
+     */
+    function _openPopup(layer, html, latlng) {
         var map = CLLD.Maps[eid];
         if (!map.popup) {
             map.popup = L.popup();
         }
-        map.popup.setLatLng(layer.getLatLng());
+        latlng = latlng == undefined ? layer.getLatLng() : latlng
+        map.popup.setLatLng(latlng);
         map.popup.setContent(html);
         map.map.openPopup(map.popup);
     }
 
-    this.showInfoWindow = function(layer) {
+    this.showInfoWindow = function(layer, latlng) {
         var map = CLLD.Maps[eid];
 
         if (map.options.no_popup) {
@@ -460,8 +472,10 @@ CLLD.Map = function(eid, layers, options) {
             layer = map.marker_map[layer];
         }
         if (layer.feature.properties.popup) {
-            _openPopup(layer, layer.feature.properties.popup);
+            // popup content directly supplied by feature properties
+            _openPopup(layer, layer.feature.properties.popup, latlng);
         } else {
+            // popup content must be fetched via ajax
             $.get(
                 CLLD.route_url(
                     map.options.info_route,
@@ -473,7 +487,7 @@ CLLD.Map = function(eid, layers, options) {
                         layer.feature.properties.info_query == undefined ? {} : layer.feature.properties.info_query)),
                 map.options.info_query,
                 function(data, textStatus, jqXHR) {
-                    _openPopup(layer, data);
+                    _openPopup(layer, data, latlng);
                 },
                 'html'
             );
@@ -482,6 +496,14 @@ CLLD.Map = function(eid, layers, options) {
 
     this.icon = CLLD.MapIcons[this.options.icons == undefined ? 'base' : this.options.icons];
 
+    /**
+     * Default function to call upon instantiation of each feature in a GeoJSON layer.
+     * We assume that features are points with markers.
+     *
+     * @param feature
+     * @param layer
+     * @private
+     */
     var _onEachFeature = function(feature, layer) {
         var size = 30,
             map = CLLD.Maps[eid];
@@ -553,7 +575,11 @@ CLLD.Map = function(eid, layers, options) {
 
     for (name in layers) {
         if (layers.hasOwnProperty(name)) {
-            this.layer_map[name] = L.geoJson(undefined, {onEachFeature: _onEachFeature}).addTo(this.map);
+            opts = {onEachFeature: _onEachFeature};
+            if (CLLD.LayerOptions[name]) {
+                opts = $.extend(opts, CLLD.LayerOptions[name]);
+            }
+            this.layer_map[name] = L.geoJson(undefined, opts).addTo(this.map);
             this.layer_geojson[name] = layers[name];
 
             if ($.type(layers[name]) === 'string') {
@@ -617,9 +643,9 @@ CLLD.mapGetMap = function(eid) {
     return undefined;
 };
 
-CLLD.mapShowInfoWindow = function(eid, layer) {
+CLLD.mapShowInfoWindow = function(eid, layer, latlng) {
     var map = CLLD.mapGetMap(eid);
-    map.showInfoWindow(layer);
+    map.showInfoWindow(layer, latlng);
 };
 
 CLLD.mapResizeIcons = function(eid, size) {
