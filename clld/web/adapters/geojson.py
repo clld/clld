@@ -91,28 +91,28 @@ class GeoJson(Renderable):
     def get_coordinates(self, obj):
         return [obj.longitude, obj.latitude]
 
-    def render(self, ctx, req, dump=True):
+    def get_features(self, ctx, req):
         self.map_marker = req.registry.getUtility(interfaces.IMapMarker)
-        features = []
 
         for feature in self.feature_iterator(ctx, req):
             language = self.get_language(ctx, req, feature)
             if language.longitude is None or language.latitude is None:
                 continue  # pragma: no cover
 
-            features.append({
+            yield {
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
                     "coordinates": self.get_coordinates(language),
                 },
                 "properties": self._feature_properties(ctx, req, feature, language),
-            })
+            }
 
+    def render(self, ctx, req, dump=True):
         res = {
             'type': 'FeatureCollection',
             'properties': self._featurecollection_properties(ctx, req),
-            'features': features}
+            'features': list(self.get_features(ctx, req))}
         return pyramid_render('json', res, request=req) if dump else res
 
 
