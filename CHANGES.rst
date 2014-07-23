@@ -2,6 +2,16 @@
 Changes
 -------
 
+0.15.1
+~~~~~~
+
+Minor new features:
+
+- new db.util function as_int,
+- added hook to GeoJson adapter to allow features with non-Point geometries,
+- more flexible CLLD.Map API.
+
+
 0.15
 ~~~~
 
