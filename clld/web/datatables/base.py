@@ -7,11 +7,10 @@ import re
 
 from sqlalchemy import desc
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
-from sqlalchemy.sql.expression import cast
 from zope.interface import implementer
 
 from clld.db.meta import DBSession
-from clld.db.util import icontains
+from clld.db.util import icontains, as_int
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import link, button, icon, JS_CLLD, external_link
 from clld.web.util.component import Component
@@ -214,10 +213,10 @@ class IntegerIdCol(IdCol):
     __kw__ = {'input_size': 'mini', 'sClass': 'right', 'sTitle': 'No.'}
 
     def search(self, qs):
-        return filter_number(cast(self.model_col, Integer), qs, type_=int)
+        return filter_number(as_int(self.model_col), qs, type_=int)
 
     def order(self):
-        return cast(self.model_col, Integer)
+        return as_int(self.model_col)
 
 
 class LinkToMapCol(Col):
