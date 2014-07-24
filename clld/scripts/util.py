@@ -7,10 +7,7 @@ import argparse
 import json
 import logging
 from functools import partial
-from io import open as ioopen
-from zipfile import ZipFile, ZIP_DEFLATED
 
-from six import PY2
 from six.moves.urllib.parse import quote_plus
 from six.moves import input
 import transaction
@@ -19,15 +16,12 @@ from sqlalchemy.orm import joinedload
 from path import path
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
-import dataset as ds
 
 from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.util import slug
 from clld.interfaces import IDownload
 from clld.lib import bibtex
-from clld.web.adapters.md import TxtCitation
-from clld.web.adapters.csv import JsonTableSchemaAdapter
 
 
 def glottocodes_by_isocode(dburi, cols=['id']):
@@ -223,109 +217,6 @@ def create_downloads(**kw):  # pragma: no cover
     for name, download in args.env['registry'].getUtilitiesFor(IDownload):
         args.log.info('creating download %s' % name)
         download.create(args.env['request'])
-
-
-FREEZE_README = """
-{0} data dump
-{1}
-
-Data of {0} is published under the following license:
-{2}
-
-It should be cited as
-
-{3}
-
-This package contains files in csv format [1] with corresponding schema descriptions in
-JSON table schema [2] format, representing rows in database tables of the {0} web
-application [3,4].
-
-[1] http://csvlint.io/about
-[2] http://dataprotocols.org/json-table-schema/
-[3] http://{4}
-[4] https://github.com/clld/{5}
-"""
-
-
-def freeze_readme(dataset, req):
-    return FREEZE_README.format(
-        dataset.name,
-        '=' * (len(dataset.name.encode('utf8')) + len(' data dump')),
-        dataset.license,
-        TxtCitation(None).render(dataset, req).encode('utf8'),
-        dataset.domain,
-        dataset.id)
-
-
-def freeze_schema(table):
-    """renders DataTables as
-    `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
-
-    .. seealso:: http://csvlint.io/about
-    """
-    type_map = JsonTableSchemaAdapter.type_map
-    fields = []
-    primary_key = None
-    foreign_keys = []
-
-    for col in table.columns:
-        spec = {
-            'name': col.name,
-            'constraints': {'type': 'http://www.w3.org/2001/XMLSchema#string'}}
-        if len(col.foreign_keys) == 1:
-            fk = list(col.foreign_keys)[0]
-            foreign_keys.append({
-                'fields': col.name,
-                'reference': {
-                    'resource': fk.column.table.name + '.csv',
-                    'fields': fk.column.name}
-            })
-        if col.primary_key:
-            primary_key = col.name
-        for t, s in type_map:
-            if isinstance(col.type, t):
-                spec['constraints']['type'] = s
-                break
-        spec['constraints']['unique'] = bool(col.primary_key or col.unique)
-        if col.doc:
-            spec['description'] = col.doc
-        fields.append(spec)
-    doc = {'fields': fields}
-    if primary_key:
-        doc['primaryKey'] = primary_key
-    if foreign_keys:
-        doc['foreignKeys'] = foreign_keys
-    return doc
-
-
-def freeze(**kw):  # pragma: no cover
-    freeze_func(parsed_args(bootstrap=True))
-
-
-def freeze_func(args, dataset=None, test=False):
-    dataset = dataset or args.env['request'].dataset
-    dump_dir = args.data_file('dumps')
-
-    if not dump_dir.exists():
-        dump_dir.mkdir()
-
-    with ioopen(dump_dir.joinpath('README.txt'), 'w', encoding='utf8') as fp:
-        fp.write(freeze_readme(dataset, args.env['request']))
-
-    db = ds.connect(str(DBSession.get_bind().url))
-    for table in Base.metadata.sorted_tables:
-        csv = dump_dir.joinpath('%s.csv' % table.name)
-        ds.freeze(db[table.name].all(), format='csv', filename=csv)
-
-        if csv.exists() or test:
-            kw = {'mode': 'wb'} if PY2 else {'mode': 'w', 'encoding': 'utf8'}
-            with ioopen(csv + '.csvm', **kw) as fp:
-                json.dump(freeze_schema(table), fp)
-
-    with ZipFile(args.data_file('..', 'data.zip'), 'w', ZIP_DEFLATED) as zipfile:
-        for f in dump_dir.files():
-            with ioopen(f, 'rb') as fp:
-                zipfile.writestr(f.basename(), fp.read())
 
 
 def gbs(**kw):  # pragma: no cover
