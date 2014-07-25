@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.15.2
+~~~~~~
+
+Minor new feature:
+
+- support unfreeze, i.e. database initialization from csv dump.
+
+
 0.15.1
 ~~~~~~
 

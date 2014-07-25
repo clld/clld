@@ -192,6 +192,9 @@ class TestWithDbAndData(TestWithDb):
         common.Config.add_replacement('gone', None, model=common.Language)
         DBSession.flush()
 
+        for l in DBSession.query(common.Language):
+            assert l.pk
+
 
 class TestWithEnv(TestWithDbAndData):
     __cfg__ = TESTS_DIR.joinpath('test.ini').abspath()

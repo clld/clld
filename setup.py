@@ -49,7 +49,6 @@ install_requires = [
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
-    'dataset',
 ]
 
 if not PY3:
@@ -81,7 +80,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.15.1',
+      version='0.15.2',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description='',
