@@ -4,25 +4,18 @@ import logging
 logging.disable(logging.WARN)
 from tempfile import mkdtemp
 
-from six import PY3
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, null
+from sqlalchemy.orm import sessionmaker
 from path import path
-import dataset as ds
 
 from clld.tests.util import TestWithEnv
-from clld.db.meta import Base
-from clld.db.models.common import Dataset, Source, Parameter, DomainElement
-from clld.db.migration import Connection
-from clld.lib.bibtex import EntryType
+from clld.db.meta import Base, DBSession
+from clld.db.models.common import Dataset, Language
 
 
 class Tests(TestWithEnv):
     def test_freeze(self):
         from clld.scripts.freeze import freeze_func, unfreeze_func
-
-        if PY3:
-            # pending: https://github.com/pudo/dataset/issues/100
-            return  # pragma: no cover
 
         tmp = path(mkdtemp())
         tmp.joinpath('data').mkdir()
@@ -33,23 +26,25 @@ class Tests(TestWithEnv):
             def data_file(self, *comps):
                 return tmp.joinpath('data', *comps)
 
-        db = ds.connect('sqlite://', reflectMetadata=False)
-        Base.metadata.create_all(db.engine)
-        conn = Connection(db.engine)
-        conn.insert(Dataset, id='test', domain='test', name='äöüß')
-        conn.insert(Dataset, id='test2', domain='test', name='test', jsondata=dict(a=1.1))
-        conn.insert(Source, id='test', name='test', bibtex_type=EntryType.book)
-        pk = conn.insert(Parameter, id='p', name='p')
-        conn.insert(DomainElement, id='de', name='de', parameter_pk=pk)
-
+        DBSession.flush()
         args = Args()
-        freeze_func(args, dataset=Dataset.first(), datafreeze_db=db)
+        freeze_func(args, dataset=Dataset.first(), with_history=False)
         self.assert_(tmp.joinpath('data.zip').exists())
 
         engine = create_engine('sqlite://')
         Base.metadata.create_all(engine)
+        self.assertEqual(
+            engine.execute('select count(*) from language').fetchone()[0], 0)
         unfreeze_func(args, engine=engine)
-        count = engine.execute('select count(*) from dataset').fetchone()[0]
-        self.assertEqual(count, 2)
+
+        s1 = DBSession
+        s2 = sessionmaker(bind=engine)()
+        self.assertEqual(s1.query(Language).count(), s2.query(Language).count())
+
+        l1 = s1.query(Language).filter(Language.latitude != null()).first()
+        l2 = s2.query(Language).filter(Language.pk == l1.pk).first()
+        self.assertEqual(l1.created, l2.created)
+        self.assertEqual(l1.latitude, l2.latitude)
+        self.assertEqual(l1.description, l2.description)
 
         tmp.rmtree(ignore_errors=True)

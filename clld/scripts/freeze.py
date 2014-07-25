@@ -3,18 +3,19 @@ from io import open as ioopen
 from zipfile import ZipFile, ZIP_DEFLATED
 import json
 from tempfile import mkdtemp
+from datetime import datetime, date
 
 from six import PY2
-import dataset as ds
 from dateutil.parser import parse
 from path import path
+from sqlalchemy.sql import select
 
 from clld.web.adapters.md import TxtCitation
 from clld.web.adapters.csv import JsonTableSchemaAdapter
 from clld.scripts.util import parsed_args
 from clld.db.meta import Base, DBSession, JSONEncodedDict
-from clld.lib.dsv import reader
-from clld.util import DeclEnumType, to_binary
+from clld.lib.dsv import reader, UnicodeWriter
+from clld.util import DeclEnumType
 
 
 FREEZE_README = """
@@ -90,11 +91,35 @@ def freeze_schema(table):
     return doc
 
 
+def _freeze(table, fpath):
+    def conv(v, col):
+        if v is None:
+            return ''
+        if isinstance(col.type, DeclEnumType):  # pragma: no cover
+            return v.value
+        if isinstance(col.type, JSONEncodedDict):
+            return json.dumps(v)
+        if isinstance(v, (datetime, date)):
+            return v.isoformat()
+        return v
+
+    keys = [col.name for col in table.columns]
+    cols = {col.name: col for col in table.columns}
+    rows = [keys]
+
+    for row in DBSession.execute(select([table])):
+        rows.append([conv(row[key], cols[key]) for key in keys])
+
+    if len(rows) > 1:
+        with UnicodeWriter(fpath) as writer:
+            writer.writerows(rows)
+
+
 def freeze(**kw):  # pragma: no cover
     freeze_func(parsed_args(bootstrap=True))
 
 
-def freeze_func(args, dataset=None, datafreeze_db=None):
+def freeze_func(args, dataset=None, with_history=True):
     dataset = dataset or args.env['request'].dataset
     dump_dir = args.data_file('dumps')
 
@@ -104,14 +129,10 @@ def freeze_func(args, dataset=None, datafreeze_db=None):
     with ioopen(dump_dir.joinpath('README.txt'), 'w', encoding='utf8') as fp:
         fp.write(freeze_readme(dataset, args.env['request']))
 
-    db = datafreeze_db or ds.connect(str(DBSession.get_bind().url), reflectMetadata=False)
     for table in Base.metadata.sorted_tables:
         csv = dump_dir.joinpath('%s.csv' % table.name).abspath()
-        ds.freeze(
-            db[table.name].all(),
-            format='csv',
-            filename=csv.basename(),
-            prefix=csv.dirname())
+        if with_history or not table.name.endswith('_history'):
+            _freeze(table, csv)
 
         if csv.exists():
             kw = {'mode': 'wb'} if PY2 else {'mode': 'w', 'encoding': 'utf8'}
