@@ -75,7 +75,6 @@ class JsonTableSchemaAdapter(Index):
                         foreign_keys.append({
                             'fields': field,
                             'reference': {
-                                'datapackage': req.route_url(fk.column.table.name + 's'),
                                 'resource': fk.column.table.name,
                                 'fields': fk.column.name}
                         })
