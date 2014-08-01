@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.15.5
+~~~~~~
+
+- better support in DataTable for resources which are not db models.
+
+
 0.15.4
 ~~~~~~
 
