@@ -24,9 +24,9 @@
 
         % if request.registry.settings.get('clld.environment') == 'production':
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        ##<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        ## http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js
         % endif
 
         % for asset in assets['js'].urls():
