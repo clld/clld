@@ -21,7 +21,7 @@
         </li>
         % endif
     </ul>
-    <div id="${obj.eid}" style="width: 100%; height: 500px;"> </div>
+    <div id="${obj.eid}" style="width: 100%; height: ${obj.options.get('height', 500)}px;"> </div>
     <script>
     $(window).load(function() {
         ${h.JS_CLLD.map(obj.eid, dict((l.id, l.data) for l in obj.layers), obj.options)|n};
