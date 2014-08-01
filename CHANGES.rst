@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.15.4
+~~~~~~
+
+- upgraded to DataTables 1.10.2.
+- added map option to control height of map element.
+- removed deployment-specific requirements from app scaffold.
+
+
 0.15.3
 ~~~~~~
 
