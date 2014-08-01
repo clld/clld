@@ -353,6 +353,9 @@ class DataTable(Component):
                 '%ss' % self.model.mapper_name().lower(), _query=query_params),
         }
 
+    def db_model(self):
+        return self.model
+
     def base_query(self, query):
         """Custom DataTables can overwrite this method to add joins, or apply filters.
 
@@ -361,11 +364,11 @@ class DataTable(Component):
         return query
 
     def default_order(self):
-        return self.model.pk
+        return self.db_model().pk
 
     def get_query(self, limit=1000, offset=0):
         query = self.base_query(
-            DBSession.query(self.model).filter(self.model.active == True))
+            DBSession.query(self.db_model()).filter(self.db_model().active == True))
         self.count_all = query.count()
 
         _filters = []
