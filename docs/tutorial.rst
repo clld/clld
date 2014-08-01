@@ -16,7 +16,11 @@ To retrieve the ``clld`` software from GitHub, git must be installed on the syst
 Installation
 ~~~~~~~~~~~~
 
-For the time being, the ``clld`` package can only be installed from source. To do so,
+To install the python package from pypi run
+
+    pip install clld
+
+To install from a git repository,
 you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_::
 
     git clone git@github.com:clld/clld.git

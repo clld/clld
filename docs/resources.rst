@@ -4,11 +4,11 @@
 Resources
 =========
 
-Resources are a central concept in CLLD. While we may use the term resource
+Resources are a central concept in ``clld``. While we may use the term resource
 also for single instances, more generally a resource is a type of data implementing
 an interface to which behaviour can be attached.
 
-The default resources known in a CLLD app are listed in ``clld.RESOURCES``, but it is
+The default resources known in a ``clld`` app are listed in ``clld.RESOURCES``, but it is
 possible to extend this list when configuring a custom app (see :ref:`sec-extending-resource`).
 
 Resources have the following attributes:
@@ -43,12 +43,14 @@ Adapters
 Adapters are basically used to provide representations of a resource. Thus, if we want to
 provide the classification tree of a Glottolog languoid in newick format, we have to write
 and register an adapter. This kind of adapter is generally implemented as subclass of
-:py:class:`clld.web.adapters.base.Representation`.
+:py:class:`clld.web.adapters.base.Representation` or :py:class:`clld.web.adapters.base.Index`.
 
 For the builtin resources a couple of adapters are registered by default:
 
 - a template-based adapter to render the details page,
 - a JSON representation of the resource (based on :py:class:`clld.web.adapters.base.JSON`).
+- a CSV representation of a resource index (:py:class:`clld.web.adapters.csv.CsvAdapter`).
+
 
 .. _sec-resource-routes:
 
@@ -103,7 +105,7 @@ event subscriber.
 Requesting a resource
 ---------------------
 
-The flow of events when a resource is requested from a CLLD app is as follows
+The flow of events when a resource is requested from a ``clld`` app is as follows
 (we don't give a complete rundown but only highlight the deviations from the general
 `pyramid request processing <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/router.html>`_ flow):
 

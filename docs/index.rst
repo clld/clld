@@ -20,7 +20,8 @@ The ``clld`` framework
 ----------------------
 
 Underlying all applications built within the project to publish datasets is the ``clld``
-framework - a python package providing functionality to build and maintain CLLD apps.
+framework - a `python package <https://pypi.python.org/pypi/clld/>`_ providing functionality
+to build and maintain CLLD apps.
 
 Design
 ~~~~~~
@@ -38,8 +39,9 @@ The following goals directed the design:
 
 These constraints led to the following design decisions:
 
-- Target Ubuntu 12.04 with postgresql 9.1 and python 2.7 (but keep an eye on python 3.x compatibility) as
-  primary deployment platform.
+- We target Ubuntu 12.04 with postgresql 9.1 and python 2.7 as primary deployment platform.
+  As of version 0.13 ``clld`` does also work with python 3.4, the version of python3 that is
+  comes packaged in Ubuntu 14.04.
 - Use `sqlalchemy <http://sqlalchemy.org>`_ and it's implementation of
   `joined table inheritance <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#joined-table-inheritance>`_
   to provide a core database model that can easily be extended.
