@@ -20,7 +20,7 @@ if [ $# -eq 1 ]
   then
     pip freeze > requirements.txt
 fi
-python ewave/scripts/unfreeze.py sqlite.ini
+python $1/scripts/unfreeze.py sqlite.ini
 pip install nose
 pip install nosexcover
 pip install mock
