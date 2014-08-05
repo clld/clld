@@ -103,7 +103,7 @@ class ClldRequest(Request):
         dt = self.registry.getUtility(interfaces.IDataTable, name)
         return dt(self, model, **kw)
 
-    def get_map(self, name=None):
+    def get_map(self, name=None, **kw):
         """
         :param name: Name under which the map was registered.
         :return:
@@ -114,7 +114,7 @@ class ClldRequest(Request):
         if name:
             map_ = self.registry.queryUtility(interfaces.IMap, name=name)
             if map_:
-                return map_(self.context, self)
+                return map_(self.context, self, **kw)
 
     def _route(self, obj, rsc, **kw):
         """Determines the name of the canonical route for a resource instance. The

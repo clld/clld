@@ -681,7 +681,7 @@ CLLD.mapToggleLanguages = function(eid){
         var checkbox = $('#marker-toggle-'+marker.feature.properties.language.id);
         return checkbox.length && checkbox.prop('checked');
     })
-}
+};
 
 CLLD.mapToggleLayer = function(eid, layer, ctrl) {
     var map = CLLD.Maps[eid];
@@ -702,6 +702,29 @@ CLLD.mapShowGeojson = function(eid, layer) {
         CLLD.Modal.show(data.properties.name, null, '<pre>' + JSON.stringify(data, null, 2) + '</pre>');
     }
     return false;
+};
+
+CLLD.mapLegendFilter = function(eid, colname, ctrlname, value_getter, dtname) {
+    var i, any,
+        ctrl = $('#dt-filter-' + colname),
+        checkboxes = {};
+    dtname = dtname === undefined ? 'Values' : dtname;
+    $('input.' + ctrlname).each(function(i) {checkboxes[$(this).attr('value')] = $(this).prop('checked')});
+    any = checkboxes['--any--'];
+
+    CLLD.mapFilterMarkers(eid, function(marker){
+        return any || checkboxes[value_getter(marker.feature.properties)];
+    });
+
+    for (i in checkboxes) {
+        if (checkboxes.hasOwnProperty(i) && checkboxes[i]) {
+            if (i == '--any--') {
+                i = '';
+            }
+            ctrl.val(i);
+            CLLD.DataTables[dtname].fnFilter(i, $("thead .control").index(ctrl));
+        }
+    }
 };
 
 /*

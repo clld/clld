@@ -9,8 +9,8 @@
 <p>${ctx.description}</p>
 % endif
 
-% if request.map:
-${request.map.render()}
+% if map_ or request.map:
+${(map_ or request.map).render()}
 % endif
 
 ${request.get_datatable('values', h.models.Value, parameter=ctx).render()}

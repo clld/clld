@@ -62,3 +62,25 @@ class Tests(TestWithEnv):
         ctx.multiple = [common.Language.first()]
         dt = CombinationMap(ctx, self.env['request'])
         dt.render()
+
+    def test_FilterLegend(self):
+        from clld.web.maps import FilterLegend, Map
+        from clld.web.datatables import Languages
+
+        class FLanguages(Languages):
+            def col_defs(self):
+                cols = Languages.col_defs(self)
+                cols[1].choices = ['name']
+                return cols
+
+        class FMap(Map):
+            def get_legends(self):
+                yield FilterLegend(
+                    self, 
+                    '', 
+                    col='name', 
+                    dt=FLanguages(self.req, common.Language))
+
+        map_ = FMap(common.Language.first(), self.env['request'])
+        map_.render()
+
