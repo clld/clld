@@ -120,6 +120,7 @@ Test.prototype.test_MapWithLocalData = function() {
     CLLD.mapToggleLabels('map', '#unchecked');
     CLLD.mapResizeIcons('map', 15);
     CLLD.mapToggleLayer('map', 'l1', '#cb');
+    CLLD.mapLegendFilter('map', 'name', 'jsname', function(p){return 'a'}, 'dt');
 };
 
 Test.prototype.test_process_gbs_info = function() {

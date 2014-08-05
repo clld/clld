@@ -319,7 +319,7 @@ $(document).ready(function() {
 ##
 ##
 ##
-<%def name="values_and_sentences(parameter=None)">
+<%def name="values_and_sentences(parameter=None, values_dt=None)">
     <div id="list-container">
     <% parameter = parameter or ctx %>
     <div class="tabbable">
@@ -329,7 +329,7 @@ $(document).ready(function() {
 	</ul>
 	<div class="tab-content" style="overflow: visible;">
 	    <div id="tab1" class="tab-pane active">
-		${request.get_datatable('values', h.models.Value, parameter=parameter).render()}
+		${(values_dt or request.get_datatable('values', h.models.Value, parameter=parameter)).render()}
 	    </div>
 	    <div id="tab2" class="tab-pane">
 		${request.get_datatable('sentences', h.models.Sentence, parameter=parameter).render()}

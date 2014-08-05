@@ -88,6 +88,54 @@ class Legend(object):
         )
 
 
+class FilterLegend(Legend):
+    """
+    Legend rendering radio controls to filter languages on a map in synch with a column
+    of an associated DataTable.
+    """
+    def __init__(self, map_, value_getter, col=None, dt=None, **kw):
+        """
+        @param value_getter: Name of a javascript object which will be called with the \
+        properties associated with a map marker to determine its filter value.
+        """
+        kw.setdefault('stay_open', True)
+        if col and dt:
+            col = {c.name: c for c in dt.cols}.get(col)
+        if col:
+            kw.setdefault('label', col.js_args.get('sTitle'))
+        Legend.__init__(self, map_, col.name if col else 'nocol', [], **kw)
+        self.jsname = 'fl-' + self.name
+        items = [self.li(col, '--any--', value_getter, checked=True)]
+        for item in getattr(col, 'choices', []):
+            items.append(self.li(col, item, value_getter))
+        self.items = items
+
+    def li_label(self, item):
+        return item[1] if isinstance(item, (tuple, list)) else item
+
+    def li(self, col, item, value_getter, checked=False):
+        input_attrs = dict(
+            type='radio',
+            class_='stay-open %s inline' % self.jsname,
+            name=self.jsname,
+            value=item[0] if isinstance(item, (tuple, list)) else item,
+            onclick=helpers.JS("CLLD.mapLegendFilter")(
+                self.map.eid,
+                self.name,
+                self.jsname,
+                helpers.JS(value_getter),
+                col.dt.eid if col else None))
+        if checked:
+            input_attrs['checked'] = 'checked'
+        return HTML.label(
+            HTML.input(**input_attrs),
+            ' ',
+            self.li_label(item),
+            class_="stay-open",
+            style="margin-left:5px; margin-right:5px;",
+        )
+
+
 class Map(Component):
     """Map objects bridge the technology divide between server side python code and
     client side leaflet maps.
