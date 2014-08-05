@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.16
+~~~~
+
+- added support for filter legends which synch map and datatable.
+
+
 0.15.5
 ~~~~~~
 
