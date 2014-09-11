@@ -184,7 +184,7 @@ class CsvMixin(object):
         obj = cls()
         cols = cols or obj.csv_head()
         for i, k in enumerate(cols):
-            if not (k.endswith('__id') or k.endswith('__ids')):
+            if not (k.endswith('__id') or k.endswith('__ids')) and hasattr(obj, k):
                 setattr(obj, k, cls.value_from_csv(k, row[i]) or None)
         return obj
 

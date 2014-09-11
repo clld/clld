@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+import os
 from io import open as ioopen
 from zipfile import ZipFile, ZIP_DEFLATED
 import json
@@ -9,6 +10,7 @@ from six import PY2
 from dateutil.parser import parse
 from path import path
 from sqlalchemy.sql import select
+import requests
 
 from clld.web.adapters.md import TxtCitation
 from clld.web.adapters.csv import JsonTableSchemaAdapter
@@ -16,6 +18,86 @@ from clld.scripts.util import parsed_args
 from clld.db.meta import Base, DBSession, JSONEncodedDict
 from clld.lib.dsv import reader, UnicodeWriter
 from clld.util import DeclEnumType
+
+
+def update_zenodo_metadata(**kw):  # pragma: no cover
+    update_zenodo_metadata_func(parsed_args((('doi',), {}), bootstrap=True))
+
+
+def update_zenodo_metadata_func(args, doi=None, dataset=None):  # pragma: no cover
+    from pprint import pprint
+    dataset = dataset or args.env['request'].dataset
+    doi = doi or args.doi
+    token = os.environ.get('ZENODO_ACCESS_TOKEN')
+    if not token:
+        return
+
+    def api(path='', method='GET', **kw):
+        verb = method.upper()
+        method = getattr(requests, method.lower())
+        res = method(
+            "https://zenodo.org/api/deposit/depositions%s?access_token=%s" % (
+                path, token),
+            **kw)
+        print(verb, '/api/deposit/depositions' + path, res.status_code)
+        return res
+
+    zid = None
+    md = {}
+    for deposition in api().json():
+        if deposition['doi'] == doi:
+            zid = deposition['id']
+            md = deposition['metadata']
+            break
+
+    if not zid:
+        return
+
+    if 'clld' not in [c['identifier'] for c in md['communities']]:
+        md['communities'].append({
+            "identifier": "clld",
+            "provisional": True,
+            "title": "Cross-Linguistic Linked Data"})
+
+    md['creators'] = []
+    for editor in dataset.editors:
+        md['creators'].append(dict(
+            name=editor.contributor.name,
+            affiliation=editor.contributor.description or ''))
+
+    md['imprint_place'] = dataset.publisher_place or ''
+    md['imprint_publisher'] = dataset.publisher_name or ''
+    md["keywords"].append("linguistics")
+    md["keywords"] = list(set(md['keywords']))
+    if 'creativecommons.org' in dataset.license and '/by/' in dataset.license:
+        md["license"] = "cc-by"
+    md["notes"] = "This deposit contains both, the data of %s as well as the software "\
+    "serving http://%s" % (dataset.name, dataset.domain)
+    md["publication_date"] = dataset.published.isoformat()
+    url = 'http://' + dataset.domain
+    for ri in md["related_identifiers"]:
+        if ri['identifier'] == url:
+            break
+    else:
+        md["related_identifiers"].append(dict(
+            identifier=url, relation='isSupplementTo', scheme='url'))
+    md["upload_type"] = "dataset"
+
+    res = api('/%s/actions/edit' % zid, method='post')
+    #if res.status_code == 400:
+    #    api('/%s/actions/discard' % zid, method='post')
+    #    res = api('/%s/actions/edit' % zid, method='post')
+    assert res.status_code == 201
+
+    headers = {"Content-Type": "application/json"}
+    res = api(
+        '/%s' % zid, method='put', data=json.dumps(dict(metadata=md)), headers=headers)
+    pprint(res.json())
+    if res.status_code == 200:
+        res = api('/%s/actions/publish' % zid, method='post')
+        assert res.status_code == 202
+    else:
+        api('/%s/actions/discard' % zid, method='post')
 
 
 FREEZE_README = """
@@ -40,7 +122,7 @@ application [3,4].
 """
 
 
-def freeze_readme(dataset, req):
+def freeze_readme(dataset, req):  # pragma: no cover
     return FREEZE_README.format(
         dataset.name,
         '=' * (len(dataset.name.encode('utf8')) + len(' data dump')),
@@ -50,7 +132,7 @@ def freeze_readme(dataset, req):
         dataset.id)
 
 
-def freeze_schema(table):
+def freeze_schema(table):  # pragma: no cover
     """renders DataTables as
     `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
 
@@ -91,7 +173,7 @@ def freeze_schema(table):
     return doc
 
 
-def _freeze(table, fpath):
+def _freeze(table, fpath):  # pragma: no cover
     def conv(v, col):
         if v is None:
             return ''
