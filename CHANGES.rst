@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.17
+~~~~
+
+- enhanced support for zenodo and datahub.io integration
+
+
 0.16
 ~~~~
 

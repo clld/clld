@@ -111,9 +111,11 @@ def properties_as_xml_snippet(subject, props):
 def convert(string, from_, to_):
     if from_ == to_:
         return encoded(string)
-    assert from_ in FORMATS and to_ in FORMATS
+    assert from_ in FORMATS and (to_ is None or to_ in FORMATS)
     g = Graph()
     g.parse(BytesIO(encoded(string)), format=from_)
+    if to_ is None:
+        return g
     out = BytesIO()
     g.serialize(out, format=to_)
     out.seek(0)

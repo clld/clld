@@ -18,5 +18,5 @@ class Tests(unittest.TestCase):
 
         g = ClldGraph()
         for from_ in FORMATS:
-            for to_ in FORMATS:
+            for to_ in list(FORMATS.keys()) + [None]:
                 convert(g.serialize(format=from_), from_, to_)

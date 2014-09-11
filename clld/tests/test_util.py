@@ -1,8 +1,11 @@
+# coding: utf8
 from __future__ import unicode_literals
 from datetime import date
 import random
+from tempfile import mktemp
 
 from six import binary_type
+from path import path
 
 
 def test_parse_json_with_datetime():
@@ -15,6 +18,17 @@ def test_nfilter():
     from clld.util import nfilter
 
     assert nfilter(range(5)) == list(range(1, 5))
+
+
+def test_json():
+    from clld.util import jsondump, jsonload
+
+    d = {'a': 234, 'ä': 'öäüß'}
+    p = path(mktemp())
+    jsondump(d, p)
+    for k, v in jsonload(p).items():
+        assert d[k] == v
+    p.remove()
 
 
 def test_encoded():

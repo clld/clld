@@ -3,6 +3,7 @@ import re
 import unicodedata
 import string
 from datetime import date, datetime
+import json
 
 from six import PY3, string_types, text_type, add_metaclass, binary_type
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
@@ -31,6 +32,22 @@ def format_json(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat()
     return value
+
+
+def jsondump(obj, path):
+    kw = dict(mode='w')
+    if PY3:  # pragma: no cover
+        kw['encoding'] = 'utf8'
+    with open(path, **kw) as fp:
+        return json.dump(obj, fp)
+
+
+def jsonload(path):
+    kw = {}
+    if PY3:  # pragma: no cover
+        kw['encoding'] = 'utf8'
+    with open(path, **kw) as fp:
+        return json.load(fp)
 
 
 def nfilter(seq):
