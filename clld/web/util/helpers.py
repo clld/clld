@@ -430,7 +430,8 @@ def contactmail(req, ctx=None, title='contact maintainer'):
             'contactmail_{0}.mako'.format(name), {'req': req, 'ctx': ctx}, request=req)\
             .strip()\
             .encode('utf8')
-    href = 'mailto:{0}?{1}'.format(req.dataset.contact, urlencode(params))
+	query = urlencode(params).replace('+', '%20')
+    href = 'mailto:{0}?{1}'.format(req.dataset.contact, query)
     return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 
