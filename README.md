@@ -12,8 +12,8 @@ Documentation for the code base and its use is available at http://clld.readthed
 Cite
 ----
 
-Version 0.14: 
-[![DOI](https://zenodo.org/badge/5142/clld/clld.png)](http://dx.doi.org/10.5281/zenodo.10941)
+Version 0.17: 
+[![DOI](https://zenodo.org/badge/5142/clld/clld.png)](http://dx.doi.org/10.5281/zenodo.11854)
 
 
 Contributing
