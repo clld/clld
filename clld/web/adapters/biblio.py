@@ -1,11 +1,13 @@
-"""Adapters to render bibtex
-"""
+"""Adapters to render bibliographic information in various formats."""
 from clld.web.adapters.base import Representation
 from clld.lib.bibtex import IDatabase, IRecord, Database
 from clld.interfaces import IRepresentation, IIndex, ISource, IDataTable
 
 
 class _Format(Representation):
+
+    """Virtual base class."""
+
     def filename(self, ctx, req):
         return '%s-refs.%s' % (req.dataset.id, self.extension)
 
@@ -23,21 +25,45 @@ class _Format(Representation):
 
 
 class Bibtex(_Format):
+
+    """BibTeX.
+
+    .. seealso:: http://en.wikipedia.org/wiki/BibTeX
+    """
+
     extension = 'bib'
     mimetype = 'text/x-bibtex'
 
 
 class Endnote(_Format):
+
+    """Endnote.
+
+    .. seealso:: http://en.wikipedia.org/wiki/EndNote
+    """
+
     extension = 'en'
     mimetype = "application/x-endnote-refer"
 
 
 class ReferenceManager(_Format):
+
+    """ReferenceManager.
+
+    .. seealso:: http://en.wikipedia.org/wiki/RIS_%28file_format%29
+    """
+
     extension = 'ris'
     mimetype = "application/x-research-info-systems"
 
 
 class Mods(_Format):
+
+    """Metadata Object Description Schema.
+
+    .. seealso:: http://www.loc.gov/standards/mods/
+    """
+
     extension = 'mods'
     mimetype = 'application/mods+xml'
 

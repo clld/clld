@@ -6,8 +6,7 @@ import clld
 
 
 def skip(_in, out, **kw):
-    """filter to skip content of assets which are fetched from CDN in production.
-    """
+    """filter to skip content of assets which are fetched from CDN in production."""
     out.write('')  # pragma: no cover
 
 environment = Environment(

@@ -1,3 +1,4 @@
+"""Functionality to access the API of clld apps."""
 from __future__ import unicode_literals
 
 import requests
@@ -18,7 +19,8 @@ def json(app, **kw):
 
 
 def resourcemap(app, type_):
-    """
+    """Retrieve the resource map oa an app.
+
     :param app: the domain or host of a CLLD app.
     """
     return json(app, path='/resourcemap.json', rsc=type_)

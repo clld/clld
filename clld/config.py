@@ -6,7 +6,7 @@ from six.moves.configparser import ConfigParser
 
 
 def get_config(p):
-    """Reads a config file.
+    """Read a config file.
 
     :return: dict of ('section.option', value) pairs.
     """

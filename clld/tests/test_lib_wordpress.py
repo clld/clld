@@ -7,6 +7,11 @@ class Tests(unittest.TestCase):
     def _requests(self, c, status=200):
         return Mock(get=lambda *a, **kw: Mock(text=c, status_code=status))
 
+    def test_sluggify(self):
+        from clld.lib.wordpress import sluggify
+
+        assert sluggify('a  and B') == 'a-and-b'
+
     def test_Client(self):
         from clld.lib.wordpress import Client
 

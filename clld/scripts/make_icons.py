@@ -1,6 +1,4 @@
-"""
-script to create the default set of map marker icons distributed with clld.
-"""
+"""script to create the default set of map marker icons distributed with clld."""
 import sys
 
 try:
@@ -36,7 +34,8 @@ shapes = {
 
 
 def pyxColor(string):
-    """
+    """Return a pyxColor instance.
+
     :param string: RGB color name like 'ffffff'
     :return: pyx color.
 

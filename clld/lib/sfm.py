@@ -1,9 +1,6 @@
-"""
-Parsing SIL Standard Format (SFM) files
-"""
+"""Parsing SIL Standard Format (SFM) files."""
 from __future__ import unicode_literals, print_function, absolute_import, division
 import re
-from collections import OrderedDict
 import mimetypes
 from collections import defaultdict
 from io import open
@@ -16,8 +13,7 @@ MARKER_PATTERN = re.compile('\\\\(?P<marker>[a-z_]+)(\s+|$)')
 
 
 def marker_split(block):
-    """generate marker, value pairs from a text block (i.e. a list of lines).
-    """
+    """generate marker, value pairs from a text block (i.e. a list of lines)."""
     marker = None
     value = []
 
@@ -38,22 +34,21 @@ def marker_split(block):
 
 
 class Entry(list, UnicodeMixin):
-    """We store entries in SFM files as lists of (marker, value) pairs.
-    """
+
+    """We store entries in SFM files as lists of (marker, value) pairs."""
+
     def markers(self):
         return set(k for k, v in self)
 
     def get(self, key, default=None):
-        """Use get to retrieve the first value for a marker or None.
-        """
+        """Use get to retrieve the first value for a marker or None."""
         for k, v in self:
             if k == key:
                 return v
         return default
 
     def getall(self, key):
-        """Use getall to retrieve all values for a marker.
-        """
+        """Use getall to retrieve all values for a marker."""
         return [v for k, v in self if k == key]
 
     def __unicode__(self):
@@ -64,8 +59,7 @@ class Entry(list, UnicodeMixin):
 
 
 def parse(filename, encoding, entry_impl, entry_sep):
-    """We assume entries in the file are separated by a blank line.
-    """
+    """We assume entries in the file are separated by a blank line."""
     with open(filename, encoding=encoding) as fp:
         for block in fp.read().split(entry_sep):
             if block.strip():
@@ -82,6 +76,9 @@ def parse(filename, encoding, entry_impl, entry_sep):
 
 
 class Dictionary(object):
+
+    """Represents lexical data from a SFM file."""
+
     def __init__(self,
                  filename,
                  encoding='utf8',
@@ -122,8 +119,9 @@ class Dictionary(object):
         return entry
 
     def values(self, marker):
-        """
-        :return: list of distinct values for marker in any entry.
+        """Compute simple stats for the values of marker.
+
+        :return: dict of distinct values for marker with number of occurrences.
         """
         res = defaultdict(lambda: 0)
         for e in self.entries:

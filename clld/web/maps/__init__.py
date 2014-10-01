@@ -1,3 +1,4 @@
+"""Functionality to configure leaflet maps from python."""
 from __future__ import unicode_literals, division, print_function, absolute_import
 import requests
 from six import string_types
@@ -13,14 +14,19 @@ from clld.util import cached_property
 
 
 class Layer(object):
-    """A layer in our terminology is a
+
+    """Represents a layer in a leaflet map.
+
+    A layer in our terminology is a
     `FeatureCollection <http://geojson.org/geojson-spec.html#feature-collection-objects>`_
     in geojson and a
     `geoJson layer <http://leafletjs.com/reference.html#geojson>`_
     in leaflet, i.e. a bunch of points on the map.
     """
+
     def __init__(self, id_, name, data, **kw):
-        """
+        """Initialize a layer object.
+
         :param id_: Map-wide unique string identifying the layer.
         :param name: Human readable name of the layer.
         :param data: A GeoJSON FeatureCollection either specified as corresponding Python\
@@ -36,8 +42,9 @@ class Layer(object):
 
 
 class Legend(object):
-    """Object holding all data necessary to render a navpill with a dropdown above a map.
-    """
+
+    """Represents a navpill with a dropdown above a map."""
+
     def __init__(self,
                  map_,
                  name,
@@ -89,12 +96,16 @@ class Legend(object):
 
 
 class FilterLegend(Legend):
-    """
-    Legend rendering radio controls to filter languages on a map in synch with a column
+
+    """Legend with actionable items.
+
+    Legend rendering radio controls to filter languages on a map in sync with a column
     of an associated DataTable.
     """
+
     def __init__(self, map_, value_getter, col=None, dt=None, **kw):
-        """
+        """Initialize.
+
         @param value_getter: Name of a javascript object which will be called with the \
         properties associated with a map marker to determine its filter value.
         """
@@ -137,13 +148,14 @@ class FilterLegend(Legend):
 
 
 class Map(Component):
-    """Map objects bridge the technology divide between server side python code and
-    client side leaflet maps.
-    """
+
+    """Represents the configuration for a leaflet map."""
+
     __template__ = 'clld:web/templates/map.mako'
 
     def __init__(self, ctx, req, eid='map'):
-        """
+        """Initialize.
+
         :param ctx: context object of the current request.
         :param req: current pyramid request object.
         :param eid: Page-unique DOM-node ID.
@@ -167,7 +179,8 @@ class Map(Component):
 
     @cached_property()
     def layers(self):
-        """
+        """The list of layers of the map.
+
         .. note:: Since layers may be costly to compute, we cache them per map instance.
 
         :return: list of :py:class:`clld.web.maps.Layer` instances.
@@ -175,7 +188,8 @@ class Map(Component):
         return list(self.get_layers())
 
     def get_layers(self):
-        """
+        """Generate the list of layers.
+
         :return: list or generator of :py:class:`clld.web.maps.Layer` instances.
         """
         route_params = {'ext': 'geojson'}
@@ -256,8 +270,9 @@ class Map(Component):
 
 
 class ParameterMap(Map):
-    """Map displaying markers for valuesets associated with a parameter instance.
-    """
+
+    """Map displaying markers for valuesets associated with a parameter instance."""
+
     def get_layers(self):
         if self.ctx.domain:
             for de in self.ctx.domain:
@@ -280,8 +295,9 @@ class ParameterMap(Map):
 
 
 class GeoJsonMultiple(GeoJson):
-    """Render a collection of languages as geojson feature collection.
-    """
+
+    """Render a collection of languages as geojson feature collection."""
+
     def feature_iterator(self, ctx, req):
         return ctx
 
@@ -293,6 +309,9 @@ class GeoJsonMultiple(GeoJson):
 
 
 class CombinationMap(Map):
+
+    """Map for a combination of parameters."""
+
     __geojson__ = GeoJsonCombinationDomainElement
 
     def get_layers(self):
@@ -324,6 +343,9 @@ class _GeoJson(GeoJsonLanguages):
 
 
 class LanguageMap(Map):
+
+    """Map showing a single language."""
+
     def get_language(self):
         return self.ctx
 
@@ -343,12 +365,26 @@ class LanguageMap(Map):
 
 
 class GeoJsonSelectedLanguages(GeoJsonLanguages):
+
+    """Represents the geo-data of an iterable selection of languages.
+
+    The iterable is assumed to be passed into the adapter upon initialization.
+    """
+
     def feature_iterator(self, ctx, req):
         return self.obj
 
 
 class SelectedLanguagesMap(Map):
+
+    """Map showing an arbitrary selection of languages."""
+
     def __init__(self, ctx, req, languages, geojson_impl=None, **kw):
+        """Initialize.
+
+        :param languages: Iterable collection of languages.
+        :param geojson_impl: GeoJson implementation to use.
+        """
         self.geojson_impl = geojson_impl or GeoJsonSelectedLanguages
         self.languages = languages
         Map.__init__(self, ctx, req, **kw)
@@ -402,6 +438,9 @@ def layers(spec, size, zindex=0):  # pragma: no cover
 
 
 class CombinedMap(Map):  # pragma: no cover
+
+    """Map for combination of parameters from different clld apps."""
+
     def get_layers(self):
         for i, spec in enumerate(self.ctx):
             for layer in layers(spec, (i + 1) * 10 + 10, (i + 1) * (-1000)):

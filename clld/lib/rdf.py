@@ -1,6 +1,4 @@
-"""
-This module provides functionality for handling our data as rdf.
-"""
+"""This module provides functionality for handling our data as rdf."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 from collections import namedtuple
 
@@ -45,7 +43,9 @@ NAMESPACES = {
 
 
 def expand_prefix(p):
-    """
+    """Expand default prefixes if possible.
+
+    >>> assert str(expand_prefix('dcterms:title')) == 'http://purl.org/dc/terms/title'
     >>> assert expand_prefix('noprefix:lname') == 'noprefix:lname'
     >>> assert expand_prefix('rdf:nolname') == 'rdf:nolname'
     >>> assert expand_prefix('nocolon') == 'nocolon'
@@ -64,16 +64,21 @@ def expand_prefix(p):
 
 
 def url_for_qname(qname):
-    """
+    """Expand qname to full URL respecting our default prefixes.
+
     >>> assert url_for_qname('dcterms:title') == 'http://purl.org/dc/terms/title'
     """
     return str(expand_prefix(qname))
 
 
 class ClldGraph(Graph):
-    """augment the standard rdflib.Graph by making sure our standard ns prefixes are
+
+    """Augmented rdflib.Graph.
+
+    Augment the standard rdflib.Graph by making sure our standard ns prefixes are
     always bound.
     """
+
     def __init__(self, *args, **kw):
         super(ClldGraph, self).__init__(*args, **kw)
         for prefix, ns in NAMESPACES.items():
@@ -81,9 +86,7 @@ class ClldGraph(Graph):
 
 
 def properties_as_xml_snippet(subject, props):
-    """somewhat ugly way to get at a snippet of an rdf-xml serialization of properties
-    of a subject.
-    """
+    """Serialize props of subject as RDF-XML snippet."""
     if isinstance(subject, string_types):
         subject = URIRef(subject)
     g = ClldGraph()

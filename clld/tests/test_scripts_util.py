@@ -102,4 +102,3 @@ class Tests2(TestWithEnv):
             self.env['request'],
             Mock(update=Mock(return_value=Mock(status=200))),
             query_options=[joinedload(Language.languageidentifier)])
-

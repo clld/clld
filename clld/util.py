@@ -1,3 +1,4 @@
+"""Generic utility functions."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 import re
 import unicodedata
@@ -16,7 +17,7 @@ DATETIME_ISO_FORMAT = re.compile(
 
 def parse_json_with_datetime(d):
     """
-    converts iso formatted timestamps found as values in the dict d to datetime objects.
+    convert iso formatted timestamps found as values in the dict d to datetime objects.
 
     :return: A shallow copy of d with converted timestamps.
     """
@@ -35,6 +36,11 @@ def format_json(value):
 
 
 def jsondump(obj, path):
+    """python 2 + 3 compatible version of json.dump.
+
+    :param obj: The object to be dumped.
+    :param path: The path of the JSON file to be written.
+    """
     kw = dict(mode='w')
     if PY3:  # pragma: no cover
         kw['encoding'] = 'utf8'
@@ -43,6 +49,10 @@ def jsondump(obj, path):
 
 
 def jsonload(path):
+    """python 2 + 3 compatible version of json.load.
+
+    :return: The python object read from path.
+    """
     kw = {}
     if PY3:  # pragma: no cover
         kw['encoding'] = 'utf8'
@@ -51,7 +61,7 @@ def jsonload(path):
 
 
 def nfilter(seq):
-    """Replacement for python 2's filter(None, seq)
+    """Replacement for python 2's filter(None, seq).
 
     :return: a list filtered from seq containing only truthy items.
     """
@@ -59,15 +69,21 @@ def nfilter(seq):
 
 
 def to_binary(s, encoding='utf8'):
+    """Portable cast function.
+
+    In python 2 the ``str`` function which is used to coerce objects to bytes does not
+    accept an encoding argument, whereas python 3's ``bytes`` function requires one.
+
+    :param s: object to be converted to binary_type
+    :return: binary_type instance, representing s.
+    """
     if PY3:  # pragma: no cover
         return s if isinstance(s, binary_type) else binary_type(s, encoding=encoding)
     return binary_type(s)
 
 
 def dict_merged(d, _filter=None, **kw):
-    """Updates dictionary d with the items passed as keyword parameters if the value
-    passes _filter.
-    """
+    """Update dictionary d with the items passed as kw if the value passes _filter."""
     if not _filter:
         _filter = lambda s: s is not None
     d = d or {}
@@ -81,10 +97,17 @@ class NoDefault(object):
     def __repr__(self):
         return '<NoDefault>'
 
+
+#: A singleton which can be used to distinguish no-argument-passed from None passed as
+#: argument in callables with optional arguments.
 NO_DEFAULT = NoDefault()
 
 
 def xmlchars(text):
+    """Not all of UTF-8 is considered valid character data in XML ...
+
+    Thus, this function can be used to remove illegal characters from ``text``.
+    """
     invalid = list(range(0x9))
     invalid.extend([0xb, 0xc])
     invalid.extend(list(range(0xe, 0x20)))
@@ -92,7 +115,9 @@ def xmlchars(text):
 
 
 def format_size(num):
-    """http://stackoverflow.com/a/1094933
+    """Format byte-sizes.
+
+    .. seealso:: http://stackoverflow.com/a/1094933
     """
     for x in ['bytes', 'KB', 'MB', 'GB']:
         if num < 1024.0 and num > -1024.0:
@@ -102,16 +127,15 @@ def format_size(num):
 
 
 class UnicodeMixin(object):
+
+    """Portable label mixin."""
+
     def __unicode__(self):
-        """
-        :return: a human readable label for the object
-        """
+        """a human readable label for the object."""
         return '%s' % self  # pragma: no cover
 
     def __str__(self):
-        """
-        :return: a human readable label for the object, appropriately encoded (or not)
-        """
+        """a human readable label for the object, appropriately encoded (or not)."""
         if PY3:
             return self.__unicode__()  # pragma: no cover
         return self.__unicode__().encode('utf-8')
@@ -121,6 +145,7 @@ class UnicodeMixin(object):
 # From "The Enum Recipe": http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/
 #
 class EnumSymbol(UnicodeMixin):
+
     """Define a fixed symbol tied to a parent class."""
 
     def __init__(self, cls_, name, value, description, *args):
@@ -151,6 +176,7 @@ class EnumSymbol(UnicodeMixin):
 
 
 class EnumMeta(type):
+
     """Generate new DeclEnum classes."""
 
     def __init__(cls, classname, bases, dict_):
@@ -167,7 +193,9 @@ class EnumMeta(type):
 
 @add_metaclass(EnumMeta)
 class DeclEnum(object):
+
     """Declarative enumeration."""
+
     _reg = {}
 
     @classmethod
@@ -299,10 +327,7 @@ LGR_ABBRS = {
 
 
 def slug(s, remove_whitespace=True, lowercase=True):
-    """
-    :return: A condensed version of the string s, containing only lowercase alphanumeric \
-    characters.
-    """
+    """Condensed version of s, containing only lowercase alphanumeric characters."""
     res = ''.join((c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn'))
     if lowercase:
@@ -316,7 +341,8 @@ def slug(s, remove_whitespace=True, lowercase=True):
 
 
 def encoded(string, encoding='utf8'):
-    """
+    """Cast string to binary_type.
+
     :param string: six.binary_type or six.text_type
     :param encoding: encoding which the object is forced to
     :return: six.binary_type
@@ -335,6 +361,7 @@ def encoded(string, encoding='utf8'):
 
 
 class cached_property(object):
+
     """Decorator for read-only properties evaluated only once.
 
     It can be used to create a cached property like this::
@@ -362,6 +389,7 @@ class cached_property(object):
 
     inspired by the recipe by Christopher Arndt in the PythonDecoratorLibrary
     """
+
     def __call__(self, fget):
         self.fget = fget
         self.__doc__ = fget.__doc__

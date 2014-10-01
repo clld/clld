@@ -1,6 +1,5 @@
 """
-Functionality supporting the creation of bibliographical data using the
-Bibliographic Ontology
+Functionality for the creation of bibliographical data using the Bibliographic Ontology.
 
 .. seealso:: http://bibliontology.com/
 """

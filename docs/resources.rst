@@ -22,8 +22,8 @@ interface
 model
     core model class for the resource.
 
-Behaviour may be tied to a resource either via the ``name`` (as is the case for routes) or
-via the ``interface`` (as is the case for adapters).
+Behaviour may be tied to a resource either via the ``name`` (as is the case for :ref:`sec-resource-routes`) or
+via the ``interface`` (as is the case for :ref:`sec-resource-adapters`).
 
 
 .. _sec-resource-models:
@@ -74,19 +74,24 @@ For each resource the following routes and views (and URLs) are registered by de
 Views
 -----
 
-clld.web.views
+We distinguish two classes of views for resources:
 
-- index
-- detail
-
+- index views, implemented in :py:func:`clld.web.views.index_view`, serve rendered adapters
+  registered for the interface ``IIndex`` and a particular resource. They typically require
+  a corresponding ``DataTable`` subclass to be instantiated as context object when the view
+  is executed.
+- detail views, implemented in :py:func:`clld.web.views.detail_view`, serve rendered adapters
+  registered for the interface ``IRepresentation`` and a particular resource. The resource
+  instance with the ``id`` passed in the request will be fetched from the database as context object
+  of the view.
 
 .. _sec-resource-templates:
 
 Templates
 ---------
 
-The views associated with resources may use templates to render the response. In particular
-this is the case for the HTML index and details view.
+The adapters associated with resources may use templates to render the response. In particular
+this is the case for the HTML index and detail view.
 
 
 

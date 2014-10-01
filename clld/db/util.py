@@ -1,3 +1,4 @@
+"""Database utilities."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 import time
 
@@ -19,8 +20,9 @@ def icontains(col, qs):
 
 
 def compute_language_sources(*references):
-    """compute relations between languages and sources by going through the relevant
-    models derived from the HasSource mixin.
+    """compute relations between languages and sources.
+
+    by going through the relevant models derived from the HasSource mixin.
     """
     old_sl = {}
     for pair in DBSession.query(common.LanguageSource):
@@ -41,8 +43,7 @@ def compute_language_sources(*references):
 
 
 def compute_number_of_values():
-    """compute number of values per valueset and store it in valueset's jsondata.
-    """
+    """compute number of values per valueset and store it in valueset's jsondata."""
     for valueset in DBSession.query(common.ValueSet).options(
         joinedload(common.ValueSet.values)
     ):
@@ -54,8 +55,9 @@ def get_distinct_values(col, key=None):
 
 
 def page_query(q, n=1000, verbose=False, commit=False):
-    """
-    http://stackoverflow.com/a/1217947
+    """Go through query results in batches.
+
+    .. seealso:: http://stackoverflow.com/a/1217947
     """
     s = time.time()
     offset = 0

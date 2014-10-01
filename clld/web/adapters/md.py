@@ -1,3 +1,4 @@
+"""Adapters to serialize metadata of clld objects."""
 from zope.interface import implementer
 
 from clld import interfaces
@@ -6,6 +7,9 @@ from clld.lib import bibtex
 
 
 class Metadata(Representation):
+
+    """Virtual base class."""
+
     rel = 'describedby'
 
     @property
@@ -14,6 +18,9 @@ class Metadata(Representation):
 
 
 class MetadataFromRec(Metadata):
+
+    """Virtual base class deriving metadata from a bibtex record."""
+
     def rec(self, ctx, req):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
@@ -42,8 +49,9 @@ class MetadataFromRec(Metadata):
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class BibTex(MetadataFromRec):
-    """Resource metadata as BibTex record.
-    """
+
+    """Resource metadata as BibTex record."""
+
     name = 'BibTeX'
     __label__ = 'BibTeX'
     unapi = 'bibtex'
@@ -56,8 +64,9 @@ class BibTex(MetadataFromRec):
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class ReferenceManager(MetadataFromRec):
-    """Resource metadata in RIS format.
-    """
+
+    """Resource metadata in RIS format."""
+
     name = 'RIS'
     __label__ = 'RIS'
     unapi = 'ris'
@@ -70,8 +79,9 @@ class ReferenceManager(MetadataFromRec):
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)
 class TxtCitation(Metadata):
-    """Resource metadata formatted as plain text citation.
-    """
+
+    """Resource metadata formatted as plain text citation."""
+
     name = "Citation"
     __label__ = 'Text'
     extension = 'md.txt'

@@ -1,4 +1,5 @@
 # coding: utf8
+"""Functionality to format HTML pagination controls."""
 from __future__ import unicode_literals
 
 from paginate import Page
@@ -7,11 +8,13 @@ from clld.web.util.component import Component
 
 
 class Pager(Component):
+
     """A pager component based on paginate.Page.
 
     >>> pager = Pager(None, range(100), page=4, url_maker=lambda p: 'page %s' % p)
     >>> assert pager.render()
     """
+
     def __init__(self, req, collection, **kw):
         self.req = req
         self.page = Page(collection, **kw)

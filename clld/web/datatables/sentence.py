@@ -1,3 +1,4 @@
+"""Default DataTable for Sentence objects."""
 from sqlalchemy.orm import joinedload
 
 from clld.db.util import get_distinct_values
@@ -10,6 +11,9 @@ from clld.web.datatables.base import (
 
 
 class TypeCol(Col):
+
+    """Render the type attribute of a Sentence."""
+
     def __init__(self, dt, name, **kw):
         kw.setdefault('sTitle', dt.req.translate('Type'))
         kw.setdefault('choices', get_distinct_values(Sentence.type))
@@ -31,6 +35,9 @@ class TsvCol(Col):
 
 
 class Sentences(DataTable):
+
+    """Default DataTable for Sentence objects."""
+
     __constraints__ = [Parameter, Language]
 
     def base_query(self, query):

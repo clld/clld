@@ -76,11 +76,10 @@ class Tests(TestWithEnv):
         class FMap(Map):
             def get_legends(self):
                 yield FilterLegend(
-                    self, 
-                    '', 
-                    col='name', 
+                    self,
+                    '',
+                    col='name',
                     dt=FLanguages(self.req, common.Language))
 
         map_ = FMap(common.Language.first(), self.env['request'])
         map_.render()
-

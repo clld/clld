@@ -140,6 +140,7 @@ def unescape(string):
 
 
 class EntryType(DeclEnum):
+
     """Bibtext entry types.
 
     article
@@ -229,6 +230,7 @@ class EntryType(DeclEnum):
     Required fields: author, title, note
     Optional fields: month, year, key
     """
+
     article = 'article', 'article'  # Article
     book = 'book', 'book'  # Book
     booklet = 'booklet', 'booklet'
@@ -295,7 +297,7 @@ class _Convertable(UnicodeMixin):
 
 class IRecord(Interface):
 
-    """marker"""
+    """marker."""
 
 
 @implementer(IRecord)
@@ -398,7 +400,8 @@ class Record(OrderedDict, _Convertable):
         return ' and ' if key in ['author', 'editor'] else '; '
 
     def getall(self, key):
-        """
+        """Get list of all values for key.
+
         :return: list of strings representing the values of the record for field 'key'.
         """
         res = self.get(key, [])
@@ -417,7 +420,8 @@ class Record(OrderedDict, _Convertable):
         return Record.sep(key).join(nfilter(value))
 
     def __unicode__(self):
-        """
+        """Represent the record in BibTeX format.
+
         :return: string encoding the record in BibTeX syntax.
         """
         fields = []

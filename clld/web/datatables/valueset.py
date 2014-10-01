@@ -1,3 +1,4 @@
+"""Default DataTable for ValueSet objects."""
 from functools import partial
 
 from sqlalchemy.orm import joinedload, joinedload_all
@@ -6,17 +7,14 @@ from clld.db.models.common import (
     ValueSet, Parameter, Language, Contribution, ValueSetReference,
 )
 from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol,
+    DataTable, LinkCol, DetailsRowLinkCol, LinkToMapCol, RefsCol,
 )
-from clld.web.util.helpers import linked_references
-
-
-class RefsCol(Col):
-    def format(self, item):
-        return linked_references(self.dt.req, item)
 
 
 class Valuesets(DataTable):
+
+    """Default DataTable for ValueSet objects."""
+
     __constraints__ = [Parameter, Contribution, Language]
 
     def base_query(self, query):
@@ -39,7 +37,7 @@ class Valuesets(DataTable):
         return query
 
     def col_defs(self):
-        refs_col = RefsCol(self, 'references', bSearchable=False, bSortable=False)
+        refs_col = RefsCol(self, 'references')
         res = [DetailsRowLinkCol(self, 'd')]
         get = lambda what, i: getattr(i, {'p': 'parameter', 'l': 'language'}[what])
 

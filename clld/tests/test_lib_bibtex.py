@@ -117,13 +117,13 @@ class Tests(unittest.TestCase):
             (
                 """@inproceedings{moisikesling2011,
   author    = {Moisik, Scott R. and Esling, John H.},
-  booktitle = {Proceedings of the International Congress of Phonetic Sciences (ICPhS XVII)},
+  booktitle = {Proceedings of the Congress of Phonetic Sciences (ICPhS XVII)},
   pages     = {1406-1409},
   title     = {The 'whole larynx' approach to laryngeal features},
   year      = {2011}
 }""",
                 "Moisik, Scott R. and Esling, John H. 2011. The 'whole larynx' approach "
-                "to laryngeal features. In Proceedings of the International Congress of "
+                "to laryngeal features. In Proceedings of the Congress of "
                 "Phonetic Sciences (ICPhS XVII), 1406-1409.")
         ]:
             rec = Record.from_string(bib)

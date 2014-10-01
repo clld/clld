@@ -1,6 +1,4 @@
-"""
-Common models for all clld apps
-"""
+"""Common models for all clld apps."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 import os
 from collections import OrderedDict
@@ -43,11 +41,14 @@ from clld.web.icon import ORDERED_ICONS
 
 
 class Config(Base):
-    """Model class to allow storage of key-value pairs of configuration data in the
-    database. This model is also (ab-)used to implement a mechanism linking database
+
+    """Model class to allow storage of key-value pairs of configuration data.
+
+    This model is also (ab-)used to implement a mechanism linking database
     objects of all types without enforcing referential intagrity, e.g. to model chains
     of superseding objects, where referred objects may become obsolete themselves.
     """
+
     key = Column(Unicode)
     value = Column(Unicode)
 
@@ -55,7 +56,8 @@ class Config(Base):
 
     @staticmethod
     def replacement_key(model, id_):
-        """
+        """Determine the replacement key for an object.
+
         :param model: Model class or instance.
         :param id_: Identifier of a class instance.
         :return: ``str`` representation identifying a database object.
@@ -65,7 +67,8 @@ class Config(Base):
 
     @classmethod
     def get_replacement_id(cls, model, id_):
-        """
+        """Lookup and retrieve the ID of an object.
+
         :return: id of a resource registered as replacement for the specified resource.
         """
         res = DBSession.query(cls.value)\
@@ -91,8 +94,10 @@ class Config(Base):
 
 
 class IdNameDescriptionMixin(object):
-    """Mixin for 'visible' objects, i.e. anything that has to be displayed (to humans or
-    machines); in particular all :doc:`resources` fall into this category.
+
+    """Mixin for 'visible' objects, i.e. anything that has to be displayed.
+
+    In particular all :doc:`resources` fall into this category.
 
     .. note::
 
@@ -100,6 +105,7 @@ class IdNameDescriptionMixin(object):
         or :py:attr:`clld.db.models.common.IdNameDescriptionMixin.markup_description`
         should be supplied, since these are used mutually exclusively.
     """
+
     id = Column(String, unique=True)
     """A ``str`` identifier of an object which can be used for sorting and as part of a
     URL path; thus should be limited to characters valid in URLs, and should not contain
@@ -121,6 +127,7 @@ class IdNameDescriptionMixin(object):
 # to store arbitrary key-value pairs and files associated with an object.
 # ----------------------------------------------------------------------------
 class FilesMixin(IdNameDescriptionMixin):
+
     """This mixin provides a way to associate files with instances of another model class.
 
     .. note::
@@ -128,6 +135,7 @@ class FilesMixin(IdNameDescriptionMixin):
         The file itself is not stored in the database but must be created in the
         filesystem, e.g. using the create method.
     """
+
     @classmethod
     def owner_class(cls):
         return cls.__name__.split('_')[0]
@@ -144,8 +152,7 @@ class FilesMixin(IdNameDescriptionMixin):
 
     @property
     def relpath(self):
-        """OS file path of the file relative to the application's file-system directory.
-        """
+        """OS file path of the file relative to the application's file-system dir."""
         return os.path.join(self.owner_class().lower(), str(self.object.id), str(self.id))
 
     def create(self, dir_, content):
@@ -161,13 +168,12 @@ class FilesMixin(IdNameDescriptionMixin):
 
 
 class HasFilesMixin(object):
-    """Mixin for model classes which may have associated files.
-    """
+
+    """Mixin for model classes which may have associated files."""
+
     @property
     def files(self):
-        """
-        :return: ``dict`` of associated files keyed by ``id``.
-        """
+        """return ``dict`` of associated files keyed by ``id``."""
         return dict((f.id, f) for f in self._files)
 
     @declared_attr
@@ -176,9 +182,9 @@ class HasFilesMixin(object):
 
 
 class DataMixin(object):
-    """This mixin provides a simple way to attach arbitrary key-value pairs to another
-    model class identified by class name.
-    """
+
+    """Provide a simple way to attach key-value pairs to a model class given by name."""
+
     @classmethod
     def owner_class(cls):
         return cls.__name__.split('_')[0]
@@ -193,6 +199,7 @@ class DataMixin(object):
 
 
 class HasDataMixin(object):
+
     """Adds a convenience method to retrieve the key-value pairs from data as dict.
 
     .. note::
@@ -201,10 +208,9 @@ class HasDataMixin(object):
         makes sense, i.e. the keys in data are actually unique, thus usable as dictionary
         keys.
     """
+
     def datadict(self):
-        """
-        :return: ``dict`` of associated key-value pairs.
-        """
+        """return ``dict`` of associated key-value pairs."""
         return dict((d.key, d.value) for d in self.data)
 
     @declared_attr
@@ -213,13 +219,17 @@ class HasDataMixin(object):
 
 
 class LanguageSource(Base, Versioned):
+
+    """Association table."""
+
     __table_args__ = (UniqueConstraint('language_pk', 'source_pk'),)
     language_pk = Column(Integer, ForeignKey('language.pk'))
     source_pk = Column(Integer, ForeignKey('source.pk'))
 
 
 def _add_solr_language_info(res, obj):
-    """
+    """Shortcut function.
+
     :param res: Solr document, i.e. a dict to which new keys will be added.
     :param obj: object which is searched for language information.
     :return: mutated dict res
@@ -240,11 +250,13 @@ def _add_solr_language_info(res, obj):
 # implementers of the related interface.
 # ----------------------------------------------------------------------------
 class Dataset_data(Base, Versioned, DataMixin):
-    pass
+
+    """Associated data mapper."""
 
 
 class Dataset_files(Base, Versioned, FilesMixin):
-    pass
+
+    """Associated files mapper."""
 
 
 @implementer(interfaces.IDataset)
@@ -254,9 +266,13 @@ class Dataset(Base,
               IdNameDescriptionMixin,
               HasDataMixin,
               HasFilesMixin):
-    """Each project (e.g. WALS, APiCS) is regarded as one dataset; thus, each app will
+
+    """Represents a database.
+
+    Each project (e.g. WALS, APiCS) is regarded as one dataset; thus, each app will
     have exactly one Dataset object.
     """
+
     published = Column(Date, default=date.today, doc='date of publication')
     publisher_name = Column(Unicode, doc='publisher')
     publisher_place = Column(Unicode, doc='place of publication')
@@ -266,11 +282,6 @@ class Dataset(Base,
     contact = Column(String)
 
     def get_stats(self, resources, **filters):
-        """
-        :param resources:
-        :param filters:
-        :return:
-        """
         res = OrderedDict()
         for rsc in resources:
             if rsc.name != 'combination':
@@ -301,11 +312,13 @@ class Dataset(Base,
 
 
 class Language_data(Base, Versioned, DataMixin):
-    pass
+
+    """Associated data mapper."""
 
 
 class Language_files(Base, Versioned, FilesMixin):
-    pass
+
+    """Associated files mapper."""
 
 
 @implementer(interfaces.ILanguage)
@@ -315,9 +328,12 @@ class Language(Base,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
-    """Languages are the main objects of discourse. We attach a geo-coordinate
-    to them to be able to put them on maps.
+
+    """Languages are the main objects of discourse.
+
+    We attach a geo-coordinate to them to be able to put them on maps.
     """
+
     latitude = Column(
         Float(),
         CheckConstraint('-90 <= latitude and latitude <= 90'),
@@ -365,8 +381,9 @@ class DomainElement(Base,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):
-    """DomainElements can be used to model controlled lists of values for a Parameter.
-    """
+
+    """DomainElements can be used to model controlled lists of values for a Parameter."""
+
     __table_args__ = (
         UniqueConstraint('name', 'parameter_pk'),
         UniqueConstraint('number', 'parameter_pk'))
@@ -395,8 +412,9 @@ class Parameter(Base,
                 IdNameDescriptionMixin,
                 HasDataMixin,
                 HasFilesMixin):
-    """A measurable attribute of a language.
-    """
+
+    """A measurable attribute of a language."""
+
     __table_args__ = (UniqueConstraint('name'),)
     domain = relationship(
         'DomainElement', backref='parameter', order_by=DomainElement.number)
@@ -413,12 +431,14 @@ class CombinationDomainElement(object):
 
 @implementer(interfaces.ICombination)
 class Combination(object):
-    """A combination of parameters
-    """
+
+    """A combination of parameters."""
+
     delimiter = '_'
 
     def __init__(self, *parameters):
-        """
+        """Initialize.
+
         :param parameters: distinct Parameter instances.
         """
         assert len(parameters) < 5
@@ -446,7 +466,8 @@ class Combination(object):
 
     @cached_property()
     def domain(self):
-        """
+        """Compute the domain as cartesian product of constituent domains.
+
         .. note::
 
             This does only work well with parameters which have a discrete domain.
@@ -515,8 +536,9 @@ class Source(Base,
              IdNameDescriptionMixin,
              HasDataMixin,
              HasFilesMixin):
-    """A bibliographic record, cited as source for some statement.
-    """
+
+    """A bibliographic record, cited as source for some statement."""
+
     glottolog_id = Column(String)
     google_book_search_id = Column(String)
 
@@ -603,8 +625,9 @@ class Contribution(Base,
                    IdNameDescriptionMixin,
                    HasDataMixin,
                    HasFilesMixin):
-    """A set of data contributed within the same context by the same set of contributors.
-    """
+
+    """A set of data contributed within the same context by the same contributors."""
+
     __table_args__ = (UniqueConstraint('name'),)
     date = Column(Date)
 
@@ -642,8 +665,9 @@ class ValueSet(Base,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
-    """The intersection of Language and Parameter.
-    """
+
+    """The intersection of Language and Parameter."""
+
     language_pk = Column(Integer, ForeignKey('language.pk'))
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
@@ -681,8 +705,9 @@ class Value(Base,
             IdNameDescriptionMixin,
             HasDataMixin,
             HasFilesMixin):
-    """A measurement of a parameter for a particular language.
-    """
+
+    """A measurement of a parameter for a particular language."""
+
     # we must override the pk col declaration from Base to have it available for ordering.
     pk = Column(Integer, primary_key=True)
     valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
@@ -732,16 +757,16 @@ class Contributor(Base,
                   IdNameDescriptionMixin,
                   HasDataMixin,
                   HasFilesMixin):
-    """Creator of a contribution.
-    """
+
+    """Creator of a contribution."""
+
     __table_args__ = (UniqueConstraint('name'),)
     url = Column(Unicode())
     email = Column(String)
     address = Column(Unicode)
 
     def last_first(self):
-        """ad hoc - possibly incorrect - way of formatting the name as "last, first"
-        """
+        """ad hoc - possibly incorrect - way of formatting the name as "last, first"."""
         parts = (self.name or '').split()
         return '' if not parts else ', '.join([parts[-1], ' '.join(parts[:-1])])
 
@@ -761,9 +786,10 @@ class Sentence(Base,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
+
     """Sentence of a language serving as example for some statement.
 
-    ..notes::
+    .. note::
 
         Columns inherited from IdNameDescriptionMixin are interpreted as follows:
 
@@ -774,6 +800,7 @@ class Sentence(Base,
         markup. These attributes should take precedence over their non-prefixed
         counterparts when rendering a Sentence.
     """
+
     analyzed = Column(Unicode)
     gloss = Column(Unicode)
     type = Column(Unicode)
@@ -819,8 +846,9 @@ class Unit(Base,
            IdNameDescriptionMixin,
            HasDataMixin,
            HasFilesMixin):
-    """A linguistic unit of a language.
-    """
+
+    """A linguistic unit of a language."""
+
     language_pk = Column(Integer, ForeignKey('language.pk'))
     language = relationship(Language)
 
@@ -843,6 +871,9 @@ class UnitDomainElement(Base,
                         IdNameDescriptionMixin,
                         HasDataMixin,
                         HasFilesMixin):
+
+    """Doamin element for the domain of a UnitParameter."""
+
     unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
     ord = Column(Integer)
 
@@ -864,8 +895,9 @@ class UnitParameter(Base,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):
-    """A measurable attribute of a unit.
-    """
+
+    """A measurable attribute of a unit."""
+
     domain = relationship(
         'UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
 
@@ -906,7 +938,9 @@ class UnitValue(Base,
 
     @validates('unitparameter_pk')
     def validate_parameter_pk(self, key, unitparameter_pk):
-        """We have to make sure, the parameter a value is tied to and the parameter a
+        """Validator to sync related parameter.
+
+        We have to make sure, the parameter a value is tied to and the parameter a
         possible domainelement is tied to stay in sync.
         """
         if self.unitdomainelement and self.unitdomainelement.unitparameter_pk:
@@ -922,6 +956,9 @@ class UnitValue(Base,
 # Non-core mappers and association tables
 # ----------------------------------------------------------------------------
 class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
+
+    """Possibly language-specific abbreviation used in IGTs."""
+
     __table_args__ = (UniqueConstraint('id', 'language_pk'),)
 
     language_pk = Column(Integer, ForeignKey('language.pk'))
@@ -929,6 +966,9 @@ class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
 
 
 class IdentifierType(DeclEnum):
+
+    """Known language identifiers."""
+
     iso = 'iso639-3', 'ISO 639-3', \
           'http://www.sil.org/iso639-3/documentation.asp?id={0.name}'
     wals = 'wals', 'WALS Code', 'http://wals.info/languoid/lect/wals_code_{0.name}'
@@ -938,10 +978,14 @@ class IdentifierType(DeclEnum):
 
 
 class Identifier(Base, Versioned, IdNameDescriptionMixin):
-    """We want to be able to link languages to languages in other systems. Thus,
+
+    """A language identifier.
+
+    We want to be able to link languages to languages in other systems. Thus,
     we store identifiers of various types like 'wals', 'iso639-3', 'glottolog'.
     But we might as well just store alternative names for languages.
     """
+
     __table_args__ = (UniqueConstraint('name', 'type', 'description'),)
     id = Column(String)
     type = Column(String)
@@ -955,9 +999,13 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
 
 
 class LanguageIdentifier(Base, Versioned):
-    """Languages are linked to identifiers with an optional description of this
+
+    """Association table.
+
+    Languages are linked to identifiers with an optional description of this
     linkage, e.g. 'is dialect of'.
     """
+
     language_pk = Column(Integer, ForeignKey('language.pk'))
     identifier_pk = Column(Integer, ForeignKey('identifier.pk'))
     description = Column(Unicode)
@@ -985,32 +1033,37 @@ class HasSourceMixin(object):
 
 
 class SentenceReference(Base, Versioned, HasSourceMixin):
-    """
-    """
+
+    """Association table."""
+
     sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
     sentence = relationship(Sentence, backref="references")
 
 
 class ContributionReference(Base, Versioned, HasSourceMixin):
-    """
-    """
+
+    """Association table."""
+
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     contribution = relationship(Contribution, backref="references")
 
 
 class ValueSetReference(Base, Versioned, HasSourceMixin):
+
     """References for a set of values (related to one parameter and one language).
 
     These references can be interpreted as justifications why a language does not "have"
     certain values for a parameter, too.
     """
+
     valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
     valueset = relationship(ValueSet, backref="references")
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
-    """Many-to-many association between contributors and contributions
-    """
+
+    """Many-to-many association between contributors and contributions."""
+
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
 
@@ -1025,8 +1078,9 @@ class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
 
 
 class Editor(Base, PolymorphicBaseMixin, Versioned):
-    """Many-to-many association between contributors and dataset
-    """
+
+    """Many-to-many association between contributors and dataset."""
+
     dataset_pk = Column(Integer, ForeignKey('dataset.pk'))
     contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
 
@@ -1046,9 +1100,9 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
 
 
 class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
-    """Many-to-many association between values and sentences given as explanation of a
-    value.
-    """
+
+    """Association between values and sentences given as explanation of a value."""
+
     value_pk = Column(Integer, ForeignKey('value.pk'))
     sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
     description = Column(Unicode())

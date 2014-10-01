@@ -1,3 +1,4 @@
+"""View logic for clld default views."""
 from json import dumps
 import re
 from functools import partial
@@ -15,7 +16,7 @@ from clld.web.maps import CombinedMap
 
 
 def xpartial(func, *args, **kw):
-    """augment partial to make it possible to register partials as view callables.
+    """Augment partial to make it possible to register partials as view callables.
 
     >>> f = xpartial(lambda x, y: x + y, 1)
     >>> assert f(1) == 2
@@ -26,7 +27,7 @@ def xpartial(func, *args, **kw):
 
 
 def redirect(cls, location, ctx, req):
-    """can be used with xpartial to register views that simply redirect
+    """Can be used with xpartial to register views that simply redirect.
 
     >>> view = xpartial(pyramid.httpexceptions.HTTPFound, lambda req: req.route_url('.'))
     """
@@ -36,14 +37,14 @@ def redirect(cls, location, ctx, req):
 
 
 def gone(ctx, req):
-    """view callable
-    """
+    """view callable."""
     raise pyramid.httpexceptions.HTTPGone()
 
 
 def view(interface, ctx, req, getadapters=False):
-    """renders a resource as pyramid response using the most appropriate adapter
-    for the accept header sent.
+    """Render a resource as pyramid response.
+
+    Using the most appropriate adapter for the accept header sent.
     """
     #
     # if req.matched_route.name.endswith('_alt') -> add rel="canonical" header
@@ -155,20 +156,17 @@ def select_combination(ctx, req):
 
 
 def _raise(req):
-    """view callable to test error reporting in running apps.
-    """
+    """view callable to test error reporting in running apps."""
     raise ValueError('test')
 
 
 def _ping(req):
-    """view to test aliveness of apps.
-    """
+    """view to test aliveness of apps."""
     return {'status': 'ok'}
 
 
 def unapi(req):
-    """implements the server side of the unAPI spec.
-    """
+    """View callable implementing the server side of the unAPI spec."""
     id_ = req.params.get('id')
     if id_:
         obj = req.ctx_for_url(id_)
@@ -208,6 +206,9 @@ def unapi(req):
 # datasets. It may be used by CrossGram at some point.
 #
 class ParameterMultiSelect(MultiSelect):  # pragma: no cover
+
+    """Experimental."""
+
     def __init__(self, req, name, eid, collection=None, url=None, selected=None):
         MultiSelect.__init__(self, req, name, eid, url='x')
         self.data = []

@@ -1,3 +1,8 @@
+"""
+Functionality to configure select2 (multi)select widgets.
+
+.. seealso:: http://ivaynberg.github.io/select2/
+"""
 from __future__ import unicode_literals
 
 from clld.db.meta import DBSession
@@ -7,8 +12,9 @@ from clld.web.util.component import Component
 
 
 class MultiSelect(Component):
-    """A select component based on select2.
-    """
+
+    """A select component based on select2."""
+
     __template__ = 'clld:web/templates/multiselect.mako'
 
     def __init__(self,
@@ -19,7 +25,8 @@ class MultiSelect(Component):
                  url=None,
                  selected=None,
                  multiple=True):
-        """
+        """Initialize.
+
         for selections using remote data pass url, otherwise pass collection to force
         creation of a select element (with no order preserved for the selection) or
         specify a 'data' member in options.
@@ -53,8 +60,7 @@ class MultiSelect(Component):
         return res
 
     def format_result(self, obj):
-        """
-        called for each matching result.
+        """called for each matching result.
 
         :return: dict which can be serialized as JSON for use by the select2 component.
         """
@@ -63,17 +69,19 @@ class MultiSelect(Component):
             'text': '%s' % getattr(obj, 'label', obj)}
 
     def render(self, selected=None):
-        """allow the list of selected items to be specified upon rendering, too.
-        """
+        """allow the list of selected items to be specified upon rendering, too."""
         if selected:
             self.selected = selected
         return Component.render(self)
 
 
 class CombinationMultiSelect(MultiSelect):
-    """
+
+    """Multiple selection of parameters for combination.
+
     >>> ms = CombinationMultiSelect(None)
     """
+
     def __init__(self, req, name='parameters', eid='ms-parameters', combination=None,
                  **kw):
         if combination:

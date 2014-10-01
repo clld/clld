@@ -1,4 +1,8 @@
 # coding: utf8
+"""Various helper functions to be used mainly in templates.
+
+.. note:: This module is available within Mako templates as ``h``.
+"""
 from __future__ import unicode_literals
 import re
 from itertools import groupby  # we just import this to have it available in templates!
@@ -90,6 +94,15 @@ def data_uri(filename, mimetype):
 
 
 class JS(object):
+
+    """Markup JavaScript object names for proper serialization to pseudo-JSON.
+
+    We use JSON serialization to convert python objects to javascript objects, e.g. for
+    options. Sometimes these options take javascript names (of functions, etc.). To make
+    sure such names can be serialized properly, i.e. without being quoted as literal
+    strings, they can be wrapped into a JS object.
+    """
+
     delimiter = '|'
     pattern = re.compile('\"\{0}(?P<name>[^\{0}]+)\{0}\"'.format(delimiter))
 
@@ -118,6 +131,9 @@ JSDataTable = JS('CLLD.DataTable')
 
 
 class JSNamespace(object):
+
+    """Shortcut to create JS objects within a common namespace."""
+
     def __init__(self, prefix):
         self.prefix = prefix
 
@@ -163,10 +179,7 @@ def format_gbs_identifier(source):
 
 
 def format_coordinates(obj, no_seconds=True, wgs_link=True):
-    """
-    WGS84
-    53° 33' 2" N, 9° 59' 36" E
-    53.550556°, 9.993333°
+    """Format WGS84 coordinates as HTML.
 
     .. seealso:: http://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
     """
@@ -283,6 +296,7 @@ def link_to_map(language):
 
 
 def gbs_link(source, pages=None):
+    """Format Google-Books information for source as HTML."""
     if not source or not source.google_book_search_id \
             or not source.jsondata or not source.jsondata.get('gbs'):
         return ''
@@ -329,6 +343,7 @@ ALT_TRANSLATION_LANGUAGE_PATTERN = re.compile('((?P<language>[a-zA-Z\s]+):)')
 # TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU
 #
 def rendered_sentence(sentence, abbrs=None, fmt='long'):
+    """Format a sentence as HTML."""
     if sentence.xhtml:
         return HTML.div(
             HTML.div(Markup(sentence.xhtml), class_='body'), class_="sentence")
@@ -424,6 +439,7 @@ def icon(class_, inverted=False, **kw):
 
 
 def contactmail(req, ctx=None, title='contact maintainer'):
+    """Format the contact address for a dataset as mailto: link."""
     params = {}
     for name in ['subject', 'body']:
         params[name] = pyramid_render(
@@ -436,7 +452,8 @@ def contactmail(req, ctx=None, title='contact maintainer'):
 
 
 def newline2br(text):
-    """
+    """Replace newlines in text with HTML br tags.
+
     >>> assert newline2br(None) == ''
     """
     if not text:
@@ -450,7 +467,8 @@ def newline2br(text):
 
 
 def text2html(text, mode='br', sep='\n\n'):
-    """
+    """Turn plain text into simple HTML.
+
     >>> assert 'div' in text_type(text2html('chunk', mode='p'))
     """
     if mode == 'p':
@@ -511,7 +529,8 @@ def language_identifier(req, obj, **kw):
 
 
 def get_referents(source, exclude=None):
-    """
+    """Retrieve objects referencing source.
+
     :return: dict storing lists of objects referring to source keyed by type.
     """
     res = {}
@@ -533,6 +552,7 @@ def get_referents(source, exclude=None):
 
 
 def alt_representations(req, rsc, doc_position='right', exclude=None):
+    """Represent available adapters for rsc as dropdown menu."""
     exclude = exclude or []
     exclude.extend(['html', 'snippet.html'])
     adapters = [a for n, a in req.registry.getAdapters([rsc], interfaces.IRepresentation)
@@ -586,7 +606,8 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
 
 
 def partitioned(items, n=3):
-    """
+    """Partition items into n buckets.
+
     >>> assert list(partitioned(range(10)))[0] == [0, 1, 2, 3]
     """
     max_items_per_bucket, rem = divmod(len(items), n)
@@ -604,8 +625,7 @@ def partitioned(items, n=3):
 
 
 def icons(req, param):
-    """
-    Creates an HTML snippet listing available icons.
+    """Create an HTML snippet listing available icons.
 
     :param req: current request
     :param param: parameter name

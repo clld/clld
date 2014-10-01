@@ -1,3 +1,4 @@
+"""Adapter registry to be included by pyramid configurator."""
 from zope.interface import implementedBy
 
 from clld import RESOURCES
@@ -16,8 +17,7 @@ from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 
 
 def includeme(config):
-    """register adapters
-    """
+    """register adapters."""
     specs = []
     for rsc in RESOURCES:
         # each resource is available ...
@@ -138,7 +138,9 @@ def get_adapters(interface, ctx, req):
 
 
 def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
-    """
+    """Retrieve matching adapter.
+
+    :param interface: Interface class to lookup adapter for.
     """
     adapters = dict(get_adapters(interface, ctx, req))
 

@@ -27,6 +27,5 @@ class Tests(TestWithEnv):
         res = adapter.render(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
         self.assertIn('foreignKeys', json.loads(res))
-        res = adapter.render_to_response(
+        adapter.render_to_response(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
-        #self.assertIn('header=present', str(res))

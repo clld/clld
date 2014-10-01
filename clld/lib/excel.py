@@ -1,6 +1,4 @@
-"""
-Functionality to support reading and writing of excel files.
-"""
+"""Functionality to support reading and writing of excel files."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 
 import xlwt

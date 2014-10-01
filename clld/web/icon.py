@@ -1,3 +1,4 @@
+"""Functionality to manage icons for map markers."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import product
 
@@ -66,8 +67,9 @@ SECONDARY_COLORS = [c for c in COLORS if c not in PREFERED_COLORS]
 
 @implementer(IIcon)
 class Icon(object):
-    """default implementation of IIcon: Icons are static image files.
-    """
+
+    """Default implementation of IIcon: Icons are static image files."""
+
     def __init__(self, name):
         self.name = name
 
@@ -93,8 +95,9 @@ ORDERED_ICONS = [ICON_MAP[s + c] for s, c in
 
 @implementer(IMapMarker)
 class MapMarker(object):
-    """The default map marker is an orange circle
-    """
+
+    """The default map marker is an orange circle."""
+
     def get_icon(self, ctx, req):
         return 'cff6600'
 

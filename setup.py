@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 import sys
 
@@ -84,7 +85,7 @@ setup(name='clld',
       version='0.17',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
-      long_description='',
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",

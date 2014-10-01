@@ -1,5 +1,5 @@
 """
-python interface to bibutils
+python interface to bibutils.
 
 .. seealso:: http://sourceforge.net/p/bibutils/home/Bibutils/
 """

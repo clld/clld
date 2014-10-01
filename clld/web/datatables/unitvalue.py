@@ -1,3 +1,4 @@
+"""Default DataTable for UnitValue objects."""
 from sqlalchemy.orm import joinedload
 
 from clld.db.models import common
@@ -5,6 +6,9 @@ from clld.web.datatables.base import DataTable, LinkCol
 
 
 class UnitValueNameCol(LinkCol):
+
+    """render the label for the UnitValue."""
+
     def order(self):
         return common.UnitDomainElement.id \
             if self.dt.unitparameter and self.dt.unitparameter.domain \
@@ -17,6 +21,9 @@ class UnitValueNameCol(LinkCol):
 
 
 class Unitvalues(DataTable):
+
+    """Default DataTable for UnitValue objects."""
+
     __constraints__ = [common.UnitParameter, common.Contribution, common.Unit]
 
     def base_query(self, query):

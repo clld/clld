@@ -1,3 +1,4 @@
+"""Default DataTable for Value objects."""
 from sqlalchemy.orm import joinedload, joinedload_all
 
 from clld.db.models.common import (
@@ -5,13 +6,17 @@ from clld.db.models.common import (
 )
 from clld.db.util import icontains
 from clld.web.datatables.base import (
-    DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol,
+    DataTable, LinkCol, DetailsRowLinkCol, LinkToMapCol,
 )
-from clld.web.util.helpers import linked_references, map_marker_img
+from clld.web.datatables.base import RefsCol as BaseRefsCol
+from clld.web.util.helpers import map_marker_img
 from clld.web.util.htmllib import HTML, literal
 
 
 class ValueNameCol(LinkCol):
+
+    """Render the label for a Value."""
+
     def get_obj(self, item):
         return item.valueset
 
@@ -34,6 +39,9 @@ class ValueNameCol(LinkCol):
 
 
 class ValueSetCol(LinkCol):
+
+    """Render a link to the corresponding ValueSet."""
+
     def get_obj(self, item):
         return item.valueset
 
@@ -41,15 +49,18 @@ class ValueSetCol(LinkCol):
         return {'label': item.valueset.name}
 
 
-class RefsCol(Col):
-    __kw__ = dict(bSearchable=False, bSortable=False)
+class RefsCol(BaseRefsCol):
 
-    def format(self, item):
-        return ', '.join(filter(
-            None, [item.valueset.source, linked_references(self.dt.req, item.valueset)]))
+    """Listing sources for the corresponding ValueSet."""
+
+    def get_obj(self, item):
+        return item.valueset
 
 
 class Values(DataTable):
+
+    """Default DataTable for Value objects."""
+
     __constraints__ = [Parameter, Contribution, Language]
 
     def base_query(self, query):

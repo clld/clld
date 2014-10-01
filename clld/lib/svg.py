@@ -1,3 +1,4 @@
+"""Provides functionality to create simple SVG pie charts."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 import math
 from operator import add
@@ -20,7 +21,8 @@ SVG_CIRCLE_TEMPLATE = '    <circle fill="%s" cx="%s" cy="%s" r="%s" stroke="blac
 
 
 def pie(data, colors, width=34):
-    """
+    """Create SVG pie charts.
+
     :return: SVG representation of the data as pie chart.
 
     >>> assert pie([2, 7], ['eee', '111'])

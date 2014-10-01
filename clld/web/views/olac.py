@@ -66,9 +66,15 @@ def date(dt=None):
 
 
 class ResumptionToken(UnicodeMixin):
-    """We encode all information from a List query in the resumption token so that we do
+
+    """Represents an OAI-PMH resumption token.
+
+    We encode all information from a List query in the resumption token so that we do
     not actually have to keep track of sequences of requests (in the spirit of REST).
+
+    .. seealso: http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
     """
+
     PATTERN = re.compile('(?P<offset>[0-9]+)(?P<from>f%s)?(?P<until>u%s)?$'
                          % (TIMESTAMP_REGEX, TIMESTAMP_REGEX))
     limit = 100
@@ -100,8 +106,9 @@ class ResumptionToken(UnicodeMixin):
 
 
 class OlacConfig(object):
-    """utility class bundling all configurable aspects of an applications OLAC repository
-    """
+
+    """Configuration of an applications OLAC repository."""
+
     scheme = 'oai'
     delimiter = ':'
 
@@ -118,8 +125,6 @@ class OlacConfig(object):
         return self._query(req).order_by(Language.updated, Language.pk).first()
 
     def get_record(self, req, identifier):
-        """
-        """
         rec = Language.get(self.parse_identifier(req, identifier), default=None)
         assert rec
         return rec
@@ -133,13 +138,9 @@ class OlacConfig(object):
         return q
 
     def format_identifier(self, req, item):
-        """
-        """
         return self.delimiter.join([self.scheme, req.dataset.domain, item.id])
 
     def parse_identifier(self, req, id_):
-        """
-        """
         assert self.delimiter in id_
         return id_.split(self.delimiter)[-1]
 
@@ -160,13 +161,14 @@ class OlacConfig(object):
 
 
 def olac(req):
-    """View implementing the OLAC OAI-PMH repository protocol.
-    """
+    """View implementing the OLAC OAI-PMH repository protocol."""
     return olac_with_cfg(req, req.registry.getUtility(IOlacConfig))
 
 
 def olac_with_cfg(req, cfg):
-    """If applications want to disseminate metadata for other resources than languages
+    """Factory function for olac views with different configurations.
+
+    If applications want to disseminate metadata for other resources than languages
     this function can be used to provide a second olac repository.
     """
     res = dict(verb=None, error=None, response_date=timestamp(), params={}, date=date)

@@ -1,5 +1,7 @@
 """
-This module provides base classes to compose DataTables, i.e. objects which have a double
+This module provides base classes to compose DataTables.
+
+I.e. objects which have a double
 nature: On the client they provide the information to instantiate a jquery DataTables
 object. Server side they know how to provide the data to the client-side table.
 """
@@ -12,17 +14,20 @@ from zope.interface import implementer
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import link, button, icon, JS_CLLD, external_link
+from clld.web.util.helpers import (
+    link, button, icon, JS_CLLD, external_link, linked_references,
+)
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
-from clld.util import cached_property
+from clld.util import cached_property, nfilter
 
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
 
 def filter_number(col, qs, type_=None, qs_weight=1):
-    """
+    """Extended filter operators for numbers.
+
     :param col: an sqlalchemy column instance.
     :param qs: a string, providing a filter criterion.
     :return: sqlalchemy filter expression.
@@ -59,12 +64,14 @@ def filter_number(col, qs, type_=None, qs_weight=1):
 
 
 class Col(object):
+
     """DataTables are basically a list of column specifications.
 
     A column in a DataTable typically corresponds to a column of an sqlalchemy model.
     This column can either be supplied directly via a model_col keyword argument, or we
     try to look it up as attribute with name "name" on self.dt.model.
     """
+
     dt_name_pattern = re.compile('[a-z]+[A-Z]+[a-z]+')
 
     # convenient way to provide defaults for some kw arguments of __init__:
@@ -116,8 +123,12 @@ class Col(object):
                 self.input_size = 'small'
 
     def get_obj(self, item):
-        """derived columns with a model_col not on self.dt.model should override this
-        method.
+        """Get the object for formatting and filtering.
+
+        .. note::
+
+            derived columns with a model_col not on self.dt.model should override this
+            method.
         """
         if getattr(self, '_get_object'):
             return self._get_object(item)
@@ -139,13 +150,11 @@ class Col(object):
     # external API called by DataTable objects:
     #
     def order(self):
-        """called when collecting the order by clauses of a datatable's search query
-        """
+        """Called when collecting the order by clauses of a datatable's search query."""
         return self.model_col
 
     def search(self, qs):
-        """called when collecting the filter criteria of a datatable's search query
-        """
+        """Called when collecting the filter criteria of a datatable's search query."""
         if isinstance(self.model_col_type, (String, Unicode)):
             if getattr(self, 'choices', None):
                 # make sure select box values match sharp!
@@ -158,15 +167,16 @@ class Col(object):
             return self.model_col.__eq__(qs == 'True')
 
     def format(self, item):
-        """called when converting the matching result items of a datatable's search query
-        to json.
-        """
+        """Called when converting the matching result items of a datatable to json."""
         if getattr(self, '_format'):
             return self._format(item)
         return self.format_value(self.get_value(item))
 
 
 class ExternalLinkCol(Col):
+
+    """Format item as external link."""
+
     __kw__ = {'bSearchable': False, 'bSortable': False}
 
     def get_attrs(self, item):
@@ -178,8 +188,9 @@ class ExternalLinkCol(Col):
 
 
 class PercentCol(Col):
-    """treats a model col of type float as percentage.
-    """
+
+    """Treat a model col of type float as percentage."""
+
     def search(self, qs):
         return filter_number(self.model_col, qs, qs_weight=0.01)
 
@@ -188,8 +199,9 @@ class PercentCol(Col):
 
 
 class LinkCol(Col):
-    """Column which renders a link.
-    """
+
+    """Column which renders a link."""
+
     def get_attrs(self, item):
         return {}
 
@@ -199,6 +211,9 @@ class LinkCol(Col):
 
 
 class IdCol(LinkCol):
+
+    """Render an ID."""
+
     __kw__ = {'sClass': 'right', 'input_size': 'mini'}
 
     def get_attrs(self, item):
@@ -210,6 +225,9 @@ class IdCol(LinkCol):
 
 
 class IntegerIdCol(IdCol):
+
+    """Render a numeric ID."""
+
     __kw__ = {'input_size': 'mini', 'sClass': 'right', 'sTitle': 'No.'}
 
     def search(self, qs):
@@ -220,9 +238,13 @@ class IntegerIdCol(IdCol):
 
 
 class LinkToMapCol(Col):
-    """We use the CLLD.Map.showInfoWindow API function to construct a button to open
+
+    """Render a button.
+
+    We use the CLLD.Map.showInfoWindow API function to construct a button to open
     a popup on the map.
     """
+
     __kw__ = {'bSearchable': False, 'bSortable': False, 'sTitle': '', 'map_id': 'map'}
 
     def format(self, item):
@@ -239,6 +261,12 @@ class LinkToMapCol(Col):
 
 
 class DetailsRowLinkCol(Col):
+
+    """Render a button to open a details row on the fly.
+
+    .. seealso:: http://www.datatables.net/examples/api/row_details.html
+    """
+
     __kw__ = {
         'bSearchable': False,
         'bSortable': False,
@@ -257,15 +285,28 @@ class DetailsRowLinkCol(Col):
             tag=HTML.button)
 
 
+class RefsCol(Col):
+
+    """Column listing linked sources."""
+
+    __kw__ = dict(bSearchable=False, bSortable=False)
+
+    def format(self, item):
+        vs = self.get_obj(item)
+        return ', '.join(nfilter(
+            [getattr(vs, 'source'), linked_references(self.dt.req, vs)]))
+
+
 @implementer(IDataTable)
 class DataTable(Component):
-    """DataTables are used to manage (sort, filter, display) lists of instances of one
-    model class.
+
+    """
+    DataTables are used to manage selections of instances of one model class.
 
     Often datatables are used to display only a pre-filtered set of items which are
     related to some other entity in the system. This scenario is supported as follows:
-    For each model class listed in
-    :py:attr:`clld.web.datatables.base.DataTable.__constraints__` an appropriate object
+    For each model class listed
+    in :py:attr:`clld.web.datatables.base.DataTable.__constraints__` an appropriate object
     specified either by keyword parameter or as request parameter will be looked up at
     datatable initialization, and placed into a datatable attribute named after the model
     class in lowercase. These attributes will be used when creating the URL for the data
@@ -273,15 +314,16 @@ class DataTable(Component):
 
     .. note::
 
-         The actual filtering has to be done in a custom implementation of
-         :py:meth:`clld.web.datatables.base.DataTable.base_query`.
+        The actual filtering has to be done in a custom implementation
+        of :py:meth:`clld.web.datatables.base.DataTable.base_query`.
+    """
 
-     """
     __template__ = 'clld:web/templates/datatable.mako'
     __constraints__ = []
 
     def __init__(self, req, model, eid=None, **kw):
-        """
+        """Initialize.
+
         :param req: request object.
         :param model: mapper class, instances of this class will be the rows in the table.
         :param eid: HTML element id that will be assigned to this data table.
@@ -324,7 +366,8 @@ class DataTable(Component):
         return self.col_defs()
 
     def xhr_query(self):
-        """
+        """Get additional URL parameters for XHR.
+
         :return: a mapping to be passed as query parameters to the server when requesting\
         table data via xhr.
         """
@@ -422,8 +465,6 @@ class DataTable(Component):
         return query
 
     def toolbar(self):
-        """
-        """
         return HTML.div(
             button(
                 icon('info-sign', inverted=True),
