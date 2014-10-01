@@ -66,21 +66,11 @@ With this setup, we can add a method to Languoid to retrieve all ancestors:
 .. code-block:: python
 
     def get_ancestors(self):
-        # retrieve the pks of the ancestors ordered by distance, i.e. from direct parent
+        # retrieve the ancestors ordered by distance, i.e. from direct parent
         # to top-level family:
-        pks = [
-            r[0] for r in DBSession.query(ClosureTable.parent_pk)
-            .filter(ClosureTable.child_pk == self.pk)
-            .order_by(ClosureTable.depth)]
-        # store the ancestor objects keyed py pk
-        ancestors = {
-            l.pk: l for l in DBSession.query(Languoid).filter(Languoid.pk.in_(pks))}
-        # yield the ancestors in order
-        for pk in pks:
-            yield ancestors[pk]
-
-.. note::
-
-    We can not simply use the query retrieving the pks from the closure table as subquery
-    when retrieving actual Languoid objects, because order of an inner query will be for
-    the outer query, thus we would end up with a set of ancestors with no defined order.
+        return DBSession.query(Languoid)\
+            .join(TreeClosureTable, and_(
+                TreeClosureTable.parent_pk == Languoid.pk,
+                TreeClosureTable.depth > 0))\
+            .filter(TreeClosureTable.child_pk == self.pk)\
+            .order_by(TreeClosureTable.depth)
