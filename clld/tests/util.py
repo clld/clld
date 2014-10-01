@@ -510,7 +510,7 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
 
     """run tests using selenium with the firefox driver."""
 
-    host = '0.0.0.0:8880'
+    host = '127.0.0.1:8880'
 
     @classmethod
     def setUpClass(cls):
