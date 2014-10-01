@@ -22,8 +22,8 @@ class Tests(TestCase):
 
         c = "\\_md x\r\n\\lx ml\r\nlemma\r\n\\ge gloss\r\n\r\n\\lx äöüß\r\n\\ge gloss 2"
         tmp = tempfile.mktemp()
-        with open(tmp, encoding='utf8', mode='w') as fp:
-            fp.write(c)
+        with open(tmp, mode='wb') as fp:
+            fp.write(c.encode('utf8'))
 
         try:
             db = Dictionary(tmp)
