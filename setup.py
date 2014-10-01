@@ -49,6 +49,7 @@ install_requires = [
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
+    'webhelpers2',
 ]
 
 if not PY3:
