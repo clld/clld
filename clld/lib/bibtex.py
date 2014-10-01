@@ -25,9 +25,9 @@ UU_PATTERN = re.compile('\?\[\\\\u(?P<number>[0-9]{3,4})\]')
 
 
 def u_unescape(s):
-    """
-    Unencode Unicode escape sequences
-    match all 3/4-digit sequences with unicode character
+    """Unencode Unicode escape sequences.
+
+    Match all 3/4-digit sequences with unicode character
     replace all '?[\\u....]' with corresponding unicode
 
     There are some decimal/octal mismatches in unicode encodings in bibtex
@@ -115,7 +115,7 @@ def stripctrlchars(string):
 
 
 def unescape(string):
-    """transform latex escape sequences of type \`\ae  into unicode
+    """Transform latex escape sequences of type \`\ae  into unicode.
 
     :param string: six.text_type or six.binary_type \
     (which will be decoded using latex+latin1)
@@ -140,63 +140,91 @@ def unescape(string):
 
 
 class EntryType(DeclEnum):
-    """
-article
+    """Bibtext entry types.
+
+    article
+    -------
     An article from a journal or magazine.
     Required fields: author, title, journal, year
     Optional fields: volume, number, pages, month, note, key
-book
+
+    book
+    ----
     A book with an explicit publisher.
     Required fields: author/editor, title, publisher, year
     Optional fields: volume/number, series, address, edition, month, note, key
-booklet
+
+    booklet
+    -------
     A work that is printed and bound, but without a named publisher or sponsoring
     institution.
     Required fields: title
     Optional fields: author, howpublished, address, month, year, note, key
-conference
+
+    conference
+    ----------
     The same as inproceedings, included for Scribe compatibility.
-inbook
+
+    inbook
+    ------
     A part of a book, usually untitled. May be a chapter (or section or whatever) and/or
     a range of pages.
     Required fields: author/editor, title, chapter/pages, publisher, year
     Optional fields: volume/number, series, type, address, edition, month, note, key
-incollection
+
+    incollection
+    ------------
     A part of a book having its own title.
     Required fields: author, title, booktitle, publisher, year
     Optional fields: editor, volume/number, series, type, chapter, pages, address,
     edition, month, note, key
-inproceedings
+
+    inproceedings
+    -------------
     An article in a conference proceedings.
     Required fields: author, title, booktitle, year
     Optional fields: editor, volume/number, series, pages, address, month, organization,
     publisher, note, key
-manual
+
+    manual
+    ------
     Technical documentation.
     Required fields: title
     Optional fields: author, organization, address, edition, month, year, note, key
-mastersthesis
+
+    mastersthesis
+    -------------
     A Master's thesis.
     Required fields: author, title, school, year
     Optional fields: type, address, month, note, key
-misc
+
+    misc
+    ----
     For use when nothing else fits.
     Required fields: none
     Optional fields: author, title, howpublished, month, year, note, key
-phdthesis
+
+    phdthesis
+    ---------
     A Ph.D. thesis.
     Required fields: author, title, school, year
     Optional fields: type, address, month, note, key
-proceedings
+
+    proceedings
+    -----------
     The proceedings of a conference.
     Required fields: title, year
     Optional fields: editor, volume/number, series, address, month, publisher,
     organization, note, key
-techreport
+
+    techreport
+    ----------
     A report published by a school or other institution, usually numbered within a series.
     Required fields: author, title, institution, year
     Optional fields: type, number, address, month, note, key
-unpublished
+
+    unpublished
+    -----------
     A document having an author and title, but not formally published.
     Required fields: author, title, note
     Optional fields: month, year, key
@@ -248,8 +276,9 @@ FIELDS = [
 
 
 class _Convertable(UnicodeMixin):
-    """Mixin adding a shortcut to clld.lib.bibutils.convert as method.
-    """
+
+    """Mixin adding a shortcut to clld.lib.bibutils.convert as method."""
+
     def format(self, fmt):
         if fmt == 'txt':
             if hasattr(self, 'text'):
@@ -265,14 +294,14 @@ class _Convertable(UnicodeMixin):
 
 
 class IRecord(Interface):
-    """marker
-    """
+
+    """marker"""
 
 
 @implementer(IRecord)
 class Record(OrderedDict, _Convertable):
-    """A BibTeX record is basically an ordered dict with two special properties - id and
-    genre.
+
+    """A BibTeX record is an ordered dict with two special properties - id and genre.
 
     To overcome the limitation of single values per field in BibTeX, we allow fields,
     i.e. values of the dict to be iterables of strings as well.
@@ -286,6 +315,7 @@ class Record(OrderedDict, _Convertable):
 
     .. note:: Unknown genres are converted to "misc".
     """
+
     def __init__(self, genre, id_, *args, **kw):
         if isinstance(genre, string_types):
             try:
@@ -377,7 +407,8 @@ class Record(OrderedDict, _Convertable):
         return [_f for _f in res if _f]
 
     def __getitem__(self, key):
-        """
+        """Get concatenated string of all values for key.
+
         :return: string representing the concatenation of the values for field 'key'.
         """
         value = OrderedDict.__getitem__(self, key)
@@ -401,7 +432,7 @@ class Record(OrderedDict, _Convertable):
 """ % (getattr(self.genre, 'value', self.genre), self.id, "\n".join(fields)[:-1])
 
     def text(self):
-        """linearize the bib record according to the rules of the unified style
+        """Linearize the bib record according to the rules of the unified style.
 
         Book:
         author. year. booktitle. (series, volume.) address: publisher.
@@ -447,7 +478,7 @@ class Record(OrderedDict, _Convertable):
                 atom += '(%s)' % self['issue']
             res.append(atom)
             res.append(self.get('pages'))
-        elif genre == 'incollection':
+        elif genre == 'incollection' or genre == 'inproceedings':
             prefix = 'In'
             atom = ''
             if editors:
@@ -494,15 +525,15 @@ class Record(OrderedDict, _Convertable):
 
 
 class IDatabase(Interface):
-    """marker
-    """
+
+    """marker."""
 
 
 @implementer(IDatabase)
 class Database(_Convertable):
-    """
-    a class to handle bibtex databases, i.e. a container class for Record instances.
-    """
+
+    """Represents a bibtex databases, i.e. a container class for Record instances."""
+
     def __init__(self, records):
         self.records = [r for r in records if r.genre and r.id]
         self._keymap = None
@@ -512,16 +543,14 @@ class Database(_Convertable):
 
     @property
     def keymap(self):
-        """map bibtex record ids to list index
-        """
+        """Map bibtex record ids to list index."""
         if self._keymap is None:
             self._keymap = dict((r.id, i) for i, r in enumerate(self.records))
         return self._keymap
 
     @classmethod
     def from_file(cls, bibFile, encoding='utf8', lowercase=False):
-        """
-        a bibtex database defined by a bib-file
+        """Create bibtex database from a bib-file.
 
         @param bibFile: path of the bibtex-database-file to be read.
         """
@@ -538,7 +567,7 @@ class Database(_Convertable):
         return len(self.records)
 
     def __getitem__(self, key):
-        """to access bib records by index or citation key"""
+        """Access bib records by index or citation key."""
         return self.records[key if isinstance(key, int) else self.keymap[key]]
 
     def __iter__(self):
