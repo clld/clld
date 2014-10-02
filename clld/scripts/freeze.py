@@ -1,3 +1,4 @@
+"""Support for freezing and unfreezing of app databases."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 from io import open as ioopen
@@ -72,7 +73,7 @@ def update_zenodo_metadata_func(args, doi=None, dataset=None):  # pragma: no cov
     if 'creativecommons.org' in dataset.license and '/by/' in dataset.license:
         md["license"] = "cc-by"
     md["notes"] = "This deposit contains both, the data of %s as well as the software "\
-    "serving http://%s" % (dataset.name, dataset.domain)
+        "serving http://%s" % (dataset.name, dataset.domain)
     md["publication_date"] = dataset.published.isoformat()
     url = 'http://' + dataset.domain
     for ri in md["related_identifiers"]:
@@ -84,7 +85,7 @@ def update_zenodo_metadata_func(args, doi=None, dataset=None):  # pragma: no cov
     md["upload_type"] = "dataset"
 
     res = api('/%s/actions/edit' % zid, method='post')
-    #if res.status_code == 400:
+    # if res.status_code == 400:
     #    api('/%s/actions/discard' % zid, method='post')
     #    res = api('/%s/actions/edit' % zid, method='post')
     assert res.status_code == 201
@@ -133,8 +134,7 @@ def freeze_readme(dataset, req):  # pragma: no cover
 
 
 def freeze_schema(table):  # pragma: no cover
-    """renders DataTables as
-    `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
+    """Return a JSON Table schema for table.
 
     .. seealso:: http://csvlint.io/about
     """

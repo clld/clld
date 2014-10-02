@@ -1,6 +1,5 @@
 # coding: utf8
-"""
-Support for reading delimiter-separated value files.
+"""Support for reading delimiter-separated value files.
 
 This module contains unicode aware replacements for :func:`csv.reader`
 and :func:`csv.writer`.  It was stolen/extracted from the ``csvkit``
@@ -29,9 +28,9 @@ from clld.util import slug, to_binary, encoded
 
 
 class UTF8Recoder(object):
-    """
-    Iterator that reads an encoded stream and reencodes the input to UTF-8.
-    """
+
+    """Iterator that reads an encoded stream and reencodes the input to UTF-8."""
+
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
 
@@ -43,6 +42,9 @@ class UTF8Recoder(object):
 
 
 class UnicodeWriter(object):
+
+    """Write Unicode data to a csv file."""
+
     def __init__(self, f=None, encoding='utf8', **kw):
         self.f = f
         self.encoding = encoding
@@ -86,6 +88,9 @@ class UnicodeWriter(object):
 
 
 class UnicodeReader(Iterator):
+
+    """Read Unicode data from a csv file."""
+
     def __init__(self, f, **kw):
         self.f = f
         self.encoding = kw.pop('encoding', 'utf8')
@@ -129,6 +134,9 @@ class UnicodeReader(Iterator):
 
 
 class UnicodeDictReader(UnicodeReader):
+
+    """Read Unicode data represented as one dictionary per row."""
+
     def __init__(self, f, fieldnames=None, restkey=None, restval=None, **kw):
         self._fieldnames = fieldnames   # list of keys for the dict
         self.restkey = restkey          # key to catch long rows
@@ -173,6 +181,9 @@ class UnicodeDictReader(UnicodeReader):
 
 
 class NamedTupleReader(UnicodeDictReader):
+
+    """Read namedtuple objects from a csv file."""
+
     def __init__(self, f, **kw):
         self._cls = None
         UnicodeDictReader.__init__(self, f, **kw)
@@ -191,7 +202,9 @@ class NamedTupleReader(UnicodeDictReader):
 
 
 def normalize_name(s):
-    """This function is called to convert ASCII strings to something that can pass as
+    """Convert a string into a valid python attribute name.
+
+    This function is called to convert ASCII strings to something that can pass as
     python attribute name, to be used with namedtuples.
     """
     s = s.replace('-', '_').replace('.', '_').replace(' ', '_')
@@ -206,7 +219,8 @@ def normalize_name(s):
 
 
 def reader(lines_or_file, namedtuples=False, dicts=False, encoding='utf8', **kw):
-    """
+    """Convenience factory function for csv reader.
+
     :param lines_or_file: Content to be read. Either a file handle, a file path or a list\
     of strings.
     :param namedtuples: Yield namedtuples.

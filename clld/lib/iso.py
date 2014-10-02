@@ -1,6 +1,4 @@
-"""
-functionality to gather information about iso-639-3 codes from sil.org
-"""
+"""Functionality to gather information about iso-639-3 codes from sil.org."""
 # http://www-01.sil.org/iso639-3/iso-639-3_20130531.tab
 #
 # Id      char(3) NOT NULL,  -- The three-letter 639-3 identifier
@@ -63,15 +61,12 @@ TAB_NAME_PATTERN = re.compile(
 
 
 def get(path):
-    """retrieve a resource from the sil site and return it's representation.
-    """
+    """Retrieve a resource from the sil site and return it's representation."""
     return requests.get("http://www.sil.org/iso639-3/" + path).content
 
 
 def get_taburls():
-    """retrieves the current (date-stamped) file names for download files from sil's
-    download page.
-    """
+    """Retrieve the current (date-stamped) file names for download files from sil."""
     soup = bs(get('download.asp'))
     name_map = {
         None: 'codes',
@@ -88,8 +83,7 @@ def get_taburls():
 
 
 def get_tab(name):
-    """generator for entries in a tab file specified by name.
-    """
+    """Generator for entries in a tab file specified by name."""
     return dsv.reader(get(get_taburls()[name]).split('\n'), namedtuples=True)
 
 
@@ -98,8 +92,7 @@ def _text(e):
 
 
 def get_documentation(code):
-    """scrape information about a iso 639-3 code from the documentation page.
-    """
+    """Scrape information about a iso 639-3 code from the documentation page."""
     soup = bs(get('documentation.asp?id=' + code))
     assert code in soup.find_all('h1', limit=1)[0].text
 

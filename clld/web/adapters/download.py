@@ -1,3 +1,4 @@
+"""Functionality to create downloads for the data of a clld app."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
@@ -51,6 +52,9 @@ def download_dir(pkg):
 
 @implementer(IDownload)
 class Download(object):
+
+    """Represents a download format of a clld app's data."""
+
     ext = None
 
     def __init__(self, model, pkg, **kw):
@@ -164,10 +168,15 @@ class Download(object):
 
 
 class CsvDump(Download):
+
+    """Download of a resource type as csv."""
+
     ext = 'csv'
 
     def __init__(self, model, pkg, fields=None, **kw):
-        """fields can be a list of column names or a dictionary mapping model attribute
+        """Initialize.
+
+        fields can be a list of column names or a dictionary mapping model attribute
         names to csv column names.
         """
         super(CsvDump, self).__init__(model, pkg, **kw)
@@ -203,6 +212,9 @@ class CsvDump(Download):
 
 
 class N3Dump(Download):
+
+    """Download of a resource type as n-triples."""
+
     ext = 'n3'
 
     def dump_rendered(self, req, fp, item, index, rendered):
@@ -214,6 +226,9 @@ class N3Dump(Download):
 
 
 class RdfXmlDump(Download):
+
+    """Download of a resource type as rdf-xml."""
+
     ext = 'rdf'
 
     def before(self, req, fp):
@@ -229,6 +244,9 @@ class RdfXmlDump(Download):
 
 
 class Sqlite(Download):
+
+    """Generic download - no support for file creation."""
+
     ext = 'sqlite'
 
     def create(self, req):  # pragma: no cover

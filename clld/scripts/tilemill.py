@@ -1,6 +1,4 @@
-"""
-jumpstart a tilemill project based on a dataset from a clld app.
-"""
+"""jumpstart a tilemill project based on a dataset from a clld app."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 import sys
 import os
@@ -15,8 +13,7 @@ from six.moves.urllib.parse import urlparse
 
 
 def layer(project, param, url):
-    """a layer description for the tilemill project file.
-    """
+    """a layer description for the tilemill project file."""
     return {
         "geometry": "point",
         "extent": [-158, -33.866669, 178.08837900000003, 70.110481],
@@ -36,8 +33,7 @@ def layer(project, param, url):
 
 
 def project(name, param):
-    """a tilemill project description, including a basic countries-of-the-world layer.
-    """
+    """a tilemill project description, including a basic countries-of-the-world layer."""
     return {
         "bounds": [-180, -85.05112877980659, 180, 85.05112877980659],
         "center": [0, 0, 2],
@@ -70,8 +66,7 @@ def project(name, param):
 
 
 def legend(param):
-    """
-    :return: HTML markup for a legend for a tilemill map project.
+    """return HTML markup for a legend for a tilemill map project.
 
     .. note:: We include icons via data-uris.
     """
@@ -88,8 +83,7 @@ def legend(param):
 
 
 def style(project, param):
-    """carto css styles for the features of one parameter.
-    """
+    """carto css styles for the features of one parameter."""
     def valueset(vs):
         icon = os.path.basename(urlparse(vs['properties']['icon']).path)
         return """\
@@ -147,7 +141,8 @@ Map {
 
 
 def main(url):
-    """
+    """create a tilemill project skeleton.
+
     create zip archive including:
     - project.mml
     - style.mss

@@ -1,5 +1,6 @@
 # coding: utf8
-"""
+"""Functionality to create Coins, i.e. context objects in spans.
+
 .. seealso:: http://ocoins.info/
 """
 from __future__ import unicode_literals
@@ -156,9 +157,9 @@ def _encoded(value):
 
 
 class ContextObject(list, UnicodeMixin):
-    """
-    A Context Object which knows how to render it's metadata as HTML span tags.
-    """
+
+    """A Context Object which knows how to render it's metadata as HTML span tags."""
+
     def __init__(self, sid, mtx, *data):
         self.sid = sid
         self.mtx = mtx

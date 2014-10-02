@@ -1,8 +1,12 @@
+"""Default DataTable for Contribution objects."""
 from clld.web.datatables.base import DataTable, Col, LinkCol
 from clld.web.util.helpers import linked_contributors, cite_button
 
 
 class ContributorsCol(Col):
+
+    """Render links to the corresponding Contributors of a Contribution."""
+
     __kw__ = {'bSearchable': False, 'bSortable': False}
 
     def format(self, item):
@@ -10,6 +14,9 @@ class ContributorsCol(Col):
 
 
 class CitationCol(Col):
+
+    """Render a cite-button."""
+
     __kw__ = {'bSearchable': False, 'bSortable': False}
 
     def format(self, item):
@@ -17,6 +24,9 @@ class CitationCol(Col):
 
 
 class Contributions(DataTable):
+
+    """Default DataTable for Contribution objects."""
+
     def col_defs(self):
         return [
             LinkCol(self, 'name'),

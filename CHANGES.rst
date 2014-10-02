@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.18
+~~~~
+
+- bug fixes
+- work on docs, including pep257 conformance
+
+
 0.17
 ~~~~
 

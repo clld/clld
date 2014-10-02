@@ -1,5 +1,5 @@
 """
-views implementing the sitemap protocol
+view callables implementing the sitemap protocol.
 
 .. seealso:: http://www.sitemaps.org/
 """
@@ -19,7 +19,8 @@ LIMIT = 50000
 
 
 def robots(req):
-    """
+    """robots.txt response listing the sitemaps.
+
     .. seealso:: http://www.sitemaps.org/protocol.html#submit_robots
     """
     return Response(
@@ -27,7 +28,9 @@ def robots(req):
 
 
 def _query(req, rsc):
-    """we must make sure, each query is ordered, so that limit and offset does make sense.
+    """Ordered sqlalchemy query.
+
+    We must make sure, each query is ordered, so that limit and offset does make sense.
     """
     return DBSession.query(rsc.model.id, rsc.model.updated).order_by(rsc.model.pk)
 
@@ -51,7 +54,8 @@ def _response(type_, itemiter):
 
 
 def sitemapindex(req):
-    """
+    """Response listing resource-specific sitemaps.
+
     .. seealso:: http://www.sitemaps.org/protocol.html#index
     """
     def _iter(sitemaps):
@@ -67,7 +71,10 @@ def sitemapindex(req):
 
 
 def sitemap(req):
-    """
+    """Resource-specific sitemap.
+
+    .. note:: The resource is looked up using the URL parameter ``rsc``.
+
     .. seealso:: http://www.sitemaps.org/protocol.html#xmlTagDefinitions
     """
     def _iter():
@@ -84,6 +91,7 @@ def sitemap(req):
 
 
 def resourcemap(req):
+    """Resource-specific JSON response listing all resource instances."""
     res = {'properties': {'dataset': req.dataset.id}, 'resources': []}
     rsc = req.params.get('rsc')
     if rsc:

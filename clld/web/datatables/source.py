@@ -1,9 +1,13 @@
+"""Default DataTable for Source objects."""
 from clld.db.models.common import Language, LanguageSource, Source
 from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
 from clld.lib.bibtex import EntryType
 
 
 class TypeCol(Col):
+
+    """Render the BibTeX type of a Source item."""
+
     def __init__(self, dt, name, *args, **kw):
         kw['sTitle'] = 'BibTeX type'
         kw['choices'] = [(t.value, t.description) for t in EntryType]
@@ -20,6 +24,9 @@ class TypeCol(Col):
 
 
 class Sources(DataTable):
+
+    """Default DataTable for Source objects."""
+
     __constraints__ = [Language]
 
     def base_query(self, query):

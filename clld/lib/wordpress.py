@@ -18,22 +18,21 @@ XMLRPC_PATH = 'xmlrpc.php'
 
 
 def sluggify(phrase):
-    """
-    >>> assert sluggify('a  and B') == 'a-and-b'
-    """
     phrase = phrase.lower().strip()
     phrase = re.sub('\s+', '-', phrase)
     return phrase
 
 
 class Client(object):
-    """client to a wpmu blog
+
+    """Implements a client for a wpmu blog.
 
     provides a unified interface to functionality called over xmlrpc or plain http
 
     >>> c = Client('blog.example.org', 'user', 'password')
     >>> assert c.service_url == 'http://blog.example.org/xmlrpc.php'
     """
+
     def __init__(self, url, user, password):
         self.user = user
         self.password = password
@@ -110,9 +109,7 @@ class Client(object):
         return cat_map
 
     def get_post_id_from_path(self, path):
-        """
-        pretty hacky way to determine whether some post exists
-        """
+        """Pretty hacky way to determine whether some post exists."""
         if not path.startswith(self.base_url):
             path = self.base_url + path
         res = requests.get(path)

@@ -1,6 +1,4 @@
-"""
-Functionality to gather information to link to ethnologue.com
-"""
+"""Functionality to gather information to link to ethnologue.com."""
 from __future__ import unicode_literals, print_function
 import re
 import time
@@ -10,13 +8,12 @@ from bs4 import BeautifulSoup as bs
 
 
 def get(path):
-    """retrieve a resource from the ethnologue site and return it's representation.
-    """
+    """Retrieve a resource from the ethnologue site and return it's representation."""
     return requests.get("http://ethnologue.com" + path).content
 
 
 def get_subgroups():
-    """Parses subgroups from ethnologue's language family pages.
+    """Parse subgroups from ethnologue's language family pages.
 
     :return: dict
     """
@@ -44,10 +41,11 @@ def get_classification(group, doc):
     prefix = '/subgroups/'
     res = {}
     psubgroupname = re.compile('(?P<name>[^\(]+)')
-    pext = re.compile('\((?P<ext>[0-9]+)\)')
+    # pext = re.compile('\((?P<ext>[0-9]+)\)')
 
     def parse_languages(node):
-        """
+        """Example.
+
         <span class="field-content">Chinese, Gan <a href="/language/gan">[gan]</a>
         """
         for a in node.find_all('a', href=True):
@@ -79,9 +77,9 @@ def get_classification(group, doc):
         id_ = a['href'][len(prefix):]
         subgroups.append(id_)
         name = psubgroupname.match(a.text).group('name').strip()
-        ext = int(pext.search(a.text).group('ext').strip())
+        # ext = int(pext.search(a.text).group('ext').strip())
         subfamilies, languages = parse_classification(a)
-        #if ext != len(languages) and id_ not in [
+        # if ext != len(languages) and id_ not in [
         #    'mor-0', 'west-3', 'bole-proper', 'bai', 'atlantic-congo', 'east-16',
         #    'west-12', 'volta-congo', 'benue-congo', 'bantoid', 'southern',
         #    'narrow-bantu',
@@ -93,7 +91,7 @@ def get_classification(group, doc):
         #    'central-27',
         #    'niloti',
         #    'southern-21',
-        #]:
+        # ]:
         #    print(group)
         #    print(id_)
         #    print(ext, len(languages))

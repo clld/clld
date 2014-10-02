@@ -1,3 +1,4 @@
+"""Serialize clld objects as csv."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 
 from sqlalchemy import types
@@ -9,8 +10,9 @@ from clld.lib.dsv import UnicodeWriter
 
 
 class CsvAdapter(Index):
-    """renders DataTables as csv files
-    """
+
+    """Represent DataTables as csv files."""
+
     extension = 'csv'
     mimetype = 'text/csv'
     content_type_params = dict(header='present')
@@ -31,11 +33,15 @@ class CsvAdapter(Index):
 
 
 class JsonTableSchemaAdapter(Index):
-    """renders DataTables as
+
+    """Schema for the columns in a DataTable.
+
+    Renders DataTables as
     `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
 
     .. seealso:: http://csvlint.io/about
     """
+
     extension = 'csv.csvm'
     mimetype = 'application/csvm+json'
     send_mimetype = 'application/json'

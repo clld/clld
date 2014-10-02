@@ -1,3 +1,4 @@
+"""Base classes for adapters."""
 from __future__ import unicode_literals
 from zope.interface import implementer
 from pyramid.response import Response
@@ -8,7 +9,8 @@ from clld.util import to_binary
 
 
 class Renderable(object):
-    """Virtual base class for adapters
+
+    """Virtual base class for adapters.
 
     Adapters can provide custom behaviour either by specifying a template to use for
     rendering, or by overwriting the render method.
@@ -16,6 +18,7 @@ class Renderable(object):
     >>> r = Renderable(None)
     >>> assert r.label == 'Renderable'
     """
+
     name = None
     template = None
     mimetype = 'text/plain'
@@ -63,15 +66,15 @@ class Renderable(object):
 
 @implementer(interfaces.IRepresentation)
 class Representation(Renderable):
-    """Base class for adapters implementing IRepresentation
-    """
-    pass
+
+    """Base class for adapters implementing IRepresentation."""
 
 
 @implementer(interfaces.IRepresentation)
 class Json(Renderable):
-    """JavaScript Object Notation
-    """
+
+    """JavaScript Object Notation."""
+
     name = 'JSON'
     mimetype = 'application/json'
     extension = 'json'
@@ -81,8 +84,9 @@ class Json(Renderable):
 
 
 class SolrDoc(Json):
-    """Document for indexing with Solr encoded in JSON
-    """
+
+    """Document for indexing with Solr encoded in JSON."""
+
     name = 'Solr JSON'
     send_mimetype = Json.mimetype
     mimetype = 'application/vnd.clld.solr+json'
@@ -94,9 +98,8 @@ class SolrDoc(Json):
 
 @implementer(interfaces.IIndex)
 class Index(Renderable):
-    """Base class for adapters implementing IIndex
-    """
-    pass
+
+    """Base class for adapters implementing IIndex."""
 
 
 ADAPTER_COUNTER = 0

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Utilities to help with testing."""
 from __future__ import absolute_import, division, unicode_literals
 import threading
 from collections import namedtuple
@@ -41,18 +42,20 @@ TESTS_DIR = path(clld.__file__).dirname().joinpath('tests')
 
 
 class Route(Mock):
+
+    """Mock a pyramid Route object."""
+
     def __init__(self, name='home'):
         super(Mock, self).__init__()
         self.name = name
 
 
 def main(global_config, **settings):
-    """called when bootstrapping a pyramid app using clld/tests/test.ini
-    """
+    """called when bootstrapping a pyramid app using clld/tests/test.ini."""
     from clld.web.app import get_configurator
 
     class IF(Interface):
-        """" """""
+        pass
 
     settings['mako.directories'] = ['clld:web/templates']
     config = get_configurator(
@@ -63,6 +66,9 @@ def main(global_config, **settings):
 
 
 class TestWithDb(unittest.TestCase):
+
+    """For tests in need of a session bound to an empty db."""
+
     __with_custom_language__ = True
 
     def setUp(self):
@@ -81,6 +87,9 @@ class TestWithDb(unittest.TestCase):
 
 
 class TestWithDbAndData(TestWithDb):
+
+    """For tests in need of a session bound to a db with sample data."""
+
     def setUp(self):
         TestWithDb.setUp(self)
 
@@ -197,6 +206,9 @@ class TestWithDbAndData(TestWithDb):
 
 
 class TestWithEnv(TestWithDbAndData):
+
+    """For tests in need of a configured app."""
+
     __cfg__ = TESTS_DIR.joinpath('test.ini').abspath()
     __setup_db__ = True
 
@@ -263,7 +275,8 @@ class TestWithEnv(TestWithDbAndData):
 
 
 def _add_header(headers, name, value):
-    """
+    """Add (name, value) to headers.
+
     >>> headers = []
     >>> assert _add_header(headers, 'n', 'v') == [('n', 'v')]
     >>> headers = {}
@@ -277,6 +290,9 @@ def _add_header(headers, name, value):
 
 
 class ExtendedTestApp(TestApp):
+
+    """WebTest TestApp with extended support for evaluation of responses."""
+
     parsed_body = None
 
     def get(self, *args, **kw):
@@ -321,21 +337,29 @@ class ExtendedTestApp(TestApp):
 
 
 class TestWithApp(TestWithEnv):
+
+    """For tests in need of a running app."""
+
     def setUp(self):
         TestWithEnv.setUp(self)
         self.app = ExtendedTestApp(self.env['app'])
 
 
 class Handler(WSGIRequestHandler):  # pragma: no cover
+
+    """Logging HTTP request handler."""
+
     def log_message(self, *args, **kw):
         return
 
 
 class ServerThread(threading.Thread):  # pragma: no cover
-    """ Run WSGI server on a background thread.
+
+    """Run WSGI server on a background thread.
 
     Pass in WSGI app object and serve pages from it for Selenium browser.
     """
+
     def __init__(self, app, host='0.0.0.0:8880'):
         threading.Thread.__init__(self)
         self.app = app
@@ -343,9 +367,7 @@ class ServerThread(threading.Thread):  # pragma: no cover
         self.srv = None
 
     def run(self):
-        """
-        Open WSGI server to listen to HOST_BASE address
-        """
+        """Open WSGI server to listen to HOST_BASE address."""
         self.srv = make_server(self.host, int(self.port), self.app, handler_class=Handler)
         try:
             self.srv.serve_forever()
@@ -356,17 +378,17 @@ class ServerThread(threading.Thread):  # pragma: no cover
             self.srv = None
 
     def quit(self):
-        """
-        """
         if self.srv:
             self.srv.shutdown()
 
 
 class PageObject(object):  # pragma: no cover
-    """Virtual base class for objects we wish to interact with in selenium tests.
-    """
+
+    """Virtual base class for objects we wish to interact with in selenium tests."""
+
     def __init__(self, browser, eid, url=None):
-        """
+        """Initialize.
+
         :param browser: The selenium webdriver instance.
         :param eid: Element id of a dom object.
         :param url: If specified, we first navigate to this url.
@@ -385,6 +407,9 @@ class PageObject(object):  # pragma: no cover
 
 
 class Map(PageObject):  # pragma: no cover
+
+    """PageObject to interact with maps."""
+
     def __init__(self, browser, eid=None, url=None, sleep=2):
         super(Map, self).__init__(browser, eid or 'map-container', url=url)
         time.sleep(sleep)
@@ -410,6 +435,9 @@ class Map(PageObject):  # pragma: no cover
 
 
 class DataTable(PageObject):  # pragma: no cover
+
+    """PageObject to interact with DataTables."""
+
     info_pattern = re.compile('\s+'.join([
         'Showing', '(?P<offset>[0-9,]+)',
         'to', '(?P<limit>[0-9,]+)',
@@ -422,8 +450,7 @@ class DataTable(PageObject):  # pragma: no cover
         super(DataTable, self).__init__(browser, eid or 'dataTables_wrapper', url=url)
 
     def get_info(self):
-        """Parses the DataTables result info.
-        """
+        """Parse the DataTables result info."""
         fieldnames = 'offset limit filtered total'
         res = []
         info = self.e.find_element_by_class_name('dataTables_info')
@@ -436,9 +463,7 @@ class DataTable(PageObject):  # pragma: no cover
         return namedtuple('Info', fieldnames)(*res)
 
     def get_first_row(self):
-        """
-        :return: list with text-values of the cells of the first table row.
-        """
+        """Return a list with text-values of the cells of the first table row."""
         table = None
         for t in self.e.find_elements_by_tag_name('table'):
             if 'dataTable' in t.get_attribute('class'):
@@ -450,7 +475,7 @@ class DataTable(PageObject):  # pragma: no cover
         return res
 
     def filter(self, name, value):
-        """filters the table by using value for the column specified by name.
+        """filter the table by using value for the column specified by name.
 
         Note that this abstracts the different ways filter controls can be implemented.
         """
@@ -463,8 +488,7 @@ class DataTable(PageObject):  # pragma: no cover
         time.sleep(2.5)
 
     def sort(self, label, sleep=2.5):
-        """Triggers a table sort by clicking on the th Element specified by label.
-        """
+        """Trigger a table sort by clicking on the th Element specified by label."""
         sort = None
         for e in self.e.find_elements_by_xpath("//th"):
             if 'sorting' in e.get_attribute('class') and e.text.strip().startswith(label):
@@ -483,9 +507,10 @@ class DataTable(PageObject):  # pragma: no cover
 
 
 class TestWithSelenium(unittest.TestCase):  # pragma: no cover
-    """run tests using selenium with the firefox driver
-    """
-    host = '0.0.0.0:8880'
+
+    """run tests using selenium with the firefox driver."""
+
+    host = '127.0.0.1:8880'
 
     @classmethod
     def setUpClass(cls):
@@ -529,6 +554,9 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
 
 
 class XmlResponse(object):
+
+    """Wrapper for XML responses."""
+
     ns = None
 
     def __init__(self, response):

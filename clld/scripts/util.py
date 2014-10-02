@@ -1,3 +1,4 @@
+"""Shared functionality for clld console scripts."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 import sys
@@ -25,7 +26,7 @@ from clld.lib import bibtex
 
 
 def glottocodes_by_isocode(dburi, cols=['id']):
-    """Query Glottolog
+    """Query Glottolog.
 
     :dburi: If not None, sqlalchemy dburi for a glottolog database. If None, \
     glottolog.org will be queried.
@@ -71,7 +72,7 @@ def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
     if glottocode or (glottocodes and isocode and isocode in glottocodes):
         glottocode = glottocode or glottocodes[isocode]
         DBSession.add(common.LanguageIdentifier(
-                language=lang, identifier=identifier('glottolog', glottocode)))
+            language=lang, identifier=identifier('glottolog', glottocode)))
 
 
 def bibtex2source(rec, cls=common.Source):
@@ -112,7 +113,8 @@ def confirm(question, default=False):  # pragma: no cover
 
 
 def data_file(module, *comps):
-    """
+    """Return path object of file in the data directory of an app.
+
     >>> assert data_file(common)
     """
     return path(module.__file__).dirname().joinpath('..', 'data', *comps)
@@ -129,6 +131,9 @@ def setup_session(config_uri, engine=None):
 
 
 class ExistingDir(argparse.Action):  # pragma: no cover
+
+    """Action to select an existing directory."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         path_ = path(values)
         if not path_.exists():
@@ -139,6 +144,9 @@ class ExistingDir(argparse.Action):  # pragma: no cover
 
 
 class ExistingConfig(argparse.Action):  # pragma: no cover
+
+    """Action to select an existing config file."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         path_ = path(values.split('#')[0])
         if not path_.exists():
@@ -147,6 +155,9 @@ class ExistingConfig(argparse.Action):  # pragma: no cover
 
 
 class SqliteDb(argparse.Action):  # pragma: no cover
+
+    """Action to select an sqlite db to connect to."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, 'engine', create_engine('sqlite:///%s' % values[0]))
 
@@ -166,8 +177,7 @@ def index(rsc, req, solr, query_options=None, batch_size=1000):
 
 
 def parsed_args(*arg_specs, **kw):  # pragma: no cover
-    """pass a truthy value as keyword parameter bootstrap to bootstrap the app.
-    """
+    """pass a truthy value as keyword parameter bootstrap to bootstrap the app."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config_uri", action=ExistingConfig, help="ini file providing app config")
@@ -335,6 +345,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
 
 
 class Data(defaultdict):
+
     """Dictionary, serving to store references to new db objects during data imports.
 
     The values are dictionaries, keyed by the name of the mapper class used to create the
@@ -343,6 +354,7 @@ class Data(defaultdict):
     >>> d = Data()
     >>> assert d['k'] == {}
     """
+
     def __init__(self, **kw):
         super(Data, self).__init__(dict)
         self.defaults = kw

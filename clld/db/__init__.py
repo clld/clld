@@ -1,6 +1,5 @@
 """
-Common data model for clld applications
----------------------------------------
+Common data model for clld applications.
 
 We exploit several features of sqlalchemy to make the definition of the data model as
 succinct as possible:

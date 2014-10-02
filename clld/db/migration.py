@@ -1,4 +1,5 @@
-"""
+"""Functionality for alembic scripts.
+
 This module provides
 
 - basic crud functionality within alembic migration scripts,
@@ -24,6 +25,7 @@ def _with_where_clause(table, stmt, **where):
 
 
 class Connection(object):
+
     """A wrapper around an SQLAlchemy connection.
 
     This wrapper provides the convenience of allowing typical CRUD operations to be
@@ -40,8 +42,10 @@ class Connection(object):
         from alembic import op
         conn = Connection(op.get_bind())
     """
+
     def __init__(self, conn):
-        """
+        """Initialize.
+
         :param conn:
             SQLAlchemy connection object, i.e. anything with a ``execute`` method; so in
             particular a session qualifies as well as an engine, i.e. what ``get_bind()``
@@ -50,39 +54,32 @@ class Connection(object):
         self._conn = conn
 
     def execute(self, *args, **kw):
-        """Provides access to the underlying connection's ``execute`` method.
-        """
+        """Provide access to the underlying connection's ``execute`` method."""
         return self._conn.execute(*args, **kw)
 
     #
     # CRUD operations:
     #
     def select(self, model, **where):
-        """Run a select statement and return a ResultProxy.
-        """
+        """Run a select statement and return a ResultProxy."""
         table = model.__table__
         return self.execute(_with_where_clause(table, base_select([table]), **where))
 
     def all(self, model, **where):
-        """
-        :return: All results of a select statement.
-        """
+        """return all results of a select statement."""
         return self.select(model, **where).fetchall()
 
     def first(self, model, **where):
-        """
-        :return: First result of a select statement or ``None``.
-        """
+        """return first result of a select statement or ``None``."""
         return self.select(model, **where).fetchone()
 
     def get(self, model, pk):
-        """
-        :return: Row specified by primary key.
-        """
+        """return row specified by primary key."""
         return self.first(model, pk=pk)
 
     def pk(self, model, id_, attr='id'):
-        """
+        """Get the primary key of an object specified by a unique property.
+
         :param model: model class.
         :param id_: Value to be used when filtering.
         :param attr: Column to be used for filtering.
@@ -93,7 +90,7 @@ class Connection(object):
             return res.pk
 
     def insert(self, model, **values):
-        """Runs an insert statement.
+        """Run an insert statement.
 
         :return: primary key of the inserted row.
         """
@@ -110,8 +107,7 @@ class Connection(object):
         return res.inserted_primary_key[0]
 
     def update(self, model, values, **where):
-        """Runs an update statement.
-        """
+        """Run an update statement."""
         if not isinstance(values, dict):
             values = dict(values)
         if hasattr(model.__table__.c, 'updated'):
@@ -120,8 +116,7 @@ class Connection(object):
         self.execute(_with_where_clause(table, table.update(), **where).values(**values))
 
     def delete(self, model, **where):
-        """Runs a delete statement.
-        """
+        """Run a delete statement."""
         self.execute(
             _with_where_clause(model.__table__, model.__table__.delete(), **where))
 
@@ -129,8 +124,9 @@ class Connection(object):
     # domain specific operations:
     #
     def set_glottocode(self, lid, gc, gcid=None):
-        """assigns a unique glottocode to a language, i.e. alternative glottocodes will be
-        deleted.
+        """assign a unique glottocode to a language.
+
+        i.e. alternative glottocodes will be deleted.
 
         :param lid: ``id`` of the language.
         :param gc: Glottocode to be assigned.
@@ -167,8 +163,6 @@ class Connection(object):
 
 
 def merge_sources(conn, from_id, to_id, *fields):  # pragma: no cover
-    """
-    """
     if not isinstance(conn, Connection):
         conn = Connection(conn)
     # resolve id to pk

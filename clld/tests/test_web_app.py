@@ -58,7 +58,7 @@ class Tests(TestWithEnv):
         from clld.web.app import get_configurator
 
         class IF(Interface):
-            """" """""
+            pass
 
         config = get_configurator(
             'clld',

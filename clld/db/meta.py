@@ -1,6 +1,4 @@
-"""
-We provide some infrastructure to build extensible database models.
-"""
+"""We provide some infrastructure to build extensible database models."""
 from copy import copy
 from datetime import datetime
 try:
@@ -35,7 +33,9 @@ from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 @sqlalchemy.event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
-    """Implements
+    """Event listener to handle disconnects.
+
+    Implements
     `pessimistic disconnect handling <http://docs.sqlalchemy.org/en/rel_0_9/core/\
     pooling.html#disconnect-handling-pessimistic>`_.
 
@@ -59,10 +59,14 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
 
 class ActiveOnlyQuery(Query):  # pragma: no cover
-    """Implements a
+
+    """A pre-filtering query.
+
+    Implements a
     `pre-filtering query <http://www.sqlalchemy.org/trac/wiki/UsageRecipes/\
     PreFilteredQuery>`_ that filters on the :py:attr:`clld.db.meta._Base.active` flag.
     """
+
     def get(self, ident):
         # override get() so that the flag is always checked in the
         # DB as opposed to pulling from the identity map.
@@ -94,8 +98,9 @@ VersionedDBSession = scoped_session(versioned_session(
 
 
 class JSONEncodedDict(TypeDecorator):
-    """Represents an immutable structure as a json-encoded string.
-    """
+
+    """Represents an immutable structure as a json-encoded string."""
+
     impl = VARCHAR
 
     def process_bind_param(self, value, dialect):
@@ -120,17 +125,14 @@ def _solr_timestamp(dt):
 
 
 class CsvMixin(object):
-    """
-    Mixin providing methods to control serialization and deserialization of an object as
-    row in a csv file.
-    """
+
+    """Mixin providing methods to control (de-)serialization of an object as csv row."""
+
     #: base name of the csv file
     __csv_name__ = None
 
     def csv_head(self):
-        """
-        :return: List of column names.
-        """
+        """return List of column names."""
         cols = []
         for om in object_mapper(self).iterate_to_root():
             cols.extend(col.key for col in om.local_table.c)
@@ -160,9 +162,7 @@ class CsvMixin(object):
         return prop
 
     def to_csv(self, ctx=None, req=None, cols=None):
-        """
-        :return: list of values to be passed to csv.writer.writerow
-        """
+        """return list of values to be passed to csv.writer.writerow."""
         return [self.value_to_csv(attr, ctx, req) for attr in cols or self.csv_head()]
 
     @classmethod
@@ -194,11 +194,14 @@ class CsvMixin(object):
 
 
 class _Base(UnicodeMixin, CsvMixin):
-    """The declarative base for all our models.
-    """
+
+    """The declarative base for all our models."""
+
     @declared_attr
     def __tablename__(cls):
-        """We derive the table name from the model class name. This should be safe,
+        """We derive the table name from the model class name.
+
+        This should be safe,
         because we don't want to have model classes with the same name either.
         Care has to be taken, though, to prevent collisions with the names of tables
         which are automatically created (history tables for example).
@@ -233,7 +236,9 @@ class _Base(UnicodeMixin, CsvMixin):
     jsondata = sqlalchemy.Column(JSONEncodedDict)
 
     def update_jsondata(self, **kw):
-        """Since we use the simple
+        """Convenience function.
+
+        Since we use the simple
         `JSON encoded dict recipe <http://docs.sqlalchemy.org/en/rel_0_9/core/types.html\
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
@@ -244,7 +249,9 @@ class _Base(UnicodeMixin, CsvMixin):
 
     @classmethod
     def mapper_name(cls):
-        """To make implementing model class specific behavior across the technology
+        """Get the name of the mapper class.
+
+        To make implementing model class specific behavior across the technology
         boundary easier - e.g. specifying CSS classes - we provide a string representation
         of the model class.
 
@@ -258,16 +265,15 @@ class _Base(UnicodeMixin, CsvMixin):
 
     @property
     def replacement_id(self):
-        """This property is used to allow automatically redirecting to a 'better' version
-        of a resource.
-        """
+        """Used to allow automatically redirecting to a 'better' version of a resource."""
         if not self.active:
             return self.jsondatadict.get('__replacement_id__')
 
     @classmethod
     def get(cls, value, key=None, default=NO_DEFAULT, session=None):
-        """Convenient method to query a model where exactly one result is expected, e.g.
-        to retrieve an instance by primary key or id.
+        """Convenience method to query a model where exactly one result is expected.
+
+        e.g. to retrieve an instance by primary key or id.
 
         :param value: The value used in the filter expression of the query.
         :param str key: The key or attribute name to be used in the filter expression. If\
@@ -285,14 +291,11 @@ class _Base(UnicodeMixin, CsvMixin):
 
     @classmethod
     def first(cls):
-        """More convenience.
-        """
+        """More convenience."""
         return DBSession.query(cls).order_by(cls.pk).first()
 
     def history(self):
-        """
-        :return: Result proxy to iterate over previous versions of a record.
-        """
+        """return result proxy to iterate over previous versions of a record."""
         model = object_mapper(self).class_
         if not hasattr(model, '__history_mapper__'):
             return []  # pragma: no cover
@@ -302,7 +305,8 @@ class _Base(UnicodeMixin, CsvMixin):
             .order_by(sqlalchemy.desc(history_class.version))
 
     def __json__(self, req):
-        """
+        """Custom JSON serialization of an object.
+
         :param req: pyramid Request object.
         :return: ``dict`` suitable for serialization as JSON.
         """
@@ -315,7 +319,8 @@ class _Base(UnicodeMixin, CsvMixin):
             for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
 
     def __solr__(self, req):
-        """
+        """Custom solr document representing the object.
+
         :param req: pyramid Request object.
         :return: ``dict`` suitable as JSON encoded \
         `Solr <https://lucene.apache.org/solr/>`_ document.
@@ -359,9 +364,7 @@ class _Base(UnicodeMixin, CsvMixin):
         return res
 
     def __unicode__(self):
-        """
-        :return: A human readable label for the object.
-        """
+        """A human readable label for the object."""
         r = getattr(self, 'name', None)
         if not r:
             r = getattr(self, 'id', None)
@@ -378,10 +381,14 @@ Base = declarative_base(cls=_Base)
 
 
 class PolymorphicBaseMixin(object):
-    """We use joined table inheritance to allow projects to augment base ``clld``
+
+    """Mixin providing the wiring for joined table inheritance.
+
+    We use joined table inheritance to allow projects to augment base ``clld``
     models with project specific attributes. This mixin class prepares
     models to serve as base classes for inheritance.
     """
+
     polymorphic_type = sqlalchemy.Column(sqlalchemy.String(20))
 
     @declared_attr
@@ -394,7 +401,8 @@ class PolymorphicBaseMixin(object):
 
 
 def is_base(cls):
-    """
+    """Determine whether a class is a base class or an inheriting one.
+
     :param cls: Model class.
     :return: ``bool`` signaling whether ``cls`` is a base class or derived, i.e.\
     customized.
@@ -406,6 +414,7 @@ def is_base(cls):
 
 
 class CustomModelMixin(object):
+
     """Mixin for customized classes in our joined table inheritance scheme.
 
     .. note::
@@ -413,6 +422,7 @@ class CustomModelMixin(object):
         With this scheme there can be only one specialized mapper class per inheritable
         base class.
     """
+
     @declared_attr
     def __mapper_args__(cls):
         return {'polymorphic_identity': 'custom'}  # pragma: no cover

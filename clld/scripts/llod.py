@@ -86,7 +86,7 @@ def register(args):  # pragma: no cover
     if not package:
         package = datahub(
             'package_create',
-            {'name': name, 'title': 'CLLD-' + dataset.id, 'owner_org': 'clld'})
+            **{'name': name, 'title': 'CLLD-' + dataset.id, 'owner_org': 'clld'})
     md = {
         'url': 'http://%s' % dataset.domain,
         'notes': '%s published by the CLLD project' % dataset.name,

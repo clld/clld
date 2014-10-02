@@ -1,6 +1,4 @@
-"""
-Common functionality of CLLD Apps is cobbled together here.
-"""
+"""Common functionality of clld Apps is cobbled together here."""
 from functools import partial
 from collections import OrderedDict
 import re
@@ -51,11 +49,14 @@ assert assets
 
 
 class ClldRequest(Request):
-    """Custom Request class
-    """
+
+    """Custom Request class."""
+
     @reify
     def purl(self):
-        """For more convenient URL manipulations, we provide the current request's URL
+        """Access the current request's URL.
+
+        For more convenient URL manipulations, we provide the current request's URL
         as `purl.URL <http://purl.readthedocs.org/en/latest/#purl.URL>`_ instance.
         """
         return URL(self.url)
@@ -66,14 +67,17 @@ class ClldRequest(Request):
 
     @reify
     def query_params(self):
-        """
+        """Convenient access to the query parameters of the current request.
+
         :return: dict of the query parameters of the request URL.
         """
         return {k: v[0] for k, v in self.purl.query_params().items()}
 
     @property
     def db(self):
-        """We make the db session available as request attribute, so we do not have to
+        """Convenient access to the db session.
+
+        We make the db session available as request attribute, so we do not have to
         import it in templates.
         """
         return DBSession
@@ -84,14 +88,17 @@ class ClldRequest(Request):
 
     @reify
     def dataset(self):
-        """Properties of the :py:class:`clld.db.models.common.Dataset` object an
+        """Convenient access to the Dataset object.
+
+        Properties of the :py:class:`clld.db.models.common.Dataset` object an
         application serves are used in various places, so we want to have a reference to
         it.
         """
         return self.db.query(common.Dataset).first()
 
     def get_datatable(self, name, model, **kw):
-        """
+        """Convenient lookup and retrieval of initialized DataTable object.
+
         :param name: Name under which the datatable class was registered.
         :param model: model class to pass as initialization parameter to the datatable.
         :param kw:
@@ -104,7 +111,8 @@ class ClldRequest(Request):
         return dt(self, model, **kw)
 
     def get_map(self, name=None, **kw):
-        """
+        """Convenient lookup and retrieval of initialized Map object.
+
         :param name: Name under which the map was registered.
         :return:
             :py:class:`clld.web.maps.Map` instance, if a map was registered else ``None``.
@@ -117,8 +125,9 @@ class ClldRequest(Request):
                 return map_(self.context, self, **kw)
 
     def _route(self, obj, rsc, **kw):
-        """Determines the name of the canonical route for a resource instance. The
-        resource may be specified as object or as mapper class and id.
+        """Determine the name of the canonical route for a resource instance.
+
+        The resource may be specified as object or as mapper class and id.
 
         :return:
             pair (route_name, kw) suitable as arguments for the Request.route_url method.
@@ -140,8 +149,9 @@ class ClldRequest(Request):
         return route, kw
 
     def ctx_for_url(self, url):
-        """Method to reverse URL generation for resources, i.e. given a URL, tries to
-        determine the associated resource.
+        """Method to reverse URL generation for resources.
+
+        I.e. given a URL, tries to determine the associated resource.
 
         :return: model instance or ``None``.
         """
@@ -160,7 +170,8 @@ class ClldRequest(Request):
                         return rsc.model.get(info['match']['id'], default=None)
 
     def resource_url(self, obj, rsc=None, **kw):
-        """
+        """Get the absolute URL for a resource.
+
         :param obj:
             A resource or the id of a resource; in the latter case ``rsc`` must be passed.
         :param rsc: A registered :py:class:`clld.Resource`.
@@ -194,7 +205,8 @@ class ClldRequest(Request):
 
 
 def menu_item(resource, ctx, req, label=None):
-    """
+    """Factory function for a resource-specific menu item.
+
     :return: A pair (URL, label) to create a menu item.
     """
     return req.route_url(resource), label or req.translate(resource.capitalize())
@@ -202,6 +214,7 @@ def menu_item(resource, ctx, req, label=None):
 
 @implementer(interfaces.ICtxFactoryQuery)
 class CtxFactoryQuery(object):
+
     """Implements reasonable default queries to be used in context factories.
 
     By reasonable we mean providing good performance for typical data sizes. Applications
@@ -209,8 +222,11 @@ class CtxFactoryQuery(object):
     for the ICtxFactoryQuery interface. Usually this will be a class derived from
     CtxFactoryQuery.
     """
+
     def refined_query(self, query, model, req):
-        """Derived classes may override this method to add model-specific query
+        """To be overridden.
+
+        Derived classes may override this method to add model-specific query
         refinements of their own.
         """
         return query
@@ -249,7 +265,9 @@ class CtxFactoryQuery(object):
 
 
 def ctx_factory(model, type_, req):
-    """The context of a request is either a single model instance or an instance of
+    """Factory function for request contexts.
+
+    The context of a request is either a single model instance or an instance of
     DataTable incorporating all information to retrieve an appropriately filtered list
     of model instances.
     """
@@ -306,7 +324,8 @@ def register_adapter(config, cls, from_, to_=None, name=None):
 
 
 def register_menu(config, *items):
-    """
+    """Register an item for the main menu.
+
     :param items: (name, factory) pairs, where factory is a callable that accepts the two\
     parameters (ctx, req) and returns a pair (url, label) to use for the menu link.
     """
@@ -317,7 +336,8 @@ def register_menu(config, *items):
 
 
 def add_route_and_view(config, route_name, route_pattern, view, **kw):
-    """
+    """Add a route and a corresponding view and appropriate default routes and views.
+
     .. note:: To allow custom route patterns we look them up in a dict in settings.
     """
     route_patterns = config.registry.settings.get('route_patterns', {})
@@ -387,7 +407,8 @@ def add_410(config, pattern, name=None):
 # the main interface:
 #
 def get_configurator(pkg, *utilities, **kw):
-    """
+    """Factory function to retrive a pyramid Configurator, including clld functionality.
+
     .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
     """
     kw.setdefault('package', pkg)

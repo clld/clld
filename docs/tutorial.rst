@@ -9,7 +9,7 @@ Starting with version 0.13 ``clld`` works with python 2.7 and 3.4. It has been i
 Ubuntu 12.04, Mac OSX (see :ref:`install_mac`) and Windows (see :ref:`install_win`).
 While it might be possible to use sqlite as database backend, all production installations
 of ``clld`` and most development is done with postgresql 9.1.
-To retrieve the ``clld`` software from GitHub, git must be installed on the system.
+To retrieve the ``clld`` software from GitHub, ``git`` must be installed on the system.
 
 .. _install:
 
@@ -30,15 +30,15 @@ you may run the following commands in an activated `virtualenv <http://www.virtu
 Alternatively, you may want to fork ``clld`` first and then work with your fork.
 
 
-Bootstrapping a CLLD app
-~~~~~~~~~~~~~~~~~~~~~~~~
+Bootstrapping a ``clld`` app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A CLLD app is a python package implementing a
+A ``clld`` app is a python package implementing a
 `pyramid <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
 web application.
 
 The ``clld`` package provides a pyramid application scaffold to create the initial package directory
-layout for a CLLD app::
+layout for a ``clld`` app::
 
     pcreate -t clld_app myapp
 
@@ -50,7 +50,6 @@ This will create a python package ``myapp`` with the following layout::
 
     (clld)robert@astroman:~/venvs/clld$ tree myapp/
     myapp/                           # project directory
-    ├── CHANGES.txt
     ├── development.ini              # deployment settings
     ├── fabfile.py                   # fabric tasks for managing the application
     ├── MANIFEST.in
@@ -96,7 +95,7 @@ your app's code in the ``site-packages`` directory.
 Now edit the `configuration file <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html>`_,
 ``myapp/development.ini`` providing a setting ``sqlalchemy.url`` in the ``[app:main]`` section.
 The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_ given in this
-setting must point to an existing (although empty) database if the ``postgresql`` dialect is chosen.
+setting must point to an existing (but empty) database if the ``postgresql`` dialect is chosen.
 
 Running::
 
@@ -111,23 +110,25 @@ script, you have to re-run the above command.
     an existing database, so before running it, you have to drop and re-create and empty
     database "by hand".
 
+You are now ready to run::
 
-How do the basic concepts fit to the implementation?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pserve --reload development.ini
 
-The dataset
-+++++++++++
+and navigate with your browser to http://0.0.0.0:6543 to visit your application.
 
-Each ``clld`` app is assumed to serve a dataset. This dataset is assumed to have a publisher
-and a license. Information about the publisher and the license should be part of the data,
-as well as other metadata about the dataset.
+The next step is populating the database.
 
-``clld`` supports scripted initial creation of a suitable database for this dataset.
+
+Populating the database
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``clld`` framework does not provide any GUI or web interface for populating the database.
+Instead, this is assumed to be done with a script.
 You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
 
     python myapp/scripts/initializedb.py development.ini
 
-Filling the database is done by instantiating model objects and
+Adding objects to the database is done by instantiating model objects and
 `adding them <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#adding-new-objects>`_
 to ``clld.db.meta.DBSession``. (This session is already initialized when your code in ``initializedb.py`` runs.)
 For more information about database objects read the chapter :ref:`db_objects`.
@@ -161,6 +162,17 @@ Thus, you can create objects which you can reference later like
     do so).
 
 
+The dataset
++++++++++++
+
+Each ``clld`` app is assumed to serve a dataset, so you must add an instance of
+:py:class:`clld.db.models.common.Dataset`
+to your database.
+This dataset is assumed to have a publisher
+and a license. Information about the publisher and the license should be part of the data,
+as well as other metadata about the dataset.
+
+
 A note on files
 +++++++++++++++
 
@@ -181,16 +193,6 @@ recreated at any time. To separate these concerns physically, downloads are typi
 in a different directory than primary data files.
 
 
-The app
-+++++++
-
-You are now ready to run::
-
-    pserve --reload development.ini
-
-and navigate with your browser to http://0.0.0.0:6543 to visit your application.
-
-
 Deployment
 ~~~~~~~~~~
 
@@ -204,5 +206,5 @@ Examples
 ~~~~~~~~
 
 A good way explore how to customize a ``clld`` app is by looking at the code of existing apps.
-These apps are listed at `<http://clld.org/datasets>`_ and each app links to its source code
+These apps are listed at `<http://clld.org/datasets.html>`_ and each app links to its source code
 repository on `GitHub <https://github.com/clld>`_ (in the site footer).

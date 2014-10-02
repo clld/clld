@@ -1,5 +1,4 @@
-"""latex.py
-
+"""
 Character translation utilities for LaTeX-formatted text.
 
 Usage:
@@ -25,6 +24,7 @@ from six import text_type, Iterator, unichr
 
 def register():
     """Enable encodings of the form 'latex+x' where x describes another encoding.
+
     Unicode characters are translated to or from x when possible, otherwise
     expanded to latex.
     """
@@ -32,7 +32,7 @@ def register():
 
 
 def getregentry():
-    """Encodings module API."""
+    """Encoding module API."""
     return _registry('latex')  # pragma: no cover
 
 
@@ -130,7 +130,9 @@ def _tokenize(tex):  # pragma: no cover
 
 
 class _unlatex(Iterator):  # pragma: no cover
+
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
+
     def __iter__(self):
         """Turn self into an iterator.  It already is one, nothing to do."""
         return self
@@ -180,7 +182,9 @@ class _unlatex(Iterator):  # pragma: no cover
         return self[-1]
 
     def candidates(self, offset):
-        """Generate pairs delta,c where c is a token or tuple of tokens from tex
+        """Generate pairs delta,c.
+
+        Where c is a token or tuple of tokens from tex
         (after deleting extraneous brackets starting at pos) and delta
         is the length of the tokens prior to bracket deletion.
         """

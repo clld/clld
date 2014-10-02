@@ -1,3 +1,8 @@
+"""
+Functionality to serialize clld objects as GeoJSON.
+
+.. seealso:: http://geojson.org/
+"""
 from json import loads
 from itertools import groupby
 
@@ -27,7 +32,8 @@ def _flatten(d, parent_key=''):
 
 
 def flatten(d):
-    """
+    """tilemill can only handle flat properties objects.
+
     >>> sorted(flatten({'a': {'b': [1, {'c': 4}, 3]}}).keys())
     ['a_b_0', 'a_b_1_c', 'a_b_2']
     """
@@ -35,16 +41,21 @@ def flatten(d):
 
 
 def pacific_centered_coordinates(obj):
-    """The world should be divided between Icelandic (westernmost language) and
+    """Re-compute coordinates, to make markers on the map appear pacific-centered.
+
+    The world should be divided between Icelandic (westernmost language) and
     Tupi (easternmost language), i.e. between -17 and -36.
 
     We chose -26 as divider because that puts cape verde to the west of africa.
+
+    .. seealso: https://github.com/Leaflet/Leaflet/issues/1360
     """
     return [obj.longitude if obj.longitude > -26 else obj.longitude + 360, obj.latitude]
 
 
 @implementer(interfaces.IRepresentation)
 class GeoJson(Renderable):
+
     """Base class for adapters which render geojson feature collections.
 
     The geojson we serve to leaflet must fulfill the following requirements:
@@ -52,13 +63,16 @@ class GeoJson(Renderable):
     - an icon member in the feature properties.
     - a language.id member in feature properties.
     """
+
     name = "GeoJSON"
     extension = 'geojson'
     mimetype = 'application/geojson'
     send_mimetype = 'application/json'  # application/vnd.geo+json
 
     def _featurecollection_properties(self, ctx, req):
-        """we return the layer index passed in the request, to make sure the features are
+        """Get properties object for the FeatureCollection.
+
+        We return the layer index passed in the request, to make sure the features are
         added to the correct layer group.
         """
         res = {'layer': req.params.get('layer', '')}
@@ -66,8 +80,7 @@ class GeoJson(Renderable):
         return res
 
     def featurecollection_properties(self, ctx, req):
-        """override to add properties
-        """
+        """override to add properties."""
         return {}
 
     def feature_iterator(self, ctx, req):
@@ -79,13 +92,11 @@ class GeoJson(Renderable):
         return res
 
     def feature_properties(self, ctx, req, feature):
-        """override to add properties
-        """
+        """override to add properties."""
         return {}
 
     def get_language(self, ctx, req, feature):
-        """override to fetch language object from non-default location
-        """
+        """override to fetch language object from non-default location."""
         return feature
 
     def get_coordinates(self, obj):
@@ -117,8 +128,9 @@ class GeoJson(Renderable):
 
 
 class GeoJsonParameter(GeoJson):
-    """Render a parameter's values as geojson feature collection.
-    """
+
+    """Render a parameter's values as geojson feature collection."""
+
     def featurecollection_properties(self, ctx, req):
         marker = req.registry.getUtility(interfaces.IMapMarker)
         return {
@@ -148,8 +160,9 @@ class GeoJsonParameter(GeoJson):
 
 
 class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
-    """GeoJSON adapter for parameters with multiple valuesets per language.
-    """
+
+    """GeoJSON adapter for parameters with multiple valuesets per language."""
+
     def feature_iterator(self, ctx, req):
         q = self.get_query(ctx, req)
         return groupby(q.order_by(ValueSet.language_pk), lambda vs: vs.language)
@@ -162,6 +175,9 @@ class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
 
 
 class GeoJsonCombinationDomainElement(GeoJson):
+
+    """GeoJSON adapter for a domain element of a combination of parameters."""
+
     def feature_iterator(self, ctx, req):
         return ctx.languages
 
@@ -172,9 +188,12 @@ class GeoJsonCombinationDomainElement(GeoJson):
 
 
 class GeoJsonParameterFlatProperties(GeoJsonParameter):
-    """GeoJSON with flattened feature properties suitable for importing in the tilemill
-    mapping software.
+
+    """GeoJSON with flattened feature properties for importing in tilemill.
+
+    .. seealso: https://github.com/mapbox/tilemill/issues/2294
     """
+
     name = "GeoJSON for tilemill"
     extension = 'flat.geojson'
     mimetype = 'application/flat+geojson'
@@ -188,7 +207,8 @@ class GeoJsonParameterFlatProperties(GeoJsonParameter):
 
 @implementer(interfaces.IIndex)
 class GeoJsonLanguages(GeoJson):
-    """Render a collection of languages as geojson feature collection.
-    """
+
+    """Render a collection of languages as geojson feature collection."""
+
     def feature_iterator(self, ctx, req):
         return ctx.get_query(limit=5000)

@@ -1,3 +1,4 @@
+"""Implementation of a component concept."""
 from markupsafe import Markup
 from pyramid.renderers import render
 
@@ -5,15 +6,20 @@ from clld.util import cached_property
 
 
 class Component(object):
-    """Virtual base class for page components, i.e. objects that can be rendered as HTML
+
+    """Virtual base class for page components.
+
+    Components are objects that can be rendered as HTML
     and typically define behavior using a corresponding JavaScript object which accepts
     an options object upon initialization.
     """
+
     __template__ = None
 
     @cached_property()
     def options(self):
-        """
+        """Typically options to configure a corresponding JavaScript object.
+
         :return: JSON serializable dict
         """
         opts = self.get_default_options()

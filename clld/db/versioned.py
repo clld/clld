@@ -1,6 +1,4 @@
-"""
-Support for per-record versioning; based on an sqlalchemy recipe.
-"""
+"""Support for per-record versioning; based on an sqlalchemy recipe."""
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper, attributes, object_mapper
 from sqlalchemy.orm.exc import UnmappedColumnError

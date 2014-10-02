@@ -1,3 +1,4 @@
+"""Represent clld objects as excel spreadsheets."""
 from six import BytesIO
 import xlwt
 
@@ -6,8 +7,9 @@ from clld.lib.excel import hyperlink
 
 
 class ExcelAdapter(Index):
-    """renders DataTables as excel sheets
-    """
+
+    """Represent DataTables as excel sheets."""
+
     extension = 'xls'
     mimetype = 'application/vnd.ms-excel'
 
@@ -42,6 +44,9 @@ class ExcelAdapter(Index):
 
 
 class Languages(ExcelAdapter):
+
+    """Represent DataTable of Language instances as excel sheet."""
+
     def header(self, ctx, req):
         return super(Languages, self).header(ctx, req) + ['Latitude', 'Longitude']
 
@@ -52,6 +57,9 @@ class Languages(ExcelAdapter):
 
 
 class Values(ExcelAdapter):
+
+    """Represent DataTable of Value instances as excel sheet."""
+
     def header(self, ctx, req):
         return super(Values, self).header(ctx, req) + [
             'Parameter', 'Language', 'Frequency', 'Confidence', 'References']
@@ -67,6 +75,9 @@ class Values(ExcelAdapter):
 
 
 class Sentences(ExcelAdapter):
+
+    """Represent DataTable of Sentence instances as excel sheet."""
+
     def header(self, ctx, req):
         return ['ID', 'Text', 'Analyzed', 'Gloss', 'Translation', 'Language']
 

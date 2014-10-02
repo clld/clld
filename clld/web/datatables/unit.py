@@ -1,3 +1,4 @@
+"""Default DataTable for Unit objects."""
 from sqlalchemy.orm import joinedload
 
 from clld.db.models.common import Unit, Language
@@ -5,11 +6,17 @@ from clld.web.datatables.base import DataTable, LinkCol
 
 
 class DescriptionLinkCol(LinkCol):
+
+    """Render a link to the unit using the description as label."""
+
     def get_attrs(self, item):
         return {'label': item.description}
 
 
 class Units(DataTable):
+
+    """Default DataTable for Unit objects."""
+
     __constraints__ = [Language]
 
     def base_query(self, query):

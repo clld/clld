@@ -1,5 +1,6 @@
-"""Functionality to retrieve data from a FileMaker server using the
-*Custom Web Publishing with XML* protocol.
+"""Functionality to retrieve data from a FileMaker server.
+
+We use the FileMaker *Custom Web Publishing with XML* protocol.
 
 .. seealso:: http://www.filemaker.com/support/product/docs/12/fms/fms12_cwp_xml_en.pdf
 """
@@ -22,8 +23,7 @@ SC = re.compile("font-variant:\s*small\-caps")
 
 
 def normalize_markup(s):
-    """normalize markup in filemaker data
-    """
+    """normalize markup in filemaker data."""
     if not s:
         return
     soup = bs(s.strip().replace('\n', ' ').replace('<BR>', '\n'))
@@ -47,8 +47,9 @@ def normalize_markup(s):
 
 
 class Result(object):
-    """Parses a filemaker pro xml result.
-    """
+
+    """Represents a filemaker pro xml result."""
+
     def __init__(self, content):
         self._root = et.fromstring(content)
         fields = []
@@ -89,8 +90,9 @@ class Result(object):
 
 
 class Client(object):
-    """Client for FileMaker's 'Custom Web Publishing with XML' feature.
-    """
+
+    """Client for FileMaker's 'Custom Web Publishing with XML' feature."""
+
     def __init__(self, host, db, user, password, limit=1000, cache=None, verbose=True):
         self.host = host
         self.db = db
@@ -124,7 +126,8 @@ class Client(object):
         return Result(xml)
 
     def get(self, what):
-        """
+        """Retrieve data from the server.
+
         :param what: Name of the layout from which to retrieve data.
         :return: ``list`` of ``dict`` representing the data of the layout.
         """

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 import sys
 
@@ -49,6 +50,7 @@ install_requires = [
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
+    'webhelpers2',
 ]
 
 if not PY3:
@@ -80,10 +82,10 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.17',
+      version='0.18',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
-      long_description='',
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
