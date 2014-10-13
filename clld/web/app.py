@@ -17,7 +17,6 @@ from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPGone
 from pyramid import events
 from pyramid.request import Request, reify
-from pyramid.response import Response
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
