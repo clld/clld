@@ -43,14 +43,13 @@ install_requires = [
     'markupsafe',
     'requests',
     'rdflib',
-    'newrelic',
     'colander',
     'python-dateutil',
     'paginate',
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
-    'webhelpers2',
+    'webhelpers2>=2.0rc1',
 ]
 
 if not PY3:
