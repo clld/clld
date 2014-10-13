@@ -117,7 +117,8 @@
     $(document).ready(function() {
         ##$('#${eid}').dataTable({aaSorting: [], bLengthChange: false, bPaginate: false, bInfo: false, sDom: 'fr<"toolbar">tip'});
         CLLD.DataTables['${eid}'] = $('#${eid}').dataTable(${dumps(_options)|n});
-        $('#${eid} tbody td button.sdetails').live('click', function () {
+
+        $(document).on('click', '#${eid} tbody td button.details', function () {
             var nTr = $(this).parents('tr')[0];
             if (CLLD.DataTables['${eid}'].fnIsOpen(nTr)) {
                 CLLD.DataTables['${eid}'].fnClose(nTr);
