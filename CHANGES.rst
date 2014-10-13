@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.19
+~~~~
+
+- value tables for parameter combinations are now sortable.
+
+
 0.18
 ~~~~
 

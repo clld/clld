@@ -43,14 +43,13 @@ install_requires = [
     'markupsafe',
     'requests',
     'rdflib',
-    'newrelic',
     'colander',
     'python-dateutil',
     'paginate',
     'html5lib==0.999', # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
-    'webhelpers2',
+    'webhelpers2>=2.0rc1',
 ]
 
 if not PY3:
@@ -82,7 +81,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.18',
+      version='0.19',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description=README + '\n\n' + CHANGES,

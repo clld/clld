@@ -19,6 +19,10 @@ Releasing clld
 
   $ java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 
+- Make sure flake8 passes::
+
+  $ flake8 --ignore=E711,E712,D100,D101,D103,D102,D301 --max-line-length=90 clld
+
 - Make sure docs render OK::
 
   $ cd docs

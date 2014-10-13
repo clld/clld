@@ -493,12 +493,6 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view(
         'select_combination', '/_select_combination', select_combination)
 
-    # TODO: remove google site verification for personal account! should be configurable!
-    config.add_route('google-site-verification', 'googlebbc8f4da1abdc58b.html')
-    config.add_view(
-        lambda r: Response('google-site-verification: googlebbc8f4da1abdc58b.html'),
-        route_name='google-site-verification')
-
     config.add_route_and_view('unapi', '/unapi', unapi)
     config.add_route_and_view('olac', '/olac', olac)
 

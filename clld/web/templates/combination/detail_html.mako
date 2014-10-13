@@ -9,7 +9,7 @@
     <script src="${request.static_url('clld:web/static/js/select2.js')}"></script>
 </%block>
 
-<h2>${_('Combination')} ${ctx.name}</h2>
+<h3>${_('Combination')} ${' / '.join(h.link(request, p) for p in ctx.parameters)|n}</h3>
 
 % if len(ctx.parameters) < 4:
 <div>
@@ -17,7 +17,7 @@
         <fieldset>
             <p>
                 You may combine these ${_('Parameters').lower()} with another one.
-                Start typing the feature name or number in the field below.
+                Start typing the ${_('Parameter').lower()} name or number in the field below.
             </p>
             <% select = CombinationMultiSelect(request, combination=ctx) %>
             ${select.render()}
@@ -27,12 +27,14 @@
 </div>
 % endif
 
+% if multivalued:
 <div class="alert alert-info">
     <strong>Note:</strong> Languages may have multiple values marked with
     overlapping markers. These languages are additionally marked with a small red
     triangle. Clicking on this marker will show all value markers associated with the
     language.
 </div>
+% endif
 
 % if request.map:
 ${request.map.render()}
@@ -40,55 +42,6 @@ ${request.map.render()}
 
 % if ctx.domain:
 <div id="list-container">
-    <table class="table table-nonfluid">
-        <thead>
-            <th> </th>
-            <th> </th>
-            <th>${' / '.join(h.link(request, p) for p in ctx.parameters)|n}</th>
-            <th>Number of languages</th>
-        </thead>
-        <tbody>
-            % for i, de in enumerate(ctx.domain):
-            <tr>
-                <td>
-                    % if de.languages:
-                    <button title="click to toggle display of languages for value ${de.name}"
-                            type="button" class="btn btn-mini expand-collapse" data-toggle="collapse" data-target="#de-${i}">
-                        <i class="icon icon-plus"> </i>
-                    </button>
-                    % endif
-                </td>
-                <td>
-                    % if de.languages:
-                    <img height="20" width="20" src="${de.icon.url(request)}"/>
-                    % endif
-                </td>
-                <td>
-                    ${de.name}
-                    <div id="de-${i}" class="collapse">
-                        <table class="table table-condensed table-nonfluid">
-                            <tbody>
-                                % for language in de.languages:
-                                <tr>
-                                    <td>${h.link_to_map(language)}</td>
-                                    <td>${h.link(request, language)}</td>
-                                </tr>
-                                % endfor
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-                <td style="text-align: right;">${str(len(de.languages))}</td>
-            </tr>
-            % endfor
-        </tbody>
-    </table>
+    ${util.combination_valuetable(ctx, iconselect=iconselect or False)}
 </div>
-<script>
-$(document).ready(function() {
-    $('.expand-collapse').click(function(){ //you can give id or class name here for $('button')
-        $(this).children('i').toggleClass('icon-minus icon-plus');
-    });
-});
-</script>
 % endif
