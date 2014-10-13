@@ -110,7 +110,7 @@ def xmlchars(text):
     """
     invalid = list(range(0x9))
     invalid.extend([0xb, 0xc])
-    invalid.extend(list(range(0xe, 0x20)))
+    invalid.extend(range(0xe, 0x20))
     return re.sub('|'.join('\\x%0.2X' % i for i in invalid), '', text)
 
 
@@ -217,8 +217,7 @@ class DeclEnum(object):
 class DeclEnumType(SchemaType, TypeDecorator):
     def __init__(self, enum):
         self.enum = enum
-        self.impl = Enum(
-            *list(enum.values()),
+        self.impl = Enum(*enum.values(),
             name="ck%s" % re.sub(
                 '([A-Z])', lambda m: "_" + m.group(1).lower(), enum.__name__))
 

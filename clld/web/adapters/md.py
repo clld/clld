@@ -1,4 +1,6 @@
 """Adapters to serialize metadata of clld objects."""
+from itertools import chain
+
 from zope.interface import implementer
 
 from clld import interfaces
@@ -25,15 +27,14 @@ class MetadataFromRec(Metadata):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
             genre = 'inbook'
-            data['author'] = [
-                c.name for c in
-                list(ctx.primary_contributors) + list(ctx.secondary_contributors)]
+            data['author'] = [c.name for c in
+                chain(ctx.primary_contributors, ctx.secondary_contributors)]
             data['booktitle'] = req.dataset.description
-            data['editor'] = [c.contributor.name for c in list(req.dataset.editors)]
+            data['editor'] = [c.contributor.name for c in req.dataset.editors]
             id_ = '%s-%s' % (req.dataset.id, ctx.id)
         else:
             genre = 'book'
-            data['editor'] = [c.contributor.name for c in list(ctx.editors)]
+            data['editor'] = [c.contributor.name for c in ctx.editors]
             id_ = req.dataset.id
 
         return bibtex.Record(

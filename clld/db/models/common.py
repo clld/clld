@@ -489,7 +489,7 @@ class Combination(object):
                 values_by_parameter[p.pk] = []
             for v in values:
                 values_by_parameter[v.valueset.parameter_pk].append(v)
-            for i, cv in enumerate(product(*list(values_by_parameter.values()))):
+            for i, cv in enumerate(product(*values_by_parameter.values())):
                 d[tuple(v.domainelement.number for v in cv)].languages.append(language)
                 if i > 0:
                     # a language with multiple values, store a reference.

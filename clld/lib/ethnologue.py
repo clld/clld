@@ -24,14 +24,14 @@ def get_subgroups():
             if a['href'].startswith(prefix):
                 yield a.text.split('(')[0].strip(), a['href'][len(prefix):]
 
-    res = dict(list(parse_subgroups(get('/browse/families'))))
+    res = dict(parse_subgroups(get('/browse/families')))
     ids = list(res.values())
     res['docs'] = {}
 
     for id_ in ids:
         time.sleep(1)
         doc = get(prefix + id_)
-        res.update(dict(list(parse_subgroups(doc))))
+        res.update(parse_subgroups(doc))
         res['docs'][id_] = doc
 
     return res
