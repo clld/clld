@@ -640,7 +640,7 @@ def icons(req, param):
         onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
     rows = [
         HTML.tr(*map(td, icons)) for c, icons in
-        groupby(sorted(iconlist, key=lambda i: i.name), lambda i: i.name[0])]
+        groupby(sorted(iconlist, key=lambda i: i.name[1:]), lambda i: i.name[1:])]
     return HTML.div(
         HTML.table(
             HTML.tbody(*rows),
