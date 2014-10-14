@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.19.2
+~~~~~~
+
+- workaround for compatibility with python 3.4
+- upgraded DataTables to 1.10.3
+
+
 0.19.1
 ~~~~~~
 

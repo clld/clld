@@ -26,11 +26,13 @@ def xpartial(func, *args, **kw):
     return res
 
 
-def redirect(cls, location, ctx, req):
+def redirect(cls, location, ctx, req=None):
     """Can be used with xpartial to register views that simply redirect.
 
     >>> view = xpartial(pyramid.httpexceptions.HTTPFound, lambda req: req.route_url('.'))
     """
+    # workaround for https://github.com/Pylons/pyramid/issues/1428
+    req = req or ctx
     if callable(location):
         location = location(req)
     raise cls(location=location)
