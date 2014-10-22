@@ -1,6 +1,6 @@
 """Functionality to manage icons for map markers."""
 from __future__ import unicode_literals, print_function, division, absolute_import
-from itertools import product
+from itertools import product, chain
 
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
@@ -82,15 +82,15 @@ class Icon(object):
 
 
 #: a list of all available icons:
-ICONS = list(map(Icon, ['%s%s' % (s, c) for s in SHAPES for c in COLORS]))
+ICONS = [Icon('%s%s' % (s, c)) for s in SHAPES for c in COLORS]
 
 #: a dictionary mapping icon names to icon objects:
 ICON_MAP = {icon.name: icon for icon in ICONS}
 
 #: a list of icons ordered by preference:
-ORDERED_ICONS = [ICON_MAP[s + c] for s, c in
-                 list(product(SHAPES, PREFERED_COLORS)) +
-                 list(product(SHAPES, SECONDARY_COLORS))]
+ORDERED_ICONS = [ICON_MAP[s + c] for s, c in chain(
+                 product(SHAPES, PREFERED_COLORS),
+                 product(SHAPES, SECONDARY_COLORS))]
 
 
 @implementer(IMapMarker)
