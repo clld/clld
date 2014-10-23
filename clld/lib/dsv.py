@@ -198,10 +198,8 @@ class NamedTupleReader(UnicodeDictReader):
         d = UnicodeDictReader.item(self, row)
         for name in self.fieldnames:
             d.setdefault(name, None)
-        for k in list(d.keys()):
-            if k not in self.fieldnames:
-                del d[k]
-        return self.cls(**{normalize_name(k): v for k, v in d.items()})
+        return self.cls(
+            **{normalize_name(k): v for k, v in d.items() if k in self.fieldnames})
 
 
 def normalize_name(s):
