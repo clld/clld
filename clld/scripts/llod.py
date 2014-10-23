@@ -1,13 +1,18 @@
 # coding: utf8
+"""Functionality to create a full RDF dump and register a dataset with datahub.io"""
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 from tempfile import mkdtemp
 import json
+from subprocess import check_call
 
 from path import path
 from six import BytesIO, binary_type
 import requests
+from rdflib import Graph
+from sqlalchemy.exc import InvalidRequestError
 
+from clld.lib import rdf
 from clld.util import jsonload, jsondump
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset, Combination
@@ -17,6 +22,12 @@ from clld import RESOURCES
 
 
 def datahub(action, **params):  # pragma: no cover
+    """Access datahub.io's API.
+
+    :param action: Name of the action to perform.
+    :param params: Payload.
+    :return: result member of the JSON response in case of success else None.
+    """
     res = requests.post(
         "http://datahub.io/api/action/" + action,
         data=json.dumps(params),
@@ -29,13 +40,14 @@ def datahub(action, **params):  # pragma: no cover
 
 
 def n3(graph, with_head=False):  # pragma: no cover
+    """Serialize an RDF graph as N3, by default ommitting the namespace declarations."""
     out = BytesIO()
     graph.serialize(out, format='n3')
     out.seek(0)
     res = out.read()
     if with_head:
         return res
-    return res.split(binary_type('\n\n'))[1]
+    return res.split(binary_type('\n\n'), 1)[1]
 
 
 def get_graph(obj, req, rscname):  # pragma: no cover
@@ -45,48 +57,56 @@ def get_graph(obj, req, rscname):  # pragma: no cover
 
 
 def llod(**kw):  # pragma: no cover
-    llod_func(parsed_args(bootstrap=True))
+    args = parsed_args(bootstrap=True)
+    llod_func(args)
+    register(args)
 
 
 def llod_func(args):  # pragma: no cover
+    """Create an RDF dump and compute some statistics about it."""
     tmp = path(mkdtemp())
     count_rsc = 0
     count_triples = 0
 
-    with open(tmp.joinpath('rdf.n3'), 'w') as fp:
+    tmp_dump = tmp.joinpath('rdf.n3')
+    with open(tmp_dump, 'w') as fp:
         for rsc in RESOURCES:
             args.log.info('Resource type %s ...' % rsc.name)
-            if rsc.model == Combination:
+            try:
+                q = DBSession.query(rsc.model)
+            except InvalidRequestError:
+                args.log.info('... skipping')
                 continue
-            for obj in DBSession.query(rsc.model).order_by(rsc.model.pk):
+            for obj in q.order_by(rsc.model.pk):
                 graph = get_graph(obj, args.env['request'], rsc.name)
                 count_triples += len(graph)
                 count_rsc += 1
                 fp.write(n3(graph, with_head=count_rsc == 1))
             args.log.info('... finished')
 
-    #
-    # TODO: put summary in json file (or in db?)
-    # URL of dump, number of resources and number of triples.
     # put in args.data_file('..', 'static', 'download')?
+    md = {'path': tmp, 'resources': count_rsc, 'triples': count_triples}
+    md.update(count_links(tmp_dump))
+    jsondump(md, args.data_file('rdf-metadata.json'))
+    print(md)
 
-    jsondump(
-        {'path': tmp, 'resources': count_rsc, 'triples': count_triples},
-        args.data_file('rdf-metadata.json'))
-
-    print(tmp)
-    print(count_rsc)
-    print(count_triples)
+    dataset = Dataset.first()
+    rdf_dump = args.module_dir.joinpath(
+        'static', 'download', '%s-dataset.n3' % dataset.id)
+    tmp_dump.copy(rdf_dump)
+    check_call('gzip -f %s' % rdf_dump, shell=True)
+    print(str(rdf_dump))
 
 
 def register(args):  # pragma: no cover
+    """Register a dataset with datahub.io."""
     dataset = Dataset.first()
     name = 'clld-' + dataset.id.lower()
     package = datahub('package_show', id=name)
     if not package:
         package = datahub(
             'package_create',
-            **{'name': name, 'title': 'CLLD-' + dataset.id, 'owner_org': 'clld'})
+            **{'name': name, 'title': 'CLLD-' + dataset.id.upper(), 'owner_org': 'clld'})
     md = {
         'url': 'http://%s' % dataset.domain,
         'notes': '%s published by the CLLD project' % dataset.name,
@@ -109,7 +129,8 @@ def register(args):  # pragma: no cover
     if rdf_md.exists():
         rdf_md = jsonload(rdf_md)
         md['extras'] = [
-            {'key': k, 'value': str(rdf_md[k])} for k in ['triples', 'resources']]
+            {'key': k, 'value': str(rdf_md[k])} for k in rdf_md.keys()
+            if k.split(':')[0] in ['triples', 'resources', 'links']]
 
     package = datahub('package_update', id=name, **md)
     resources = [rsc['name'] for rsc in package['resources']]
@@ -134,3 +155,28 @@ def register(args):  # pragma: no cover
             format='text/n3',
             mimetype='text/n3')
         assert rsc
+
+    print('>>> Make sure to upload the RDF dump to the production site.')
+
+
+def count_links(p):  # pragma: no cover
+    g = Graph()
+    g.parse(p, format='n3')
+    res = {
+        'links:lexvo': len(list(g.triples(
+            (None, rdf.NAMESPACES['lexvo']['iso639P3PCode'], None)))),
+    }
+
+    for dataset, predicate, domain in [
+        ('dbpedia', 'owl:sameAs', "http://dbpedia.org"),
+        ('geonames', 'dcterms:spatial', "http://www.geonames.org"),
+        ('gold', 'rdf:type', "http://purl.org/linguistics/gold/"),
+        ('clld-wals', 'skos:broader', "http://wals.info/"),
+        ('clld-glottolog', 'owl:sameAs', "http://glottolog.org/")
+    ]:
+        q = g.query('SELECT ?s ?o WHERE {?s %s ?o. FILTER(STRSTARTS(STR(?o), "%s")).}' % (
+            predicate, domain))
+        count = len(list(q))
+        if count:
+            res['links:' + dataset] = count
+    return res
