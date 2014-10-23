@@ -1,5 +1,6 @@
 """Serialize clld objects as csv."""
 from __future__ import unicode_literals, print_function, division, absolute_import
+from itertools import chain
 
 from sqlalchemy import types
 from sqlalchemy.inspection import inspect
@@ -7,6 +8,8 @@ from pyramid.renderers import render as pyramid_render
 
 from clld.web.adapters.base import Index
 from clld.lib.dsv import UnicodeWriter
+
+QUERY_LIMIT = 2000
 
 
 class CsvAdapter(Index):
@@ -19,11 +22,13 @@ class CsvAdapter(Index):
 
     def render(self, ctx, req):
         with UnicodeWriter() as writer:
-            for i, item in enumerate(ctx.get_query(limit=2000)):
-                if i == 0:
-                    cols = item.csv_head()
-                    writer.writerow(cols)
-                writer.writerow(item.to_csv(ctx=ctx, req=req, cols=cols))
+            rows = iter(ctx.get_query(limit=QUERY_LIMIT))
+            first = next(rows, None)
+            if first is not None:
+                cols = first.csv_head()
+                writer.writerow(cols)
+                for item in chain([first], rows):
+                    writer.writerow(item.to_csv(ctx=ctx, req=req, cols=cols))
             return writer.read()
 
     def render_to_response(self, ctx, req):

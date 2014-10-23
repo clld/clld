@@ -1,6 +1,7 @@
 """Functionality to support reading and writing of excel files."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 
+from six.moves import zip
 import xlwt
 
 
@@ -32,5 +33,5 @@ def rows(sheet, as_dict=False):
     for j in range(start, sheet.nrows):
         res = [sheet.cell(j, i).value for i in range(sheet.ncols)]
         if as_dict:
-            res = dict(list(zip(keys, res)))
+            res = dict(zip(keys, res))
         yield res

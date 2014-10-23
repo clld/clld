@@ -437,6 +437,10 @@ CLLD.Map = function(eid, layers, options) {
         "Esri.WorldShadedRelief",
         "Esri.WorldPhysical"];
 
+    if (this.options.base_layer) {
+        baseLayers = [this.options.base_layer].concat(baseLayers);
+    }
+
     /**
      * Open a leaflet popup.
      *

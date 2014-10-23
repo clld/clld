@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.20
+~~~~
+
+- better support for LLOD/datahub.io integration
+- new map option base_layer
+- refactored clld.db.models.common
+
+
 0.19.2
 ~~~~~~
 

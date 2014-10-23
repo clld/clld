@@ -294,8 +294,8 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
                     or (len(twords) > 2 and twords.issubset(iwords)):
                 needs_check = False
             if int(source.id) == 241:
-                log.info('%s' % sorted(list(words(stitle))))
-                log.info('%s' % sorted(list(iwords)))
+                log.info('%s' % sorted(words(stitle)))
+                log.info('%s' % sorted(iwords))
             if needs_check:
                 log.info('------- %s -> %s' % (
                     source.id, item['volumeInfo'].get('industryIdentifiers')))

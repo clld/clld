@@ -336,6 +336,7 @@ center        ``(lat, lon)`` ``None``                      center of the map
 icon_size     ``int``        ``20`` if sidebar else ``30`` size of marker icons in pixels
 icons         ``str``        ``'base'``                    name of a javascript marker factory function
 on_init       ``str``        ``None``                      name of a javascript function to call when initialization is done
+base_layer    ``str``        ``None``                      name of a base layer which should be selected upon map load
 ============= ============== ============================= =================================================================
 
 
