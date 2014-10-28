@@ -630,7 +630,7 @@ def get_configurator(pkg, *utilities, **kw):
         config.registry.registerUtility(utility, interface)
 
     for name in ['adapters', 'datatables', 'maps']:
-        mod = maybe_import('%s.%s' % (config.package_name,  name))
+        mod = maybe_import('%s.%s' % (config.package_name, name))
         if mod and hasattr(mod, 'includeme'):
             config.include(mod)
 
