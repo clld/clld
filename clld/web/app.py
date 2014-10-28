@@ -32,6 +32,7 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
+from clld.web.adapters.base import adapter_factory, Index
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
     select_combination,
@@ -353,7 +354,7 @@ def add_route_and_view(config, route_name, route_pattern, view, **kw):
     config.add_view(view, route_name=route_name + '_alt', **kw)
 
 
-def register_resource(config, name, model, interface, with_index=False):
+def register_resource(config, name, model, interface, with_index=False, with_detail=True):
     # in case of tests, this method may be called multiple times!
     if [rsc for rsc in RESOURCES if rsc.name == name]:
         return
@@ -370,6 +371,13 @@ def register_resource(config, name, model, interface, with_index=False):
             '/%ss' % name,
             index_view,
             factory=partial(ctx_factory, model, 'index'))
+        config.register_adapter(
+            adapter_factory(name + '/index_html.mako', base=Index), interface)
+
+    if with_detail:
+        config.register_adapter(
+            adapter_factory(name + '/detail_html.mako'), interface)
+
     #
     # TODO: register download!?
     #
@@ -620,5 +628,10 @@ def get_configurator(pkg, *utilities, **kw):
 
     for utility, interface in utilities:
         config.registry.registerUtility(utility, interface)
+
+    for name in ['adapters', 'datatables', 'maps']:
+        mod = maybe_import('%s.%s' % (config.package_name,  name))
+        if mod and hasattr(mod, 'includeme'):
+            config.include(mod)
 
     return config
