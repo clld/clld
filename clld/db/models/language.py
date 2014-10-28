@@ -134,7 +134,7 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
     But we might as well just store alternative names for languages.
     """
 
-    __table_args__ = (UniqueConstraint('name', 'type', 'description'),)
+    __table_args__ = (UniqueConstraint('name', 'type', 'description', 'lang'),)
 
     id = Column(String)
     type = Column(String)
