@@ -19,7 +19,7 @@ from .contributor import Contributor_data, Contributor_files, Contributor
 from .contribution import (Contribution_data, Contribution_files, Contribution,
     ContributionReference, ContributionContributor)
 
-from .dataset import Dataset_data, Dataset_files, Dataset
+from .dataset import Dataset_data, Dataset_files, Dataset, Editor
 
 from .sentence import Sentence_data, Sentence_files, Sentence, SentenceReference
 
