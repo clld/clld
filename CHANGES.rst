@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.21.1
+~~~~~~
+
+Bugfixes:
+- corrected Identifier unique constraint
+- fixed problem with backward compatibility of common models split.
+
+
 0.21
 ~~~~
 
