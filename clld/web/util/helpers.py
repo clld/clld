@@ -45,6 +45,10 @@ from clld.util import xmlchars
 assert xmlchars
 
 
+#: dimension of marker images on maps, legends and in datatables.
+MARKER_IMG_DIM = '20'
+
+
 def get_valueset(req, ctx):
     param = req.params.get('parameter')
     if param is None:  # pragma: no cover
@@ -233,7 +237,7 @@ def format_license_icon_url(req):
         return url
 
 
-def format_frequency(req, obj, marker=None, height='20', width='20'):
+def format_frequency(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
     if not obj.frequency or obj.frequency == 100:
         return ''
     res = 'Frequency: %s%%' % round(obj.frequency, 1)
@@ -241,7 +245,7 @@ def format_frequency(req, obj, marker=None, height='20', width='20'):
     if marker:
         url = marker(obj, req)
         if url:
-            return HTML.img(src=url, height=height, width=width, alt=res, title=res)
+            return marker_img(url, height=height, width=width, alt=res, title=res)
     return res
 
 
@@ -250,10 +254,10 @@ def map_marker_url(req, obj, marker=None):
     return marker(obj, req)
 
 
-def map_marker_img(req, obj, marker=None, height='20', width='20'):
+def map_marker_img(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
     url = map_marker_url(req, obj, marker=marker)
     if url:
-        return HTML.img(src=url, height=height, width=width)
+        return marker_img(url, height=height, width=width)
     return ''
 
 
@@ -624,6 +628,12 @@ def partitioned(items, n=3):
     yield bucket
 
 
+def marker_img(src, **kw):
+    kw.setdefault('height', MARKER_IMG_DIM)
+    kw.setdefault('width', MARKER_IMG_DIM)
+    return HTML.img(src=src, **kw)
+
+
 def icons(req, param):
     """Create an HTML snippet listing available icons.
 
@@ -633,10 +643,7 @@ def icons(req, param):
     """
     iconlist = req.registry.queryUtility(interfaces.IIconList)
     td = lambda icon: HTML.td(
-        HTML.img(
-            src=icon.url(req),
-            height='20',
-            width='20'),
+        marker_img(icon.url(req)),
         onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
     rows = [
         HTML.tr(*map(td, icons)) for c, icons in
