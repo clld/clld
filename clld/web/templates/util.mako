@@ -166,6 +166,16 @@
 </%def>
 
 ##
+## format citation information as well.
+##
+<%def name="cite(obj=None, title='Cite')">
+    <%self:well title="${title}">
+        ${h.newline2br(h.text_citation(request, obj or ctx))|n}
+        ${h.cite_button(request, obj or ctx)}
+    </%self:well>
+</%def>
+
+##
 ##
 ##
 <%def name="feed(title, url, eid='feed', **kw)">
