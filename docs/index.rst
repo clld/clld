@@ -55,6 +55,7 @@ Contents:
     linkeddata
     protocols
     deployment
+    tools
     trees
     advanced
     design

@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.21
+~~~~
+
+- more helpers, template functions and config defaults.
+
+
 0.20
 ~~~~
 

@@ -1,4 +1,16 @@
-"""Support for freezing and unfreezing of app databases."""
+"""
+Complete archiving workflow:
+
+1. run ``freeze_func`` to create a database dump as zip archive of csv files
+2. commit and push the dump to the repos
+3. run ``create_release_func`` to create a release of the repos (thereby triggering the
+   zenodo hook)
+4. lookup DOI created by zenodo
+5. run ``update_zenodo_metadata_func`` to update the associated metadata at ZENODO.
+
+``unfreeze_func`` can be used to recreate an app's database from a frozen set of csv
+files.
+"""
 from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 from io import open as ioopen
@@ -12,6 +24,10 @@ from dateutil.parser import parse
 from path import path
 from sqlalchemy.sql import select
 import requests
+try:
+    import github3
+except ImportError:
+    github3 = None
 
 from clld.web.adapters.md import TxtCitation
 from clld.web.adapters.csv import JsonTableSchemaAdapter
@@ -21,16 +37,52 @@ from clld.lib.dsv import reader, UnicodeWriter
 from clld.util import DeclEnumType
 
 
+def create_release_func(args, tag=None, name=None, dataset=None):  # pragma: no cover
+    """
+    Create a release of a GitHub repository.
+
+    .. seealso:: https://developer.github.com/v3/repos/releases/#create-a-release
+    """
+    if github3 is None:
+        args.log.critical("github3 is not installed. Can't access the GitHub API.")
+        return
+
+    token = os.environ.get('GITHUB_TOKEN')
+    if token is None:
+        args.log.critical('Environment variable GITHUB_TOKEN must be set.')
+        return
+
+    req = args.env['request']
+    dataset = dataset or req.dataset
+    today = date.today()
+    tag = tag or 'v%s-%s' % (today.year, today.month)
+
+    repo = github3.login(token=token).repository('clld', args.module.__name__)
+    return repo.create_release(
+        tag,
+        name='%s %s' % (name or dataset.name, tag[1:] if tag.startswith('v') else tag),
+        body='<p>%s</p>' % TxtCitation(None).render(dataset, req).encode('utf8'))
+
+
 def update_zenodo_metadata(**kw):  # pragma: no cover
     update_zenodo_metadata_func(parsed_args((('doi',), {}), bootstrap=True))
 
 
 def update_zenodo_metadata_func(args, doi=None, dataset=None):  # pragma: no cover
+    """
+    Update the metadata registered by ZENODO for the dataset.
+
+    This is necessary, because ZENODO derives the metadata upon upload from the GitHub
+    repository. Thus, all and only committers end up as authors, etc.
+
+    .. seealso:: https://zenodo.org/dev
+    """
     from pprint import pprint
     dataset = dataset or args.env['request'].dataset
     doi = doi or args.doi
     token = os.environ.get('ZENODO_ACCESS_TOKEN')
     if not token:
+        args.log.critical('Environment variable ZENODO_ACCESS_TOKEN must be set.')
         return
 
     def api(path='', method='GET', **kw):
@@ -85,19 +137,20 @@ def update_zenodo_metadata_func(args, doi=None, dataset=None):  # pragma: no cov
     md["upload_type"] = "dataset"
 
     res = api('/%s/actions/edit' % zid, method='post')
-    # if res.status_code == 400:
-    #    api('/%s/actions/discard' % zid, method='post')
-    #    res = api('/%s/actions/edit' % zid, method='post')
     assert res.status_code == 201
 
     headers = {"Content-Type": "application/json"}
     res = api(
-        '/%s' % zid, method='put', data=json.dumps(dict(metadata=md)), headers=headers)
-    pprint(res.json())
+        '/%s' % zid,
+        method='put',
+        data=json.dumps(dict(metadata={k: v for k, v in md.items() if v is not None})),
+        headers=headers)
     if res.status_code == 200:
         res = api('/%s/actions/publish' % zid, method='post')
         assert res.status_code == 202
     else:
+        pprint(res.json())
+        pprint(md)
         api('/%s/actions/discard' % zid, method='post')
 
 
