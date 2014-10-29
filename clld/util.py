@@ -217,7 +217,8 @@ class DeclEnum(object):
 class DeclEnumType(SchemaType, TypeDecorator):
     def __init__(self, enum):
         self.enum = enum
-        self.impl = Enum(*enum.values(),
+        self.impl = Enum(
+            *enum.values(),
             name="ck%s" % re.sub(
                 '([A-Z])', lambda m: "_" + m.group(1).lower(), enum.__name__))
 

@@ -8,7 +8,7 @@ from clld.db.versioned import Versioned
 
 from . import IdNameDescriptionMixin, Language
 
-__all__ = ['GlossAbbreviation']
+__all__ = ('GlossAbbreviation',)
 
 
 class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):

@@ -10,11 +10,13 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     unitparameter as _unitparameter)  # needed to initalize relationship
+assert _unitparameter
 
-__all__ = ['UnitValue']
+__all__ = ('UnitValue',)
 
 
 class UnitValue_data(Base, Versioned, DataMixin):

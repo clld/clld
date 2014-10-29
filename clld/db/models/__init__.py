@@ -1,3 +1,4 @@
+# flake8: noqa
 from __future__ import unicode_literals, print_function, division, absolute_import
 
 from ._mixins import (IdNameDescriptionMixin,

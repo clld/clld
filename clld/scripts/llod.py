@@ -1,5 +1,5 @@
 # coding: utf8
-"""Functionality to create a full RDF dump and register a dataset with datahub.io"""
+"""Functionality to create a full RDF dump and register a dataset with datahub.io."""
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 from tempfile import mkdtemp
@@ -15,7 +15,7 @@ from sqlalchemy.exc import InvalidRequestError
 from clld.lib import rdf
 from clld.util import jsonload, jsondump
 from clld.db.meta import DBSession
-from clld.db.models.common import Dataset, Combination
+from clld.db.models.common import Dataset
 from clld.scripts.util import parsed_args
 from clld.web.adapters.rdf import Rdf
 from clld import RESOURCES

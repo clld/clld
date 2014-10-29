@@ -9,11 +9,12 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Language, _add_solr_language_info)
 
-__all__ = ['Unit']
+__all__ = ('Unit',)
 
 
 class Unit_data(Base, Versioned, DataMixin):

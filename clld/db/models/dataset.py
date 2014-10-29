@@ -3,8 +3,8 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 from collections import OrderedDict
 from datetime import date
 
-from sqlalchemy import (Column, String, Unicode, Date, Integer, ForeignKey,
-    Boolean, desc)
+from sqlalchemy import (
+    Column, String, Unicode, Date, Integer, ForeignKey, Boolean, desc)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -15,11 +15,12 @@ from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.web.util.htmllib import HTML
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Contributor)
 
-__all__ = ['Dataset', 'Editor']
+__all__ = ('Dataset', 'Editor')
 
 
 class Dataset_data(Base, Versioned, DataMixin):
