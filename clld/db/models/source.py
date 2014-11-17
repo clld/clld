@@ -13,11 +13,12 @@ from clld.lib import bibtex
 from clld.lib import coins
 from clld.web.util.htmllib import HTML
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Language, LanguageSource)
 
-__all__ = ['Source', 'HasSourceMixin']
+__all__ = ('Source', 'HasSourceMixin')
 
 
 class Source_data(Base, Versioned, DataMixin):

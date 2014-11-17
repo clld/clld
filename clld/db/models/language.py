@@ -20,14 +20,15 @@ from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin)
 
-__all__ = [
+__all__ = (
     'Language', 'LanguageSource',
     'IdentifierType', 'Identifier', 'LanguageIdentifier',
     '_add_solr_language_info',
-]
+)
 
 
 def _add_solr_language_info(res, obj):

@@ -27,7 +27,8 @@ class MetadataFromRec(Metadata):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
             genre = 'inbook'
-            data['author'] = [c.name for c in
+            data['author'] = [
+                c.name for c in
                 chain(ctx.primary_contributors, ctx.secondary_contributors)]
             data['booktitle'] = req.dataset.description
             data['editor'] = [c.contributor.name for c in req.dataset.editors]

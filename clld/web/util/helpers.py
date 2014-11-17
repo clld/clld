@@ -15,7 +15,7 @@ from math import floor
 from six import text_type, string_types
 from six.moves.urllib.parse import quote, urlencode
 
-try:
+try:  # pragma: no cover
     import newrelic.agent
     assert newrelic.agent
     NEWRELIC = True
@@ -33,6 +33,7 @@ from pyramid.interfaces import IRoutesMapper
 from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
+from clld.web.util.downloadwidget import DownloadWidget
 from clld.db.meta import DBSession
 from clld.db.models import common as models
 from clld.web.adapters import get_adapter, get_adapters
@@ -557,56 +558,18 @@ def get_referents(source, exclude=None):
 
 def alt_representations(req, rsc, doc_position='right', exclude=None):
     """Represent available adapters for rsc as dropdown menu."""
-    exclude = exclude or []
-    exclude.extend(['html', 'snippet.html'])
-    adapters = [a for n, a in req.registry.getAdapters([rsc], interfaces.IRepresentation)
-                if a.extension not in set(exclude)]
-    doc = []
-    for adapter in adapters:
-        if adapter.__doc__:
-            doc.append(HTML.dt(adapter.name or adapter.extension))
-            doc.append(HTML.dd(adapter.__doc__))
-    doc = HTML.div(
-        HTML.p(
-            """You may download alternative representations of the data on
-"%s" by clicking the button """ % rsc.name,
-            icon('download-alt')),
-        HTML.dl(*doc))
-    return HTML.div(HTML.div(
-        button(
-            icon('info-sign', inverted=True),
-            **{'class': ['btn-info'],
-               'id': 'rsc-dl',
-               'data-content': text_type(doc)}),
-        HTML.a(
-            icon('download-alt'),
-            HTML.span(class_="caret"),
-            **{
-                'class_': "btn dropdown-toggle",
-                'data-toggle': "dropdown",
-                'href': "#",
-                'id': "dt-dl-opener",
-            }
-        ),
-        HTML.ul(
-            *[HTML.li(HTML.a(
-                a.name or a.extension,
-                href="#",
-                onclick="document.location.href = '%s'; return false;"
-                        % req.resource_url(rsc, ext=a.extension),
-                id='dt-dl-%s' % a.extension))
-              for a in adapters],
-            **dict(class_="dropdown-menu")),
-        class_='btn-group'),
-        HTML.script(literal("""\
-    $(document).ready(function() {
-        $('#rsc-dl').clickover({
-            html: true,
-            title: 'Alternative representations',
-            placement: '%s',
-            trigger: 'click'
-        });
-    });""" % doc_position)))
+    kw = dict(doc_position=doc_position)
+    if exclude:
+        kw['exclude'] = exclude
+    route, route_kw = req._route(rsc, None, ext='%s')
+    dlw = DownloadWidget(
+        req,
+        rsc,
+        rsc,
+        JS_CLLD.route_url(route, route_kw),
+        interfaces.IRepresentation,
+        **kw)
+    return dlw.render()
 
 
 def partitioned(items, n=3):

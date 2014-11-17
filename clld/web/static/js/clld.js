@@ -175,7 +175,7 @@ CLLD.DataTable = (function(){
      * @function
      */    
     var _init = function(eid, toolbar, options) {
-        var col;
+        var col, i;
 
         options = options === undefined ? {} : options;
 
@@ -315,34 +315,6 @@ CLLD.DataTable = (function(){
             CLLD.DataTables[eid].fnFilter($(this).val(), $("#"+eid+" thead .control").index(this));
         });
 
-        var dl = '<p>You may use the download button <i class="icon-download-alt"> </i> to download the currently selected items in various formats.</p>';
-        dl += '<p>Columns containing numeric data may be filtered giving upper or lower ';
-        dl += 'bounds in the form "&lt;5" or ranges in the form ';
-        dl += '"-2..20".</p>';
-        if (options.sDescription) {
-            dl += options.sDescription;
-        }
-        for (i=0; i < options.aoColumns.length; i++) {
-            col = options.aoColumns[i];
-            if (col.sDescription) {
-                dl += '<dt>'+col.sTitle+'</dt><dd>'+col.sDescription+'</dd>';
-            }
-        }
-
-        $('.'+eid+'-cdOpener').clickover({
-            html: true,
-            content: '<dl>'+dl+'</dl>',
-            title: 'Column Descriptions',
-            placement: 'left',/*function (context, source) {
-                var position = $(source).position();
-                if (position.top < 80){
-                    return "bottom";
-                }
-                return "left";
-            },*/
-            trigger: "click"
-        });
-
         for (i=0; i < options.aoColumns.length; i++) {
             col = options.aoColumns[i];
             if (col.sFilter) {
@@ -354,7 +326,7 @@ CLLD.DataTable = (function(){
     return {
         init: _init,
         current_url: function(eid, fmt) {
-            var url, parts,
+            var url, parts, i,
                 query = {'sEcho': 1},
                 oSettings = CLLD.DataTables[eid].fnSettings();
             query.iSortingCols = oSettings.aaSorting.length;
@@ -419,7 +391,7 @@ CLLD.Map = function(eid, layers, options) {
         }
     );
 
-    var i, hash, layer, opts,
+    var i, hash, opts, name,
         local_data = false,
         baseLayers = [
         "Thunderforest.Landscape",
@@ -570,6 +542,8 @@ CLLD.Map = function(eid, layers, options) {
     this.layer_geojson = {};
 
     this.eachMarker = function(func) {
+        var id;
+
         for (id in this.marker_map) {
             if (this.marker_map.hasOwnProperty(id)) {
                 func(this.marker_map[id]);

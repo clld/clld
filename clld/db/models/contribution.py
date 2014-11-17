@@ -9,11 +9,12 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     HasSourceMixin, Contributor)
 
-__all__ = ['Contribution', 'ContributionReference', 'ContributionContributor']
+__all__ = ('Contribution', 'ContributionReference', 'ContributionContributor')
 
 
 class Contribution_data(Base, Versioned, DataMixin):

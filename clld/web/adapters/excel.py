@@ -8,7 +8,7 @@ from clld.lib.excel import hyperlink
 
 class ExcelAdapter(Index):
 
-    """Represent DataTables as excel sheets."""
+    """Represent tables as excel sheets."""
 
     extension = 'xls'
     mimetype = 'application/vnd.ms-excel'
@@ -58,7 +58,7 @@ class Languages(ExcelAdapter):
 
 class Values(ExcelAdapter):
 
-    """Represent DataTable of Value instances as excel sheet."""
+    """Represent table of Value instances as excel sheet."""
 
     def header(self, ctx, req):
         return super(Values, self).header(ctx, req) + [
@@ -76,7 +76,7 @@ class Values(ExcelAdapter):
 
 class Sentences(ExcelAdapter):
 
-    """Represent DataTable of Sentence instances as excel sheet."""
+    """Represent table of Sentence instances as excel sheet."""
 
     def header(self, ctx, req):
         return ['ID', 'Text', 'Analyzed', 'Gloss', 'Translation', 'Language']

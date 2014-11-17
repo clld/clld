@@ -10,12 +10,14 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     HasSourceMixin,
     parameter as _parameter)  # needed to initalize relationship
+assert _parameter
 
-__all__ = ['ValueSet', 'ValueSetReference']
+__all__ = ('ValueSet', 'ValueSetReference')
 
 
 class ValueSet_data(Base, Versioned, DataMixin):

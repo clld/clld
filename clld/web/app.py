@@ -200,6 +200,10 @@ class ClldRequest(Request):
             return self.registry.settings['clld.files'].joinpath(file_.relpath)
 
     def file_url(self, file_):
+        if 'url' in file_.jsondatadict:
+            # just a preparation for full support of non-local files
+            return file_.jsondatadict['url']  # pragma: no cover
+
         if 'clld.files' in self.registry.settings:
             return self.static_url(self.file_ospath(file_))
 

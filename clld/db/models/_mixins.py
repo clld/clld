@@ -6,11 +6,11 @@ from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 
-__all__ = [
+__all__ = (
     'IdNameDescriptionMixin',
     'FilesMixin', 'HasFilesMixin',
     'DataMixin', 'HasDataMixin',
-]
+)
 
 
 class IdNameDescriptionMixin(object):

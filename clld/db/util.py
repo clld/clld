@@ -1,6 +1,7 @@
 """Database utilities."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 import time
+import re
 
 from sqlalchemy import Integer
 from sqlalchemy.orm import joinedload
@@ -16,7 +17,23 @@ def as_int(col):
 
 
 def icontains(col, qs):
-    return col.ilike('%' + qs + '%')
+    """Infix search condition.
+
+    Basic support is provided for specifying matches at beginning or end of the text.
+    """
+    spattern = re.compile('^(\^|\\\\b)')
+    epattern = re.compile('(\$|\\\\b)$')
+
+    prefix, suffix = '%', '%'
+    if spattern.search(qs):
+        qs = spattern.sub('', qs)
+        prefix = ''
+
+    if epattern.search(qs):
+        qs = epattern.sub('', qs)
+        suffix = ''
+
+    return col.ilike(prefix + qs + suffix)
 
 
 def compute_language_sources(*references):

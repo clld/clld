@@ -17,12 +17,14 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Sentence, ValueSet,
     parameter as _parameter)  # needed to initalize relationship
+assert _parameter
 
-__all__ = ['Value', 'ValueSentence']
+__all__ = ('Value', 'ValueSentence')
 
 
 class Value_data(Base, Versioned, DataMixin):

@@ -10,11 +10,12 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     _add_solr_language_info, HasSourceMixin)
 
-__all__ = ['Sentence', 'SentenceReference']
+__all__ = ('Sentence', 'SentenceReference')
 
 
 class Sentence_data(Base, Versioned, DataMixin):

@@ -5,7 +5,7 @@ from sqlalchemy import Column, Unicode
 
 from clld.db.meta import Base, DBSession
 
-__all__ = ['Config']
+__all__ = ('Config',)
 
 
 class Config(Base):

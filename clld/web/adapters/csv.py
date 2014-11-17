@@ -14,7 +14,7 @@ QUERY_LIMIT = 2000
 
 class CsvAdapter(Index):
 
-    """Represent DataTables as csv files."""
+    """Represent tables as csv files."""
 
     extension = 'csv'
     mimetype = 'text/csv'
@@ -39,9 +39,9 @@ class CsvAdapter(Index):
 
 class JsonTableSchemaAdapter(Index):
 
-    """Schema for the columns in a DataTable.
+    """Schema for the columns in a table.
 
-    Renders DataTables as
+    Renders tables as
     `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
 
     .. seealso:: http://csvlint.io/about

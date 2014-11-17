@@ -1,5 +1,5 @@
 """
-Complete archiving workflow:
+Complete archiving workflow.
 
 1. run ``freeze_func`` to create a database dump as zip archive of csv files
 2. commit and push the dump to the repos

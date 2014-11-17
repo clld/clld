@@ -14,11 +14,12 @@ from clld import interfaces
 from clld.util import cached_property
 from clld.web.icon import ORDERED_ICONS
 
-from . import (IdNameDescriptionMixin,
+from . import (
+    IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Language)
 
-__all__ = ['DomainElement', 'Parameter', 'Combination']
+__all__ = ('DomainElement', 'Parameter', 'Combination')
 
 
 class DomainElement_data(Base, Versioned, DataMixin):
@@ -156,6 +157,7 @@ class Combination(object):
     @cached_property()
     def values(self):
         from . import ValueSet, Value
+
         def _filter(query, operation):
             q = query.filter(Parameter.pk == self.parameters[0].pk)
             return getattr(q, operation)(

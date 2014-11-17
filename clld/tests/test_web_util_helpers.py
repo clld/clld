@@ -22,6 +22,11 @@ class Tests(TestWithEnv):
 
         alt_representations(self.env['request'], common.Parameter.first())
 
+    def test_icon(self):
+        from clld.web.util.helpers import icon
+
+        self.assertIn('white', icon('download', inverted=True))
+
     def test_icons(self):
         from clld.web.util.helpers import icons
 
