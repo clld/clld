@@ -20,6 +20,7 @@ sdist
 develop-eggs
 .installed.cfg
 lib64
+.webassets-*
 
 # Installer logs
 pip-log.txt
