@@ -15,8 +15,9 @@ from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
 from clld.web.util.htmllib import HTML
 from clld.web.util.helpers import (
-    link, button, icon, JS_CLLD, external_link, linked_references,
+    link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
+from clld.web.util.downloadwidget import DownloadWidget
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 from clld.util import cached_property, nfilter
@@ -297,6 +298,24 @@ class RefsCol(Col):
             [getattr(vs, 'source'), linked_references(self.dt.req, vs)]))
 
 
+class Toolbar(DownloadWidget):
+    def get_options(self):
+        return {'doc_position': 'left'}
+
+    def doc(self):
+        items = []
+        for col in self.ctx.cols:
+            dsc = col.js_args.get('sDescription')
+            if dsc:
+                items.extend([HTML.dt(col.js_args['sTitle']), HTML.dd(dsc)])
+        return HTML.dl(
+            HTML.p(
+                'Columns containing numeric data may be filtered giving upper or lower '
+                'bounds in the form "<5" or ranges in the form "-2..20".'),
+            self.ctx.options.get('sDescription', ''),
+            *items)
+
+
 @implementer(IDataTable)
 class DataTable(Component):
 
@@ -334,6 +353,8 @@ class DataTable(Component):
         self.count_all = None
         self.count_filtered = None
         self.filters = []
+        self._toolbar = Toolbar(
+            req, self, model(), JSDataTable.current_url(self.eid, '%s'), IIndex)
 
         for _model in self.__constraints__:
             attr = self.attr_from_constraint(_model)
@@ -464,31 +485,8 @@ class DataTable(Component):
             .offset(int(self.req.params.get('iDisplayStart', offset)))
         return query
 
+    def render(self):
+        return Component.render(self) + self._toolbar.js()
+
     def toolbar(self):
-        return HTML.div(
-            button(
-                icon('info-sign', inverted=True),
-                class_='btn-info %s-cdOpener' % self.eid),
-            HTML.a(
-                icon('download-alt'),
-                HTML.span(class_="caret"),
-                **{
-                    'class_': "btn dropdown-toggle",
-                    'data-toggle': "dropdown",
-                    'href': "#",
-                    'id': "dt-dl-opener",
-                }
-            ),
-            HTML.ul(
-                *[HTML.li(HTML.a(
-                    fmt,
-                    href="#",
-                    onclick="document.location.href = CLLD.DataTable.current_url"
-                    "('%s', '%s'); return false;" % (self.eid, fmt),
-                    id='dt-dl-%s' % fmt))
-                  for fmt in
-                  [a.extension for n, a in
-                   self.req.registry.getAdapters([self.model()], IIndex)]
-                  if fmt != 'html'],
-                **dict(class_="dropdown-menu")),
-            class_='btn-group right')
+        return self._toolbar.render(no_js=True)
