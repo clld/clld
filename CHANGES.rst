@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.22
+~~~~
+
+- icontains function does now provide support for prefix and suffix searches.
+- initial basic support for non-local files is implemented.
+
+
 0.21.1
 ~~~~~~
 
