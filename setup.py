@@ -42,11 +42,11 @@ install_requires = [
     'yuicompressor',
     'markupsafe',
     'requests',
-    'rdflib',
+    'rdflib==4.0.1',  # rdflib 4.1 requires html5lib==0.95
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.999', # our tests rely on the childNodes attribute
+    'html5lib==0.999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
     'webhelpers2>=2.0rc1',
