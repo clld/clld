@@ -15,7 +15,7 @@ from math import floor
 from six import text_type, string_types
 from six.moves.urllib.parse import quote, urlencode
 
-try:
+try:  # pragma: no cover
     import newrelic.agent
     assert newrelic.agent
     NEWRELIC = True
