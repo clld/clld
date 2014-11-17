@@ -558,9 +558,17 @@ def get_referents(source, exclude=None):
 
 def alt_representations(req, rsc, doc_position='right', exclude=None):
     """Represent available adapters for rsc as dropdown menu."""
-    route, kw = req._route(rsc, None, ext='%s')
+    kw = dict(doc_position=doc_position)
+    if exclude:
+        kw['exclude'] = exclude
+    route, route_kw = req._route(rsc, None, ext='%s')
     dlw = DownloadWidget(
-        req, rsc, rsc, JS_CLLD.route_url(route, kw), interfaces.IRepresentation)
+        req,
+        rsc,
+        rsc,
+        JS_CLLD.route_url(route, route_kw),
+        interfaces.IRepresentation,
+        **kw)
     return dlw.render()
 
 

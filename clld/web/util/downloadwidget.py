@@ -8,7 +8,9 @@ from clld.web.util.htmllib import HTML, literal
 
 
 class DownloadWidget(Component):
+
     """Button group, grouping an info popover and a download selection."""
+
     def __init__(self, req, ctx, obj, dl_url_tmpl, interface, **kw):
         self.req = req
         self.ctx = ctx
