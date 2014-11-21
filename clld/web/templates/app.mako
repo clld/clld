@@ -63,6 +63,7 @@
                             </li>
                         % endfor
                         </ul>
+                    <%block name="navextra"></%block>
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
