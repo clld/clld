@@ -7,8 +7,8 @@ except ImportError:
 
 from six import string_types, text_type, PY2
 from pytz import UTC
-from sqlalchemy import (Column, Integer, Float, String, Boolean, DateTime,
-    func, event)
+from sqlalchemy import (
+    Column, Integer, Float, String, Boolean, DateTime, func, event)
 from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.declarative import (
@@ -135,7 +135,8 @@ class CsvMixin(object):
     def csv_head(self):
         """return List of column names."""
         exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
-        cols = sorted(col.key for om in object_mapper(self).iterate_to_root()
+        cols = sorted(
+            col.key for om in object_mapper(self).iterate_to_root()
             for col in om.local_table.c
             if col.key not in exclude and not exclude.add(col.key))
         return cols
@@ -310,7 +311,8 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         :return: ``dict`` suitable for serialization as JSON.
         """
         exclude = {'created', 'updated', 'polymorphic_type'}
-        cols = [col.key for om in object_mapper(self).iterate_to_root()
+        cols = [
+            col.key for om in object_mapper(self).iterate_to_root()
             for col in om.local_table.c
             if col.key not in exclude and not exclude.add(col.key)]
         return {col: format_json(getattr(self, col)) for col in cols}
