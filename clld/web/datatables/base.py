@@ -477,7 +477,7 @@ class DataTable(Component):
                         query = query.order_by(order)
 
         clauses = self.default_order()
-        if not isinstance(clauses, tuple):
+        if not isinstance(clauses, (list, tuple)):
             clauses = (clauses,)
         query = query.order_by(*clauses)
 
