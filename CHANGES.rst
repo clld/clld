@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.23
+~~~~
+
+- better support for composite default_order in DataTable
+- enhanced css
+- bugfixes
+
+
 0.22
 ~~~~
 
