@@ -476,7 +476,11 @@ class DataTable(Component):
                             order = desc(order)
                         query = query.order_by(order)
 
-        query = query.order_by(self.default_order())
+        clauses = self.default_order()
+        if not isinstance(clauses, tuple):
+            clauses = (clauses,)
+        query = query.order_by(*clauses)
+
         if 'iDisplayLength' in self.req.params:
             # make sure no more than 1000 items can be selected
             limit = min([int(self.req.params['iDisplayLength']), 1000])
