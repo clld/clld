@@ -12,9 +12,8 @@ This module provides
     `offline mode <http://alembic.readthedocs.org/en/latest/tutorial.html\
     #generating-sql-scripts-a-k-a-offline-mode>`_.
 """
-from datetime import datetime
 
-from sqlalchemy.sql import select as base_select
+from sqlalchemy.sql import select as base_select, func
 from clld.db.models import common
 
 
@@ -96,8 +95,8 @@ class Connection(object):
         """
         for k, v in [
             ('version', 1),
-            ('created', datetime.utcnow()),
-            ('updated', datetime.utcnow()),
+            ('created', func.now()),
+            ('updated', func.now()),
             ('active', True)
         ]:
             if hasattr(model.__table__.c, k):
@@ -111,7 +110,7 @@ class Connection(object):
         if not isinstance(values, dict):
             values = dict(values)
         if hasattr(model.__table__.c, 'updated'):
-            values.setdefault('updated', datetime.utcnow())
+            values.setdefault('updated', func.now())
         table = model.__table__
         self.execute(_with_where_clause(table, table.update(), **where).values(**values))
 

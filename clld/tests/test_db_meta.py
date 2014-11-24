@@ -31,6 +31,22 @@ class Tests(TestWithDb):
             self.assertTrue('custom_t' in lang.__solr__(None))
             break
 
+    def test_CustomModelMixin_polymorphic(self):
+        from clld.tests.fixtures import CustomLanguage
+
+        lang = Language(id='def', name='Name')
+        clang = CustomLanguage(id='abc', name='Name', custom='c')
+        DBSession.add_all([lang, clang])
+        DBSession.flush()
+        DBSession.expunge_all()
+        lang = DBSession.query(Language).filter_by(id='def').one()
+        clang = DBSession.query(Language).filter_by(id='abc').one()
+
+        self.assertEqual(lang.polymorphic_type, 'base')
+        self.assertEqual(clang.polymorphic_type, 'custom')
+        self.assertIs(type(lang), Language)
+        self.assertIs(type(clang), CustomLanguage)
+
     def test_CsvMixin(self):
         l1 = Language(id='abc', name='Name', latitude=12.4, jsondata=dict(a=None))
         DBSession.add(l1)

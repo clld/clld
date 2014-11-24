@@ -1,6 +1,5 @@
 """We provide some infrastructure to build extensible database models."""
 from copy import copy
-from datetime import datetime
 try:
     import simplejson as json
 except ImportError:
@@ -8,7 +7,9 @@ except ImportError:
 
 from six import string_types, text_type, PY2
 from pytz import UTC
-import sqlalchemy
+from sqlalchemy import (
+    Column, Integer, Float, String, Boolean, DateTime, func, event)
+from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.declarative import (
     declarative_base,
@@ -31,7 +32,7 @@ from clld.db.versioned import versioned_session
 from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 
-@sqlalchemy.event.listens_for(Pool, "checkout")
+@event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
     """Event listener to handle disconnects.
 
@@ -54,7 +55,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
         # raise DisconnectionError - pool will try
         # connecting again up to three times before raising.
-        raise sqlalchemy.exc.DisconnectionError()
+        raise DisconnectionError()
     cursor.close()
 
 
@@ -133,11 +134,12 @@ class CsvMixin(object):
 
     def csv_head(self):
         """return List of column names."""
-        cols = []
-        for om in object_mapper(self).iterate_to_root():
-            cols.extend(col.key for col in om.local_table.c)
-        return sorted([col for col in set(cols) if col not in [
-            'active', 'version', 'created', 'updated', 'polymorphic_type']])
+        exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
+        cols = sorted(
+            col.key for om in object_mapper(self).iterate_to_root()
+            for col in om.local_table.c
+            if col.key not in exclude and not exclude.add(col.key))
+        return cols
 
     def value_to_csv(self, attr, ctx=None, req=None):
         """Convert one value to a representation suitable for csv writer.
@@ -171,9 +173,9 @@ class CsvMixin(object):
             return None
         col = getattr(cls, attr)
         if hasattr(col, 'property') and hasattr(col.property, 'columns'):
-            if isinstance(col.property.columns[0].type, sqlalchemy.Integer):
+            if isinstance(col.property.columns[0].type, Integer):
                 return int(value)
-            if isinstance(col.property.columns[0].type, sqlalchemy.Float):
+            if isinstance(col.property.columns[0].type, Float):
                 if isinstance(value, string_types):
                     value = value.replace(',', '.')
                 return float(value)
@@ -193,9 +195,11 @@ class CsvMixin(object):
         return session.query(cls).order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
 
 
-class _Base(UnicodeMixin, CsvMixin):
+class Base(UnicodeMixin, CsvMixin, declarative_base()):
 
     """The declarative base for all our models."""
+
+    __abstract__ = True
 
     @declared_attr
     def __tablename__(cls):
@@ -212,28 +216,24 @@ class _Base(UnicodeMixin, CsvMixin):
     #: the kind of data stored in a table. 'Natural' candidates for primary keys
     #: should be marked with unique constraints instead. This adds flexibility
     #: when it comes to database changes.
-    pk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, doc='primary key')
+    pk = Column(Integer, primary_key=True, doc='primary key')
 
     #: To allow for timestamp-based versioning - as opposed or in addition to the version
     #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
     #: a timestamp for creation or an object.
-    created = sqlalchemy.Column(
-        sqlalchemy.DateTime(timezone=True), default=datetime.utcnow)
+    created = Column(DateTime(timezone=True), default=func.now())
 
     #: Timestamp for latest update of an object.
-    updated = sqlalchemy.Column(
-        sqlalchemy.DateTime(timezone=True),
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+    updated = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
     #: The active flag is meant as an easy way to mark records as obsolete or inactive,
     #: without actually deleting them. A custom Query class could then be used which
     #: filters out inactive records.
-    active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    active = Column(Boolean, default=True)
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
-    jsondata = sqlalchemy.Column(JSONEncodedDict)
+    jsondata = Column(JSONEncodedDict)
 
     def update_jsondata(self, **kw):
         """Convenience function.
@@ -302,7 +302,7 @@ class _Base(UnicodeMixin, CsvMixin):
 
         history_class = model.__history_mapper__.class_
         return DBSession.query(history_class).filter(history_class.pk == self.pk)\
-            .order_by(sqlalchemy.desc(history_class.version))
+            .order_by(history_class.version.desc())
 
     def __json__(self, req):
         """Custom JSON serialization of an object.
@@ -310,13 +310,12 @@ class _Base(UnicodeMixin, CsvMixin):
         :param req: pyramid Request object.
         :return: ``dict`` suitable for serialization as JSON.
         """
-        cols = []
-        for om in object_mapper(self).iterate_to_root():
-            cols.extend(col.key for col in om.local_table.c)
-
-        return dict(
-            (col, format_json(getattr(self, col)))
-            for col in set(cols) if col not in ['created', 'updated', 'polymorphic_type'])
+        exclude = {'created', 'updated', 'polymorphic_type'}
+        cols = [
+            col.key for om in object_mapper(self).iterate_to_root()
+            for col in om.local_table.c
+            if col.key not in exclude and not exclude.add(col.key)]
+        return {col: format_json(getattr(self, col)) for col in cols}
 
     def __solr__(self, req):
         """Custom solr document representing the object.
@@ -377,9 +376,6 @@ class _Base(UnicodeMixin, CsvMixin):
             object_mapper(self).class_.__name__, getattr(self, 'id', self.pk))
 
 
-Base = declarative_base(cls=_Base)
-
-
 class PolymorphicBaseMixin(object):
 
     """Mixin providing the wiring for joined table inheritance.
@@ -389,7 +385,7 @@ class PolymorphicBaseMixin(object):
     models to serve as base classes for inheritance.
     """
 
-    polymorphic_type = sqlalchemy.Column(sqlalchemy.String(20))
+    polymorphic_type = Column(String(20))
 
     @declared_attr
     def __mapper_args__(cls):

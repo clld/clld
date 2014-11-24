@@ -1,6 +1,14 @@
 /*
  *
  */
+html {
+    overflow-y: scroll;
+}
+
+div.navbar-inverse a.brand {
+    color: #FFFFFF;
+}
+
 #contextnavbar .nav li {
   min-height: 26px !important;
 }
