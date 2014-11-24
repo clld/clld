@@ -1,3 +1,4 @@
+# coding: utf8
 """Functionality to create downloads for the data of a clld app."""
 from __future__ import unicode_literals, division, absolute_import, print_function
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -120,15 +121,16 @@ class Download(object):
                     zipfile.writestr(self.name, self.read_stream(fp))
                 else:  # pragma: no cover
                     zipfile.write(filename, self.name)
+                cit = TxtCitation(None).render(req.dataset, req)
                 zipfile.writestr(
                     'README.txt',
                     README.format(
                         req.dataset.name,
                         '=' * (
-                            len(req.dataset.name.encode('utf8'))
+                            len(req.dataset.name)
                             + len(' data download')),
                         req.dataset.license,
-                        TxtCitation(None).render(req.dataset, req).encode('utf8')))
+                        TxtCitation(None).render(req.dataset, req)).encode('utf8'))
         if p.exists():  # pragma: no cover
             p.remove()
         tmp.move(p)
