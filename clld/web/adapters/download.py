@@ -121,7 +121,6 @@ class Download(object):
                     zipfile.writestr(self.name, self.read_stream(fp))
                 else:  # pragma: no cover
                     zipfile.write(filename, self.name)
-                cit = TxtCitation(None).render(req.dataset, req)
                 zipfile.writestr(
                     'README.txt',
                     README.format(
