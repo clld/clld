@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.23.1
+~~~~~~
+
+bugfix release: fixed broken backwards compatibility of DownloadWidget.
+
+
 0.23
 ~~~~
 

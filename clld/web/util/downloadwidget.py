@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from six import text_type
 from markupsafe import Markup
 
+from clld.interfaces import IDataTable
 from clld.web.util.component import Component
 from clld.web.util.htmllib import HTML, literal
 
@@ -21,6 +22,7 @@ class DownloadWidget(Component):
         kw.setdefault('exclude', ['html', 'snippet.html'])
         self._kw = kw
         self._opener_class = 'dl-widget-%s' % self.interface.__name__
+        self._id_prefix = 'dt-dl-' if IDataTable.providedBy(ctx) else 'rsc-dl-'
 
     def get_default_options(self):
         return self._kw
@@ -47,6 +49,7 @@ class DownloadWidget(Component):
         return HTML.a(
             adapter.name or adapter.extension,
             href="#",
+            id=self._id_prefix + adapter.extension,
             onclick="document.location.href = %s; return false;"
                     % (self.dl_url_tmpl % adapter.extension))
 
@@ -78,7 +81,7 @@ class DownloadWidget(Component):
                     'class_': "btn dropdown-toggle",
                     'data-toggle': "dropdown",
                     'href': "#",
-                    'id': "dt-dl-opener"}),
+                    'id': self._id_prefix + "opener"}),
             HTML.ul(
                 *[HTML.li(self.dl_link(adapter)) for adapter in adapters],
                 **dict(class_="dropdown-menu")),

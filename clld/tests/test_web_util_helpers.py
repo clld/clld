@@ -20,7 +20,8 @@ class Tests(TestWithEnv):
     def test_alt_representations(self):
         from clld.web.util.helpers import alt_representations
 
-        alt_representations(self.env['request'], common.Parameter.first())
+        alt_representations(
+            self.env['request'], common.Parameter.first(), exclude=['xslt'])
 
     def test_icon(self):
         from clld.web.util.helpers import icon
