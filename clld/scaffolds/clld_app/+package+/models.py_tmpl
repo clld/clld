@@ -21,5 +21,5 @@ from clld.db.meta import Base, CustomModelMixin
 # specialized common mapper classes
 #-----------------------------------------------------------------------------
 #@implementer(interfaces.ILanguage)
-#class {{package}}Language(Language, CustomModelMixin):
+#class {{package}}Language(CustomModelMixin, Language):
 #    pk = Column(Integer, ForeignKey('language.pk'), primary_key=True)
