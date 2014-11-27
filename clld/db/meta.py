@@ -20,6 +20,7 @@ from sqlalchemy.orm import (
     sessionmaker,
     object_mapper,
     class_mapper,
+    deferred,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -221,15 +222,21 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
     #: To allow for timestamp-based versioning - as opposed or in addition to the version
     #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
     #: a timestamp for creation or an object.
-    created = Column(DateTime(timezone=True), default=func.now())
+    @declared_attr
+    def created(cls):
+        return deferred(Column(DateTime(timezone=True), default=func.now()))
 
     #: Timestamp for latest update of an object.
-    updated = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    @declared_attr
+    def updated(cls):
+        return deferred(Column(DateTime(timezone=True), default=func.now(), onupdate=func.now()))
 
     #: The active flag is meant as an easy way to mark records as obsolete or inactive,
     #: without actually deleting them. A custom Query class could then be used which
     #: filters out inactive records.
-    active = Column(Boolean, default=True)
+    @declared_attr
+    def active(cls):
+        return deferred(Column(Boolean, default=True))
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
