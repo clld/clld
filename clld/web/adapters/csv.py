@@ -14,7 +14,9 @@ QUERY_LIMIT = 2000
 
 class CsvAdapter(Index):
 
-    """Represent tables as csv files."""
+    """Represent tables as csv files (maximal %d rows)."""
+
+    __doc__ %= QUERY_LIMIT
 
     extension = 'csv'
     mimetype = 'text/csv'

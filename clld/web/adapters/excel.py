@@ -5,10 +5,14 @@ import xlwt
 from clld.web.adapters.base import Index
 from clld.lib.excel import hyperlink
 
+QUERY_LIMIT = 2000
+
 
 class ExcelAdapter(Index):
 
-    """Represent tables as excel sheets."""
+    """Represent tables as excel sheets (maximal %d rows)."""
+
+    __doc__ %= QUERY_LIMIT
 
     extension = 'xls'
     mimetype = 'application/vnd.ms-excel'
@@ -28,7 +32,7 @@ class ExcelAdapter(Index):
         for i, col in enumerate(self.header(ctx, req)):
             ws.write(0, i, col)
 
-        for j, item in enumerate(ctx.get_query(limit=2000)):
+        for j, item in enumerate(ctx.get_query(limit=QUERY_LIMIT)):
             for i, col in enumerate(self.row(ctx, req, item)):
                 ws.write(j + 1, i, col)
 
@@ -45,7 +49,9 @@ class ExcelAdapter(Index):
 
 class Languages(ExcelAdapter):
 
-    """Represent DataTable of Language instances as excel sheet."""
+    """Represent DataTable of Language instances as excel sheet (maximal %d rows)."""
+
+    __doc__ %= QUERY_LIMIT
 
     def header(self, ctx, req):
         return super(Languages, self).header(ctx, req) + ['Latitude', 'Longitude']
@@ -58,7 +64,9 @@ class Languages(ExcelAdapter):
 
 class Values(ExcelAdapter):
 
-    """Represent table of Value instances as excel sheet."""
+    """Represent table of Value instances as excel sheet (maximal %d rows)."""
+
+    __doc__ %= QUERY_LIMIT
 
     def header(self, ctx, req):
         return super(Values, self).header(ctx, req) + [
@@ -76,7 +84,9 @@ class Values(ExcelAdapter):
 
 class Sentences(ExcelAdapter):
 
-    """Represent table of Sentence instances as excel sheet."""
+    """Represent table of Sentence instances as excel sheet (maximal %d rows)."""
+
+    __doc__ %= QUERY_LIMIT
 
     def header(self, ctx, req):
         return ['ID', 'Text', 'Analyzed', 'Gloss', 'Translation', 'Language']
