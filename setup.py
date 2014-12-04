@@ -42,7 +42,7 @@ install_requires = [
     'yuicompressor',
     'markupsafe',
     'requests',
-    'rdflib==4.0.1',  # rdflib 4.1 requires html5lib==0.95
+    'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
     'colander',
     'python-dateutil',
     'paginate',
