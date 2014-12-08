@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from sqlalchemy.orm import undefer
 from sqlalchemy.exc import InvalidRequestError
 
 from clld.tests.util import TestWithDb
@@ -20,7 +21,8 @@ class Tests(TestWithDb):
         assert migration.pk(common.Identifier, 'iso-csw') == pk
         assert len(list(migration.select(common.Identifier))) == 1
 
-        identifier = DBSession.query(common.Identifier).get(pk)
+        identifier = DBSession.query(common.Identifier)\
+            .options(undefer('*')).get(pk)
         assert identifier.active
         assert identifier.version == 1
         assert identifier.created

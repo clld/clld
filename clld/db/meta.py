@@ -21,6 +21,7 @@ from sqlalchemy.orm import (
     object_mapper,
     class_mapper,
     deferred,
+    undefer,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -290,7 +291,8 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
         try:
-            return session.query(cls).filter_by(**{key: value}).one()
+            return session.query(cls)\
+                .options(undefer('updated')).filter_by(**{key: value}).one()
         except (NoResultFound, MultipleResultsFound):
             if default is NO_DEFAULT:
                 raise

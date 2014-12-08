@@ -10,7 +10,7 @@ from collections import namedtuple
 
 from pyramid.renderers import render
 from pyramid.response import Response
-from sqlalchemy.orm import joinedload_all
+from sqlalchemy.orm import joinedload_all, undefer
 
 from clld.util import UnicodeMixin
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
@@ -130,7 +130,7 @@ class OlacConfig(object):
         return rec
 
     def query_records(self, req, from_=None, until=None):
-        q = self._query(req).order_by(Language.pk)
+        q = self._query(req).options(undefer('updated')).order_by(Language.pk)
         if from_:
             q = q.filter(Language.updated >= from_)
         if until:

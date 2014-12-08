@@ -5,7 +5,7 @@
     <updated>${h.datetime.datetime.now().isoformat()}</updated>
     <author>${request.dataset.name}</author>
     <id>${request.url}</id>
-    % for item in ctx.get_query(limit=1000):
+    % for item in ctx.get_query(limit=1000, undefer_cols=['updated']):
     <entry>
         <title>${item}</title>
         <link href="${request.resource_url(item)}"/>
