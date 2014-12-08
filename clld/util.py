@@ -134,11 +134,14 @@ class UnicodeMixin(object):
         """a human readable label for the object."""
         return '%s' % self  # pragma: no cover
 
-    def __str__(self):
-        """a human readable label for the object, appropriately encoded (or not)."""
-        if PY3:
-            return self.__unicode__()  # pragma: no cover
-        return self.__unicode__().encode('utf-8')
+    if PY3:  # pragma: no cover
+        def __str__(self):
+            """a human readable label for the object, appropriately encoded (or not)."""
+            return self.__unicode__()
+    else:
+        def __str__(self):
+            """a human readable label for the object, appropriately encoded (or not)."""
+            return self.__unicode__().encode('utf-8')
 
 
 #
