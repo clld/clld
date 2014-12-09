@@ -308,7 +308,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         :param req: pyramid Request object.
         :return: ``dict`` suitable for serialization as JSON.
         """
-        exclude = {'created', 'updated', 'polymorphic_type'}
+        exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
         cols = [
             col.key for om in object_mapper(self).iterate_to_root()
             for col in om.local_table.c
