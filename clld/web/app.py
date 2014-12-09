@@ -277,7 +277,7 @@ def ctx_factory(model, type_, req):
     """
     def replacement(id_):
         raise HTTPMovedPermanently(
-            location=req.route_url(model.mapper_name().lower(), id=id_))
+            location=req.route_url(model.__name__.lower(), id=id_))
 
     if type_ == 'index':
         datatable = req.registry.getUtility(

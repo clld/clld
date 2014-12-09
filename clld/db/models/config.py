@@ -30,8 +30,13 @@ class Config(Base):
         :param id_: Identifier of a class instance.
         :return: ``str`` representation identifying a database object.
         """
-        mapper_name = model if isinstance(model, string_types) else model.mapper_name()
-        return '__%s_%s__' % (mapper_name, id_)
+        if isinstance(model, string_types):
+            name = model
+        elif isinstance(model, type):
+            name = model.__name__
+        else:
+            name = model.__class__.__name__
+        return '__%s_%s__' % (name, id_)
 
     @classmethod
     def get_replacement_id(cls, model, id_):

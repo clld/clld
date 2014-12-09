@@ -157,7 +157,7 @@ def get_downloads(req):
     for k, items in groupby(
         sorted(
             list(req.registry.getUtilitiesFor(interfaces.IDownload)), key=lambda t: t[0]),
-        lambda t: t[1].model.mapper_name() + 's',
+        lambda t: t[1].model.__name__ + 's',
     ):
         yield k, sorted([i[1] for i in items if i[1].size], key=lambda d: d.ext)
 
@@ -545,14 +545,14 @@ def get_referents(source, exclude=None):
         (models.Sentence, models.SentenceReference),
         (models.Contribution, models.ContributionReference),
     ]:
-        if obj_cls.mapper_name().lower() in (exclude or []):
+        if obj_cls.__name__.lower() in (exclude or []):
             continue
         q = DBSession.query(obj_cls).join(ref_cls).filter(ref_cls.source_pk == source.pk)
         if obj_cls == models.ValueSet:
             q = q.options(
                 joinedload_all(models.ValueSet.parameter),
                 joinedload_all(models.ValueSet.language))
-        res[obj_cls.mapper_name().lower()] = q.all()
+        res[obj_cls.__name__.lower()] = q.all()
     return res
 
 

@@ -368,13 +368,13 @@ class DataTable(Component):
 
     @staticmethod
     def attr_from_constraint(model):
-        return model.mapper_name().lower()
+        return model.__name__.lower()
 
     def __unicode__(self):
-        return '%ss' % self.model.mapper_name()
+        return '%ss' % self.model.__name__
 
     def __repr__(self):
-        return '%ss' % self.model.mapper_name()
+        return '%ss' % self.model.__name__
 
     def col_defs(self):
         """Must be implemented by derived classes.
@@ -415,7 +415,7 @@ class DataTable(Component):
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
             'sAjaxSource': self.req.route_url(
-                '%ss' % self.model.mapper_name().lower(), _query=query_params),
+                '%ss' % self.model.__name__.lower(), _query=query_params),
         }
 
     def db_model(self):

@@ -1,5 +1,6 @@
 """We provide some infrastructure to build extensible database models."""
 from copy import copy
+import warnings
 try:
     import simplejson as json
 except ImportError:
@@ -265,7 +266,8 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
 
         :rtype: str
         """
-        return class_mapper(cls).class_.__name__
+        warnings.warn('Use (__class__.)__name__ instead of mapper_name', DeprecationWarning)
+        return cls.__name__
 
     @property
     def jsondatadict(self):
@@ -305,7 +307,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
 
     def history(self):
         """return result proxy to iterate over previous versions of a record."""
-        model = object_mapper(self).class_
+        model = self.__class__
         if not hasattr(model, '__history_mapper__'):
             return []  # pragma: no cover
 
@@ -377,12 +379,12 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         if not r:
             r = getattr(self, 'id', None)
         if not r:
-            r = repr(self)[1:].split('object')[0] + ('%s' % self.pk)
+            r = '%s%s' % (self.__class__.__name__, self.pk)
         return r
 
     def __repr__(self):
-        return '%s-%s' % (
-            object_mapper(self).class_.__name__, getattr(self, 'id', self.pk))
+        return '<%s %r>' % (
+            self.__class__.__name__, getattr(self, 'id', self.pk))
 
 
 class PolymorphicBaseMixin(object):
