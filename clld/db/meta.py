@@ -256,19 +256,6 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         d.update(**kw)
         self.jsondata = d
 
-    @classmethod
-    def mapper_name(cls):
-        """Get the name of the mapper class.
-
-        To make implementing model class specific behavior across the technology
-        boundary easier - e.g. specifying CSS classes - we provide a string representation
-        of the model class.
-
-        :rtype: str
-        """
-        warnings.warn('Use (__class__.)__name__ instead of mapper_name', DeprecationWarning)
-        return cls.__name__
-
     @property
     def jsondatadict(self):
         return self.jsondata or {}
@@ -355,7 +342,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             url=req.resource_url(self) if req else None,
             dataset=req.dataset.id if req else None,
             rscname=cls.__name__,
-            name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
+            name=getattr(self, 'name', '%s %s' % (self.__class__.__name__, self.pk)),
             active=self.active,
         )
         for attr in ['updated', 'created']:
