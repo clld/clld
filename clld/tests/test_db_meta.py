@@ -3,6 +3,7 @@ import json
 
 from sqlalchemy.orm.exc import NoResultFound
 from nose.tools import assert_almost_equal
+from six import PY3
 
 from clld.tests.util import TestWithDb
 from clld.db.models.common import Language
@@ -101,6 +102,10 @@ class Tests(TestWithDb):
         # coercion, while on py3, the two methods should actually return the same string.
         self.assertEqual(l.__str__(), l.__unicode__())
         Language().__str__()
+        if PY3:  # pragma: no cover
+            self.assertEqual(repr(l), "<Language 'abc'>")
+        else:
+            self.assertEqual(repr(l), "<Language u'abc'>")
 
     def test_Base_jsondata(self):
         l = Language(id='abc', name='Name')
