@@ -68,7 +68,7 @@ def compute_number_of_values():
 
 
 def get_distinct_values(col, key=None):
-    return sorted([r[0] for r in DBSession.query(col).distinct() if r[0]], key=key)
+    return sorted((c for c, in DBSession.query(col).distinct() if c), key=key)
 
 
 def page_query(q, n=1000, verbose=False, commit=False):

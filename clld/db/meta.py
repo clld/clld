@@ -1,5 +1,4 @@
 """We provide some infrastructure to build extensible database models."""
-from copy import copy
 import warnings
 try:
     import simplejson as json
@@ -252,8 +251,8 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
         """
-        d = copy(self.jsondata) or {}
-        d.update(**kw)
+        d = (self.jsondata or {}).copy()
+        d.update(kw)
         self.jsondata = d
 
     @property
