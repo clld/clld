@@ -98,7 +98,8 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
     # we distinguish between primary and secondary (a.k.a. 'with ...') contributors.
     primary = Column(Boolean, default=True)
 
-    contributor = relationship(Contributor, lazy=False)
+    contributor = relationship(
+        Contributor, lazy=False, backref=backref('editor', uselist=False))
 
     @declared_attr
     def dataset(cls):
