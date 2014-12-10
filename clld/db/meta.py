@@ -1,5 +1,4 @@
 """We provide some infrastructure to build extensible database models."""
-from copy import copy
 import warnings
 try:
     import simplejson as json
@@ -252,22 +251,9 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
         """
-        d = copy(self.jsondata) or {}
-        d.update(**kw)
+        d = (self.jsondata or {}).copy()
+        d.update(kw)
         self.jsondata = d
-
-    @classmethod
-    def mapper_name(cls):
-        """Get the name of the mapper class.
-
-        To make implementing model class specific behavior across the technology
-        boundary easier - e.g. specifying CSS classes - we provide a string representation
-        of the model class.
-
-        :rtype: str
-        """
-        warnings.warn('Use (__class__.)__name__ instead of mapper_name', DeprecationWarning)
-        return cls.__name__
 
     @property
     def jsondatadict(self):
@@ -321,7 +307,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         :param req: pyramid Request object.
         :return: ``dict`` suitable for serialization as JSON.
         """
-        exclude = {'created', 'updated', 'polymorphic_type'}
+        exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
         cols = [
             col.key for om in object_mapper(self).iterate_to_root()
             for col in om.local_table.c
@@ -355,7 +341,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             url=req.resource_url(self) if req else None,
             dataset=req.dataset.id if req else None,
             rscname=cls.__name__,
-            name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
+            name=getattr(self, 'name', '%s %s' % (self.__class__.__name__, self.pk)),
             active=self.active,
         )
         for attr in ['updated', 'created']:

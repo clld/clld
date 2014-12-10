@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import date
 
 from sqlalchemy import (
-    Column, String, Unicode, Date, Integer, ForeignKey, Boolean, desc)
+    Column, String, Unicode, Date, Integer, ForeignKey, Boolean)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -105,4 +105,4 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
     def dataset(cls):
         return relationship(
             Dataset, backref=backref(
-                'editors', order_by=[desc(cls.primary), cls.ord], lazy=False))
+                'editors', order_by=[cls.primary.desc(), cls.ord], lazy=False))

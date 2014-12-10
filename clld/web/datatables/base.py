@@ -7,7 +7,6 @@ object. Server side they know how to provide the data to the client-side table.
 """
 import re
 
-from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer
@@ -474,7 +473,7 @@ class DataTable(Component):
                         orders = [orders]
                     for order in orders:
                         if self.req.params.get('sSortDir_%s' % index) == 'desc':
-                            order = desc(order)
+                            order = order.desc()
                         query = query.order_by(order)
 
         clauses = self.default_order()

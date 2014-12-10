@@ -6,7 +6,6 @@ from sqlalchemy import (
     Integer,
     Unicode,
     ForeignKey,
-    desc,
 )
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
@@ -66,7 +65,7 @@ class Value(Base,
         return relationship(
             ValueSet,
             backref=backref(
-                'values', order_by=[desc(cls.frequency), cls.confidence, cls.pk]))
+                'values', order_by=[cls.frequency.desc(), cls.confidence, cls.pk]))
 
     def __json__(self, req):
         res = Base.__json__(self, req)
