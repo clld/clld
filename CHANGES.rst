@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.24.1
+~~~~~~
+
+bugfix release: a test data file was not committed, leading to a failing test suite.
+
+
 0.24
 ~~~~
 
