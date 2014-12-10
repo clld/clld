@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<imeji:items xmlns:imeji-metadata="http://imeji.org/terms/metadata" xmlns:imeji="http://imeji.org/terms" xmlns:dc="http://purl.org/dc/elements/1.1" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:eprofiles="http://purl.org/escidoc/metadata/profiles/0.1" xmlns:dcterms="http://purl.org/dc/terms" xmlns:eterms="http://purl.org/escidoc/metadata/terms/0.1" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:foaf="http://xmlns.com/foaf/0.1" xmlns:dcam="http://purl.org/dc/dcam">
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/Wo1JI_oZNyrfxV_t">
+        <dcterms:created>2014-10-16T09:01:20.137Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.155Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>006a6dc402c6d84dc4c10d955599f57c</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>virr-image.tif</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/2f/90/53/9e-a090-416f-bc4e-f760c4c42fae/0/original/00e2470c22c8ff97d7569bc488dfe42a.tif</imeji:fullImageUrl>
+        <imeji:fulltext>virr-image.tif title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/Wo1JI_oZNyrfxV_t/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/qY4LkbbxzOddGvHR">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/D78i1HFiUhTnWyRH">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/f66d548f-f79e-4a0f-8a22-691470782d17">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/sCooi0G_D8SW5__">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/KHUV7faLBp9R5Zqm">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/2f/90/53/9e-a090-416f-bc4e-f760c4c42fae/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/2f/90/53/9e-a090-416f-bc4e-f760c4c42fae/0/thumbnail/00e2470c22c8ff97d7569bc488dfe42a.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/2f/90/53/9e-a090-416f-bc4e-f760c4c42fae/0/web/00e2470c22c8ff97d7569bc488dfe42a.jpg</imeji:webImageUrl>
+    </imeji:item>
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/4PN_PejOVg1bsW4R">
+        <dcterms:created>2014-10-16T09:01:11.504Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.156Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>59b741f8a28790fc78b7b0a8874f8b36</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>ngc6503-animated.fits</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/02/d1/62/27-3432-486a-9023-772b5505c5e1/0/original/85e4bac686ac6c9e71f00c872098f97e.fits</imeji:fullImageUrl>
+        <imeji:fulltext>ngc6503-animated.fits title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/4PN_PejOVg1bsW4R/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/hBSDywDhxf4hwHYo">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/lQGjDwjKCIPLLUbI">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/44e520b0-130c-447d-a771-fd22aca05b5f">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/po7QMaLnU3GQsOlA">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/esvLwraJvbfdUf5n">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/02/d1/62/27-3432-486a-9023-772b5505c5e1/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/02/d1/62/27-3432-486a-9023-772b5505c5e1/0/thumbnail/85e4bac686ac6c9e71f00c872098f97e.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/02/d1/62/27-3432-486a-9023-772b5505c5e1/0/web/85e4bac686ac6c9e71f00c872098f97e.jpg</imeji:webImageUrl>
+    </imeji:item>
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/NXP6my0vdVOc2UC0">
+        <dcterms:created>2014-10-09T11:06:20.808Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.156Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>c9042f038c72fe3aa5498ca244602929</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>N1-FTween-Lamin-H2AvD-2.lsm</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/92/13/29/54-0611-4bf3-a344-9d69e57deb6c/0/original/4a897c05771ef4bed020ca4213e5e584.lsm</imeji:fullImageUrl>
+        <imeji:fulltext>N1-FTween-Lamin-H2AvD-2.lsm title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/NXP6my0vdVOc2UC0/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/2ESR_triaJRXYnu">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/EqYsqaYjDUFJtXs5">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/731846e2-c85d-493e-a1d9-38f17d3815a2">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/QsYDHhvv_Tu31tzp">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/nioTGocrxsYfvZ8E">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/92/13/29/54-0611-4bf3-a344-9d69e57deb6c/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/92/13/29/54-0611-4bf3-a344-9d69e57deb6c/0/thumbnail/4a897c05771ef4bed020ca4213e5e584.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/92/13/29/54-0611-4bf3-a344-9d69e57deb6c/0/web/4a897c05771ef4bed020ca4213e5e584.jpg</imeji:webImageUrl>
+    </imeji:item>
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/v4PPsD4rlv35yyu">
+        <dcterms:created>2014-10-09T11:02:20.214Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.156Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>59b741f8a28790fc78b7b0a8874f8b36</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>ngc6503.fits</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/5b/22/db/42-a1a4-4db0-af24-b76cb9873d3d/0/original/1e618c086fd0366255f6c43f882528d2.fits</imeji:fullImageUrl>
+        <imeji:fulltext>ngc6503.fits title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/v4PPsD4rlv35yyu/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/pqQMpPli3K6M072B">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/hnSySP4ByANUfoo">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/9da5a652-22a0-45ae-ba51-75aa2137be3d">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/i4rnCt81xCLqAGSJ">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/lQy1KUeGnVkzDpL7">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/5b/22/db/42-a1a4-4db0-af24-b76cb9873d3d/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/5b/22/db/42-a1a4-4db0-af24-b76cb9873d3d/0/thumbnail/1e618c086fd0366255f6c43f882528d2.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/5b/22/db/42-a1a4-4db0-af24-b76cb9873d3d/0/web/1e618c086fd0366255f6c43f882528d2.jpg</imeji:webImageUrl>
+    </imeji:item>
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/pSw0VXdRfBl6horY">
+        <dcterms:created>2014-10-09T11:02:16.048Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.156Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>2a6e5754443aa9edccbb5645e222b38d</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>m42_40min_red.fits</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/de/a2/12/84-0987-4f25-a863-bc28ea24d9b4/0/original/0053ee4dd1395f506488df46327d3031.fits</imeji:fullImageUrl>
+        <imeji:fulltext>m42_40min_red.fits title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/pSw0VXdRfBl6horY/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/AfAtklpBemu9b_l">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/GzaRCxXCxUEmyGji">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/6244b844-6091-4a55-9278-956d47bac82c">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/PMnGrbQhnRRJZpPK">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/Cgx1QU6Nf56SRQWj">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/de/a2/12/84-0987-4f25-a863-bc28ea24d9b4/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/de/a2/12/84-0987-4f25-a863-bc28ea24d9b4/0/thumbnail/0053ee4dd1395f506488df46327d3031.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/de/a2/12/84-0987-4f25-a863-bc28ea24d9b4/0/web/0053ee4dd1395f506488df46327d3031.jpg</imeji:webImageUrl>
+    </imeji:item>
+    <imeji:item id="http://dev-faces.mpdl.mpg.de/imeji/item/y31dG_cHa2epEoL">
+        <dcterms:created>2014-10-09T11:02:09.031Z</dcterms:created>
+        <dcterms:creator>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</dcterms:creator>
+        <imeji:discardComment></imeji:discardComment>
+        <dcterms:modified>2014-11-20T09:31:29.156Z</dcterms:modified>
+        <imeji:modifiedBy>http://dev-faces.mpdl.mpg.de/imeji/user/saquet%40mpdl.mpg.de</imeji:modifiedBy>
+        <imeji:status>RELEASED</imeji:status>
+        <imeji:version>1</imeji:version>
+        <dcterms:issued>2014-10-16T09:15:53.978Z</dcterms:issued>
+        <imeji:checksum>c4a0d8c51b797ff390b41ee383bdff6b</imeji:checksum>
+        <imeji:collection>http://dev-faces.mpdl.mpg.de/imeji/collection/FKMxUpYdV9N2J4XG</imeji:collection>
+        <imeji:escidocId></imeji:escidocId>
+        <imeji:filename>HB060602_3ptSoma.swc</imeji:filename>
+        <imeji:filetype>application/octet-stream</imeji:filetype>
+        <imeji:fullImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/99/be/af/77-8746-4694-909a-96867455a1c1/0/original/0f9cdd2c62ddb12006353dee67104f78.swc</imeji:fullImageUrl>
+        <imeji:fulltext>HB060602_3ptSoma.swc title Munich, Germany  lat:48.1351253 long:11.5819806 Bastien Saquet  Innovations, Max Planck Digital Library, Max Planck Society</imeji:fulltext>
+        <imeji:metadataSet id="http://dev-faces.mpdl.mpg.de/imeji/item/y31dG_cHa2epEoL/metadataSet/0">
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="text" id="http://imeji.org/terms/metadata/aGFOfrNG1GUT0_80">
+                <imeji:position>0</imeji:position>
+                <imeji:text>title</imeji:text>
+                <imeji:statement>http://imeji.org/terms/statement/xx9HntRF7GuFIJA</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="geolocation" id="http://imeji.org/terms/metadata/xQPIjNbK7ekZwqMK">
+                <imeji:position>1</imeji:position>
+                <imeji:latitude>48.1351253</imeji:latitude>
+                <imeji:longitude>11.5819806</imeji:longitude>
+                <dcterms:title>Munich, Germany</dcterms:title>
+                <imeji:statement>http://imeji.org/terms/statement/dCIHVzo4TWBD1bWc</imeji:statement>
+            </imeji:metadata>
+            <imeji:metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="" xsi:type="conePerson" id="http://imeji.org/terms/metadata/18bfbc0e-5952-43f3-b5bb-8f6d89205b50">
+                <imeji:position>2</imeji:position>
+                <imeji:coneId>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</imeji:coneId>
+                <foaf:person id="http://xmlns.com/foaf/0.1/person/R6UMGZHC9b8TOJGJ">
+                    <eterms:alternative-name></eterms:alternative-name>
+                    <eterms:complete-name>Saquet, Bastien</eterms:complete-name>
+                    <eterms:family-name>Saquet</eterms:family-name>
+                    <eterms:given-name>Bastien</eterms:given-name>
+                    <dc:identifier>http://pubman.mpdl.mpg.de/cone/persons/resource/persons96343</dc:identifier>
+                    <eprofiles:organizationalunit id="http://purl.org/escidoc/metadata/profiles/0.1/organizationalunit/sa9cb7cd97MhBiHY">
+                        <eterms:city></eterms:city>
+                        <eterms:country></eterms:country>
+                        <dcterms:description></dcterms:description>
+                        <dcterms:identifier>escidoc:persistent1</dcterms:identifier>
+                        <dcterms:title>Innovations, Max Planck Digital Library, Max Planck Society</dcterms:title>
+                        <imeji:position>0</imeji:position>
+                    </eprofiles:organizationalunit>
+                    <imeji:position>0</imeji:position>
+                </foaf:person>
+                <imeji:statement>http://dev-faces.mpdl.mpg.de/imeji/statement/PEZt5pc6csPGhqf</imeji:statement>
+            </imeji:metadata>
+            <imeji:profile>http://dev-faces.mpdl.mpg.de/imeji/metadataProfile/dhV6XK39_UPrItK5</imeji:profile>
+        </imeji:metadataSet>
+        <imeji:storageId>FKMxUpYdV9N2J4XG/99/be/af/77-8746-4694-909a-96867455a1c1/0</imeji:storageId>
+        <imeji:thumbnailImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/99/be/af/77-8746-4694-909a-96867455a1c1/0/thumbnail/0f9cdd2c62ddb12006353dee67104f78.jpg</imeji:thumbnailImageUrl>
+        <imeji:visibility>PUBLIC</imeji:visibility>
+        <imeji:webImageUrl>http://dev-faces.mpdl.mpg.de/imeji/file/FKMxUpYdV9N2J4XG/99/be/af/77-8746-4694-909a-96867455a1c1/0/web/0f9cdd2c62ddb12006353dee67104f78.jpg</imeji:webImageUrl>
+    </imeji:item>
+</imeji:items>
