@@ -1,6 +1,6 @@
 """Support for per-record versioning; based on an sqlalchemy recipe."""
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapper, attributes, object_mapper
+from sqlalchemy.orm import mapper, attributes, object_mapper, deferred
 from sqlalchemy.orm.exc import UnmappedColumnError
 from sqlalchemy import Table, Column, ForeignKeyConstraint, Integer
 from sqlalchemy import event
@@ -91,7 +91,7 @@ def _history_mapper(local_mapper):
         local_mapper.local_table.append_column(
             Column('version', Integer, default=1, nullable=False)
         )
-        local_mapper.add_property("version", local_mapper.local_table.c.version)
+        local_mapper.add_property("version", deferred(local_mapper.local_table.c.version))
 
 
 class Versioned(object):

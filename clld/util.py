@@ -35,17 +35,17 @@ def format_json(value):
     return value
 
 
-def jsondump(obj, path):
+def jsondump(obj, path, **kw):
     """python 2 + 3 compatible version of json.dump.
 
     :param obj: The object to be dumped.
     :param path: The path of the JSON file to be written.
     """
-    kw = dict(mode='w')
+    _kw = dict(mode='w')
     if PY3:  # pragma: no cover
-        kw['encoding'] = 'utf8'
-    with open(path, **kw) as fp:
-        return json.dump(obj, fp)
+        _kw['encoding'] = 'utf8'
+    with open(path, **_kw) as fp:
+        return json.dump(obj, fp, **kw)
 
 
 def jsonload(path):
@@ -134,11 +134,14 @@ class UnicodeMixin(object):
         """a human readable label for the object."""
         return '%s' % self  # pragma: no cover
 
-    def __str__(self):
-        """a human readable label for the object, appropriately encoded (or not)."""
-        if PY3:
-            return self.__unicode__()  # pragma: no cover
-        return self.__unicode__().encode('utf-8')
+    if PY3:  # pragma: no cover
+        def __str__(self):
+            """a human readable label for the object, appropriately encoded (or not)."""
+            return self.__unicode__()
+    else:
+        def __str__(self):
+            """a human readable label for the object, appropriately encoded (or not)."""
+            return self.__unicode__().encode('utf-8')
 
 
 #

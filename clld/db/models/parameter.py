@@ -107,10 +107,6 @@ class Combination(object):
         self.multiple = []
 
     @classmethod
-    def mapper_name(cls):
-        return str('combination')
-
-    @classmethod
     def get(cls, id_, **kw):
         params = []
         for pid in set(id_.split(cls.delimiter)):

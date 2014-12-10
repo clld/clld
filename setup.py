@@ -42,7 +42,7 @@ install_requires = [
     'yuicompressor',
     'markupsafe',
     'requests',
-    'rdflib==4.0.1',  # rdflib 4.1 requires html5lib==0.95
+    'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
     'colander',
     'python-dateutil',
     'paginate',
@@ -81,7 +81,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='clld',
-      version='0.23.1',
+      version='0.24',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description=README + '\n\n' + CHANGES,

@@ -8,7 +8,7 @@ from uuid import uuid4
 import datetime
 
 from sqlalchemy import engine_from_config
-from sqlalchemy.orm import joinedload_all, joinedload
+from sqlalchemy.orm import joinedload_all, joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from path import path
@@ -94,7 +94,7 @@ class ClldRequest(Request):
         application serves are used in various places, so we want to have a reference to
         it.
         """
-        return self.db.query(common.Dataset).first()
+        return self.db.query(common.Dataset).options(undefer('updated')).first()
 
     def get_datatable(self, name, model, **kw):
         """Convenient lookup and retrieval of initialized DataTable object.
@@ -277,7 +277,7 @@ def ctx_factory(model, type_, req):
     """
     def replacement(id_):
         raise HTTPMovedPermanently(
-            location=req.route_url(model.mapper_name().lower(), id=id_))
+            location=req.route_url(model.__name__.lower(), id=id_))
 
     if type_ == 'index':
         datatable = req.registry.getUtility(

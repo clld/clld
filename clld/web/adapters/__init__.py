@@ -24,10 +24,10 @@ def includeme(config):
         name, interface = rsc.name, rsc.interface
 
         # ... as json
-        cls = type('Json%s' % rsc.model.mapper_name(), (Json,), {})
+        cls = type('Json%s' % rsc.model.__name__, (Json,), {})
         config.registry.registerAdapter(
             cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)
-        cls = type('Solr%s' % rsc.model.mapper_name(), (SolrDoc,), {})
+        cls = type('Solr%s' % rsc.model.__name__, (SolrDoc,), {})
         config.registry.registerAdapter(
             cls, (interface,), interfaces.IRepresentation, name=SolrDoc.mimetype)
 

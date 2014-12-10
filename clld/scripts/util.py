@@ -348,7 +348,7 @@ class Data(defaultdict):
 
     """Dictionary, serving to store references to new db objects during data imports.
 
-    The values are dictionaries, keyed by the name of the mapper class used to create the
+    The values are dictionaries, keyed by the name of the model class used to create the
     new objects.
 
     >>> d = Data()
@@ -370,6 +370,6 @@ class Data(defaultdict):
             for k, v in self.defaults.items():
                 kw.setdefault(k, v)
             new = model(**kw)
-        self[model.mapper_name()][key] = new
+        self[model.__name__][key] = new
         DBSession.add(new)
         return new

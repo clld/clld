@@ -1,5 +1,4 @@
 """We provide some infrastructure to build extensible database models."""
-from copy import copy
 try:
     import simplejson as json
 except ImportError:
@@ -19,7 +18,8 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
     object_mapper,
-    class_mapper,
+    deferred,
+    undefer,
 )
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -221,15 +221,21 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
     #: To allow for timestamp-based versioning - as opposed or in addition to the version
     #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
     #: a timestamp for creation or an object.
-    created = Column(DateTime(timezone=True), default=func.now())
+    @declared_attr
+    def created(cls):
+        return deferred(Column(DateTime(timezone=True), default=func.now()))
 
     #: Timestamp for latest update of an object.
-    updated = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    @declared_attr
+    def updated(cls):
+        return deferred(Column(DateTime(timezone=True), default=func.now(), onupdate=func.now()))
 
     #: The active flag is meant as an easy way to mark records as obsolete or inactive,
     #: without actually deleting them. A custom Query class could then be used which
     #: filters out inactive records.
-    active = Column(Boolean, default=True)
+    @declared_attr
+    def active(cls):
+        return deferred(Column(Boolean, default=True))
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
@@ -243,21 +249,9 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
         """
-        d = copy(self.jsondata) or {}
-        d.update(**kw)
+        d = (self.jsondata or {}).copy()
+        d.update(kw)
         self.jsondata = d
-
-    @classmethod
-    def mapper_name(cls):
-        """Get the name of the mapper class.
-
-        To make implementing model class specific behavior across the technology
-        boundary easier - e.g. specifying CSS classes - we provide a string representation
-        of the model class.
-
-        :rtype: str
-        """
-        return class_mapper(cls).class_.__name__
 
     @property
     def jsondatadict(self):
@@ -283,7 +277,8 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
         try:
-            return session.query(cls).filter_by(**{key: value}).one()
+            return session.query(cls)\
+                .options(undefer('updated')).filter_by(**{key: value}).one()
         except (NoResultFound, MultipleResultsFound):
             if default is NO_DEFAULT:
                 raise
@@ -296,7 +291,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
 
     def history(self):
         """return result proxy to iterate over previous versions of a record."""
-        model = object_mapper(self).class_
+        model = self.__class__
         if not hasattr(model, '__history_mapper__'):
             return []  # pragma: no cover
 
@@ -310,7 +305,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         :param req: pyramid Request object.
         :return: ``dict`` suitable for serialization as JSON.
         """
-        exclude = {'created', 'updated', 'polymorphic_type'}
+        exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
         cols = [
             col.key for om in object_mapper(self).iterate_to_root()
             for col in om.local_table.c
@@ -344,7 +339,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             url=req.resource_url(self) if req else None,
             dataset=req.dataset.id if req else None,
             rscname=cls.__name__,
-            name=getattr(self, 'name', '%s %s' % (self.mapper_name(), self.pk)),
+            name=getattr(self, 'name', '%s %s' % (self.__class__.__name__, self.pk)),
             active=self.active,
         )
         for attr in ['updated', 'created']:
@@ -368,12 +363,12 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         if not r:
             r = getattr(self, 'id', None)
         if not r:
-            r = repr(self)[1:].split('object')[0] + ('%s' % self.pk)
+            r = '%s%s' % (self.__class__.__name__, self.pk)
         return r
 
     def __repr__(self):
-        return '%s-%s' % (
-            object_mapper(self).class_.__name__, getattr(self, 'id', self.pk))
+        return '<%s %r>' % (
+            self.__class__.__name__, getattr(self, 'id', self.pk))
 
 
 class PolymorphicBaseMixin(object):

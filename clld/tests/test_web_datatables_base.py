@@ -32,6 +32,8 @@ class Tests(TestWithEnv):
         assert text_type(dt) == 'Contributors'
         assert repr(dt) == 'Contributors'
 
+        dt.get_query(undefer_cols=['updated']).all()
+
         self.handle_dt(TestTable, common.Contributor)
 
         self.set_request_properties(params={

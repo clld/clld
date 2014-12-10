@@ -5,18 +5,17 @@ from clld.db.models import common
 from clld import interfaces
 
 
-__version__ = "0.23.1"
-_Resource = namedtuple('Resource', 'name model interface with_index with_rdfdump')
+__version__ = "0.24"
 
 
-class _ExtendedResource(_Resource):
+class Resource(namedtuple('Resource', 'name model interface with_index with_rdfdump')):
+
+    def __new__(cls, name, model, interface, with_index=True, with_rdfdump=True):
+        return super(Resource, cls).__new__(cls, name, model, interface, with_index, with_rdfdump)
+
     @property
     def plural(self):
         return self.name + 's'
-
-
-def Resource(name, model, interface, with_index=True, with_rdfdump=True):
-    return _ExtendedResource(name, model, interface, with_index, with_rdfdump)
 
 
 RESOURCES = [

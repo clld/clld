@@ -7,7 +7,7 @@ object. Server side they know how to provide the data to the client-side table.
 """
 import re
 
-from sqlalchemy import desc
+from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer
 
@@ -367,13 +367,13 @@ class DataTable(Component):
 
     @staticmethod
     def attr_from_constraint(model):
-        return model.mapper_name().lower()
+        return model.__name__.lower()
 
     def __unicode__(self):
-        return '%ss' % self.model.mapper_name()
+        return '%ss' % self.model.__name__
 
     def __repr__(self):
-        return '%ss' % self.model.mapper_name()
+        return '%ss' % self.model.__name__
 
     def col_defs(self):
         """Must be implemented by derived classes.
@@ -414,7 +414,7 @@ class DataTable(Component):
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
             'sAjaxSource': self.req.route_url(
-                '%ss' % self.model.mapper_name().lower(), _query=query_params),
+                '%ss' % self.model.__name__.lower(), _query=query_params),
         }
 
     def db_model(self):
@@ -430,7 +430,7 @@ class DataTable(Component):
     def default_order(self):
         return self.db_model().pk
 
-    def get_query(self, limit=1000, offset=0):
+    def get_query(self, limit=1000, offset=0, undefer_cols=()):
         query = self.base_query(
             DBSession.query(self.db_model()).filter(self.db_model().active == True))
         self.count_all = query.count()
@@ -473,7 +473,7 @@ class DataTable(Component):
                         orders = [orders]
                     for order in orders:
                         if self.req.params.get('sSortDir_%s' % index) == 'desc':
-                            order = desc(order)
+                            order = order.desc()
                         query = query.order_by(order)
 
         clauses = self.default_order()
@@ -487,6 +487,10 @@ class DataTable(Component):
         query = query\
             .limit(limit if limit != -1 else 1000)\
             .offset(int(self.req.params.get('iDisplayStart', offset)))
+
+        if undefer_cols:
+            query = query.options(*(undefer(c) for c in undefer_cols))
+
         return query
 
     def render(self):
