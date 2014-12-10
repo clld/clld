@@ -490,7 +490,7 @@ class DataTable(Component):
 
         if undefer_cols:
             query = query.options(*(undefer(c) for c in undefer_cols))
-        
+
         return query
 
     def render(self):

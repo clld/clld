@@ -1,5 +1,4 @@
 """We provide some infrastructure to build extensible database models."""
-import warnings
 try:
     import simplejson as json
 except ImportError:
@@ -19,7 +18,6 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
     object_mapper,
-    class_mapper,
     deferred,
     undefer,
 )

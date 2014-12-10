@@ -8,7 +8,7 @@ from clld import interfaces
 __version__ = "0.23.1"
 
 
-class Resource(namedtuple('Resource','name model interface with_index with_rdfdump')):
+class Resource(namedtuple('Resource', 'name model interface with_index with_rdfdump')):
 
     def __new__(cls, name, model, interface, with_index=True, with_rdfdump=True):
         return super(Resource, cls).__new__(cls, name, model, interface, with_index, with_rdfdump)
