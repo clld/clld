@@ -113,13 +113,13 @@ class OlacConfig(object):
     delimiter = ':'
 
     def _query(self, req):
-        return req.db.query(Language)\
+        subquery = req.db.query(Identifier)\
+            .filter_by(type=IdentifierType.iso.value)\
             .join(LanguageIdentifier)\
-            .join(Identifier)\
-            .filter(Identifier.type == IdentifierType.iso.value)\
-            .options(joinedload_all(
-                Language.languageidentifier, LanguageIdentifier.identifier))\
-            .distinct()
+            .filter_by(language_pk=Language.pk)
+        return req.db.query(Language).filter(subquery.exists())\
+            .options(undefer('updated'), joinedload_all(
+                Language.languageidentifier, LanguageIdentifier.identifier))
 
     def get_earliest_record(self, req):
         return self._query(req).order_by(Language.updated, Language.pk).first()
@@ -130,7 +130,7 @@ class OlacConfig(object):
         return rec
 
     def query_records(self, req, from_=None, until=None):
-        q = self._query(req).options(undefer('updated')).order_by(Language.pk)
+        q = self._query(req).order_by(Language.pk)
         if from_:
             q = q.filter(Language.updated >= from_)
         if until:
