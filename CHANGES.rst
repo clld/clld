@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.24
+~~~~
+
+- support for deferred column loading
+- more flexible jsondump function
+- support for external file storage with imeji
+
+
 0.23.1
 ~~~~~~
 
