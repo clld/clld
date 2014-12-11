@@ -263,6 +263,8 @@ FIELDS = [
     'year',
 ]
 
+FIELDS_SET = set(FIELDS)
+
 
 class _Convertable(UnicodeMixin):
 
@@ -411,16 +413,13 @@ class Record(OrderedDict, _Convertable):
 
         :return: string encoding the record in BibTeX syntax.
         """
-        fields = []
-        m = max([0] + list(map(len, self.keys())))
+        keys = sorted(self, key=lambda k: (k not in FIELDS_SET, k))
+        m = max([0] + list(map(len, keys)))
 
-        for k in self.keys():
-            fields.append("  %s = {%s}," % (k.ljust(m), self[k]))
+        fields = ("  %s = {%s}" % (k.ljust(m), self[k]) for k in keys)
 
-        return """@%s{%s,
-%s
-}
-""" % (getattr(self.genre, 'value', self.genre), self.id, "\n".join(fields)[:-1])
+        return "@%s{%s,\n%s\n}" % (
+            getattr(self.genre, 'value', self.genre), self.id, ",\n".join(fields))
 
     def text(self):
         """Linearize the bib record according to the rules of the unified style.
