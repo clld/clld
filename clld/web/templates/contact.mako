@@ -4,8 +4,8 @@
 <div class="well">
     <p>You can contact us via email at <a href="mailto:${request.dataset.contact}">${request.dataset.contact}</a>.</p>
     % if request.registry.settings.get('clld.github_repos') and request.registry.settings.get('clld.github_repos_data'):
-    <% drepo = request.registry.settings['clld.github_repos'] %>
-    <% srepo = request.registry.settings['clld.github_repos_data'] %>
+    <% srepo = request.registry.settings['clld.github_repos'] %>
+    <% drepo = request.registry.settings['clld.github_repos_data'] %>
     <p><a href="https://github.com">GitHub</a> users can also create and discuss bug reports using the following <strong>issue trackers</strong>:</p>
         <ul>
             <li><a href="https://github.com/${drepo}/issues">${drepo}/issues</a> for errata regarding the site content</li>
