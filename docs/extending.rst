@@ -210,19 +210,19 @@ meanings often encountered in lexical databases:
     from clld.db.meta import CustomModelMixin
 
     @implementer(interfaces.IParameter)
-    class Meaning(common.Parameter, CustomModelMixin):
+    class Meaning(CustomModelMixin, common.Parameter):
         pk = Column(Integer, ForeignKey('parameter.pk'), primary_key=True)
 
     @implementer(interfaces.IValueSet)
-    class SynSet(common.ValueSet, CustomModelMixin):
+    class SynSet(CustomModelMixin, common.ValueSet):
         pk = Column(Integer, ForeignKey('valueset.pk'), primary_key=True)
 
     @implementer(interfaces.IUnit)
-    class Word(common.Unit, CustomModelMixin):
+    class Word(CustomModelMixin, common.Unit):
         pk = Column(Integer, ForeignKey('unit.pk'), primary_key=True)
 
     @implementer(interfaces.IValue)
-    class Counterpart(common.Value, CustomModelMixin):
+    class Counterpart(CustomModelMixin, common.Value):
         """a counterpart relates a meaning with a word
         """
         pk = Column(Integer, ForeignKey('value.pk'), primary_key=True)
