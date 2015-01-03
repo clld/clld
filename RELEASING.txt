@@ -57,6 +57,13 @@ Releasing clld
   $ git push origin
   $ git push --tags
 
+- Make it the latest github/zenodo release:
+
+  http://help.github.com/articles/creating-releases/
+  http://guides.github.com/activities/citable-code/
+  update the DOI badge (later?)
+
+
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
 
