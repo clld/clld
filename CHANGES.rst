@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.25
+~~~~
+
+Multiple small fixes, see https://github.com/clld/clld/commits/develop for details.
+
+
 0.24.1
 ~~~~~~
 
