@@ -98,35 +98,41 @@ def resourcemap(req):
     rsc = req.params.get('rsc')
     if rsc == 'language':
         q = DBSession.query(
-                common.Language.id,
-                common.Language.name,
-                common.Language.latitude,
-                common.Language.longitude,
-                common.Identifier.type.label('itype'),
-                common.Identifier.name.label('iname'))\
-            .outerjoin(join(common.LanguageIdentifier, common.Identifier, and_(
+            common.Language.id,
+            common.Language.name,
+            common.Language.latitude,
+            common.Language.longitude,
+            common.Identifier.type.label('itype'),
+            common.Identifier.name.label('iname')
+        ).outerjoin(join(
+            common.LanguageIdentifier,
+            common.Identifier, and_(
                 common.LanguageIdentifier.identifier_pk == common.Identifier.pk,
-                common.Identifier.type != 'name')))\
-            .filter(common.Language.active == True)\
-            .order_by(common.Language.id)
+                common.Identifier.type != 'name')
+        )).filter(common.Language.active == True).order_by(common.Language.id)
+
         def resources():
             for (id, name, lat, lon), rows in groupby(q, itemgetter(0, 1, 2, 3)):
-                identifiers = [{'type': r.itype, 'identifier': r.iname.lower()
-                                if r.itype.startswith('WALS') else r.iname}
+                identifiers = [
+                    {'type': r.itype, 'identifier': r.iname.lower()
+                     if r.itype.startswith('WALS') else r.iname}
                     for r in rows if r.iname is not None]
                 yield {'id': id, 'name': name, 'latitude': lat, 'longitude': lon,
                        'identifiers': identifiers}
     elif rsc == 'parameter':
         q = DBSession.query(
-                common.Parameter.id,
-                common.Parameter.name)\
-            .order_by(common.Parameter.pk)
+            common.Parameter.id,
+            common.Parameter.name
+        ).order_by(common.Parameter.pk)
+
         def resources():
             for id, name in q:
                 yield {'id': id, 'name': name}
     else:
         return HTTPNotFound()
 
-    return {'properties': {'dataset': req.dataset.id,
-        'uri_template': get_url_template(req, rsc, relative=False)},
+    return {
+        'properties': {
+            'dataset': req.dataset.id,
+            'uri_template': get_url_template(req, rsc, relative=False)},
         'resources': list(resources())}
