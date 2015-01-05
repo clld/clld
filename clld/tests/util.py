@@ -360,7 +360,7 @@ class ServerThread(threading.Thread):  # pragma: no cover
     Pass in WSGI app object and serve pages from it for Selenium browser.
     """
 
-    def __init__(self, app, host='0.0.0.0:8880'):
+    def __init__(self, app, host='127.0.0.1:8880'):
         threading.Thread.__init__(self)
         self.app = app
         self.host, self.port = host.split(':')

@@ -114,7 +114,7 @@ You are now ready to run::
 
     pserve --reload development.ini
 
-and navigate with your browser to http://0.0.0.0:6543 to visit your application.
+and navigate with your browser to http://127.0.0.1:6543 to visit your application.
 
 The next step is populating the database.
 

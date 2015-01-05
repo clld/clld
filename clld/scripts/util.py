@@ -211,8 +211,11 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     return args
 
 
-def initializedb(create=None, prime_cache=None, **kw):  # pragma: no cover
-    args = parsed_args((("--prime-cache-only",), dict(action="store_true")), **kw)
+def initializedb(*args, **kw):  # pragma: no cover
+    create = kw.pop('create', None)
+    prime_cache = kw.pop('prime_cache', None)
+    args = list(args) + [(("--prime-cache-only",), dict(action="store_true"))]
+    args = parsed_args(*args, **kw)
     if not args.prime_cache_only:
         if create:
             with transaction.manager:

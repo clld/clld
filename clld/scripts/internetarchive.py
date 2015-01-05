@@ -90,7 +90,7 @@ def ia_func(command, args, sources=None):  # pragma: no cover
                 title = source.title or source.booktitle
                 if filepath.exists():
                     continue
-                q = quote_plus('creator:"%s" AND title:"%s"' % (
+                q = quote_plus(b'creator:"%s" AND title:"%s"' % (
                     source.author.split(',')[0].encode('utf8'), title.encode('utf8')))
 
                 count += 1

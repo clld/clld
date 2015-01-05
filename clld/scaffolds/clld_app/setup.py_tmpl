@@ -8,13 +8,8 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'clld',
-    'pyramid',
-    'SQLAlchemy',
-    'transaction',
-    'pyramid_tm',
-    'zope.sqlalchemy',
     'waitress',
-    ]
+]
 
 setup(name='{{project}}',
       version='0.0',

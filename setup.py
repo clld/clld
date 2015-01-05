@@ -24,13 +24,15 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
-    'setuptools >= 0.8',
-    'pyramid >= 1.5a4',
+    'setuptools>=0.8',
+    'pyramid>=1.5a4',
     'pyramid_mako',
-    'sqlalchemy >= 0.9.3',
-    'Mako >= 0.3.6', # strict_undefined
-    'PasteDeploy >= 1.5.0', # py3 compat
-    'purl >= 0.5',
+    'pyramid_tm',
+    'transaction',
+    'SQLAlchemy>=0.9.3',
+    'Mako>=0.3.6',  # strict_undefined
+    'PasteDeploy>=1.5.0',  # py3 compat
+    'purl>=0.5',
     'path.py',
     'pyramid_exclog',
     'pytz',
@@ -53,9 +55,7 @@ install_requires = [
 ]
 
 if not PY3:
-    install_requires.extend('Babel PyX==0.12.1'.split())
-else:
-    install_requires.append('PyX>=0.13')
+    install_requires.append('Babel')
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
@@ -71,17 +71,17 @@ docs_extras = [
     'Sphinx',
     'docutils',
     'repoze.sphinx.autointerface',
-    ]
+]
 
 testing_extras = tests_require + [
     'nose',
     #'nosexcover',
     'coverage',
     'virtualenv', # for scaffolding tests
-    ]
+]
 
 setup(name='clld',
-      version='0.24.1',
+      version='0.25',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description=README + '\n\n' + CHANGES,
@@ -115,4 +115,4 @@ setup(name='clld',
         [pyramid.scaffold]
         clld_app=clld.scaffolds:ClldAppTemplate
       """
-      )
+)
