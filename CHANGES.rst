@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.26
+~~~~
+
+New helper function, refactored imeji support.
+
+
 0.25
 ~~~~
 
