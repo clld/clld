@@ -69,6 +69,12 @@ class Tests(TestWithEnv):
 
         map_marker_img(self.env['request'], None, marker=Mock(return_value=None))
 
+    def test_maybe_external_link(self):
+        from clld.web.util.helpers import maybe_external_link
+
+        self.assertFalse('href' in maybe_external_link('not a URL'))
+        self.assertTrue('href' in maybe_external_link('http://wals.info'))
+
     def test_external_link(self):
         from clld.web.util.helpers import external_link
 
