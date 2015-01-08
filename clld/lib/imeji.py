@@ -18,15 +18,12 @@ def file_urls(source):
     """Parse URL information from imeji XML.
 
     :param source: Path to a imeji collection metadata file in imeji XML format.
-    :return: dict of (filename, infodict) pairs.
+    :return: generator of infodicts.
     """
-    res = {}
-    items = ElementTree.parse(source)
-    for item in items.findall(qname('item')):
-        data = dict(id=item.attrib['id'])
+    for item in ElementTree.parse(source).findall(qname('item')):
+        data = dict(id=item.attrib['id'], filename=get(item, 'filename'))
         for key in 'full web thumbnail'.split():
             data[key] = get(item, key + 'ImageUrl')
         # add an alias for the URL to the original file:
         data['url'] = data['full']
-        res[get(item, 'filename')] = data
-    return res
+        yield data
