@@ -29,6 +29,7 @@ from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
 assert get_current_request
 from pyramid.interfaces import IRoutesMapper
+from purl import URL
 
 from clld import interfaces
 from clld import RESOURCES
@@ -290,6 +291,13 @@ def external_link(url, label=None, inverted=False, **kw):
     kw.setdefault('title', label or url)
     kw.setdefault('href', url)
     return HTML.a(icon('share', inverted=inverted), ' ', label or url, **kw)
+
+
+def maybe_external_link(text):
+    url = URL(text)
+    if url.host() and url.scheme() in ['http', 'https']:
+        return external_link(text)
+    return text
 
 
 def link_to_map(language):

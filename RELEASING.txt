@@ -63,6 +63,9 @@ Releasing clld
   http://guides.github.com/activities/citable-code/
   update the DOI badge (later?)
 
+  Note: This requires a version tag starting with a letter, e.g. v0.25;
+  otherwise the zenodo hook will not work.
+
 
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI::
