@@ -29,7 +29,7 @@ class Tests(TestWithEnv):
             'http://example.org/',
             'http://creativecommons.org/licenses/nope/4.0',
             'http://creativecommons.org/licenses/by/4.0',
-            'http://en.wikipedia.org/wiki/Public_domain',    
+            'http://en.wikipedia.org/wiki/Public_domain',
         ]):
             maybe_license_link(
                 self.env['request'],
