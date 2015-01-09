@@ -99,3 +99,4 @@ class Tests(TestWithEnv):
         classImplements(A, ILanguage)
         dt = TestTable(self.env['request'], A)
         self.assertTrue('languages' in dt.options['sAjaxSource'])
+
