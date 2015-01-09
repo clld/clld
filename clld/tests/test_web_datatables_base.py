@@ -1,6 +1,7 @@
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.types import Integer
 from six import text_type
+from zope.interface import Interface, classImplements
 
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
@@ -81,3 +82,21 @@ class Tests(TestWithEnv):
         self.handle_dt(TestTable, common.Value)
         self.set_request_properties(params={'sSearch_0': '> 10', 'sSearch_1': 'a'})
         self.handle_dt(TestTable, common.Value)
+
+    def test_DataTable_for_custom_class(self):
+        from clld.web.datatables.base import DataTable
+
+        class A(object):  # no route is registered for the name 'as' ...
+            pass
+
+        class ILanguage(Interface):  # but there is one for 'languages'!
+            pass
+
+        class TestTable(DataTable):
+            def col_defs(self):
+                return []
+
+        classImplements(A, ILanguage)
+        dt = TestTable(self.env['request'], A)
+        self.assertTrue('languages' in dt.options['sAjaxSource'])
+
