@@ -2,6 +2,14 @@
 Changes
 -------
 
+0.27
+~~~~
+
+- new helper functions supporting easy creation of license links.
+- enhanced DataTable to allow more flexibility in naming of models.
+
+
+
 0.26
 ~~~~
 
