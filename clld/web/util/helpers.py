@@ -51,6 +51,50 @@ assert xmlchars
 MARKER_IMG_DIM = '20'
 
 
+def cc_link(req, license_url, button='regular'):
+    if license_url == 'http://en.wikipedia.org/wiki/Public_domain':
+        license_url = 'http://creativecommons.org/publicdomain/zero/1.0/'
+    license_url = URL(license_url)
+    if license_url.host() != 'creativecommons.org':
+        return
+
+    comps = license_url.path().split('/')
+    if len(comps) < 3:
+        return
+
+    known = {
+        'zero': 'Public Domain',
+        'by': 'Creative Commons Attribution License',
+        'by-nc': 'Creative Commons Attribution-NonCommercial License',
+        'by-nc-nd': 'Creative Commons Attribution-NonCommercial-NoDerivatives License',
+        'by-nc-sa': 'Creative Commons Attribution-NonCommercial-ShareAlike License',
+        'by-nd': 'Creative Commons Attribution-NoDerivatives License',
+        'by-sa': 'Creative Commons Attribution-ShareAlike License'}
+    if comps[2] not in known:
+        return
+
+    icon = 'cc-' + comps[2] + ('-small' if button == 'small' else '') + '.png'
+    img_attrs = dict(
+        alt=known[comps[2]],
+        src=req.static_url('clld:web/static/images/' + icon))
+    if button == 'small':
+        img_attrs.update(height=15, width=80)
+    else:
+        img_attrs.update(height=30, width=86)
+
+    return HTML.a(HTML.img(**img_attrs), href=license_url, rel='license')
+
+
+def maybe_license_link(req, license, **kw):
+    cc_link_ = cc_link(req, license, button=kw.pop('button', 'regular'))
+    if cc_link_:
+        return cc_link_
+    license_url = URL(license)
+    if license_url.host():
+        return external_link(license_url, **kw)
+    return license
+
+
 def get_valueset(req, ctx):
     param = req.params.get('parameter')
     if param is None:  # pragma: no cover
@@ -625,3 +669,15 @@ def icons(req, param):
             class_="table table-condensed"
         ),
         button('Close', **{'data-dismiss': 'clickover'}))
+
+
+def glottolog_url(glottocode):
+    return models.Identifier(name=glottocode, type='glottolog').url()
+
+
+def collapsed(id_, content, button_content=None):
+    return HTML.div(
+        HTML.p(HTML.a(
+            button_content or icon('plus-sign'),
+            **{'class': 'btn', 'data-toggle': 'collapse', 'data-target': '#%s' % id_})),
+        HTML.div(content, id=id_, class_='collapse'))
