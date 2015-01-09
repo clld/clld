@@ -19,7 +19,7 @@ class Tests(TestWithEnv):
     def test_glottolog_url(self):
         from clld.web.util.helpers import glottolog_url
 
-        glottolog_url('abcd1234')
+	glottolog_url('abcd1234')
 
     def test_maybe_license_link(self):
         from clld.web.util.helpers import maybe_license_link
@@ -29,7 +29,7 @@ class Tests(TestWithEnv):
             'http://example.org/',
             'http://creativecommons.org/licenses/nope/4.0',
             'http://creativecommons.org/licenses/by/4.0',
-            'http://en.wikipedia.org/wiki/Public_domain',
+            'http://en.wikipedia.org/wiki/Public_domain',    
         ]):
             maybe_license_link(
                 self.env['request'],
