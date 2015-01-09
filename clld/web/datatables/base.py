@@ -9,7 +9,7 @@ import re
 
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
-from zope.interface import implementer
+from zope.interface import implementer, implementedBy
 
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
@@ -403,6 +403,13 @@ class DataTable(Component):
         query_params = {}
         query_params.update(self.req.query_params)
         query_params.update(self.xhr_query() or {})
+        try:
+            data_url = self.req.route_url(
+                '%ss' % self.model.__name__.lower(), _query=query_params)
+        except KeyError:
+            interface = list(implementedBy(self.model))[0]
+            data_url = self.req.route_url(
+                '%ss' % interface.__name__.lower()[1:], _query=query_params)
         return {
             'bServerSide': True,
             'bProcessing': True,
@@ -413,8 +420,7 @@ class DataTable(Component):
             "aoColumns": [col.js_args for col in self.cols],
             "iDisplayLength": 100,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
-            'sAjaxSource': self.req.route_url(
-                '%ss' % self.model.__name__.lower(), _query=query_params),
+            'sAjaxSource': data_url,
         }
 
     def db_model(self):
