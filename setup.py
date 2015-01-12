@@ -25,13 +25,12 @@ except IOError:
 
 install_requires = [
     'setuptools>=0.8',
-    'pyramid>=1.5a4',
-    'pyramid_mako',
+    'pyramid>=1.5.1',
+    'pyramid_mako>=1.0',
     'pyramid_tm',
-    'transaction',
-    'SQLAlchemy>=0.9.3',
-    'Mako>=0.3.6',  # strict_undefined
+    'SQLAlchemy>=0.9.8',
     'PasteDeploy>=1.5.0',  # py3 compat
+    'waitress',
     'purl>=0.5',
     'path.py',
     'pyramid_exclog',
