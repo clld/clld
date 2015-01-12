@@ -38,7 +38,7 @@ install_requires = [
     'zope.sqlalchemy',
     'WebTest',
     'six>=1.7.3',  # webassets needs add_metaclass!
-    'alembic',
+    'alembic>=0.7.1',
     'webassets',
     'yuicompressor',
     'markupsafe',
