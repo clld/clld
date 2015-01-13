@@ -2,7 +2,7 @@
 from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 
-from clld.db.util import get_distinct_values, icontains
+from clld.db.util import get_distinct_values
 from clld.db.models.common import (
     Language, Sentence, Parameter, ValueSentence, Value, ValueSet, Sentence_files,
 )
