@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.28
+~~~~
+
+- added AudioCol to support display of sentences with audio files in index.
+
+
 0.27
 ~~~~
 
