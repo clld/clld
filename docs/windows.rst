@@ -17,7 +17,11 @@ An installation for Windows 7
     Some python packages used by the ``clld`` software have extensions coded in C. If
     these packages are installed from source, the system must have a C-compiler. Without
     one, trying to install such a package results in the system complaining about
-    ``vcvarsall.bat`` missing. You can fix this problem using any of the solutions explained
+    ``vcvarsall.bat`` missing.
+    The most straightforward way to fix this is to install the
+    `Microsoft Visual C++ Compiler for Python 2.7 <http://www.microsoft.com/en-us/download/details.aspx?id=44266>`_
+    (which requires `setuptools <http://www.lfd.uci.edu/~gohlke/pythonlibs/#setuptools>`_ 6.0 or later).
+    You can find other solutions (using the MinGW compiler or Microsoft Visual Studio) explained
     in `this stackoverflow thread <http://stackoverflow.com/questions/2817869/error-unable-to-find-vcvarsall-bat>`_.
 
 

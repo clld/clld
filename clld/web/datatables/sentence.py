@@ -1,13 +1,15 @@
 """Default DataTable for Sentence objects."""
+from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 
 from clld.db.util import get_distinct_values
 from clld.db.models.common import (
-    Language, Sentence, Parameter, ValueSentence, Value, ValueSet,
+    Language, Sentence, Parameter, ValueSentence, Value, ValueSet, Sentence_files,
 )
 from clld.web.datatables.base import (
     DataTable, LinkCol, DetailsRowLinkCol, Col,
 )
+from clld.web.util.helpers import icon
 
 
 class TypeCol(Col):
@@ -34,6 +36,25 @@ class TsvCol(Col):
         return super(TsvCol, self).search('\t'.join(qs.split()))
 
 
+class AudioCol(Col):
+    def __init__(self, dt, name, **kw):
+        kw['choices'] = ['yes']
+        kw['input-size'] = 'mini'
+        kw['model_col'] = Sentence_files.id
+        Col.__init__(self, dt, name, **kw)
+
+    def format(self, item):
+        if item.audio:
+            return icon('volume-up')
+
+    def order(self):
+        return Sentence_files.id
+
+    def search(self, qs):
+        if qs == 'yes':
+            return Sentence_files.pk != 0
+
+
 class Sentences(DataTable):
 
     """Default DataTable for Sentence objects."""
@@ -41,6 +62,14 @@ class Sentences(DataTable):
     __constraints__ = [Parameter, Language]
 
     def base_query(self, query):
+        query = query\
+            .outerjoin(
+                Sentence_files,
+                and_(
+                    Sentence_files.object_pk == Sentence.pk,
+                    Sentence_files.mime_type.contains('audio/')))\
+            .options(joinedload(Sentence._files))
+
         if self.language:
             query = query.filter(Sentence.language_pk == self.language.pk)
         else:
