@@ -1,3 +1,5 @@
+from mock import Mock
+
 from clld.tests.util import TestWithEnv
 from clld.db.models import common
 
@@ -32,3 +34,11 @@ class Tests(TestWithEnv):
     def test_with_parameter(self):
         self.set_request_properties(params={'parameter': 'parameter'})
         self._run()
+
+    def test_AudioCol(self):
+        from clld.web.datatables.sentence import AudioCol, Sentences
+
+        col = AudioCol(Sentences(self.env['request'], common.Sentence), 'audio')
+        col.order()
+        col.search('yes')
+        col.format(Mock())
