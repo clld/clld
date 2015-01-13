@@ -13,7 +13,7 @@ to provide building blocks with enough shared commonality for custom data models
 Declarative base and mixins
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: clld.db.meta._Base
+.. autoclass:: clld.db.meta.Base
     :members:
     :exclude-members: first, replacement_id
 
