@@ -60,7 +60,7 @@ def cc_link(req, license_url, button='regular'):
 
     comps = license_url.path().split('/')
     if len(comps) < 3:
-        return
+        return  # pragma: no cover
 
     known = {
         'zero': 'Public Domain',
@@ -77,11 +77,8 @@ def cc_link(req, license_url, button='regular'):
     img_attrs = dict(
         alt=known[comps[2]],
         src=req.static_url('clld:web/static/images/' + icon))
-    if button == 'small':
-        img_attrs.update(height=15, width=80)
-    else:
-        img_attrs.update(height=30, width=86)
-
+    height, width = (15, 80) if button == 'small' else (30, 86)
+    img_attrs.update(height=height, width=width)
     return HTML.a(HTML.img(**img_attrs), href=license_url, rel='license')
 
 
