@@ -22,6 +22,7 @@ from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
 from pyramid.renderers import JSON, JSONP
 from purl import URL
+from six import string_types
 
 import clld
 assert clld
@@ -334,7 +335,12 @@ def register_menu(config, *items):
     parameters (ctx, req) and returns a pair (url, label) to use for the menu link.
     """
     menuitems = OrderedDict()
-    for name, factory in items:
+    for item in items:
+        if isinstance(item, string_types):
+            item = (item, {})
+        name, factory = item
+        if isinstance(factory, dict):
+            factory = partial(menu_item, name, **factory)
         menuitems[name] = factory
     config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
@@ -358,29 +364,46 @@ def add_route_and_view(config, route_name, route_pattern, view, **kw):
     config.add_view(view, route_name=route_name + '_alt', **kw)
 
 
-def register_resource(config, name, model, interface, with_index=False, with_detail=True):
+def register_resource_routes_and_views(config, rsc):
+    kw = dict(factory=partial(ctx_factory, rsc.model, 'rsc'))
+    if rsc.model == common.Dataset:
+        pattern = '/'
+        kw['alt_route_pattern'] = '/void.{ext}'
+    else:
+        pattern = '/%s/{id:[^/\.]+}' % rsc.plural
+
+    config.add_route_and_view(rsc.name, pattern, resource_view, **kw)
+    if rsc.with_index:
+        config.add_route_and_view(
+            rsc.plural,
+            '/%s' % rsc.plural,
+            index_view,
+            factory=partial(ctx_factory, rsc.model, 'index'))
+
+
+def register_resource(config, name, model, interface, with_index=False, **kw):
+    """Directive to register custom resources."""
     # in case of tests, this method may be called multiple times!
     if [rsc for rsc in RESOURCES if rsc.name == name]:
         return
-    RESOURCES.append(Resource(name, model, interface, with_index=with_index))
+    rsc = Resource(name, model, interface, with_index=with_index)
+    RESOURCES.append(rsc)
     config.register_adapter(excel.ExcelAdapter, interface)
-    config.add_route_and_view(
-        name,
-        '/%ss/{id:[^/\.]+}' % name,
-        resource_view,
-        factory=partial(ctx_factory, model, 'rsc'))
-    if with_index:
-        config.add_route_and_view(
-            name + 's',
-            '/%ss' % name,
-            index_view,
-            factory=partial(ctx_factory, model, 'index'))
-        config.register_adapter(
-            adapter_factory(name + '/index_html.mako', base=Index), interface)
+    config.register_resource_routes_and_views(rsc)
 
-    if with_detail:
-        config.register_adapter(
-            adapter_factory(name + '/detail_html.mako'), interface)
+    # we register adapters for standard views, if the corresponding templates exists.
+    templates = path(config.package.__file__).dirname().joinpath('templates')
+    for tmpl, kw in [
+        ('index_html.mako', dict(base=Index)),
+        ('detail_html.mako', {}),
+        ('snippet_html.mako', dict(
+            mimetype='application/vnd.clld.snippet+xml',
+            send_mimetype='text/html',
+            extension='snippet.html')),
+    ]:
+        if templates.joinpath(name, tmpl).exists():
+            config.register_adapter(
+                adapter_factory('%s/%s' % (name, tmpl), **kw), interface)
 
     #
     # TODO: register download!?
@@ -480,6 +503,7 @@ def get_configurator(pkg, *utilities, **kw):
         'add_settings_from_file': add_settings_from_file,
         'add_301': add_301,
         'add_410': add_410,
+        'register_resource_routes_and_views': register_resource_routes_and_views,
     }.items():
         config.add_directive(name, func)
 
@@ -508,23 +532,11 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_route_and_view('olac', '/olac', olac)
 
     for rsc in RESOURCES:
-        name, model = rsc.name, rsc.model
-        factory = partial(ctx_factory, model, 'index')
-        config.add_route_and_view(
-            rsc.plural, '/%s' % rsc.plural, index_view, factory=factory)
+        config.register_resource_routes_and_views(rsc)
         config.register_datatable(
             rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
         config.register_adapter(
             getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), rsc.interface)
-
-        _kw = dict(factory=partial(ctx_factory, model, 'rsc'))
-        if model == common.Dataset:
-            pattern = '/'
-            _kw['alt_route_pattern'] = '/void.{ext}'
-        else:
-            pattern = '/%s/{id:[^/\.]+}' % rsc.plural
-
-        config.add_route_and_view(name, pattern, resource_view, **_kw)
 
         #
         # TODO: make these downloads optional!
@@ -532,7 +544,7 @@ def get_configurator(pkg, *utilities, **kw):
         # if rsc.with_rdfdump:
         #    config.register_download(
         #        N3Dump(
-        #            model,
+        #            rsc.model,
         #            config.package_name,
         #            description="%s as RDF" % rsc.plural.capitalize()))
 

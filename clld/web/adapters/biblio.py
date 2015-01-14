@@ -1,7 +1,7 @@
 """Adapters to render bibliographic information in various formats."""
 from clld.web.adapters.base import Representation
 from clld.lib.bibtex import IDatabase, IRecord, Database
-from clld.interfaces import IRepresentation, IIndex, ISource, IDataTable
+from clld.interfaces import IIndex, ISource, IDataTable
 
 
 class _Format(Representation):
@@ -74,7 +74,6 @@ class Mods(_Format):
 def includeme(config):
     for adapter in [Bibtex, Endnote, ReferenceManager, Mods]:
         for interface in [IDatabase, IRecord, ISource]:
-            config.registry.registerAdapter(
-                adapter, (interface,), IRepresentation, name=adapter.extension)
-        config.registry.registerAdapter(
-            adapter, (ISource,), IIndex, name=adapter.extension)
+            config.register_adapter(adapter, interface, name=adapter.extension)
+        config.register_adapter(
+            adapter, ISource, IIndex, name=adapter.extension)

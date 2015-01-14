@@ -157,7 +157,7 @@ class CsvMixin(object):
             prop = json.dumps(prop)
             if PY2:
                 prop = prop.decode('utf8')
-        if rel == 'id':
+        if rel == 'id' and hasattr(prop, 'id'):
             return prop.id
         elif rel == 'ids':
             return ','.join('%s' % o.id for o in prop)
