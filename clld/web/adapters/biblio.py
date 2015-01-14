@@ -1,7 +1,7 @@
 """Adapters to render bibliographic information in various formats."""
 from clld.web.adapters.base import Representation
 from clld.lib.bibtex import IDatabase, IRecord, Database
-from clld.interfaces import IRepresentation, IIndex, ISource, IDataTable
+from clld.interfaces import IIndex, ISource, IDataTable
 
 
 class _Format(Representation):

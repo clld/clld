@@ -9,10 +9,7 @@ from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
 from clld import interfaces
 
-from . import (
-    IdNameDescriptionMixin,
-    DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
-    Unit)
+from . import IdNameDescriptionMixin, DataMixin, HasDataMixin, FilesMixin, HasFilesMixin
 
 __all__ = ('UnitDomainElement', 'UnitParameter')
 

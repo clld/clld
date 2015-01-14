@@ -1,6 +1,4 @@
 """Adapter registry to be included by pyramid configurator."""
-from zope.interface import implementedBy
-
 from clld import RESOURCES
 from clld import interfaces
 from clld.web.adapters.base import Index, Representation, Json, SolrDoc

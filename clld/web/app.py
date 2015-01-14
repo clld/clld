@@ -382,7 +382,7 @@ def register_resource_routes_and_views(config, rsc):
 
 
 def register_resource(config, name, model, interface, with_index=False, **kw):
-    """This directive can be used to register custom resources."""
+    """Directive to register custom resources."""
     # in case of tests, this method may be called multiple times!
     if [rsc for rsc in RESOURCES if rsc.name == name]:
         return
