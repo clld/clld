@@ -14,7 +14,7 @@ from . import (
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Unit)
 
-__all__ = ('UnitDomainElement', 'UnitParameter', 'UnitParameterUnit')
+__all__ = ('UnitDomainElement', 'UnitParameter')
 
 
 class UnitDomainElement_data(Base, Versioned, DataMixin):
@@ -61,10 +61,3 @@ class UnitParameter(Base,
 
     domain = relationship(
         'UnitDomainElement', backref='parameter', order_by=UnitDomainElement.id)
-
-
-class UnitParameterUnit(Base, PolymorphicBaseMixin, Versioned, IdNameDescriptionMixin):
-    unit_pk = Column(Integer, ForeignKey('unit.pk'))
-    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
-    unit = relationship(Unit, backref='unitparameter_assocs')
-    unitparameter = relationship(UnitParameter, backref='unit_assocs')

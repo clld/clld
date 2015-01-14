@@ -38,5 +38,4 @@ from .unitvalue import UnitValue_data, UnitValue_files, UnitValue
 
 from .unitparameter import (UnitDomainElement_data, UnitDomainElement_files,
     UnitDomainElement,
-    UnitParameter_data, UnitParameter_files, UnitParameter,
-    UnitParameterUnit)
+    UnitParameter_data, UnitParameter_files, UnitParameter)
