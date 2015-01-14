@@ -7,8 +7,7 @@ from clld.web.adapters.base import Index, Representation, Json, SolrDoc
 from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
-from clld.web.adapters.excel import ExcelAdapter
-assert ExcelAdapter
+from clld.web.adapters import excel
 from clld.web.adapters import csv
 from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
@@ -23,13 +22,14 @@ def includeme(config):
         # each resource is available ...
         name, interface = rsc.name, rsc.interface
 
-        # ... as json
+        config.register_adapter(
+            getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), interface)
         cls = type('Json%s' % rsc.model.__name__, (Json,), {})
-        config.registry.registerAdapter(
-            cls, (interface,), interfaces.IRepresentation, name=Json.mimetype)
+        config.register_adapter(
+            cls, interface, to_=interfaces.IRepresentation, name=Json.mimetype)
         cls = type('Solr%s' % rsc.model.__name__, (SolrDoc,), {})
-        config.registry.registerAdapter(
-            cls, (interface,), interfaces.IRepresentation, name=SolrDoc.mimetype)
+        config.register_adapter(
+            cls, interface, to_=interfaces.IRepresentation, name=SolrDoc.mimetype)
 
         if rsc.with_index:
             # ... as html index
@@ -99,32 +99,25 @@ def includeme(config):
         interface, base, mimetype, extension, template, extra = spec
         extra.update(mimetype=mimetype, extension=extension, template=template)
         cls = type('Renderer%s' % i, (base,), extra)
-        config.registry.registerAdapter(
-            cls, (interface,), list(implementedBy(base))[0], name=mimetype)
+        config.register_adapter(cls, interface, name=mimetype)
 
     for cls in [BibTex, TxtCitation, ReferenceManager]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
             for adapts in [interfaces.IContribution, interfaces.IDataset]:
-                config.registry.registerAdapter(
-                    cls,
-                    (adapts,),
-                    if_,
-                    name=cls.mimetype)
+                config.register_adapter(cls, adapts, if_, name=cls.mimetype)
 
-    config.registry.registerAdapter(
+    config.register_adapter(
         GeoJsonLanguages,
-        (interfaces.ILanguage,),
+        interfaces.ILanguage,
         interfaces.IIndex,
         name=GeoJson.mimetype)
-    config.registry.registerAdapter(
+    config.register_adapter(
         GeoJsonParameter,
-        (interfaces.IParameter,),
-        interfaces.IRepresentation,
+        interfaces.IParameter,
         name=GeoJson.mimetype)
-    config.registry.registerAdapter(
+    config.register_adapter(
         GeoJsonParameterFlatProperties,
-        (interfaces.IParameter,),
-        interfaces.IRepresentation,
+        interfaces.IParameter,
         name=GeoJsonParameterFlatProperties.mimetype)
 
     config.include(biblio)

@@ -66,6 +66,7 @@ class Tests(TestWithEnv):
             routes=[('languages', '/other')])
         # should have no effect, because a resource with this name is registered by
         # default:
+        config.register_menu('languages', ('sources', dict(label='References')))
         config.register_resource('language', None, None)
         config.register_resource('testresource', Language, IF, with_index=True)
         config.register_download(N3Dump(Language, 'clld'))

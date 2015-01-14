@@ -74,7 +74,6 @@ class Mods(_Format):
 def includeme(config):
     for adapter in [Bibtex, Endnote, ReferenceManager, Mods]:
         for interface in [IDatabase, IRecord, ISource]:
-            config.registry.registerAdapter(
-                adapter, (interface,), IRepresentation, name=adapter.extension)
-        config.registry.registerAdapter(
-            adapter, (ISource,), IIndex, name=adapter.extension)
+            config.register_adapter(adapter, interface, name=adapter.extension)
+        config.register_adapter(
+            adapter, ISource, IIndex, name=adapter.extension)
