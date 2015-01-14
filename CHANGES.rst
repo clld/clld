@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.29
+~~~~
+
+- more convenient config directives
+
+
 0.28
 ~~~~
 
