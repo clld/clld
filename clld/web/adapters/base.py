@@ -105,11 +105,15 @@ class Index(Renderable):
 ADAPTER_COUNTER = 0
 
 
-def adapter_factory(template, mimetype='text/html', extension='html', base=None, **kw):
+def adapter_factory(*args, **kw):
     global ADAPTER_COUNTER
-    base = base or Representation
-    extra = dict(mimetype=mimetype, extension=extension, template=template)
-    extra.update(kw)
-    cls = type(str('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), extra)
+    # for backwards compatibility:
+    if args:
+        kw['template'] = args[0]
+    assert 'template' in kw
+    kw.setdefault('mimetype', 'text/html')
+    kw.setdefault('extension', 'html')
+    base = kw.pop('base', Representation)
+    cls = type(str('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), kw)
     ADAPTER_COUNTER += 1
     return cls

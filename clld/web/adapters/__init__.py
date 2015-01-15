@@ -35,14 +35,14 @@ def includeme(config):
                 (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
             specs.append(
                 (interface, Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
-            config.registry.registerAdapter(
+            config.register_adapter(
                 getattr(csv, rsc.name.capitalize() + 's', csv.CsvAdapter),
-                (interface,),
+                interface,
                 interfaces.IIndex,
                 name=csv.CsvAdapter.mimetype)
-            config.registry.registerAdapter(
+            config.register_adapter(
                 csv.JsonTableSchemaAdapter,
-                (interface,),
+                interface,
                 interfaces.IIndex,
                 name=csv.JsonTableSchemaAdapter.mimetype)
 
@@ -95,9 +95,8 @@ def includeme(config):
 
     for i, spec in enumerate(specs):
         interface, base, mimetype, extension, template, extra = spec
-        extra.update(mimetype=mimetype, extension=extension, template=template)
-        cls = type('Renderer%s' % i, (base,), extra)
-        config.register_adapter(cls, interface, name=mimetype)
+        extra.update(base=base, mimetype=mimetype, extension=extension, template=template)
+        config.register_adapter(extra, interface, name=mimetype)
 
     for cls in [BibTex, TxtCitation, ReferenceManager]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
