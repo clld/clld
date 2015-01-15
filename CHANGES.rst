@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.30
+~~~~
+
+- refactored adapter management
+
+
 0.29
 ~~~~
 
