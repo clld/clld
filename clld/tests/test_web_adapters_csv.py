@@ -11,6 +11,7 @@ class Tests(TestWithEnv):
         from clld.web.adapters.csv import CsvAdapter
 
         adapter = CsvAdapter(None)
+        assert adapter.label
         res = adapter.render(
             datatables.Languages(self.env['request'], Language), self.env['request'])
         self.assert_(res.splitlines())

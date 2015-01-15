@@ -209,12 +209,12 @@ class ClldRequest(Request):
             return self.static_url(self.file_ospath(file_))
 
 
-def menu_item(resource, ctx, req, label=None):
-    """Factory function for a resource-specific menu item.
+def menu_item(route_name, ctx, req, label=None):
+    """Factory function for a menu item specified by route name.
 
     :return: A pair (URL, label) to create a menu item.
     """
-    return req.route_url(resource), label or req.translate(resource.capitalize())
+    return req.route_url(route_name), label or req.translate(route_name.capitalize())
 
 
 @implementer(interfaces.ICtxFactoryQuery)
@@ -323,6 +323,8 @@ def register_cls(interface, config, route, cls):
 
 
 def register_adapter(config, cls, from_, to_=None, name=None):
+    if isinstance(cls, dict):
+        cls = adapter_factory(**cls)
     to_ = to_ or list(implementedBy(cls))[0]
     name = name or cls.mimetype
     config.registry.registerAdapter(cls, (from_,), to_, name=name)
@@ -331,8 +333,10 @@ def register_adapter(config, cls, from_, to_=None, name=None):
 def register_menu(config, *items):
     """Register an item for the main menu.
 
-    :param items: (name, factory) pairs, where factory is a callable that accepts the two\
-    parameters (ctx, req) and returns a pair (url, label) to use for the menu link.
+    :param items: An item may be a (name, factory) pair, where factory is a callable that\
+    accepts the two parameters (ctx, req) and returns a pair (url, label) to use for the\
+    menu link; or a route name, or a pair (route name, dict), where dict is used as\
+    keyword arguments for menu_item.
     """
     menuitems = OrderedDict()
     for item in items:
@@ -382,7 +386,12 @@ def register_resource_routes_and_views(config, rsc):
 
 
 def register_resource(config, name, model, interface, with_index=False, **kw):
-    """Directive to register custom resources."""
+    """Directive to register custom resources.
+
+    .. note::
+
+        The directive accepts arbitrary keyword arguments for backwards compatibility.
+    """
     # in case of tests, this method may be called multiple times!
     if [rsc for rsc in RESOURCES if rsc.name == name]:
         return
@@ -393,7 +402,7 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
 
     # we register adapters for standard views, if the corresponding templates exists.
     templates = path(config.package.__file__).dirname().joinpath('templates')
-    for tmpl, kw in [
+    for tmpl, _kw in [
         ('index_html.mako', dict(base=Index)),
         ('detail_html.mako', {}),
         ('snippet_html.mako', dict(
@@ -401,9 +410,9 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
             send_mimetype='text/html',
             extension='snippet.html')),
     ]:
-        if templates.joinpath(name, tmpl).exists():
-            config.register_adapter(
-                adapter_factory('%s/%s' % (name, tmpl), **kw), interface)
+        if templates.joinpath(name, tmpl).exists() or kw.get('test'):
+            _kw['template'] = '%s/%s' % (name, tmpl)
+            config.register_adapter(_kw, interface)
 
     #
     # TODO: register download!?
@@ -632,13 +641,10 @@ def get_configurator(pkg, *utilities, **kw):
     if v:
         config.scan(v)  # pragma: no cover
 
-    menuitems = OrderedDict(dataset=partial(menu_item, 'dataset', label='Home'))
-    for plural in config.registry.settings.get(
+    menuitems = config.registry.settings.get(
         'clld.menuitems_list',
-        ['contributions', 'parameters', 'languages', 'contributors']
-    ):
-        menuitems[plural] = partial(menu_item, plural)
-    config.registry.registerUtility(menuitems, interfaces.IMenuItems)
+        ['contributions', 'parameters', 'languages', 'contributors'])
+    config.register_menu(('dataset', dict(label='Home')), *menuitems)
 
     config.include('pyramid_mako')
 
