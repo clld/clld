@@ -1,11 +1,14 @@
 """Base classes for adapters."""
 from __future__ import unicode_literals
+from uuid import uuid4
+
 from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
+from six import text_type
 
 from clld import interfaces
-from clld.util import to_binary
+from clld.util import to_binary, slug
 
 
 class Renderable(object):
@@ -14,9 +17,6 @@ class Renderable(object):
 
     Adapters can provide custom behaviour either by specifying a template to use for
     rendering, or by overwriting the render method.
-
-    >>> r = Renderable(None)
-    >>> assert r.label == 'Renderable'
     """
 
     name = None
@@ -102,18 +102,12 @@ class Index(Renderable):
     """Base class for adapters implementing IIndex."""
 
 
-ADAPTER_COUNTER = 0
-
-
 def adapter_factory(*args, **kw):
-    global ADAPTER_COUNTER
-    # for backwards compatibility:
+    # for backwards compatibility we interpret the first positional argument as template:
     if args:
         kw['template'] = args[0]
     assert 'template' in kw
     kw.setdefault('mimetype', 'text/html')
     kw.setdefault('extension', 'html')
     base = kw.pop('base', Representation)
-    cls = type(str('AdapterFromFactory%s' % ADAPTER_COUNTER), (base,), kw)
-    ADAPTER_COUNTER += 1
-    return cls
+    return type(str('AdapterFromFactory%s' % slug(text_type(uuid4()))), (base,), kw)
