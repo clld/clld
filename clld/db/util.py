@@ -3,12 +3,13 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 import time
 import re
 
-from sqlalchemy import Integer
+from sqlalchemy import Integer, event
 from sqlalchemy.orm import joinedload
+from sqlalchemy.schema import DDL
 from sqlalchemy.sql.expression import cast, func
 import transaction
 
-from clld.db.meta import DBSession
+from clld.db.meta import DBSession, Base
 from clld.db.models import common
 
 
@@ -16,12 +17,24 @@ def as_int(col):
     return cast(col, Integer)
 
 
-COLLKEY_SQL = """
+def with_collkey_ddl():  # pragma: no cover
+    """Register creation of collkey function.
+
+    Can be called at module level in db initialization scripts to create the collkey
+    function. Once a session is bound to an engine collkey can be used to create indexes
+    or in order_by clauses, e.g.::
+
+        Index('ducet', collkey(common.Value.name)).create(DBSession.bind)
+    """
+    event.listen(
+        Base.metadata,
+        'before_create',
+        DDL("""
 CREATE OR REPLACE FUNCTION collkey (text, text, bool, int4, bool) RETURNS bytea
     LANGUAGE 'c' IMMUTABLE STRICT AS
     '$libdir/collkey_icu.so',
     'pgsqlext_collkey';
-"""
+""").execute_if(dialect='postgresql'))
 
 
 def collkey(col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
