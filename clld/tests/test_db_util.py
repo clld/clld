@@ -27,3 +27,9 @@ class Tests(TestWithDbAndData):
         for qs, count in [('Ata', 1), ('^ata$', 0), ('^data', 1), ('set$', 1)]:
             q = DBSession.query(Dataset).filter(icontains(Dataset.name, qs))
             self.assertEqual(q.count(), count)
+
+    def test_collkey(self):
+        from clld.db.util import collkey
+        from clld.db.models.common import Language
+
+        collkey(Language.name)
