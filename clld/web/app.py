@@ -21,7 +21,6 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
 from pyramid.renderers import JSON, JSONP
-from pyramid.settings import asbool
 from purl import URL
 from six import string_types
 
