@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.31.2
+~~~~~~
+
+- Now that usage patterns have formed, a new (final) API of the pg_collkey support has been settled on.
+
+
 0.31.1
 ~~~~~~
 
