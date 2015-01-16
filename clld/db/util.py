@@ -5,7 +5,7 @@ import re
 
 from sqlalchemy import Integer
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import cast
+from sqlalchemy.sql.expression import cast, func
 import transaction
 
 from clld.db.meta import DBSession
@@ -14,6 +14,15 @@ from clld.db.models import common
 
 def as_int(col):
     return cast(col, Integer)
+
+
+def collkey(col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
+    """If supported by the database, we use pg_collkey for collation.
+
+    The optional arguments are passed to the collkey function as described at
+    http://pgxn.org/dist/pg_collkey/0.5.1/
+    """
+    return func.collkey(col, locale, special_at_4, level, numeric_sorting)
 
 
 def icontains(col, qs):
