@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.31
+~~~~
+
+- support for collation via pg_collkey (if installed for the database)
+
+
 0.30
 ~~~~
 
