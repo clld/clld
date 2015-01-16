@@ -16,13 +16,26 @@ def as_int(col):
     return cast(col, Integer)
 
 
+COLLKEY_SQL = """
+CREATE OR REPLACE FUNCTION collkey (text, text, bool, int4, bool) RETURNS bytea
+    LANGUAGE 'c' IMMUTABLE STRICT AS
+    '$libdir/collkey_icu.so',
+    'pgsqlext_collkey';
+"""
+
+
 def collkey(col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
     """If supported by the database, we use pg_collkey for collation.
 
     The optional arguments are passed to the collkey function as described at
     http://pgxn.org/dist/pg_collkey/0.5.1/
     """
-    return func.collkey(col, locale, special_at_4, level, numeric_sorting)
+    if DBSession.bind.dialect.name == 'postgresql':  # pragma: no cover
+        procs = DBSession.execute(
+            "select count(proname) from pg_proc where proname = 'collkey'")
+        if procs.fetchone()[0]:
+            return func.collkey(col, locale, special_at_4, level, numeric_sorting)
+    return col
 
 
 def icontains(col, qs):

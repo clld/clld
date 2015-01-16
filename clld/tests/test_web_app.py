@@ -19,7 +19,6 @@ class Tests(TestWithEnv):
         self.env['request'].file_url(Language_files(id='1', object=Language.first()))
         assert self.env['request'].get_datatable('valuesets', ValueSet)
         assert self.env['request'].blog is None
-        self.assertFalse(self.env['request'].with_pg_collkey)
 
     def test_menu_item(self):
         from clld.web.app import menu_item

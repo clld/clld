@@ -209,10 +209,6 @@ class ClldRequest(Request):
         if 'clld.files' in self.registry.settings:
             return self.static_url(self.file_ospath(file_))
 
-    @reify
-    def with_pg_collkey(self):
-        return asbool(self.registry.settings.get('clld.pg_collkey', 'false'))
-
 
 def menu_item(route_name, ctx, req, label=None):
     """Factory function for a menu item specified by route name.
