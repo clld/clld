@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.31.1
+~~~~~~
+
+- refactored pg_collkey support to keep logic checking for availability of the feature within clld.
+
+
 0.31
 ~~~~
 
