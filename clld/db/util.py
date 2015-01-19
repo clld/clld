@@ -37,18 +37,30 @@ CREATE OR REPLACE FUNCTION collkey (text, text, bool, int4, bool) RETURNS bytea
 """).execute_if(dialect='postgresql'))
 
 
-def collkey(col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
-    """If supported by the database, we use pg_collkey for collation.
+class _CollKey(object):
+    """Lazily check and cache collkey support in the database on first usage."""
 
-    The optional arguments are passed to the collkey function as described at
-    http://pgxn.org/dist/pg_collkey/0.5.1/
-    """
-    if DBSession.bind.dialect.name == 'postgresql':  # pragma: no cover
-        procs = DBSession.execute(
-            "select count(proname) from pg_proc where proname = 'collkey'")
-        if procs.fetchone()[0]:
+    _query = "SELECT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'collkey')"
+
+    @property
+    def has_collkey(self):  # pragma: no cover
+        result = (DBSession.bind.dialect.name == 'postgresql'
+            and DBSession.scalar(self._query))
+        self.__dict__['has_collkey'] = result  # cached overrides property
+        return result
+
+    def __call__(self, col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
+        """If supported by the database, we use pg_collkey for collation.
+
+        The optional arguments are passed to the collkey function as described at
+        http://pgxn.org/dist/pg_collkey/0.5.1/
+        """
+        if self.has_collkey:  # pragma: no cover
             return func.collkey(col, locale, special_at_4, level, numeric_sorting)
-    return col
+        return col
+
+
+collkey = _CollKey()
 
 
 def icontains(col, qs):
