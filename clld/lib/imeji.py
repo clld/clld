@@ -21,7 +21,10 @@ def file_urls(source):
     :return: generator of infodicts.
     """
     for item in ElementTree.parse(source).findall(qname('item')):
-        data = dict(id=item.attrib['id'], filename=get(item, 'filename'))
+        data = dict(
+            id=item.attrib['id'],
+            md5=get(item, 'checksum'),
+            filename=get(item, 'filename'))
         for key in 'full web thumbnail'.split():
             data[key] = get(item, key + 'ImageUrl')
         # add an alias for the URL to the original file:
