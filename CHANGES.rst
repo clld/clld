@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.31.3
+~~~~~~
+
+- Enhanced usability of helper functions.
+- Cache db capabilities in collkey function.
+
+
 0.31.2
 ~~~~~~
 
