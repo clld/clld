@@ -15,7 +15,7 @@ Releasing clld
 
   $ ./venvs/clld/clld/build.sh "<prev-rel-no>"
 
-- Make sure javascript tests pass with coverage of clld.js at > 85%::
+- Make sure javascript tests pass with coverage of clld.js at > 83%::
 
   $ java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 

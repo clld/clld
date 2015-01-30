@@ -7,7 +7,7 @@ Functionality to handle bibligraphical data in the BibTeX format.
 from __future__ import unicode_literals, division, print_function, absolute_import
 from collections import OrderedDict
 import re
-import codecs
+import io
 
 from path import path
 from zope.interface import Interface, implementer
@@ -545,13 +545,13 @@ class Database(_Convertable):
         @param bibFile: path of the bibtex-database-file to be read.
         """
         if path(bibFile).exists():
-            with codecs.open(bibFile, encoding=encoding) as fp:
+            with io.open(bibFile, encoding=encoding) as fp:
                 content = fp.read()
         else:
             content = ''
 
-        return cls([Record.from_string('@' + r, lowercase=lowercase)
-                    for r in content.split('@')[1:]])
+        return cls((Record.from_string(m.group(), lowercase=lowercase)
+                    for m in re.finditer('@[^@]*', content)))
 
     def __len__(self):
         return len(self.records)

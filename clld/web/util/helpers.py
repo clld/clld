@@ -334,10 +334,10 @@ def external_link(url, label=None, inverted=False, **kw):
     return HTML.a(icon('share', inverted=inverted), ' ', label or url, **kw)
 
 
-def maybe_external_link(text):
+def maybe_external_link(text, **kw):
     url = URL(text)
     if url.host() and url.scheme() in ['http', 'https']:
-        return external_link(text)
+        return external_link(text, **kw)
     return text
 
 
