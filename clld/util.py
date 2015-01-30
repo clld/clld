@@ -48,16 +48,16 @@ def jsondump(obj, path, **kw):
         return json.dump(obj, fp, **kw)
 
 
-def jsonload(path):
+def jsonload(path, **kw):
     """python 2 + 3 compatible version of json.load.
 
     :return: The python object read from path.
     """
-    kw = {}
+    _kw = {}
     if PY3:  # pragma: no cover
-        kw['encoding'] = 'utf8'
-    with open(path, **kw) as fp:
-        return json.load(fp)
+        _kw['encoding'] = 'utf8'
+    with open(path, **_kw) as fp:
+        return json.load(fp, **kw)
 
 
 def nfilter(seq):
