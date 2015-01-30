@@ -38,14 +38,15 @@ CREATE OR REPLACE FUNCTION collkey (text, text, bool, int4, bool) RETURNS bytea
 
 
 class _CollKey(object):
+
     """Lazily check and cache collkey support in the database on first usage."""
 
     _query = "SELECT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'collkey')"
 
     @property
     def has_collkey(self):  # pragma: no cover
-        result = (DBSession.bind.dialect.name == 'postgresql'
-            and DBSession.scalar(self._query))
+        result = DBSession.bind.dialect.name == 'postgresql'\
+            and DBSession.scalar(self._query)
         self.__dict__['has_collkey'] = result  # cached overrides property
         return result
 
