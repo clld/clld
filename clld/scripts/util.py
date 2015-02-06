@@ -17,6 +17,7 @@ from sqlalchemy.orm import joinedload
 from path import path
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
+from nameparser import HumanName
 
 from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
@@ -85,10 +86,25 @@ def bibtex2source(rec, cls=common.Source):
             container = fields if hasattr(cls, field) else jsondata
             container[field] = value
 
+    etal = ''
+    eds = ''
+    authors = rec.get('author')
+    if not authors:
+        authors = rec.get('editor', '')
+        if authors:
+            eds = ' (eds.)'
+    if authors:
+        authors = bibtex.unescape(authors).split(' and ')
+        if len(authors) > 2:
+            authors = authors[:1]
+            etal = ' et al.'
+
+        authors = [HumanName(a).last for a in authors]
+        authors = '%s%s%s' % (' and '.join(authors), etal, eds)
+
     return cls(
         id=slug(rec.id),
-        name=('%s %s' % (bibtex.unescape(
-            rec.get('author', rec.get('editor', ''))), year)).strip(),
+        name=('%s %s' % (authors, year)).strip(),
         description=bibtex.unescape(rec.get('title', rec.get('booktitle', ''))),
         jsondata=jsondata,
         bibtex_type=rec.genre,

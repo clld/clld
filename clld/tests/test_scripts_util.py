@@ -15,6 +15,8 @@ class Tests(unittest.TestCase):
     def test_bibtex2source(self):
         from clld.scripts.util import bibtex2source
 
+        bibtex2source(Record('book', 'id', author='M, R and G, H and Z, U'))
+        bibtex2source(Record('book', 'id', editor='M, R and G, H'))
         bibtex2source(Record('book', 'id', title='tb', customfield='cf', year="1920}"))
 
     def test_parsed_args(self):
