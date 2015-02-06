@@ -4,6 +4,7 @@
 .. note:: This module is available within Mako templates as ``h``.
 """
 from __future__ import unicode_literals
+import os
 import re
 from itertools import groupby  # we just import this to have it available in templates!
 assert groupby  # appease pyflakes
@@ -31,6 +32,7 @@ assert get_current_request
 from pyramid.interfaces import IRoutesMapper
 from purl import URL
 
+import clld
 from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
@@ -678,3 +680,34 @@ def collapsed(id_, content, button_content=None):
             button_content or icon('plus-sign'),
             **{'class': 'btn', 'data-toggle': 'collapse', 'data-target': '#%s' % id_})),
         HTML.div(content, id=id_, class_='collapse'))
+
+
+def static_path(*comps):
+    return os.path.abspath(
+        os.path.join(os.path.dirname(clld.__file__), 'web', 'static', *comps))
+
+
+def charis_font_spec_css():
+    """Font spec for using CharisSIL with Pisa (xhtml2pdf)."""
+    return """
+    @font-face {{
+        font-family: 'charissil';
+        src: url('{0}/CharisSIL-R.ttf');
+    }}
+    @font-face {{
+        font-family: 'charissil';
+        font-style: italic;
+        src: url('{0}/CharisSIL-I.ttf');
+    }}
+    @font-face {{
+        font-family: 'charissil';
+        font-weight: bold;
+        src: url('{0}/CharisSIL-B.ttf');
+    }}
+    @font-face {{
+        font-family: 'charissil';
+        font-weight: bold;
+        font-style: italic;
+        src: url('{0}/CharisSIL-BI.ttf');
+    }}
+""".format(static_path('fonts'))

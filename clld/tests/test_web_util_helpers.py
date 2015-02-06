@@ -11,6 +11,11 @@ from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
+    def test_charis_font_spec_css(self):
+        from clld.web.util.helpers import charis_font_spec_css
+
+        assert charis_font_spec_css()
+
     def test_collapsed(self):
         from clld.web.util.helpers import collapsed
 
