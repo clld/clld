@@ -24,5 +24,8 @@
     % endif
 % else:
 <h3>${h.link(request, ctx)}</h3>
+    % if ctx.description:
+        <p>${ctx.description}</p>
+    % endif
 ${h.format_coordinates(ctx)}
 % endif
