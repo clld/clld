@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.31.4
+~~~~~~
+
+Added support for using CharisSIL fonts when creating PDFs with Pisa.
+
+
 0.31.3
 ~~~~~~
 
