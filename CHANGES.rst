@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.31.5
+~~~~~~
+
+Enhanced method of source name creation to be more inline with common standards.
+Note: This requires the nameparser package.
+
+
 0.31.4
 ~~~~~~
 
