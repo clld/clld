@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.31.6
+~~~~~~
+
+lib.wordpress: More robust detection of post id in wordpress HTML.
+
+
 0.31.5
 ~~~~~~
 
