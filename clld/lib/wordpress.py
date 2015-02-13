@@ -108,15 +108,18 @@ class Client(object):
                 [dict(categoryId=cat_map[name]) for name in cat_map])
         return cat_map
 
-    def get_post_id_from_path(self, path):
+    def get_post_id_from_path(self, path, res=None):
         """Pretty hacky way to determine whether some post exists."""
-        if not path.startswith(self.base_url):
-            path = self.base_url + path
-        res = requests.get(path)
-        if res.status_code != 200:
-            return None
+        if path:
+            if not path.startswith(self.base_url):
+                path = self.base_url + path
+            res = requests.get(path)
+            if res.status_code != 200:
+                return None
+        else:
+            assert res  # pragma: no cover
         m = re.search(
-            '\<input type\="hidden" name\="comment_post_ID" value\="(?P<id>[0-9]+)" \/\>',
+            """\s+name=('|")comment_post_ID('|")\s+value=('|")(?P<id>[0-9]+)('|")""",
             res.text)
         if m:
             return int(m.group('id'))
