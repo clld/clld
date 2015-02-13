@@ -7,7 +7,8 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 from xml.etree import ElementTree
 
 
-qname = lambda localname: '{http://imeji.org/terms}' + localname
+def qname(localname):
+    return '{http://imeji.org/terms}' + localname
 
 
 def get(e, k):

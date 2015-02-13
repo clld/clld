@@ -21,7 +21,7 @@ Releasing clld
 
 - Make sure flake8 passes::
 
-  $ flake8 --ignore=E711,E712,D100,D101,D103,D102,D301 --max-line-length=100 clld
+  $ flake8 --ignore=E711,E712,D100,D101,D103,D102,D301,E402,E731 --max-line-length=100 clld
 
 - Make sure docs render OK::
 
