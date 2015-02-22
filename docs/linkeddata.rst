@@ -22,9 +22,7 @@ Vocabularies
 Types
 ~~~~~
 
-Resources modelled as
-
-clld.db.models.common.Language are assigned dcterm's
+Resources modelled as clld.db.models.common.Language are assigned dcterm's
 `LinguisticSystem <http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=terms#LinguisticSystem>`_ class
 or additionally a subclasses of GOLD's
 `Genetic Taxon <http://linguistics-ontology.org/gold/2010/GeneticTaxon>`_
