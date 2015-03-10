@@ -11,7 +11,7 @@ import io
 
 from path import path
 from zope.interface import Interface, implementer
-from six import unichr, text_type, string_types, PY2
+from six import unichr, text_type, string_types
 
 from clld.util import UnicodeMixin, DeclEnum, nfilter, to_binary
 from clld.lib.bibutils import convert
@@ -21,7 +21,7 @@ from clld.lib import latex
 latex.register()
 
 
-UU_PATTERN = re.compile('\?\[\\\\u(?P<number>[0-9]{3,4})\]')
+UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,4})\]')
 
 
 def u_unescape(s):
@@ -32,15 +32,15 @@ def u_unescape(s):
 
     There are some decimal/octal mismatches in unicode encodings in bibtex
     """
-    new = []
-    e = 0
-    for m in UU_PATTERN.finditer(s):
-        new.append(s[e:m.start()])
-        e = m.end()
-        digits = hex(int(m.group('number')))[2:].rjust(4, str('0') if PY2 else '0')
-        new.append((to_binary('\\u') + to_binary(digits)).decode('unicode_escape'))
-    new.append(s[e:len(s)])
-    return ''.join(new)
+    def iterchunks(s):
+        end = 0
+        for m in UU_PATTERN.finditer(s):
+            yield s[end:m.start()]
+            yield unichr(int(m.group('number')))
+            end = m.end()
+        yield s[end:]
+
+    return ''.join(iterchunks(s))
 
 
 SYMBOLS = {
