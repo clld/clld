@@ -11,9 +11,10 @@ import io
 
 from path import path
 from zope.interface import Interface, implementer
-from six import unichr, text_type, string_types
+from six import unichr, text_type, string_types, iteritems
+from six.moves import filter
 
-from clld.util import UnicodeMixin, DeclEnum, nfilter, to_binary
+from clld.util import UnicodeMixin, DeclEnum, to_binary
 from clld.lib.bibutils import convert
 from clld.lib import latex
 
@@ -319,17 +320,15 @@ class Record(OrderedDict, _Convertable):
 
     @classmethod
     def from_object(cls, obj, **kw):
-        data = dict()
+        data = {}
         for field in FIELDS:
             value = getattr(obj, field, None)
             if value:
                 data[field] = value
         data.update(kw)
         data.setdefault('title', obj.description)
-        rec = cls(obj.bibtex_type, obj.id)
-        for key in sorted(data.keys()):
-            rec[key] = data[key]
-        return rec
+        data = sorted(iteritems(data))
+        return cls(obj.bibtex_type, obj.id, *data)
 
     @classmethod
     def from_string(cls, bibtexString, lowercase=False):
@@ -386,7 +385,7 @@ class Record(OrderedDict, _Convertable):
 
     @staticmethod
     def sep(key):
-        return ' and ' if key in ['author', 'editor'] else '; '
+        return ' and ' if key in ('author', 'editor') else '; '
 
     def getall(self, key):
         """Get list of all values for key.
@@ -406,7 +405,7 @@ class Record(OrderedDict, _Convertable):
         value = OrderedDict.__getitem__(self, key)
         if not isinstance(value, (tuple, list)):
             value = [value]
-        return Record.sep(key).join(nfilter(value))
+        return Record.sep(key).join(filter(None, value))
 
     def __unicode__(self):
         """Represent the record in BibTeX format.
@@ -440,8 +439,8 @@ class Record(OrderedDict, _Convertable):
             unified-style-linguistics.csl
         """
         genre = getattr(self.genre, 'value', self.genre)
-        pages_at_end = genre in [
-            'book', 'phdthesis', 'mastersthesis', 'misc', 'techreport']
+        pages_at_end = genre in (
+            'book', 'phdthesis', 'mastersthesis', 'misc', 'techreport')
 
         if self.get('editor'):
             editors = self['editor']
@@ -453,7 +452,7 @@ class Record(OrderedDict, _Convertable):
         res = [self.get('author', editors), self.get('year', 'n.d')]
         if genre == 'book':
             res.append(self.get('booktitle') or self.get('title'))
-            series = ', '.join(nfilter([self.get('series'), self.get('volume')]))
+            series = ', '.join(filter(None, [self.get('series'), self.get('volume')]))
             if series:
                 res.append('(%s.)' % series)
         elif genre == 'misc':
@@ -463,7 +462,7 @@ class Record(OrderedDict, _Convertable):
             res.append(self.get('title'))
 
         if genre == 'article':
-            atom = ' '.join(nfilter([self.get('journal'), self.get('volume')]))
+            atom = ' '.join(filter(None, [self.get('journal'), self.get('volume')]))
             if self.get('issue'):
                 atom += '(%s)' % self['issue']
             res.append(atom)
@@ -500,7 +499,7 @@ class Record(OrderedDict, _Convertable):
                 res.append(self['pages'])
 
         if self.get('publisher'):
-            res.append(": ".join(nfilter([self.get('address'), self['publisher']])))
+            res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
 
         if pages_at_end and self.get('pages'):
             res.append(self['pages'] + 'pp')
@@ -509,9 +508,8 @@ class Record(OrderedDict, _Convertable):
         if note and note not in res:
             res.append('(%s)' % note)
 
-        return ' '.join(
-            map(lambda a: a + ('' if (a.endswith('.') or a.endswith('.)')) else '.'),
-                nfilter(res)))
+        return ' '.join(x if x.endswith(('.', '.)')) else '%s.' % x
+            for x in res if x)
 
 
 class IDatabase(Interface):
