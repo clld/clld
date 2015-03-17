@@ -22,13 +22,13 @@ from clld.lib import latex
 latex.register()
 
 
-UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,4})\]')
+UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,5})\]')
 
 
 def u_unescape(s):
     """Unencode Unicode escape sequences.
 
-    Match all 3/4-digit sequences with unicode character
+    Match all 3-5-digit sequences with unicode character
     replace all '?[\\u....]' with corresponding unicode
 
     There are some decimal/octal mismatches in unicode encodings in bibtex

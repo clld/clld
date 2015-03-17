@@ -17,6 +17,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(u_unescape('?[\\u123] ?[\\u1234]'), '{ \u04d2')
         s = '\u2013'
         self.assertEqual(s, unescape(s))
+        self.assertEqual(unescape('?[\\u65533]'), '\ufffd')
 
     def test_stripctrlchars(self):
         from clld.lib.bibtex import stripctrlchars
