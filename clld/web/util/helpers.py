@@ -275,8 +275,8 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
 
 
 def format_license_icon_url(req):
-    if 'license_icon' in req.dataset.jsondatadict:
-        url = req.dataset.jsondatadict['license_icon']
+    if 'license_icon' in req.dataset.jsondata:
+        url = req.dataset.jsondata['license_icon']
         if not url.startswith('http'):
             url = req.static_url('clld:web/static/images/' + url)
         return url
@@ -353,8 +353,7 @@ def link_to_map(language):
 
 def gbs_link(source, pages=None):
     """Format Google-Books information for source as HTML."""
-    if not source or not source.google_book_search_id \
-            or not source.jsondata or not source.jsondata.get('gbs'):
+    if not source or not source.google_book_search_id or not source.jsondata.get('gbs'):
         return ''
     if source.jsondata['gbs']['accessInfo']['viewability'] in ['NO_PAGES']:
         return ''
@@ -448,8 +447,8 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
 
     def alt_translation(sentence):
         res = ''
-        if sentence.jsondatadict.get('alt_translation'):
-            text = sentence.jsondatadict['alt_translation']
+        if sentence.jsondata.get('alt_translation'):
+            text = sentence.jsondata['alt_translation']
             name = ''
             if ALT_TRANSLATION_LANGUAGE_PATTERN.match(text):
                 name, text = [t.strip() for t in text.split(':', 1)]

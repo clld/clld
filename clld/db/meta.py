@@ -100,19 +100,22 @@ VersionedDBSession = scoped_session(versioned_session(
 
 class JSONEncodedDict(TypeDecorator):
 
-    """Represents an immutable structure as a json-encoded string."""
+    """Represents an immutable structure as a json-encoded string.
+
+    Loads/serializes an empty dict for any empty value.
+    """
 
     impl = VARCHAR
 
     def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-        return value
+        if not value:
+            value = {}
+        return json.dumps(value)
 
     def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
+        if not value:
+            return {}
+        return json.loads(value)
 
 
 def _solr_timestamp(dt):
@@ -241,6 +244,10 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
     #: provides a column to store JSON encoded dicts.
     jsondata = Column(JSONEncodedDict)
 
+    def __init__(self, jsondata=None, **kwargs):
+        kwargs['jsondata'] = jsondata or {}
+        super(Base, self).__init__(**kwargs)
+
     def update_jsondata(self, **kw):
         """Convenience function.
 
@@ -249,19 +256,23 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
         """
-        d = (self.jsondata or {}).copy()
+        d = self.jsondata.copy()
         d.update(kw)
         self.jsondata = d
 
     @property
     def jsondatadict(self):
+        """Deprecated convenience function.
+
+        Use jsondata directly instead, which is guaranteed to be a dictionary.
+        """
         return self.jsondata or {}
 
     @property
     def replacement_id(self):
         """Used to allow automatically redirecting to a 'better' version of a resource."""
         if not self.active:
-            return self.jsondatadict.get('__replacement_id__')
+            return self.jsondata.get('__replacement_id__')
 
     @classmethod
     def get(cls, value, key=None, default=NO_DEFAULT, session=None):
