@@ -514,8 +514,8 @@ class Record(OrderedDict, _Convertable):
         if note and note not in res:
             res.append('(%s)' % note)
 
-        return ' '.join(x if x.endswith(('.', '.)')) else '%s.' % x
-            for x in res if x)
+        return ' '.join(
+            x if x.endswith(('.', '.)')) else '%s.' % x for x in res if x)
 
 
 class IDatabase(Interface):

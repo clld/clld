@@ -10,7 +10,6 @@ import re
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
-from six.moves import filter
 
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
@@ -21,7 +20,7 @@ from clld.web.util.helpers import (
 from clld.web.util.downloadwidget import DownloadWidget
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
-from clld.util import cached_property
+from clld.util import cached_property, nfilter
 
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
@@ -295,8 +294,8 @@ class RefsCol(Col):
 
     def format(self, item):
         vs = self.get_obj(item)
-        return ', '.join(filter(None,
-            [getattr(vs, 'source'), linked_references(self.dt.req, vs)]))
+        return ', '.join(
+            nfilter([getattr(vs, 'source'), linked_references(self.dt.req, vs)]))
 
 
 class Toolbar(DownloadWidget):
