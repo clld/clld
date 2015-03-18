@@ -420,6 +420,12 @@ class Record(OrderedDict, _Convertable):
         return "@%s{%s,\n%s\n}" % (
             getattr(self.genre, 'value', self.genre), self.id, ",\n".join(fields))
 
+    _genre_note = {
+        'phdthesis': 'Doctoral disseration',
+        'mastersthesis': 'MA thesis',
+        'unpublished': 'unpublished',
+    }
+
     def text(self):
         """Linearize the bib record according to the rules of the unified style.
 
@@ -504,7 +510,7 @@ class Record(OrderedDict, _Convertable):
         if pages_at_end and self.get('pages'):
             res.append(self['pages'] + 'pp')
 
-        note = self.get('note')
+        note = self.get('note') or self._genre_note.get(genre)
         if note and note not in res:
             res.append('(%s)' % note)
 
