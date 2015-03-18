@@ -80,10 +80,11 @@ class Parameter(Base,
 class CombinationDomainElement(object):
     def __init__(self, combination, domainelements, icon=None):
         self.number = tuple(de.number for de in domainelements)
-        self.id = '-'.join(map(str, self.number))
+        self.id = '-'.join(str(n) for n in self.number)
         self.name = ' / '.join(de.name for de in domainelements)
         self.icon = icon
         self.languages = []
+        super(CombinationDomainElement, self).__init__()
 
 
 @implementer(interfaces.ICombination)
@@ -100,11 +101,12 @@ class Combination(object):
         """
         assert len(parameters) < 5
         assert len(set(parameters)) == len(parameters)
-        self.id = self.delimiter.join(map(str, [p.id for p in parameters]))
+        self.id = self.delimiter.join(str(p.id) for p in parameters)
         self.name = ' / '.join(p.name for p in parameters)
         self.parameters = parameters
         # we keep track of languages with multiple values.
         self.multiple = []
+        super(Combination, self).__init__()
 
     @classmethod
     def get(cls, id_, **kw):

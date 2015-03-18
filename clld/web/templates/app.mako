@@ -154,7 +154,7 @@
                             <br />
                             is licensed under a
                             <a rel="license" href="${request.dataset.license}">
-                                ${request.dataset.jsondatadict.get('license_name', request.dataset.license)}
+                                ${request.dataset.jsondata.get('license_name', request.dataset.license)}
                             </a>.
                         </div>
                         <div class="span3" style="text-align: right;">
