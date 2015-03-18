@@ -62,7 +62,7 @@ TAB_NAME_PATTERN = re.compile(
 
 def get(path):
     """Retrieve a resource from the sil site and return it's representation."""
-    return requests.get("http://www.sil.org/iso639-3/" + path).content
+    return requests.get("http://www-01.sil.org/iso639-3/" + path).content
 
 
 def get_taburls():
