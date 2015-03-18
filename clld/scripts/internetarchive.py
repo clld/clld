@@ -11,6 +11,7 @@ from clld.util import slug
 from clld.scripts.util import parsed_args, confirm
 from clld.db.models import common
 from clld.db.meta import DBSession
+from clld.db.util import page_query
 
 
 API_URL = 'https://archive.org/advancedsearch.php?fl[]=creator&fl[]=identifier&' \
@@ -42,7 +43,7 @@ def ia_func(command, args, sources=None):  # pragma: no cover
             sources = sources()
 
     i = 0
-    for i, source in enumerate(sources):
+    for i, source in enumerate(page_query(sources, verbose=True, commit=True)):
         filepath = args.data_file('ia', 'source%s.json' % source.id)
 
         if command in ['verify', 'update']:

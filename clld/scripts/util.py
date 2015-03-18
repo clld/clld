@@ -21,6 +21,7 @@ from nameparser import HumanName
 
 from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
+from clld.db.util import page_query
 from clld.util import slug
 from clld.interfaces import IDownload
 from clld.lib import bibtex
@@ -277,7 +278,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
     if callable(sources):
         sources = sources()
 
-    for i, source in enumerate(sources):
+    for i, source in enumerate(page_query(sources, verbose=True, commit=True)):
         filepath = args.data_file('gbs', 'source%s.json' % source.id)
 
         if command == 'update':
