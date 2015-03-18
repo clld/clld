@@ -10,17 +10,8 @@ from sqlalchemy import (
     Column, Integer, Float, String, Boolean, DateTime, func, event)
 from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
-from sqlalchemy.ext.declarative import (
-    declarative_base,
-    declared_attr,
-)
-from sqlalchemy.orm import (
-    scoped_session,
-    sessionmaker,
-    object_mapper,
-    deferred,
-    undefer,
-)
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.orm import scoped_session, sessionmaker, deferred, undefer
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.orm.query import Query
@@ -135,11 +126,12 @@ class CsvMixin(object):
     #: base name of the csv file
     __csv_name__ = None
 
-    def csv_head(self):
+    @classmethod
+    def csv_head(cls):
         """return List of column names."""
         exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
         cols = sorted(
-            col.key for om in object_mapper(self).iterate_to_root()
+            col.key for om in inspect(cls).iterate_to_root()
             for col in om.local_table.c
             if col.key not in exclude and not exclude.add(col.key))
         return cols
@@ -318,7 +310,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
         """
         exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
         cols = [
-            col.key for om in object_mapper(self).iterate_to_root()
+            col.key for om in inspect(self).mapper.iterate_to_root()
             for col in om.local_table.c
             if col.key not in exclude and not exclude.add(col.key)]
         return {col: format_json(getattr(self, col)) for col in cols}
@@ -358,7 +350,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             if value:
                 res[attr] = value
         suffix_map = [(text_type, '_t'), (bool, '_b'), (int, '_i'), (float, '_f')]
-        for om in object_mapper(self).iterate_to_root():
+        for om in inspect(self).mapper.iterate_to_root():
             for col in om.local_table.c:
                 if col.key not in res and col.key != 'polymorphic_type':
                     value = getattr(self, col.key)
