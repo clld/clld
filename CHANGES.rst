@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.32.1
+~~~~~~
+
+- bugfix: reduce license icon size to play well with the default footer.
+- limit sqlalchemy to < 1.0 until tested for productive use.
+
+
 0.32
 ~~~~
 
