@@ -14,6 +14,7 @@ from sqlalchemy.exc import InvalidRequestError
 
 from clld.lib import rdf
 from clld.util import jsonload, jsondump
+from clld.db.util import page_query
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset
 from clld.scripts.util import parsed_args
@@ -77,7 +78,7 @@ def llod_func(args):  # pragma: no cover
             except InvalidRequestError:
                 args.log.info('... skipping')
                 continue
-            for obj in q.order_by(rsc.model.pk):
+            for obj in page_query(q.order_by(rsc.model.pk), n=10000, verbose=True):
                 graph = get_graph(obj, args.env['request'], rsc.name)
                 count_triples += len(graph)
                 count_rsc += 1
