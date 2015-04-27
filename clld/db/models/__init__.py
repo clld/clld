@@ -1,6 +1,8 @@
 # flake8: noqa
 from __future__ import unicode_literals, print_function, division, absolute_import
 
+from clld.db.meta import (Base, PolymorphicBaseMixin, CustomModelMixin)
+
 from ._mixins import (IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin)
 
