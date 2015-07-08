@@ -28,7 +28,7 @@ install_requires = [
     'pyramid>=1.5.1',
     'pyramid_mako>=1.0',
     'pyramid_tm',
-    'SQLAlchemy>=0.9.8,<=0.9.9',
+    'SQLAlchemy>=1.0.6',
     'PasteDeploy>=1.5.0',  # py3 compat
     'waitress',
     'purl>=0.5',
@@ -47,7 +47,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.999',  # our tests rely on the childNodes attribute
+    'html5lib==0.999999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
     'webhelpers2>=2.0rc1',
@@ -81,7 +81,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='clld',
-      version='0.32.1',
+      version='0.33',
       description=(
           'Python library supporting the development of cross-linguistic databases'),
       long_description=README + '\n\n' + CHANGES,

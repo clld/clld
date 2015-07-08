@@ -1,10 +1,8 @@
-"""Support for per-record versioning; based on an sqlalchemy recipe."""
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapper, attributes, object_mapper, deferred
+from sqlalchemy.orm import mapper, attributes, object_mapper
 from sqlalchemy.orm.exc import UnmappedColumnError
 from sqlalchemy import Table, Column, ForeignKeyConstraint, Integer
-from sqlalchemy import event
-from sqlalchemy.exc import CompileError
+from sqlalchemy import event, util
 from sqlalchemy.orm.properties import RelationshipProperty
 
 
@@ -13,6 +11,10 @@ def col_references_table(col, table):
         if fk.references(table):
             return True
     return False
+
+
+def _is_versioning_col(col):
+    return "version_meta" in col.info
 
 
 def _history_mapper(local_mapper):
@@ -29,30 +31,62 @@ def _history_mapper(local_mapper):
 
     polymorphic_on = None
     super_fks = []
-    if not super_mapper or local_mapper.local_table is not super_mapper.local_table:
+
+    def _col_copy(col):
+        orig = col
+        col = col.copy()
+        orig.info['history_copy'] = col
+        col.unique = False
+        col.default = col.server_default = None
+        return col
+
+    properties = util.OrderedDict()
+    if not super_mapper or \
+            local_mapper.local_table is not super_mapper.local_table:
         cols = []
+        # add column.info to identify columns specific to versioning
+        version_meta = {"version_meta": True}
+
         for column in local_mapper.local_table.c:
-            if column.name == 'version':
+            if _is_versioning_col(column):
                 continue  # pragma: no cover
 
-            col = column.copy()
-            col.unique = False
+            col = _col_copy(column)
 
-            if super_mapper and col_references_table(column, super_mapper.local_table):
+            if super_mapper and \
+                    col_references_table(column, super_mapper.local_table):
                 super_fks.append(
-                    (col.key, list(super_history_mapper.local_table.primary_key)[0]))
+                    (
+                        col.key,
+                        list(super_history_mapper.local_table.primary_key)[0]
+                    )
+                )
 
             cols.append(col)
 
             if column is local_mapper.polymorphic_on:
                 polymorphic_on = col
 
+            orig_prop = local_mapper.get_property_by_column(column)
+            # carry over column re-mappings
+            if len(orig_prop.columns) > 1 or \
+                    orig_prop.columns[0].key != orig_prop.key:
+                properties[orig_prop.key] = tuple(
+                    col.info['history_copy'] for col in orig_prop.columns)
+
         if super_mapper:
             super_fks.append(
-                ('version', super_history_mapper.base_mapper.local_table.c.version))
-            cols.append(Column('version', Integer, primary_key=True))
-        else:
-            cols.append(Column('version', Integer, primary_key=True))
+                (
+                    'version', super_history_mapper.local_table.c.version
+                )
+            )
+
+        # "version" stores the integer version id.  This column is
+        # required.
+        cols.append(
+            Column(
+                'version', Integer, primary_key=True,
+                autoincrement=False, info=version_meta))
 
         if super_fks:
             cols.append(ForeignKeyConstraint(*zip(*super_fks)))
@@ -60,15 +94,15 @@ def _history_mapper(local_mapper):
         table = Table(
             local_mapper.local_table.name + '_history',
             local_mapper.local_table.metadata,
-            *cols
+            *cols,
+            schema=local_mapper.local_table.schema
         )
     else:  # pragma: no cover
         # single table inheritance.  take any additional columns that may have
         # been added and add them to the history table.
         for column in local_mapper.local_table.c:
             if column.key not in super_history_mapper.local_table.c:
-                col = column.copy()
-                col.unique = False
+                col = _col_copy(column)
                 super_history_mapper.local_table.append_column(col)
         table = None
 
@@ -83,7 +117,8 @@ def _history_mapper(local_mapper):
         table,
         inherits=super_history_mapper,
         polymorphic_on=polymorphic_on,
-        polymorphic_identity=local_mapper.polymorphic_identity
+        polymorphic_identity=local_mapper.polymorphic_identity,
+        properties=properties
     )
     cls.__history_mapper__ = m
 
@@ -91,7 +126,8 @@ def _history_mapper(local_mapper):
         local_mapper.local_table.append_column(
             Column('version', Integer, default=1, nullable=False)
         )
-        local_mapper.add_property("version", deferred(local_mapper.local_table.c.version))
+        local_mapper.add_property(
+            "version", local_mapper.local_table.c.version)
 
 
 class Versioned(object):
@@ -121,12 +157,15 @@ def create_version(obj, session, deleted=False):
 
     obj_changed = False
 
-    for om, hm in zip(obj_mapper.iterate_to_root(), history_mapper.iterate_to_root()):
-        if hm.single:
-            continue  # pragma: no cover
+    for om, hm in zip(
+            obj_mapper.iterate_to_root(),
+            history_mapper.iterate_to_root()
+    ):
+        if hm.single:  # pragma: no cover
+            continue
 
         for hist_col in hm.local_table.c:
-            if hist_col.key == 'version':
+            if _is_versioning_col(hist_col):
                 continue
 
             obj_col = om.local_table.c[hist_col.key]
@@ -141,22 +180,22 @@ def create_version(obj, session, deleted=False):
                 # in the case of single table inheritance, there may be
                 # columns on the mapped table intended for the subclass only.
                 # the "unmapped" status of the subclass column on the
-                # base class is a feature of the declarative module as of sqla 0.5.2.
+                # base class is a feature of the declarative module.
                 continue
 
-            # expired object attributes and also deferred cols might not be in the
-            # dict.  force it to load no matter what by using getattr().
+            # expired object attributes and also deferred cols might not
+            # be in the dict.  force it to load no matter what by
+            # using getattr().
             if prop.key not in obj_state.dict:
                 getattr(obj, prop.key)
 
             a, u, d = attributes.get_history(obj, prop.key)
-
             if d:
                 attr[hist_col.key] = d[0]
                 obj_changed = True
             elif u:
                 attr[hist_col.key] = u[0]
-            else:
+            elif a:
                 # if the attribute had no value.
                 attr[hist_col.key] = a[0]
                 obj_changed = True
@@ -165,16 +204,19 @@ def create_version(obj, session, deleted=False):
         # not changed, but we have relationships.  OK
         # check those too
         for prop in obj_mapper.iterate_properties:
-            if isinstance(prop, RelationshipProperty):
-                try:
-                    if attributes.get_history(obj, prop.key).has_changes():
+            if isinstance(prop, RelationshipProperty) and \
+                attributes.get_history(
+                    obj, prop.key,
+                    passive=attributes.PASSIVE_NO_INITIALIZE).has_changes():
+                for p in prop.local_columns:
+                    if p.foreign_keys:  # pragma: no cover
                         obj_changed = True
                         break
-                except CompileError:  # pragma: no cover
-                    pass
+                if obj_changed is True:
+                    break  # pragma: no cover
 
     if not obj_changed and not deleted:
-        return  # pragma: no cover
+        return
 
     attr['version'] = obj.version
     hist = history_cls()

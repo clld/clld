@@ -13,7 +13,7 @@ Releasing clld
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4):
 
-  $ ./venvs/clld/clld/build.sh "<prev-rel-no>"
+  $ ./venvs/clld-clld/clld/build.sh "<prev-rel-no>"
 
 - Make sure javascript tests pass with coverage of clld.js at > 83%::
 

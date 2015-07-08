@@ -22,6 +22,7 @@ from datetime import datetime, date
 from six import PY2
 from dateutil.parser import parse
 from path import path
+from sqlalchemy import Boolean
 from sqlalchemy.sql import select
 import requests
 try:
@@ -297,6 +298,8 @@ def get_converter(schema, table):
     for col in table.columns:
         if isinstance(col.type, DeclEnumType):
             conv[col.name] = col.type.enum.from_string
+        elif isinstance(col.type, Boolean):
+            conv[col.name] = lambda v: v == 'True'
         elif isinstance(col.type, JSONEncodedDict):
             conv[col.name] = json.loads
     return conv

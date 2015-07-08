@@ -2,6 +2,12 @@
 Changes
 -------
 
+0.33
+~~~~
+
+See https://github.com/clld/clld/milestones/clld%200.33
+
+
 0.32.1
 ~~~~~~
 

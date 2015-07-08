@@ -5,7 +5,7 @@ from clld.tests.util import TestWithDb
 
 class Tests(TestWithDb):
     def test_Versioning(self):
-        from clld.db.models.common import Language, Identifier, LanguageIdentifier
+        from clld.db.models.common import Language, Language_data
         from clld.db.meta import VersionedDBSession
 
         l = Language(id='abc', name='Old Name', jsondata={'i': 2})
@@ -22,10 +22,8 @@ class Tests(TestWithDb):
         res = VersionedDBSession.query(History).filter(History.pk == l.pk).all()
         self.assertEqual(res[0].name, 'Old Name')
 
-        li = LanguageIdentifier(
-            identifier=Identifier(id='asd', type='wals'),
-            language=l)
+        l.data.append(Language_data(key='k', value='v'))
         VersionedDBSession.flush()
-        VersionedDBSession.delete(li)
+        assert l.datadict()
         VersionedDBSession.delete(l)
         VersionedDBSession.flush()
