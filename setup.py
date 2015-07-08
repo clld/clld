@@ -28,7 +28,7 @@ install_requires = [
     'pyramid>=1.5.1',
     'pyramid_mako>=1.0',
     'pyramid_tm',
-    'SQLAlchemy>=0.9.8,<=0.9.9',
+    'SQLAlchemy>=1.0.6',
     'PasteDeploy>=1.5.0',  # py3 compat
     'waitress',
     'purl>=0.5',
