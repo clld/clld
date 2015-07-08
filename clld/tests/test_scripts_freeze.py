@@ -10,7 +10,7 @@ from path import path
 
 from clld.tests.util import TestWithEnv
 from clld.db.meta import Base, DBSession
-from clld.db.models.common import Dataset, Language
+from clld.db.models.common import Dataset, Language, Contribution
 
 
 class Tests(TestWithEnv):
@@ -46,5 +46,9 @@ class Tests(TestWithEnv):
         self.assertEqual(l1.created, l2.created)
         self.assertEqual(l1.latitude, l2.latitude)
         self.assertEqual(l1.description, l2.description)
+
+        contrib = s2.query(Contribution).filter(Contribution.id == 'contribution').one()
+        self.assert_(contrib.primary_contributors)
+        self.assert_(contrib.secondary_contributors)
 
         tmp.rmtree(ignore_errors=True)
