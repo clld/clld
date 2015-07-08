@@ -9,6 +9,12 @@ from clld.db.meta import DBSession
 
 
 class Tests(TestWithDb):
+    def test_Config(self):
+        from clld.db.models.common import Config
+
+        self.assertEquals(Config.replacement_key('X', 'Y'), '__X_Y__')
+        self.assertEquals(Config.replacement_key(None, 'Y'), '__NoneType_Y__')
+
     def test_Files(self):
         from clld.db.models.common import Sentence, Sentence_files
         from path import path
@@ -35,6 +41,7 @@ class Tests(TestWithDb):
         d = Dataset(id='abc', domain='test')
         DBSession.add(d)
         DBSession.flush()
+        self.assertEquals(d.jsondata, d.jsondatadict)
         d.get_stats(RESOURCES, source=Source.id == None)
 
     def test_Contributor(self):
