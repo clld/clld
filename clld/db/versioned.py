@@ -44,8 +44,8 @@ def _history_mapper(local_mapper):
     if not super_mapper or \
             local_mapper.local_table is not super_mapper.local_table:
         cols = []
-        version_meta = {"version_meta": True}  # add column.info to identify
-                                               # columns specific to versioning
+        # add column.info to identify columns specific to versioning
+        version_meta = {"version_meta": True}
 
         for column in local_mapper.local_table.c:
             if _is_versioning_col(column):

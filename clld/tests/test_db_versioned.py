@@ -25,6 +25,5 @@ class Tests(TestWithDb):
         l.data.append(Language_data(key='k', value='v'))
         VersionedDBSession.flush()
         assert l.datadict()
-        #self.assertEqual(l.version, 3)
         VersionedDBSession.delete(l)
         VersionedDBSession.flush()
