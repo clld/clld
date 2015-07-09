@@ -1,5 +1,12 @@
 #!/bin/bash
-cd ~/venvs
+#
+# get zip-URL from DOI:
+# http://dx.doi.org/10.5281/zenodo.19782 ->  http://zenodo.org/record/19782
+# curl http://zenodo.org/record/19782 | grep "\.zip"
+#
+# ./tools/unfreeze.sh csd "https://zenodo.org/record/19782/files/csd-v1.0.zip"
+#
+cd /tmp
 virtualenv --no-site-packages $1
 cd $1
 . bin/activate
@@ -26,4 +33,3 @@ pip install nosexcover
 pip install mock
 cp sqlite.ini development.ini
 nosetests
-

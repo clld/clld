@@ -333,7 +333,7 @@ def unfreeze_func(args, engine=None):
     engine = engine or DBSession.get_bind()
     data_dir = path(mkdtemp())
 
-    with ZipFile(args.data_file('..', 'data.zip')) as fp:
+    with ZipFile(args.module_dir.joinpath('data.zip')) as fp:
         fp.extractall(data_dir)
 
     for table in Base.metadata.sorted_tables:
