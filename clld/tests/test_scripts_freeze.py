@@ -22,6 +22,7 @@ class Tests(TestWithEnv):
 
         class Args(object):
             env = self.env
+            module_dir = tmp
 
             def data_file(self, *comps):
                 return tmp.joinpath('data', *comps)
