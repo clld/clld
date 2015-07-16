@@ -5,7 +5,6 @@ import sys
 from distutils.util import strtobool
 from collections import defaultdict
 import argparse
-import json
 import logging
 from functools import partial
 
@@ -22,7 +21,7 @@ from nameparser import HumanName
 from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.db.util import page_query
-from clld.util import slug
+from clld.util import slug, jsonload, jsondump
 from clld.interfaces import IDownload
 from clld.lib import bibtex
 
@@ -251,7 +250,7 @@ def create_downloads(**kw):  # pragma: no cover
 
 def gbs(**kw):  # pragma: no cover
     add_args = [
-        (("command",), dict(help="download|verify|update")),
+        (("command",), dict(help="download|verify|update|cleanup")),
         (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
     ]
 
@@ -271,6 +270,16 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
     count = 0
     api_url = "https://www.googleapis.com/books/v1/volumes?"
 
+    if command == 'cleanup':
+        for fname in args.data_file('gbs').files('*.json'):
+            try:
+                data = jsonload(fname)
+                if data.get('totalItems') == 0:
+                    os.remove(fname)
+            except ValueError:
+                os.remove(fname)
+        return
+
     if not sources:
         sources = DBSession.query(common.Source)\
             .order_by(common.Source.id)\
@@ -287,12 +296,11 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
 
         if command in ['verify', 'update']:
             if filepath.exists():
-                with open(filepath) as fp:
-                    try:
-                        data = json.load(fp)
-                    except ValueError:
-                        log.warn('no JSON object found in: %s' % filepath)
-                        continue
+                try:
+                    data = jsonload(filepath)
+                except ValueError:
+                    log.warn('no JSON object found in: %s' % filepath)
+                    continue
                 if not data['totalItems']:
                     continue
                 item = data['items'][0]
@@ -330,8 +338,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
                 log.info(source.publisher)
                 if not confirm('Are the records the same?'):
                     log.warn('---- removing ----')
-                    with open(filepath, 'w') as fp:
-                        json.dump({"totalItems": 0}, fp)
+                    jsondump({"totalItems": 0}, filepath)
         elif command == 'update':
             source.google_book_search_id = item['id']
             source.update_jsondata(gbs=item)

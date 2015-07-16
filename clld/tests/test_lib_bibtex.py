@@ -142,5 +142,6 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(db), 0)
         db = Database.from_file(TESTS_DIR.joinpath('test.bib'))
         self.assertEqual(len(db), 1)
+        assert '@' in db[0]['title']
         assert [r for r in db]
         self.assertRaises(NotImplementedError, db.format, 'txt')
