@@ -2,6 +2,13 @@
 Changes
 -------
 
+0.33.1
+~~~~~~
+
+- bugfix: BibTeX files containing @ within field values could not get parsed correctly.
+- feature: The functionality to add google books info gained a cleanup command.
+
+
 0.33
 ~~~~
 
