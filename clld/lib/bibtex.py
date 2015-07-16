@@ -554,8 +554,8 @@ class Database(_Convertable):
         else:
             content = ''
 
-        return cls((Record.from_string(m.group(), lowercase=lowercase)
-                    for m in re.finditer('@[^@]*', content)))
+        return cls((Record.from_string('@' + m, lowercase=lowercase)
+                    for m in re.split('^\s*@', content, 0, re.MULTILINE)))
 
     def __len__(self):
         return len(self.records)
