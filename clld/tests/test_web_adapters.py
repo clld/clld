@@ -87,7 +87,7 @@ class Tests2(unittest.TestCase):
     def test_pacific_centered(self):
         from clld.web.adapters.geojson import pacific_centered_coordinates
 
-        assert pacific_centered_coordinates(Mock(longitude=-50, latitude=1))[0] > 0
+        assert pacific_centered_coordinates(-50, 1)[0] > 0
 
     def test_register_app(self):
         pass

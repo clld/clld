@@ -21,6 +21,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.config import Configurator
 from pyramid.renderers import JSON, JSONP
+from pyramid.settings import asbool
 from purl import URL
 from six import string_types
 
@@ -33,6 +34,7 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
+from clld.web.adapters import geojson
 from clld.web.adapters.base import adapter_factory, Index
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
@@ -636,6 +638,9 @@ def get_configurator(pkg, *utilities, **kw):
             {'clld.publisher_logo': '%s:static/publisher_logo.png' % config.package_name})
 
     config.add_settings_from_file(pkg_dir.joinpath('appconf.ini'))
+
+    if asbool(config.registry.settings.get('clld.pacific_centered_maps')):
+        geojson.pacific_centered()
 
     v = maybe_import('%s.views' % config.package_name)
     if v:
