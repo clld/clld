@@ -312,15 +312,13 @@ class CombinationMap(Map):
 
     """Map for a combination of parameters."""
 
-    __geojson__ = GeoJsonCombinationDomainElement
-
     def get_layers(self):
         for de in self.ctx.domain:
             if de.languages:
                 yield Layer(
                     de.id,
                     de.name,
-                    self.__geojson__(de).render(de, self.req, dump=False),
+                    GeoJsonCombinationDomainElement(de).render(de, self.req, dump=False),
                     marker=HTML.img(src=de.icon.url(self.req), height='20', width='20'))
         if self.ctx.multiple:
             # yield another layer which can be used to mark languages with multiple
