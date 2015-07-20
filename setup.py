@@ -25,7 +25,7 @@ except IOError:
 
 install_requires = [
     'setuptools>=0.8',
-    'pyramid>=1.5.1',
+    'pyramid>=1.6a2',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',
