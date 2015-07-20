@@ -2,6 +2,25 @@
 Changes
 -------
 
+1.0.0
+~~~~~
+
+Feature-complete release of the clld framework.
+
+Backwards incompatible changes:
+
+- `clld.web.app` can now be included like a regular pyramid package. The `get_configurator`
+  function is gone.
+- Pacific centered maps can now be configured using an `appconf.ini` setting. This setting
+  is in effect across all GeoJSON objects of an app. The method `GeoJson.get_coordinates`
+  which was used to plug pacific centered coordinates into `GeoJson` is gone.
+
+New features:
+
+- Upon installation `clld` does now install several command line scripts, to make functionality
+  available which before had to be accessed using per-app scripts.
+
+
 0.33.1
 ~~~~~~
 
