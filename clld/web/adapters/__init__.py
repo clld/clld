@@ -41,10 +41,10 @@ def includeme(config):
                 interfaces.IIndex,
                 name=csv.CsvAdapter.mimetype)
             config.register_adapter(
-                csv.JsonTableSchemaAdapter,
+                csv.CsvmJsonAdapter,
                 interface,
                 interfaces.IIndex,
-                name=csv.JsonTableSchemaAdapter.mimetype)
+                name=csv.CsvmJsonAdapter.mimetype)
 
         # ... as html details page
         specs.append(
