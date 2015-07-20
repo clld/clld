@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, print_function
 import json
 
-import transaction
 import requests
 from sqlalchemy.orm import joinedload
 from six.moves.urllib.parse import quote_plus
 from six import text_type
 
 from clld.util import slug
-from clld.scripts.util import parsed_args, confirm
+from clld.scripts.util import confirm
 from clld.db.models import common
 from clld.db.meta import DBSession
 from clld.db.util import page_query
@@ -17,14 +16,6 @@ from clld.db.util import page_query
 API_URL = 'https://archive.org/advancedsearch.php?fl[]=creator&fl[]=identifier&' \
     'fl[]=title&fl[]=year&sort[]=&sort[]=&sort[]=&rows=5&page=1&output=json&callback&' \
     'save=yes&q='
-
-
-def ia(**kw):  # pragma: no cover
-    add_args = [(("command",), dict(help="download|verify|update"))]
-
-    args = parsed_args(*add_args, **kw)
-    with transaction.manager:
-        ia_func(args.command, args, kw.get('sources'))
 
 
 def ia_func(command, args, sources=None):  # pragma: no cover

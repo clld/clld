@@ -211,10 +211,6 @@ def _freeze(table, fpath):
             writer.writerows(rows)
 
 
-def freeze(**kw):  # pragma: no cover
-    freeze_func(parsed_args(bootstrap=True))
-
-
 def freeze_func(args, dataset=None, with_history=True):
     dataset = dataset or args.env['request'].dataset
     dump_dir = args.data_file('dumps')
@@ -303,7 +299,3 @@ def unfreeze_func(args, engine=None):
             load(table, csv, engine)
 
     data_dir.rmtree()
-
-
-def unfreeze(**kw):  # pragma: no cover
-    unfreeze_func(parsed_args())
