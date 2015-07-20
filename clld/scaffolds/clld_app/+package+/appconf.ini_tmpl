@@ -1,6 +1,7 @@
 [clld]
 menuitems_list = contributions parameters languages contributors sentences sources
 app_template = {{package}}.mako
+pacific_centered_maps = false
 
 [mako]
 directories_list = {{package}}:templates clld:web/templates
