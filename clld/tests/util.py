@@ -18,6 +18,7 @@ from six import text_type
 from mock import Mock
 from path import path
 from pyramid.paster import bootstrap
+from pyramid.config import Configurator
 import transaction
 from sqlalchemy import create_engine
 from webtest import TestApp
@@ -52,14 +53,13 @@ class Route(Mock):
 
 def main(global_config, **settings):
     """called when bootstrapping a pyramid app using clld/tests/test.ini."""
-    from clld.web.app import get_configurator
-
     class IF(Interface):
         pass
 
     settings['mako.directories'] = ['clld:web/templates']
-    config = get_configurator(
-        None, (MapMarker(), interfaces.IMapMarker), settings=settings)
+    config = Configurator(settings=settings)
+    config.include('clld.web.app')
+    config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
     config.register_adapter(Representation, Mock, name='test')
     config.register_menu(('home', lambda ctx, req: (req.resource_url(req.dataset), 'tt')))
     return config.make_wsgi_app()
@@ -98,7 +98,7 @@ class TestWithDbAndData(TestWithDb):
             name='dataset',
             description='desc',
             domain='clld',
-            jsondata={'license_icon': 'cc-by'}))
+            jsondata={'license_icon': 'cc-by', 'license_url': 'http://example.org'}))
 
         DBSession.add(common.Source(
             id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))

@@ -1,3 +1,5 @@
+import importlib
+
 from zope.interface import Interface
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
@@ -54,16 +56,16 @@ class Tests(TestWithEnv):
         add_settings_from_file(config, TESTS_DIR.joinpath('test.ini'))
         assert 'app:main.use' in config.registry.settings
 
-    def test_get_configurator(self):
-        from clld.web.app import get_configurator
-
+    def test_config(self):
         class IF(Interface):
             pass
 
-        config = get_configurator(
-            'clld',
-            settings={'sqlalchemy.url': 'sqlite://'},
-            routes=[('languages', '/other')])
+        config = Configurator(
+            root_package=importlib.import_module('clld.web'),
+            settings={
+                'sqlalchemy.url': 'sqlite://',
+                'clld.pacific_centered_maps': True})
+        config.include('clld.web.app')
         # should have no effect, because a resource with this name is registered by
         # default:
         config.register_menu('languages', ('sources', dict(label='References')))

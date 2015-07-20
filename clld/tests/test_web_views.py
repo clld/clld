@@ -1,5 +1,6 @@
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HTTPFound
+from mock import Mock
 
 from clld.tests.util import TestWithEnv, XmlResponse
 from clld.db.models import common
@@ -32,6 +33,13 @@ class Tests(TestWithEnv):
 
         res = index_view(X(self.env['request'], common.Contributor), self.env['request'])
         self.assertEqual(res.content_type, 'application/json')
+
+        class Route(Mock):
+            name = 'contributors_alt'
+
+        self.set_request_properties(
+            is_xhr=False, matched_route=Route(), matchdict={'ext': 'csv'})
+        index_view(ctx(self.env['request'], common.Contributor), self.env['request'])
 
     def test_resource_view(self):
         from clld.web.views import resource_view

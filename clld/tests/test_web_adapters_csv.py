@@ -18,15 +18,15 @@ class Tests(TestWithEnv):
         self.assert_(adapter.render_to_response(
             datatables.Languages(self.env['request'], Language), self.env['request']))
 
-    def test_JsonTableSchemaAdapter(self):
-        from clld.web.adapters.csv import JsonTableSchemaAdapter
+    def test_CsvwJsonAdapter(self):
+        from clld.web.adapters.csv import CsvmJsonAdapter
 
-        adapter = JsonTableSchemaAdapter(None)
+        adapter = CsvmJsonAdapter(None)
         res = adapter.render(
             datatables.Languages(self.env['request'], Language), self.env['request'])
-        self.assertIn('fields', json.loads(res))
+        self.assertIn('tableSchema', json.loads(res))
         res = adapter.render(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
-        self.assertIn('foreignKeys', json.loads(res))
+        self.assertIn('foreignKeys', json.loads(res)['tableSchema'])
         adapter.render_to_response(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
