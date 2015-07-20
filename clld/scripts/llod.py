@@ -17,7 +17,6 @@ from clld.util import jsonload, jsondump
 from clld.db.util import page_query
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset
-from clld.scripts.util import parsed_args
 from clld.web.adapters.rdf import Rdf
 from clld import RESOURCES
 
@@ -55,12 +54,6 @@ def get_graph(obj, req, rscname):  # pragma: no cover
     adapter = Rdf(obj)
     adapter.template = rscname + '/rdf.mako'
     return adapter.render(obj, req)
-
-
-def llod(**kw):  # pragma: no cover
-    args = parsed_args(bootstrap=True)
-    llod_func(args)
-    register(args)
 
 
 def llod_func(args):  # pragma: no cover
