@@ -34,6 +34,7 @@ from clld.web.adapters.md import TxtCitation
 from clld.web.adapters.csv import CsvmJsonAdapter
 from clld.scripts.util import parsed_args
 from clld.db.meta import Base, DBSession, JSONEncodedDict
+from clld.db.util import set_alembic_version, get_alembic_version
 from clld.lib.dsv import reader, UnicodeWriter
 from clld.util import DeclEnumType, jsondump, jsonload
 
@@ -221,6 +222,8 @@ def freeze_func(args, dataset=None, with_history=True):
     with ioopen(dump_dir.joinpath('README.txt'), 'w', encoding='utf8') as fp:
         fp.write(freeze_readme(dataset, args.env['request']))
 
+    db_version = get_alembic_version(DBSession)
+
     for table in Base.metadata.sorted_tables:
         csv = dump_dir.joinpath('%s.csv' % table.name).abspath()
         if with_history or not table.name.endswith('_history'):
@@ -230,6 +233,10 @@ def freeze_func(args, dataset=None, with_history=True):
             csvm = '%s.%s' % (table.name, CsvmJsonAdapter.extension)
             doc = CsvmJsonAdapter.csvm_doc(
                 csvm, args.env['request'], [(col.name, col) for col in table.columns])
+            if db_version:
+                # We (ab)use a dc:identifier property to pass the alembic revision of the
+                # database to the unfreeze script.
+                doc["dc:identifier"] = db_version
             jsondump(doc, dump_dir.joinpath(csvm).abspath())
 
     with ZipFile(args.data_file('..', 'data.zip'), 'w', ZIP_DEFLATED) as zipfile:
@@ -273,13 +280,14 @@ def converted(d, converter):
 
 
 def load(table, csv, engine):
-    schema = jsonload(csv.splitext()[0] + '.' + CsvmJsonAdapter.extension)['tableSchema']
+    schema = jsonload(csv.splitext()[0] + '.' + CsvmJsonAdapter.extension)
     values = []
-    converter = get_converter(schema, table)
+    converter = get_converter(schema['tableSchema'], table)
     for d in reader(csv, dicts=True, delimiter=','):
         values.append(converted(d, converter))
 
     engine.execute(table.insert(), values)
+    return schema.get("dc:identifier")
 
 
 def unfreeze_func(args, engine=None):
@@ -290,12 +298,16 @@ def unfreeze_func(args, engine=None):
     engine = engine or DBSession.get_bind()
     data_dir = path(mkdtemp())
 
-    with ZipFile(args.module_dir.joinpath('data.zip')) as fp:
+    with ZipFile(args.module_dir.joinpath('..', 'data.zip')) as fp:
         fp.extractall(data_dir)
 
+    db_version = None
     for table in Base.metadata.sorted_tables:
         csv = data_dir.joinpath('%s.csv' % table.name)
         if csv.exists():
-            load(table, csv, engine)
+            db_version = load(table, csv, engine)
+
+    if db_version:
+        set_alembic_version(engine, db_version)
 
     data_dir.rmtree()

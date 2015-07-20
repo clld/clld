@@ -141,3 +141,28 @@ def page_query(q, n=1000, verbose=False, commit=False):
         s = e
         if not r:
             break
+
+
+def set_alembic_version(engine, db_version):
+    """Sets up the alembic_version table in an sqlite database.
+
+    .. notes::
+
+        This function is only to be used with sqlite databases, either when testing or
+        when restoring a frozen database.
+
+    :param engine: A connection to an sqlite database.
+    :param db_version: The new version_num.
+    """
+    engine.execute("CREATE TABLE IF NOT EXISTS alembic_version (version_num VARCHAR(32))")
+    if engine.execute("SELECT * FROM alembic_version").fetchall():  # pragma: no cover
+        engine.execute("UPDATE alembic_version SET version_num = '%s'" % db_version)
+    else:
+        engine.execute("INSERT INTO alembic_version VALUES ('%s')" % db_version)
+
+
+def get_alembic_version(engine):
+    try:
+        return engine.execute("SELECT version_num FROM alembic_version").fetchone()[0]
+    except:  # pragma: no cover
+        return None

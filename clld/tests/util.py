@@ -33,6 +33,7 @@ except ImportError:  # pragma: no cover
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
 from clld.db.models import common
+from clld.db.util import set_alembic_version
 from clld.web.adapters import Representation
 from clld.web.icon import MapMarker
 from clld import interfaces
@@ -92,6 +93,7 @@ class TestWithDbAndData(TestWithDb):
 
     def setUp(self):
         TestWithDb.setUp(self)
+        set_alembic_version(DBSession, '58559d4eea0d')
 
         DBSession.add(common.Dataset(
             id='dataset',

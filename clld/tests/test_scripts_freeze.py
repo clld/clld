@@ -20,11 +20,12 @@ class Tests(TestWithEnv):
 
         tmp = path(mkdtemp())
         tmp.joinpath('data').mkdir()
+        tmp.joinpath('appname').mkdir()
 
         class Args(object):
             env = self.env
-            module_dir = tmp
-            module = Mock(__name__='name')
+            module_dir = tmp.joinpath('appname')
+            module = Mock(__name__='appname')
 
             def data_file(self, *comps):
                 return tmp.joinpath('data', *comps)
