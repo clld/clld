@@ -35,7 +35,10 @@ class Tests(TestWithEnv):
             '{' in adapter.render(Parameter.get('parameter'), self.env['request']))
 
     def test_GeoJsonParameterMultipleValueSets(self):
-        from clld.web.adapters.geojson import GeoJsonParameterMultipleValueSets
+        from clld.web.adapters.geojson import (
+            GeoJsonParameterMultipleValueSets, pacific_centered,
+        )
+        pacific_centered()
 
         adapter = GeoJsonParameterMultipleValueSets(None)
         self.assertTrue(
