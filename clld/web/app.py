@@ -19,8 +19,8 @@ from pyramid import events
 from pyramid.request import Request, reify
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
-from pyramid.config import Configurator
 from pyramid.renderers import JSON, JSONP
+from pyramid.settings import asbool
 from purl import URL
 from six import string_types
 
@@ -33,6 +33,7 @@ from clld import Resource, RESOURCES
 from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
+from clld.web.adapters import geojson
 from clld.web.adapters.base import adapter_factory, Index
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
@@ -401,7 +402,7 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
     config.register_resource_routes_and_views(rsc)
 
     # we register adapters for standard views, if the corresponding templates exists.
-    templates = path(config.package.__file__).dirname().joinpath('templates')
+    templates = path(config.root_package.__file__).dirname().joinpath('templates')
     for tmpl, _kw in [
         ('index_html.mako', dict(base=Index)),
         ('detail_html.mako', {}),
@@ -446,19 +447,16 @@ def add_410(config, pattern, name=None):
     _route_and_view(config, pattern, gone, name=name)
 
 
-#
-# the main interface:
-#
-def get_configurator(pkg, *utilities, **kw):
-    """Factory function to retrive a pyramid Configurator, including clld functionality.
+def includeme(config):
+    """Upgrading:
 
-    .. seealso:: https://groups.google.com/d/msg/pylons-discuss/Od6qIGaLV6A/3mXVBQ13zWQJ
+    - register utilities "by hand", after config.include('clld.web.app')
+    - add routes by hand (and remove these from the **kw passed to Configurator)
+
+    :param config:
+    :return:
     """
-    kw.setdefault('package', pkg)
-    routes = kw.pop('routes', [])
-
-    config = Configurator(**kw)
-
+    root_package = config.root_package.__name__
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
     json_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
@@ -468,9 +466,6 @@ def get_configurator(pkg, *utilities, **kw):
     jsonp_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
     jsonp_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
     config.add_renderer('jsonp', jsonp_renderer)
-
-    for name, pattern in routes:
-        config.add_route(name, pattern)
 
     config.set_request_factory(ClldRequest)
     config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)
@@ -483,7 +478,7 @@ def get_configurator(pkg, *utilities, **kw):
 
     config.add_settings({
         'pyramid.default_locale_name': 'en',
-        'clld.pkg': config.package_name,
+        'clld.pkg': root_package,
         'clld.parameters': {}})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files
@@ -495,7 +490,7 @@ def get_configurator(pkg, *utilities, **kw):
     config.add_subscriber(add_localizer, events.NewRequest)
     config.add_subscriber(init_map, events.ContextFound)
     config.add_subscriber(
-        partial(add_renderer_globals, maybe_import('%s.util' % config.package_name)),
+        partial(add_renderer_globals, maybe_import('%s.util' % root_package)),
         events.BeforeRender)
 
     #
@@ -520,7 +515,7 @@ def get_configurator(pkg, *utilities, **kw):
     # routes and views
     #
     config.add_static_view('clld-static', 'clld:web/static')
-    config.add_static_view('static', '%s:static' % config.package_name)
+    config.add_static_view('static', '%s:static' % root_package)
 
     config.add_route_and_view('_js', '/_js', js, http_cache=3600)
 
@@ -554,7 +549,7 @@ def get_configurator(pkg, *utilities, **kw):
         #    config.register_download(
         #        N3Dump(
         #            rsc.model,
-        #            config.package_name,
+        #            root_package,
         #            description="%s as RDF" % rsc.plural.capitalize()))
 
     # maps
@@ -575,9 +570,9 @@ def get_configurator(pkg, *utilities, **kw):
     #
     # note: the following exploits the import time side effect of modifying the webassets
     # environment!
-    maybe_import('%s.assets' % config.package_name)
+    maybe_import('%s.assets' % root_package)
 
-    pkg_dir = path(config.package.__file__).dirname().abspath()
+    pkg_dir = path(config.root_package.__file__).dirname().abspath()
 
     #
     # inspect default locations for views and templates:
@@ -603,7 +598,7 @@ def get_configurator(pkg, *utilities, **kw):
             if p.namebase in home_comp and p.ext == '.mako':
                 home_comp[p.namebase] = True
 
-    views = maybe_import('%s.views' % config.package_name)
+    views = maybe_import('%s.views' % root_package)
     for name, template in home_comp.items():
         if template:
             config.add_route_and_view(
@@ -619,7 +614,7 @@ def get_configurator(pkg, *utilities, **kw):
         # hard to test (in particular on travis) and without too much consequence
         # (and the consequences faced are easy to spot).
         if pkg_dir.joinpath('static', 'favicon.ico').exists():  # pragma: no cover
-            favicon['clld.favicon'] = config.package_name + ':static/favicon.ico'
+            favicon['clld.favicon'] = root_package + ':static/favicon.ico'
         config.add_settings(favicon)
 
     with open(abspath_from_asset_spec(
@@ -628,16 +623,21 @@ def get_configurator(pkg, *utilities, **kw):
         fh.update(fp.read())
         config.add_settings({'clld.favicon_hash': fh.hexdigest()})
 
+    translation_dirs = ['clld:locale']
     if pkg_dir.joinpath('locale').exists():
-        config.add_translation_dirs('clld:locale', '%s:locale' % config.package_name)
+        translation_dirs.append('%s:locale' % root_package)  # pragma: no cover
+    config.add_translation_dirs(*translation_dirs)
 
     if pkg_dir.joinpath('static/publisher_logo.png').exists():  # pragma: no cover
         config.add_settings(
-            {'clld.publisher_logo': '%s:static/publisher_logo.png' % config.package_name})
+            {'clld.publisher_logo': '%s:static/publisher_logo.png' % root_package})
 
     config.add_settings_from_file(pkg_dir.joinpath('appconf.ini'))
 
-    v = maybe_import('%s.views' % config.package_name)
+    if asbool(config.registry.settings.get('clld.pacific_centered_maps')):
+        geojson.pacific_centered()
+
+    v = maybe_import('%s.views' % root_package)
     if v:
         config.scan(v)  # pragma: no cover
 
@@ -648,12 +648,7 @@ def get_configurator(pkg, *utilities, **kw):
 
     config.include('pyramid_mako')
 
-    for utility, interface in utilities:
-        config.registry.registerUtility(utility, interface)
-
     for name in ['adapters', 'datatables', 'maps']:
-        mod = maybe_import('%s.%s' % (config.package_name, name))
+        mod = maybe_import('%s.%s' % (root_package, name))
         if mod and hasattr(mod, 'includeme'):
             config.include(mod)
-
-    return config

@@ -22,7 +22,6 @@ from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.db.util import page_query
 from clld.util import slug, jsonload, jsondump
-from clld.interfaces import IDownload
 from clld.lib import bibtex
 
 
@@ -194,7 +193,7 @@ def index(rsc, req, solr, query_options=None, batch_size=1000):
 
 def parsed_args(*arg_specs, **kw):  # pragma: no cover
     """pass a truthy value as keyword parameter bootstrap to bootstrap the app."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=kw.pop('description', None))
     parser.add_argument(
         "config_uri", action=ExistingConfig, help="ini file providing app config")
     parser.add_argument("--glottolog-dburi", default=None)
@@ -239,27 +238,6 @@ def initializedb(*args, **kw):  # pragma: no cover
     if prime_cache:
         with transaction.manager:
             prime_cache(args)
-
-
-def create_downloads(**kw):  # pragma: no cover
-    args = parsed_args(bootstrap=True)
-    for name, download in args.env['registry'].getUtilitiesFor(IDownload):
-        args.log.info('creating download %s' % name)
-        download.create(args.env['request'])
-
-
-def gbs(**kw):  # pragma: no cover
-    add_args = [
-        (("command",), dict(help="download|verify|update|cleanup")),
-        (("--api-key",), dict(default=kw.get('key', os.environ.get('GBS_API_KEY')))),
-    ]
-
-    args = parsed_args(*add_args, **kw)
-    if args.command == 'download' and not args.api_key:
-        raise argparse.ArgumentError(None, 'no API key found for download')
-
-    with transaction.manager:
-        gbs_func(args.command, args, kw.get('sources'))
 
 
 def gbs_func(command, args, sources=None):  # pragma: no cover

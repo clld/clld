@@ -16,6 +16,14 @@ from clld.db.meta import DBSession
 from clld.db.models.common import ValueSet, Value
 
 
+_PACIFIC_CENTERED = False
+
+
+def pacific_centered():
+    global _PACIFIC_CENTERED
+    _PACIFIC_CENTERED = True
+
+
 def _flatten(d, parent_key=''):
     items = []
 
@@ -40,7 +48,7 @@ def flatten(d):
     return dict(_flatten(d))
 
 
-def pacific_centered_coordinates(obj):
+def pacific_centered_coordinates(longitude, latitude):
     """Re-compute coordinates, to make markers on the map appear pacific-centered.
 
     The world should be divided between Icelandic (westernmost language) and
@@ -50,7 +58,7 @@ def pacific_centered_coordinates(obj):
 
     .. seealso: https://github.com/Leaflet/Leaflet/issues/1360
     """
-    return [obj.longitude if obj.longitude > -26 else obj.longitude + 360, obj.latitude]
+    return [longitude if longitude > -26 else longitude + 360, latitude]
 
 
 @implementer(interfaces.IRepresentation)
@@ -86,11 +94,6 @@ class GeoJson(Renderable):
     def feature_iterator(self, ctx, req):
         return iter([])  # pragma: no cover
 
-    def _feature_properties(self, ctx, req, feature, language):
-        res = {'icon': self.map_marker(feature, req), 'language': language}
-        res.update(self.feature_properties(ctx, req, feature) or {})
-        return res
-
     def feature_properties(self, ctx, req, feature):
         """override to add properties."""
         return {}
@@ -99,25 +102,22 @@ class GeoJson(Renderable):
         """override to fetch language object from non-default location."""
         return feature
 
-    def get_coordinates(self, obj):
-        return [obj.longitude, obj.latitude]
+    def get_geojson_feature(self, ctx, req, feature, language):
+        f = language.__geo_interface__
+        if _PACIFIC_CENTERED:
+            f['geometry']['coordinates'] = pacific_centered_coordinates(
+                *f['geometry']['coordinates'])
+        f['properties'].update(icon=self.map_marker(feature, req), language=language)
+        f['properties'].update(self.feature_properties(ctx, req, feature) or {})
+        return f
 
     def get_features(self, ctx, req):
         self.map_marker = req.registry.getUtility(interfaces.IMapMarker)
 
         for feature in self.feature_iterator(ctx, req):
             language = self.get_language(ctx, req, feature)
-            if language.longitude is None or language.latitude is None:
-                continue  # pragma: no cover
-
-            yield {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": self.get_coordinates(language),
-                },
-                "properties": self._feature_properties(ctx, req, feature, language),
-            }
+            if language.longitude is not None and language.latitude is not None:
+                yield self.get_geojson_feature(ctx, req, feature, language)
 
     def render(self, ctx, req, dump=True):
         res = {
