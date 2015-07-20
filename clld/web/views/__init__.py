@@ -10,6 +10,7 @@ from pyramid.renderers import render, render_to_response
 
 from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld.web.adapters import get_adapter, get_adapters
+from clld.web.adapters.csv import CsvAdapter, CsvmJsonAdapter
 from clld.web.util.multiselect import MultiSelect
 from clld.db.models.common import Combination
 from clld.web.maps import CombinedMap
@@ -47,6 +48,9 @@ def view(interface, ctx, req, getadapters=False):
     """Render a resource as pyramid response.
 
     Using the most appropriate adapter for the accept header sent.
+
+    :param getadapters: If True, the adapter used to render the response and the list of\
+    all available adapters for the context are returned as well.
     """
     #
     # if req.matched_route.name.endswith('_alt') -> add rel="canonical" header
@@ -58,8 +62,8 @@ def view(interface, ctx, req, getadapters=False):
         raise pyramid.httpexceptions.HTTPNotAcceptable()
     res = adapter.render_to_response(ctx, req)
     if getadapters:
-        res = (res, adapters)
-    return res
+        return res, adapter, adapters
+    return res  # pragma: no cover
 
 
 def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="text/html"):
@@ -74,10 +78,21 @@ def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="tex
 def index_view(ctx, req):
     if req.is_xhr and 'sEcho' in req.params:
         return datatable_xhr_view(ctx, req)
-    res, adapters = view(IIndex, ctx, req, getadapters=True)
+    res, current, adapters = view(IIndex, ctx, req, getadapters=True)
     if req.matched_route:
         if req.matched_route.name.endswith('_alt'):
+            # add the canonical link:
             _add_link_header(res, req.route_url(req.matched_route.name[:-4]))
+            if current.mimetype == CsvAdapter.mimetype:
+                # If serving csv add link header to make metadata discoverable. See
+                # http://www.w3.org/TR/2015/CR-tabular-data-model-20150716/#link-header
+                csvm = [a for a in adapters if a.extension == CsvmJsonAdapter.extension]
+                if csvm:
+                    a = csvm[0]
+                    _add_link_header(
+                        res,
+                        req.route_url(req.matched_route.name, ext=a.extension),
+                        adapter=a)
         else:
             for a in [_a for _a in adapters if _a.rel and _a.extension]:
                 _add_link_header(
@@ -88,7 +103,7 @@ def index_view(ctx, req):
 
 
 def resource_view(ctx, req):
-    res, adapters = view(IRepresentation, ctx, req, getadapters=True)
+    res, _, adapters = view(IRepresentation, ctx, req, getadapters=True)
     if req.matched_route:
         if req.matched_route.name.endswith('_alt'):
             _add_link_header(res, req.resource_url(ctx))

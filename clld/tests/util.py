@@ -98,7 +98,7 @@ class TestWithDbAndData(TestWithDb):
             name='dataset',
             description='desc',
             domain='clld',
-            jsondata={'license_icon': 'cc-by'}))
+            jsondata={'license_icon': 'cc-by', 'license_url': 'http://example.org'}))
 
         DBSession.add(common.Source(
             id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))

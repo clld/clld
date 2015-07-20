@@ -1,8 +1,17 @@
-"""Serialize clld objects as csv."""
+"""
+Serialize clld objects as csv.
+
+We also provide metadata following the guidelines of
+
+- http://www.w3.org/TR/tabular-data-model/ version
+  http://www.w3.org/TR/2015/CR-tabular-data-model-20150716/
+- http://www.w3.org/TR/tabular-metadata/ version
+  http://www.w3.org/TR/2015/CR-tabular-metadata-20150716/
+"""
 from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import chain
 
-from sqlalchemy import types
+from sqlalchemy import types, Column
 from sqlalchemy.inspection import inspect
 from pyramid.renderers import render as pyramid_render
 
@@ -39,19 +48,16 @@ class CsvAdapter(Index):
         return res
 
 
-class JsonTableSchemaAdapter(Index):
+class CsvmJsonAdapter(Index):
 
-    """Schema for the columns in a table.
+    """Metadata for tabular data serialited as csv.
 
-    Renders tables as
-    `JSON table schema <http://dataprotocols.org/json-table-schema/>`_
-
-    .. seealso:: http://csvlint.io/about
+    .. seealso:: http://www.w3.org/TR/tabular-metadata/
     """
 
-    extension = 'csv.csvm'
+    extension = 'csv-metadata.json'
     mimetype = 'application/csvm+json'
-    send_mimetype = 'application/json'
+    send_mimetype = 'application/csvm+json'
     rel = 'describedby'
 
     type_map = [
@@ -64,46 +70,63 @@ class JsonTableSchemaAdapter(Index):
         (types.String, 'http://www.w3.org/2001/XMLSchema#string'),
     ]
 
-    def render(self, ctx, req):
-        fields = []
+    @classmethod
+    def csvm_doc(cls, url, req, cols):
         primary_key = None
         foreign_keys = []
-        item = ctx.get_query(limit=1).first()
-        if item:
-            cls = inspect(item).class_
+        columns = []
 
-            for field in item.csv_head():
-                spec = {
-                    'name': field,
-                    'constraints': {'type': 'http://www.w3.org/2001/XMLSchema#string'}}
-                col = getattr(cls, field, None)
-                if col:
-                    try:
-                        col = col.property.columns[0]
-                    except AttributeError:  # pragma: no cover
-                        col = None
-                if col is not None:
-                    if len(col.foreign_keys) == 1:
-                        fk = list(col.foreign_keys)[0]
-                        foreign_keys.append({
-                            'fields': field,
-                            'reference': {
-                                'resource': fk.column.table.name,
-                                'fields': fk.column.name}
-                        })
-                    if col.primary_key:
-                        primary_key = field
-                    for t, s in self.type_map:
-                        if isinstance(col.type, t):
-                            spec['constraints']['type'] = s
-                            break
-                    spec['constraints']['unique'] = bool(col.primary_key or col.unique)
-                    if col.doc:
-                        spec['description'] = col.doc
-                fields.append(spec)
-        doc = {'fields': fields}
+        for name, col in cols:
+            spec = {
+                'name': name,
+                'datatype': {'@id': 'http://www.w3.org/2001/XMLSchema#string'}}
+            if col is not None and not isinstance(col, Column):
+                try:
+                    col = col.property.columns[0]
+                except AttributeError:  # pragma: no cover
+                    col = None
+                    raise
+            if col is not None:
+                if len(col.foreign_keys) == 1:
+                    fk = list(col.foreign_keys)[0]
+                    foreign_keys.append({
+                        'columnReference': name,
+                        'reference': {
+                            'resource': fk.column.table.name,
+                            'columnReference': fk.column.name}
+                    })
+                if col.primary_key:
+                    primary_key = name
+                for t, s in cls.type_map:
+                    if isinstance(col.type, t):
+                        spec['datatype']['@id'] = s
+                        break
+                if col.doc:
+                    spec['dc:description'] = col.doc
+            columns.append(spec)
+        tableSchema = {'columns': columns}
         if primary_key:
-            doc['primaryKey'] = primary_key
+            tableSchema['primaryKey'] = primary_key
         if foreign_keys:
-            doc['foreignKeys'] = foreign_keys
+            tableSchema['foreignKeys'] = foreign_keys
+        return {
+            "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+            "url": url,
+            "dc:publisher": {
+                "schema:name": req.dataset.publisher_name,
+                "schema:url": {"@id": req.dataset.publisher_url}
+            },
+            "dc:license": {"schema:name": req.dataset.license},
+            "tableSchema": tableSchema}
+
+    def render(self, ctx, req):
+        item = ctx.get_query(limit=1).first()
+        cls = inspect(item).class_ if item else None
+        doc = self.csvm_doc(
+            req.url.replace('.csv-metadata.json', '.csv'),
+            req,
+            [(field, getattr(cls, field, None)) for field in item.csv_head()])
+        doc["dc:title"] = "{0} - {1}".format(req.dataset.name, ctx)
+        if req.dataset.jsondata.get('license_url'):
+            doc["dc:license"]["@id"] = req.dataset.jsondata.get('license_url')
         return pyramid_render('json', doc, request=req)

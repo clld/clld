@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 from sqlalchemy import create_engine, null
 from sqlalchemy.orm import sessionmaker
 from path import path
+from mock import Mock
 
 from clld.tests.util import TestWithEnv
 from clld.db.meta import Base, DBSession
@@ -23,6 +24,7 @@ class Tests(TestWithEnv):
         class Args(object):
             env = self.env
             module_dir = tmp
+            module = Mock(__name__='name')
 
             def data_file(self, *comps):
                 return tmp.joinpath('data', *comps)
