@@ -2,6 +2,12 @@
 Changes
 -------
 
+1.0.1
+~~~~~
+
+fixed bug where the freeze function would fail on non-ascii dataset metadata.
+
+
 1.0.0
 ~~~~~
 
