@@ -183,7 +183,7 @@ def freeze_readme(dataset, req):  # pragma: no cover
         dataset.name,
         '=' * (len(dataset.name.encode('utf8')) + len(' data dump')),
         dataset.license,
-        TxtCitation(None).render(dataset, req).encode('utf8'),
+        TxtCitation(None).render(dataset, req),
         dataset.domain,
         dataset.id)
 

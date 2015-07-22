@@ -24,7 +24,7 @@ class Tests(TestWithDbAndData):
         from clld.db.models.common import Dataset
         from clld.db.meta import DBSession
 
-        for qs, count in [('Ata', 1), ('^ata$', 0), ('^data', 1), ('set$', 1)]:
+        for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('set$', 1)]:
             q = DBSession.query(Dataset).filter(icontains(Dataset.name, qs))
             self.assertEqual(q.count(), count)
 

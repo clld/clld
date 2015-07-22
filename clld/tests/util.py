@@ -97,8 +97,8 @@ class TestWithDbAndData(TestWithDb):
 
         DBSession.add(common.Dataset(
             id='dataset',
-            name='dataset',
-            description='desc',
+            name='dätäset',
+            description='düscriptiön',
             domain='clld',
             jsondata={'license_icon': 'cc-by', 'license_url': 'http://example.org'}))
 
