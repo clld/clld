@@ -98,7 +98,8 @@ def bibtex2source(rec, cls=common.Source):
             authors = authors[:1]
             etal = ' et al.'
 
-        authors = [HumanName(a).last for a in authors]
+        authors = [HumanName(a) for a in authors]
+        authors = [n.last or n.first for n in authors]
         authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(

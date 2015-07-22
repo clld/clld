@@ -2,6 +2,12 @@
 Changes
 -------
 
+1.0.2
+~~~~~
+
+fixed bug where weird author lists could not be parsed.
+
+
 1.0.1
 ~~~~~
 
