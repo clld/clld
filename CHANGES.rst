@@ -2,6 +2,15 @@
 Changes
 -------
 
+1.1.0
+~~~~~
+
+Fixing a bug for pacific centered maps of a single language, where the center
+coordinates were not corrected accordingly. This fix turned into a refactoring
+of the GeoJSON generation, reverting back to not using __geo_interface__ since
+this means sprinkling GeoJSN-creating code over multiple modules.
+
+
 1.0.2
 ~~~~~
 
