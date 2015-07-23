@@ -91,14 +91,6 @@ class Language(Base,
             return objs[0].name
 
     @property
-    def __geo_interface__(self):
-        return {
-            'id': self.id,
-            'type': 'Feature',
-            'properties': {'name': self.name},
-            'geometry': {'type': 'Point', 'coordinates': (self.longitude, self.latitude)}}
-
-    @property
     def iso_code(self):
         return self.get_identifier(IdentifierType.iso)
 

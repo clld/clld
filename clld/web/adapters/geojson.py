@@ -48,17 +48,41 @@ def flatten(d):
     return dict(_flatten(d))
 
 
-def pacific_centered_coordinates(longitude, latitude):
-    """Re-compute coordinates, to make markers on the map appear pacific-centered.
+def get_lonlat(obj):
+    """
+    Return coordinates of an object taking into account whether maps are pacific centered.
 
-    The world should be divided between Icelandic (westernmost language) and
+    Pacific centered means
+    the world should be divided between Icelandic (westernmost language) and
     Tupi (easternmost language), i.e. between -17 and -36.
 
     We chose -26 as divider because that puts cape verde to the west of africa.
 
     .. seealso: https://github.com/Leaflet/Leaflet/issues/1360
     """
-    return [longitude if longitude > -26 else longitude + 360, latitude]
+    if hasattr(obj, 'latitude') and hasattr(obj, 'longitude'):
+        longitude, latitude = obj.longitude, obj.latitude
+    elif isinstance(obj, (tuple, list)) and len(obj) == 2:
+        longitude, latitude = obj
+    else:
+        return
+    if longitude is None or latitude is None:
+        return
+    if _PACIFIC_CENTERED and longitude <= -26:
+        longitude += 360
+    return longitude, latitude
+
+
+def get_feature(obj, lonlat=None, **properties):
+    res = {
+        'type': 'Feature',
+        'properties': properties,
+        'geometry': {'type': 'Point', 'coordinates': lonlat or get_lonlat(obj)}}
+    if hasattr(obj, 'id'):
+        res['id'] = obj.id
+    if hasattr(obj, 'name'):
+        res['properties'].setdefault('name', obj.name)
+    return res
 
 
 @implementer(interfaces.IRepresentation)
@@ -102,22 +126,17 @@ class GeoJson(Renderable):
         """override to fetch language object from non-default location."""
         return feature
 
-    def get_geojson_feature(self, ctx, req, feature, language):
-        f = language.__geo_interface__
-        if _PACIFIC_CENTERED:
-            f['geometry']['coordinates'] = pacific_centered_coordinates(
-                *f['geometry']['coordinates'])
-        f['properties'].update(icon=self.map_marker(feature, req), language=language)
-        f['properties'].update(self.feature_properties(ctx, req, feature) or {})
-        return f
-
     def get_features(self, ctx, req):
-        self.map_marker = req.registry.getUtility(interfaces.IMapMarker)
+        map_marker = req.registry.getUtility(interfaces.IMapMarker)
 
         for feature in self.feature_iterator(ctx, req):
             language = self.get_language(ctx, req, feature)
-            if language.longitude is not None and language.latitude is not None:
-                yield self.get_geojson_feature(ctx, req, feature, language)
+            lonlat = get_lonlat(language)
+            if lonlat:
+                properties = self.feature_properties(ctx, req, feature) or {}
+                properties.setdefault('icon', map_marker(feature, req))
+                properties.setdefault('language', language)
+                yield get_feature(language, lonlat=lonlat, **properties)
 
     def render(self, ctx, req, dump=True):
         res = {
