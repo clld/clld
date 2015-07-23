@@ -50,7 +50,7 @@ install_requires = [
     'html5lib==0.999999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
-    'webhelpers2>=2.0rc1',
+    'webhelpers2>=2.0',
     'nameparser',
 ]
 
@@ -58,9 +58,9 @@ if not PY3:
     install_requires.append('Babel')
 
 tests_require = [
-    'WebTest >= 1.3.1', # py3 compat
+    'WebTest >= 1.3.1',  # py3 compat
     'pep8',
-    'mock',
+    'mock==1.0',
     'selenium',
 ]
 
@@ -75,14 +75,13 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
-    #'nosexcover',
     'coverage',
-    'virtualenv', # for scaffolding tests
+    'virtualenv',  # for scaffolding tests
 ]
 
 setup(
     name='clld',
-    version='1.0.2',
+    version='1.1.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,

@@ -8,7 +8,7 @@ from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
 from clld.web.util.component import Component
 from clld.web.adapters.geojson import (
-    GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement,
+    GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement, get_lonlat,
 )
 from clld.util import cached_property
 
@@ -344,18 +344,15 @@ class LanguageMap(Map):
 
     """Map showing a single language."""
 
-    def get_language(self):
-        return self.ctx
-
     def get_layers(self):
-        lang = self.get_language()
-        geojson = _GeoJson(lang)
-        yield Layer(lang.id, lang.name, geojson.render(lang, self.req, dump=False))
+        yield Layer(
+            self.ctx.id,
+            self.ctx.name,
+            _GeoJson(self.ctx).render(self.ctx, self.req, dump=False))
 
     def get_default_options(self):
-        lang = self.get_language()
         return {
-            'center': [lang.latitude, lang.longitude],
+            'center': list(reversed(get_lonlat(self.ctx))),
             'zoom': 3,
             'no_popup': True,
             'no_link': True,
