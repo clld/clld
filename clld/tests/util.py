@@ -104,7 +104,7 @@ class TestWithDbAndData(TestWithDb):
 
         DBSession.add(common.Source(
             id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))
-        source = common.Source(id='source')
+        source = common.Source(id='source', name='the source')
         contributors = {
             'contributor': 'A Name',
             'b': 'b Name',
@@ -164,7 +164,7 @@ class TestWithDbAndData(TestWithDb):
         paramnd = common.Parameter(id='no-domain', name='Parameter without domain')
         valueset = common.ValueSet(
             id='vs2', language=language, parameter=paramnd, contribution=contribution)
-        common.ValueSetReference(valueset=valueset, source=source)
+        common.ValueSetReference(valueset=valueset, source=source, description='10-20')
         value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
         DBSession.add(value)
 

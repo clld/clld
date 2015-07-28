@@ -9,7 +9,7 @@ from operator import itemgetter
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound
 
-from sqlalchemy import join, and_
+from sqlalchemy import join, and_, true
 
 from clld import RESOURCES
 from clld.db.meta import DBSession
@@ -70,7 +70,8 @@ def sitemapindex(req):
                 for i in range(n):
                     yield dict(loc=req.route_url('sitemap', rsc=r.name, n=i))
 
-    return _response('sitemapindex', _iter(req.registry.settings.get('sitemaps', [])))
+    return _response(
+        'sitemapindex', _iter(req.registry.settings.get('clld.sitemaps', [])))
 
 
 def sitemap(req):
@@ -109,7 +110,7 @@ def resourcemap(req):
             common.Identifier, and_(
                 common.LanguageIdentifier.identifier_pk == common.Identifier.pk,
                 common.Identifier.type != 'name')
-        )).filter(common.Language.active == True).order_by(common.Language.id)
+        )).filter(common.Language.active == true()).order_by(common.Language.id)
 
         def resources():
             for (id, name, lat, lon), rows in groupby(q, itemgetter(0, 1, 2, 3)):

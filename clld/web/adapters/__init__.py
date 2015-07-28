@@ -93,10 +93,7 @@ def includeme(config):
         'clld:web/templates/language/kml.mako',
         {'send_mimetype': 'application/xml'}))
 
-    for i, spec in enumerate(specs):
-        interface, base, mimetype, extension, template, extra = spec
-        extra.update(base=base, mimetype=mimetype, extension=extension, template=template)
-        config.register_adapter(extra, interface, name=mimetype)
+    config.register_adapters(specs)
 
     for cls in [BibTex, TxtCitation, ReferenceManager]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:

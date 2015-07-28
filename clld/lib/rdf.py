@@ -28,6 +28,7 @@ NAMESPACES = {
     "foaf": FOAF,
     "frbr": Namespace("http://purl.org/vocab/frbr/core#"),
     "dcterms": DCTERMS,
+    "dctype": Namespace("http://purl.org/dc/dcmitype/"),
     "rdfs": RDFS,
     "geo": Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#"),
     "isbd": Namespace("http://iflastandards.info/ns/isbd/elements/"),

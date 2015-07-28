@@ -1,4 +1,6 @@
 """Functionality to represent clld objects as RDF graphs and serializations."""
+from sqlalchemy.orm import load_only
+
 from clld.web.adapters.base import Representation, Index
 from clld.lib.rdf import convert
 from clld.util import xmlchars
@@ -30,8 +32,13 @@ class RdfIndex(Index):
     def render(self, ctx, req):
         if req.params.get('sEcho'):
             # triggered from a datatable, thus potentially filtered and sorted
-            items = [item.id for item in ctx.get_query(limit=1000)]
+            items = ctx.get_query(limit=1000)
         else:
             # triggered without any filter parameters
-            items = [row[0] for row in req.db.query(ctx.model.id)]
+            items = req.db.query(ctx.model).order_by(ctx.model.pk)
+        if isinstance(ctx.model.name, property):
+            items = [(item.id, None) for item in items.options(load_only('id'))]
+        else:
+            items = [(item.id, item.name)
+                     for item in items.options(load_only('id', 'name'))]
         return convert(super(RdfIndex, self).render(items, req), 'xml', self.rdflibname)
