@@ -104,7 +104,7 @@ class TestWithDbAndData(TestWithDb):
 
         DBSession.add(common.Source(
             id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))
-        source = common.Source(id='source')
+        source = common.Source(id='source', name='the source')
         contributors = {
             'contributor': 'A Name',
             'b': 'b Name',

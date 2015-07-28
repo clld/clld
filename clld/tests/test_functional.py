@@ -8,8 +8,8 @@ class Tests(TestWithApp):
 
     def test_sitemapindex(self):
         self.app.get_xml('/sitemap.xml')
-        self.assertEquals(len(self.app.parsed_body.findall(
-            '{http://www.sitemaps.org/schemas/sitemap/0.9}sitemap')), 1)
+        self.assertTrue(len(self.app.parsed_body.findall(
+            '{http://www.sitemaps.org/schemas/sitemap/0.9}sitemap')) > 0)
 
     def test_sitemap(self):
         self.app.get_xml('/sitemap.language.0.xml')
@@ -39,6 +39,10 @@ class Tests(TestWithApp):
             self.app.get('/sources/source.' + ext)
             self.app.get('/sources.' + ext)
         self.app.get_xml('/sources.rdf?sEcho=1')
+        # resources with a name should be listed with rdfs:label in rdf index.
+        # see https://github.com/clld/clld/issues/66
+        self.assertTrue(len(self.app.parsed_body.findall(
+            '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description')) > 0)
 
     def test_replacement(self):
         self.app.get('/languages/replaced', status=301)
