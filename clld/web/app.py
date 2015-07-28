@@ -31,10 +31,12 @@ from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld import Resource, RESOURCES
 from clld import interfaces
+from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.adapters import geojson
-from clld.web.adapters.base import adapter_factory, Index
+from clld.web.adapters.base import adapter_factory, Index, Json
+from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters.cldf import CldfDownload
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
@@ -332,6 +334,12 @@ def register_adapter(config, cls, from_, to_=None, name=None):
     config.registry.registerAdapter(cls, (from_,), to_, name=name)
 
 
+def register_adapters(config, specs):
+    for interface, base, mimetype, extension, template, extra in specs:
+        extra.update(base=base, mimetype=mimetype, extension=extension, template=template)
+        config.register_adapter(extra, interface, name=mimetype)
+
+
 def register_menu(config, *items):
     """Register an item for the main menu.
 
@@ -416,9 +424,34 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
             _kw['template'] = '%s/%s' % (name, tmpl)
             config.register_adapter(_kw, interface)
 
-    #
-    # TODO: register download!?
-    #
+    cls = type('Json%s' % rsc.model.__name__, (Json,), {})
+    config.register_adapter(
+        cls, interface, to_=interfaces.IRepresentation, name=Json.mimetype)
+
+    specs = []
+
+    if templates.joinpath(name, 'rdf.mako').exists() or kw.get('test'):
+        # ... as RDF in various notations
+        for notation in RDF_NOTATIONS.values():
+            specs.append((
+                interface,
+                Rdf,
+                notation.mimetype,
+                notation.extension,
+                name + '/rdf.mako',
+                {
+                    'name': 'RDF serialized as %s' % notation.name,
+                    'rdflibname': notation.name}))
+
+    # ... as RDF collection index
+    specs.append((
+        interface,
+        RdfIndex,
+        RDF_NOTATIONS['xml'].mimetype,
+        RDF_NOTATIONS['xml'].extension,
+        'index_rdf.mako', {'rdflibname': RDF_NOTATIONS['xml'].name}))
+
+    config.register_adapters(specs)
 
 
 def register_download(config, download):
@@ -503,6 +536,7 @@ def includeme(config):
         'register_menu': register_menu,
         'register_resource': register_resource,
         'register_adapter': register_adapter,
+        'register_adapters': register_adapters,
         'register_download': register_download,
         'add_route_and_view': add_route_and_view,
         'add_settings_from_file': add_settings_from_file,
