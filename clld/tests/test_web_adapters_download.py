@@ -8,7 +8,7 @@ from xml.etree import cElementTree as et
 from mock import Mock, MagicMock, patch
 
 from clld.util import UnicodeMixin
-from clld.db.models.common import Language, Source
+from clld.db.models.common import Language, Source, Dataset
 from clld.tests.util import TestWithEnv
 
 
@@ -55,6 +55,7 @@ class Tests(TestWithEnv):
 
     def testDownload2(self):
         from clld.web.adapters.download import CsvDump, N3Dump, RdfXmlDump
+        from clld.web.adapters.cldf import CldfDownload
 
         tmp = mktemp()
 
@@ -67,6 +68,18 @@ class Tests(TestWithEnv):
 
             def open(self, mode):
                 return open(tmp, mode)
+
+        with patch.multiple(
+            'clld.web.adapters.cldf',
+            ZipFile=MagicMock(),
+            path=MagicMock(return_value=Path()),
+        ):
+            with patch(
+                'clld.web.adapters.download.path',
+                new=MagicMock(return_value=Path()),
+            ):
+                dl = CldfDownload(Dataset, 'clld')
+                dl.create(self.env['request'], verbose=False)
 
         with patch.multiple(
             'clld.web.adapters.download',

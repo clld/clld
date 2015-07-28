@@ -35,6 +35,7 @@ from clld.web.adapters import get_adapters
 from clld.web.adapters import excel
 from clld.web.adapters import geojson
 from clld.web.adapters.base import adapter_factory, Index
+from clld.web.adapters.cldf import CldfDownload
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
     select_combination,
@@ -652,3 +653,5 @@ def includeme(config):
         mod = maybe_import('%s.%s' % (root_package, name))
         if mod and hasattr(mod, 'includeme'):
             config.include(mod)
+
+    config.register_download(CldfDownload(common.Dataset, root_package))

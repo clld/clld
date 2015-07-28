@@ -71,6 +71,22 @@ class CsvmJsonAdapter(Index):
     ]
 
     @classmethod
+    def csvm_basic_doc(cls, req, **kw):
+        doc = {
+            "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+            "dc:publisher": {
+                "schema:name": req.dataset.publisher_name,
+                "schema:url": {"@id": req.dataset.publisher_url}
+            },
+            "dc:license": {"schema:name": req.dataset.license}
+        }
+        if req.dataset.jsondata.get('license_url'):
+            doc["dc:license"]["@id"] = req.dataset.jsondata.get('license_url')
+        for k, v in kw.items():
+            doc[k] = v
+        return doc
+
+    @classmethod
     def csvm_doc(cls, url, req, cols):
         primary_key = None
         foreign_keys = []
@@ -109,15 +125,7 @@ class CsvmJsonAdapter(Index):
             tableSchema['primaryKey'] = primary_key
         if foreign_keys:
             tableSchema['foreignKeys'] = foreign_keys
-        return {
-            "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-            "url": url,
-            "dc:publisher": {
-                "schema:name": req.dataset.publisher_name,
-                "schema:url": {"@id": req.dataset.publisher_url}
-            },
-            "dc:license": {"schema:name": req.dataset.license},
-            "tableSchema": tableSchema}
+        return cls.csvm_basic_doc(req, url=url, tableSchema=tableSchema)
 
     def render(self, ctx, req):
         item = ctx.get_query(limit=1).first()
@@ -127,6 +135,4 @@ class CsvmJsonAdapter(Index):
             req,
             [(field, getattr(cls, field, None)) for field in item.csv_head()])
         doc["dc:title"] = "{0} - {1}".format(req.dataset.name, ctx)
-        if req.dataset.jsondata.get('license_url'):
-            doc["dc:license"]["@id"] = req.dataset.jsondata.get('license_url')
         return pyramid_render('json', doc, request=req)
