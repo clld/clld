@@ -1,6 +1,6 @@
 <rdf:RDF  ${h.rdf_namespace_attrs()|n}>
     <%! from clld.lib.rdf import FORMATS %>
-    <%! from clld import RESOURCES %>
+    <%! from clld import RESOURCES, __version__ %>
     <% rscs = [rsc for rsc in RESOURCES if rsc.name != 'testresource'] %>
     <% TxtCitation = h.get_adapter(h.interfaces.IRepresentation, ctx, request, ext='md.txt') %>
     <void:Dataset rdf:about="${request.route_url('dataset')}">
@@ -57,4 +57,7 @@ ${TxtCitation.render(request.dataset, request)}
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>
         <foaf:mbox>${request.dataset.id}@eva.mpg.de</foaf:mbox>
     </foaf:Organization>
+    <dctype:Software rdf:about="https://github.com/clld/clld">
+        <dcterms:identifier rdf:resource="https://github.com/clld/clld/releases/tag/${__version__}"/>
+    </dctype:Software>
 </rdf:RDF>
