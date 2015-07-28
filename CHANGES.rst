@@ -2,6 +2,13 @@
 Changes
 -------
 
+1.2.0
+~~~~~
+
+Closes https://github.com/clld/clld/issues/69
+and https://github.com/clld/clld/milestones/Release%201.2.0
+
+
 1.1.0
 ~~~~~
 
