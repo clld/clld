@@ -8,6 +8,8 @@ class Tests(TestWithApp):
 
     def test_sitemapindex(self):
         self.app.get_xml('/sitemap.xml')
+        self.assertEquals(len(self.app.parsed_body.findall(
+            '{http://www.sitemaps.org/schemas/sitemap/0.9}sitemap')), 1)
 
     def test_sitemap(self):
         self.app.get_xml('/sitemap.language.0.xml')
