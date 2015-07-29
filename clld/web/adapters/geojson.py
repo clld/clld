@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 from clld.web.adapters.base import Renderable
 from clld import interfaces
 from clld.db.meta import DBSession
-from clld.db.models.common import ValueSet, Value
+from clld.db.models.common import ValueSet, Value, Language
 
 
 _PACIFIC_CENTERED = False
@@ -116,7 +116,20 @@ class GeoJson(Renderable):
         return {}
 
     def feature_iterator(self, ctx, req):
-        return iter([])  # pragma: no cover
+        """Yield objects which will be represented as GeoJSON features.
+
+        Since the only objects we have geographic info about are Languages, we try to
+        detect (collections of) Languages associated with ctx.
+
+        :return: generator object.
+        """
+        if interfaces.IDataTable.providedBy(ctx) and ctx.model == Language:
+            return ctx.get_query(limit=5000)
+        if hasattr(ctx, 'languages'):
+            return ctx.languages
+        if interfaces.ILanguage.providedBy(ctx):
+            return [ctx]
+        return []
 
     def feature_properties(self, ctx, req, feature):
         """override to add properties."""
@@ -197,9 +210,6 @@ class GeoJsonCombinationDomainElement(GeoJson):
 
     """GeoJSON adapter for a domain element of a combination of parameters."""
 
-    def feature_iterator(self, ctx, req):
-        return ctx.languages
-
     def feature_properties(self, ctx, req, language):
         return {
             'icon': ctx.icon.url(req) if ctx.icon else '',
@@ -226,8 +236,4 @@ class GeoJsonParameterFlatProperties(GeoJsonParameter):
 
 @implementer(interfaces.IIndex)
 class GeoJsonLanguages(GeoJson):
-
     """Render a collection of languages as geojson feature collection."""
-
-    def feature_iterator(self, ctx, req):
-        return ctx.get_query(limit=5000)

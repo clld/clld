@@ -135,8 +135,10 @@ class IDownload(Interface):
 
 
 class IDataTable(Interface):
+    model = Attribute('model class of the objects listed in the table')
 
-    """marker."""
+    def get_query(request, model, **kw):
+        """called to retrieve a filtered and sorted sqla query."""
 
 
 class IMap(Interface):
