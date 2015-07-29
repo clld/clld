@@ -2,6 +2,12 @@
 Changes
 -------
 
+1.2.1
+~~~~~
+
+See https://github.com/clld/clld/commit/f6c679dc33ff090c735a0fbf624d27f5e4987d13
+
+
 1.2.0
 ~~~~~
 

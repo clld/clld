@@ -7,9 +7,7 @@ from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
 from clld.web.util.component import Component
-from clld.web.adapters.geojson import (
-    GeoJson, GeoJsonLanguages, GeoJsonCombinationDomainElement, get_lonlat,
-)
+from clld.web.adapters.geojson import GeoJson, GeoJsonCombinationDomainElement, get_lonlat
 from clld.util import cached_property
 
 
@@ -335,11 +333,6 @@ class CombinationMap(Map):
         return {'icon_size': 25, 'hash': True}
 
 
-class _GeoJson(GeoJsonLanguages):
-    def feature_iterator(self, ctx, req):
-        return [ctx]
-
-
 class LanguageMap(Map):
 
     """Map showing a single language."""
@@ -348,18 +341,18 @@ class LanguageMap(Map):
         yield Layer(
             self.ctx.id,
             self.ctx.name,
-            _GeoJson(self.ctx).render(self.ctx, self.req, dump=False))
+            GeoJson(self.ctx).render(self.ctx, self.req, dump=False))
 
     def get_default_options(self):
         return {
-            'center': list(reversed(get_lonlat(self.ctx))),
+            'center': list(reversed(get_lonlat(self.ctx) or [0, 0])),
             'zoom': 3,
             'no_popup': True,
             'no_link': True,
             'sidebar': True}
 
 
-class GeoJsonSelectedLanguages(GeoJsonLanguages):
+class GeoJsonSelectedLanguages(GeoJson):
 
     """Represents the geo-data of an iterable selection of languages.
 

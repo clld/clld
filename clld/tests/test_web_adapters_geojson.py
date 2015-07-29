@@ -3,11 +3,19 @@ from mock import Mock
 from clld.db.models.common import Parameter, Language
 from clld.tests.util import TestWithEnv
 from clld.web.adapters import geojson
+from clld.web.datatables.base import DataTable
 
 geojson.pacific_centered()
 
 
 class Tests(TestWithEnv):
+    def test_GeoJson(self):
+        adapter = geojson.GeoJson(None)
+        self.assertEquals(len(list(adapter.feature_iterator(None, None))), 0)
+        self.assertEquals(len(list(adapter.feature_iterator(Language(), None))), 1)
+        self.assertEquals(
+            len(list(adapter.feature_iterator(Mock(languages=[Language()]), None))), 1)
+
     def test_GeoJsonParameter(self):
         adapter = geojson.GeoJsonParameter(None)
         self.assertTrue(
@@ -28,13 +36,15 @@ class Tests(TestWithEnv):
             '{' in adapter.render(Parameter.get('no-domain'), self.env['request']))
 
     def test_GeoJsonLanguages(self):
-        class MockLanguages(Mock):
+        class MockLanguages(DataTable):
             def get_query(self, *args, **kw):
                 return [Language.first()]
 
         adapter = geojson.GeoJsonLanguages(None)
-        self.assertTrue(
-            '{' in adapter.render(MockLanguages(), self.env['request']))
+        self.assertIn(
+            'Point',
+            adapter.render(
+                MockLanguages(self.env['request'], Language), self.env['request']))
 
     def test_get_lonlat(self):
         self.assertIsNone(geojson.get_lonlat(None))
