@@ -21,6 +21,7 @@ class Tests(TestWithApp):
         self.app.get_html('/?__admin__=1')
         self.app.get_xml('/', accept='application/rdf+xml')
         self.app.get('/void.md.ris')
+        assert 'skos:example' in self.app.get_xml('/void.rdf')
 
     def test_resources(self):
         for rsc in RESOURCES:
