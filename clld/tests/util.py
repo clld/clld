@@ -61,6 +61,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('clld.web.app')
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
+    config.register_staticresource('css', 'clld:web/static/notexisting.css')
+    config.register_staticresource('js', 'clld:web/static/notexisting.js')
     config.register_adapter(Representation, Mock, name='test')
     config.register_menu(('home', lambda ctx, req: (req.resource_url(req.dataset), 'tt')))
     return config.make_wsgi_app()
