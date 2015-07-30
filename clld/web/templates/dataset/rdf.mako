@@ -35,20 +35,18 @@ ${TxtCitation.render(request.dataset, request)}
     </void:Dataset>
 % for rsc in rscs:
     <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
-    % if not dls:
-        % if rsc.name in sitemaps:
-            <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-                <skos:hiddenLabel>${rsc.name}</skos:hiddenLabel>
-                <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
-            </void:Dataset>
-        % endif
-    % else:
-        <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-            <skos:hiddenLabel>${rsc.name}</skos:hiddenLabel>
+    % if dls or (rsc.name in sitemaps):
+    <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
+        <skos:hiddenLabel>${rsc.name}</skos:hiddenLabel>
+        <skos:example>${request.route_url(rsc.name, id='---').replace('---', '{id}')}</skos:example>
+        % if dls:
             % for dl in dls:
             <void:dataDump rdf:resource="${dl.url(request)}"/>
             % endfor
-        </void:Dataset>
+        % else:  ## rsc.name in sitemaps
+        <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
+        % endif
+    </void:Dataset>
     % endif
 % endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">

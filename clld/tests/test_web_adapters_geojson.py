@@ -1,3 +1,5 @@
+import json
+
 from mock import Mock
 
 from clld.db.models.common import Parameter, Language
@@ -22,8 +24,9 @@ class Tests(TestWithEnv):
             '{' in adapter.render(Parameter.get('no-domain'), self.env['request']))
 
         self.set_request_properties(params=dict(domainelement='de'))
-        self.assertTrue(
-            '{' in adapter.render(Parameter.get('parameter'), self.env['request']))
+        res = json.loads(adapter.render(Parameter.get('parameter'), self.env['request']))
+        self.assertTrue(len(res['features']) > 0)
+        self.assertIn('label', res['features'][0]['properties'])
 
     def test_GeoJsonParameterMultipleValueSets(self):
         adapter = geojson.GeoJsonParameterMultipleValueSets(None)

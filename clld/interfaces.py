@@ -230,3 +230,11 @@ class IBlog(Interface):
 
     def post_url(self, ctx, req):
         """return URL of a corresponding post."""
+
+
+class IStaticResource(Interface):
+
+    """A resource to be linked from the app template."""
+
+    type = Attribute('js or css')
+    asset_spec = Attribute('asset spec to be passed to request.static_url')

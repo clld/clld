@@ -41,6 +41,13 @@
         <link rel="unapi-server" type="application/xml" title="unAPI" href="${request.route_url('unapi')}">
         <script src="${request.route_url('_js', _query=request.query_params)}"></script>
         <%block name="head"> </%block>
+        % for name, util in request.registry.getUtilitiesFor(h.interfaces.IStaticResource):
+            % if util.type == 'css':
+            <link href="${request.static_url(util.asset_spec)}" rel="stylesheet">
+            % elif util.type == 'js':
+            <script src="${request.static_url(util.asset_spec)}"></script>
+            % endif
+        % endfor
     </head>
     <body id="r-${request.matched_route.name if request.matched_route else 'body'}">
         <%block name="header"></%block>

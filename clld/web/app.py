@@ -1,6 +1,6 @@
 """Common functionality of clld Apps is cobbled together here."""
 from functools import partial
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 import re
 import importlib
 from hashlib import md5
@@ -458,6 +458,14 @@ def register_download(config, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
+StaticResource = namedtuple('StaticResource', 'type asset_spec')
+
+
+def register_staticresource(config, type, asset_spec):
+    config.registry.registerUtility(
+        StaticResource(type, asset_spec), interfaces.IStaticResource, name=asset_spec)
+
+
 def add_settings_from_file(config, file_):
     if file_.exists():
         cfg = get_config(file_)
@@ -538,6 +546,7 @@ def includeme(config):
         'register_adapter': register_adapter,
         'register_adapters': register_adapters,
         'register_download': register_download,
+        'register_staticresource': register_staticresource,
         'add_route_and_view': add_route_and_view,
         'add_settings_from_file': add_settings_from_file,
         'add_301': add_301,

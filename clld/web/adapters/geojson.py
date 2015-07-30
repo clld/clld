@@ -11,6 +11,7 @@ from pyramid.renderers import render as pyramid_render
 from sqlalchemy.orm import joinedload
 
 from clld.web.adapters.base import Renderable
+from clld.util import nfilter
 from clld import interfaces
 from clld.db.meta import DBSession
 from clld.db.models.common import ValueSet, Value, Language
@@ -188,7 +189,9 @@ class GeoJsonParameter(GeoJson):
         return valueset.language
 
     def feature_properties(self, ctx, req, valueset):
-        return {'values': list(valueset.values)}
+        return {
+            'values': list(valueset.values),
+            'label': ', '.join(nfilter(v.name for v in valueset.values))}
 
 
 class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
