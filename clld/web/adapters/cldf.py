@@ -20,6 +20,7 @@ from clld.lib.bibtex import Database
 
 class CldfDownload(Download):
     ext = 'cldf'
+    description = "Dataset in CLDF"
 
     @staticmethod
     def route_url_pattern(req, route, id=None):
