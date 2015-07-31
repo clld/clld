@@ -2,6 +2,13 @@
 Changes
 -------
 
+1.4.0
+~~~~~
+
+Improvements to make client development easier. In particular see
+https://github.com/clld/clld/issues/75
+
+
 1.3.0
 ~~~~~
 

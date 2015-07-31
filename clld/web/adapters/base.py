@@ -70,8 +70,7 @@ class Representation(Renderable):
     """Base class for adapters implementing IRepresentation."""
 
 
-@implementer(interfaces.IRepresentation)
-class Json(Renderable):
+class _Json(Renderable):
 
     """JavaScript Object Notation."""
 
@@ -81,6 +80,16 @@ class Json(Renderable):
 
     def render(self, ctx, req):
         return pyramid_render('json', ctx, request=req)
+
+
+@implementer(interfaces.IRepresentation)
+class Json(_Json):
+    pass
+
+
+@implementer(interfaces.IIndex)
+class JsonIndex(_Json):
+    pass
 
 
 class SolrDoc(Json):
@@ -93,7 +102,8 @@ class SolrDoc(Json):
     extension = 'solr.json'
 
     def render(self, ctx, req):
-        return pyramid_render('json', ctx.__solr__(req), request=req)
+        return pyramid_render(
+            'json', ctx.__solr__(req) if hasattr(ctx, '__solr__') else {}, request=req)
 
 
 @implementer(interfaces.IIndex)

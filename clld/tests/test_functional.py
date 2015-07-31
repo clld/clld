@@ -31,9 +31,12 @@ class Tests(TestWithApp):
                 continue
             self.app.get_html('/{0}s/{0}'.format(rsc.name))
             self.app.get_html('/{0}s/{0}.snippet.html'.format(rsc.name), docroot='div')
-            self.app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+            res = self.app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+            assert 'skos:scopeNote' in res
             self.app.get_html('/%ss' % rsc.name)
             self.app.get_xml('/%ss.rdf' % rsc.name)
+            self.app.get_json('/{0}s.json'.format(rsc.name))
+            self.assertIn('columns', self.app.parsed_body)
             self.app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
         self.app.get_html('/combinations/parameter')
 

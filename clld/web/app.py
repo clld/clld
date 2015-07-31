@@ -31,12 +31,9 @@ from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld import Resource, RESOURCES
 from clld import interfaces
-from clld.lib.rdf import FORMATS as RDF_NOTATIONS
 from clld.web.adapters import get_adapters
-from clld.web.adapters import excel
-from clld.web.adapters import geojson
-from clld.web.adapters.base import adapter_factory, Index, Json
-from clld.web.adapters.rdf import Rdf, RdfIndex
+from clld.web.adapters import geojson, register_resource_adapters
+from clld.web.adapters.base import adapter_factory
 from clld.web.adapters.cldf import CldfDownload
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
@@ -394,6 +391,9 @@ def register_resource_routes_and_views(config, rsc):
             index_view,
             factory=partial(ctx_factory, rsc.model, 'index'))
 
+    config.register_datatable(
+        rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
+
 
 def register_resource(config, name, model, interface, with_index=False, **kw):
     """Directive to register custom resources.
@@ -407,51 +407,8 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
         return
     rsc = Resource(name, model, interface, with_index=with_index)
     RESOURCES.append(rsc)
-    config.register_adapter(excel.ExcelAdapter, interface)
     config.register_resource_routes_and_views(rsc)
-
-    # we register adapters for standard views, if the corresponding templates exists.
-    templates = path(config.root_package.__file__).dirname().joinpath('templates')
-    for tmpl, _kw in [
-        ('index_html.mako', dict(base=Index)),
-        ('detail_html.mako', {}),
-        ('snippet_html.mako', dict(
-            mimetype='application/vnd.clld.snippet+xml',
-            send_mimetype='text/html',
-            extension='snippet.html')),
-    ]:
-        if templates.joinpath(name, tmpl).exists() or kw.get('test'):
-            _kw['template'] = '%s/%s' % (name, tmpl)
-            config.register_adapter(_kw, interface)
-
-    cls = type('Json%s' % rsc.model.__name__, (Json,), {})
-    config.register_adapter(
-        cls, interface, to_=interfaces.IRepresentation, name=Json.mimetype)
-
-    specs = []
-
-    if templates.joinpath(name, 'rdf.mako').exists() or kw.get('test'):
-        # ... as RDF in various notations
-        for notation in RDF_NOTATIONS.values():
-            specs.append((
-                interface,
-                Rdf,
-                notation.mimetype,
-                notation.extension,
-                name + '/rdf.mako',
-                {
-                    'name': 'RDF serialized as %s' % notation.name,
-                    'rdflibname': notation.name}))
-
-    # ... as RDF collection index
-    specs.append((
-        interface,
-        RdfIndex,
-        RDF_NOTATIONS['xml'].mimetype,
-        RDF_NOTATIONS['xml'].extension,
-        'index_rdf.mako', {'rdflibname': RDF_NOTATIONS['xml'].name}))
-
-    config.register_adapters(specs)
+    register_resource_adapters(config, rsc)
 
 
 def register_download(config, download):
@@ -498,7 +455,16 @@ def includeme(config):
     :param config:
     :return:
     """
+    #
+    # now we exploit the default package layout as created via the CLLD scaffold:
+    #
+    # note: the following exploits the import time side effect of modifying the webassets
+    # environment!
     root_package = config.root_package.__name__
+    maybe_import('%s.assets' % root_package)
+
+    pkg_dir = path(config.root_package.__file__).dirname().abspath()
+
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
     json_renderer.add_adapter(datetime.date, lambda obj, req: obj.isoformat())
@@ -579,22 +545,13 @@ def includeme(config):
     config.add_route_and_view('unapi', '/unapi', unapi)
     config.add_route_and_view('olac', '/olac', olac)
 
+    config.add_settings_from_file(pkg_dir.joinpath('appconf.ini'))
+    if not config.registry.settings.get('mako.directories'):
+        config.add_settings({'mako.directories': ['clld:web/templates']})
+
     for rsc in RESOURCES:
         config.register_resource_routes_and_views(rsc)
-        config.register_datatable(
-            rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
-        config.register_adapter(
-            getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), rsc.interface)
-
-        #
-        # TODO: make these downloads optional!
-        #
-        # if rsc.with_rdfdump:
-        #    config.register_download(
-        #        N3Dump(
-        #            rsc.model,
-        #            root_package,
-        #            description="%s as RDF" % rsc.plural.capitalize()))
+        register_resource_adapters(config, rsc)
 
     # maps
     config.register_map('languages', Map)
@@ -608,15 +565,6 @@ def includeme(config):
         config.registry.registerUtility(icon, interfaces.IIcon, name=icon.name)
     config.registry.registerUtility(ORDERED_ICONS, interfaces.IIconList)
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
-
-    #
-    # now we exploit the default package layout as created via the CLLD scaffold:
-    #
-    # note: the following exploits the import time side effect of modifying the webassets
-    # environment!
-    maybe_import('%s.assets' % root_package)
-
-    pkg_dir = path(config.root_package.__file__).dirname().abspath()
 
     #
     # inspect default locations for views and templates:
@@ -675,8 +623,6 @@ def includeme(config):
     if pkg_dir.joinpath('static/publisher_logo.png').exists():  # pragma: no cover
         config.add_settings(
             {'clld.publisher_logo': '%s:static/publisher_logo.png' % root_package})
-
-    config.add_settings_from_file(pkg_dir.joinpath('appconf.ini'))
 
     if asbool(config.registry.settings.get('clld.pacific_centered_maps')):
         geojson.pacific_centered()

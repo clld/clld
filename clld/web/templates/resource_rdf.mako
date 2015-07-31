@@ -3,6 +3,9 @@
         <void:inDataset rdf:resource="${request.route_url('dataset')}"/>
         <rdfs:label xml:lang="en">${ctx}</rdfs:label>
         <skos:prefLabel xml:lang="en">${ctx}</skos:prefLabel>
+        % if h.get_resource_type(ctx):
+            <skos:scopeNote xml:lang="x-clld">${h.get_resource_type(ctx)}</skos:scopeNote>
+        % endif
         <dcterms:title xml:lang="en">${ctx}</dcterms:title>
         % if getattr(ctx, 'description'):
         <dcterms:description xml:lang="en">${ctx.description}</dcterms:description>
