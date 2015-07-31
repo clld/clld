@@ -38,7 +38,7 @@ ${TxtCitation.render(request.dataset, request)}
     % if dls or (rsc.name in sitemaps):
     <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
         <skos:prefLabel xml:lang="en">${_(rsc.name)}s</skos:prefLabel>
-        <skos:hiddenLabel>${rsc.name}</skos:hiddenLabel>
+        <skos:hiddenLabel xml:lang="x-clld">${rsc.name}</skos:hiddenLabel>
         <skos:example>${request.route_url(rsc.name, id='---').replace('---', '{id}')}</skos:example>
         % if dls:
             % for dl in dls:

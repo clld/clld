@@ -5,8 +5,9 @@
         <void:inDataset rdf:resource="${request.route_url('dataset')}"/>
         <rdfs:label xml:lang="en">${_(rsc_name)}s</rdfs:label>
         <skos:prefLabel xml:lang="en">${_(rsc_name)}s</skos:prefLabel>
-        <skos:hiddenLabel xml:lang="en">${rsc_name}</skos:hiddenLabel>
         <dcterms:title xml:lang="en">${_(rsc_name)}s</dcterms:title>
+        <skos:hiddenLabel xml:lang="x-clld">${rsc_name}</skos:hiddenLabel>
+        <skos:scopeNote xml:lang="x-clld">index</skos:scopeNote>
         % for row in ctx:
         <skos:member rdf:resource="${member_urls[row[0]]}"/>
         % endfor
