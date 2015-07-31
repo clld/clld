@@ -35,6 +35,8 @@ class Tests(TestWithApp):
             assert 'skos:scopeNote' in res
             self.app.get_html('/%ss' % rsc.name)
             self.app.get_xml('/%ss.rdf' % rsc.name)
+            self.app.get_json('/{0}s.json'.format(rsc.name))
+            self.assertIn('columns', self.app.parsed_body)
             self.app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
         self.app.get_html('/combinations/parameter')
 
