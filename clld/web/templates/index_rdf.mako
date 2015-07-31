@@ -3,9 +3,9 @@
     <% member_urls = {r[0]: request.route_url(rsc_name, id=r[0]) for r in ctx} %>
     <skos:Collection rdf:about="${request.route_url(rsc_name + 's')}">
         <void:inDataset rdf:resource="${request.route_url('dataset')}"/>
-        <rdfs:label xml:lang="en">${_(rsc_name)}s</rdfs:label>
-        <skos:prefLabel xml:lang="en">${_(rsc_name)}s</skos:prefLabel>
-        <dcterms:title xml:lang="en">${_(rsc_name)}s</dcterms:title>
+        <rdfs:label xml:lang="en">${_(rsc_name.capitalize())}s</rdfs:label>
+        <skos:prefLabel xml:lang="en">${_(rsc_name.capitalize())}s</skos:prefLabel>
+        <dcterms:title xml:lang="en">${_(rsc_name.capitalize())}s</dcterms:title>
         <skos:hiddenLabel xml:lang="x-clld">${rsc_name}</skos:hiddenLabel>
         <skos:scopeNote xml:lang="x-clld">index</skos:scopeNote>
         % for row in ctx:

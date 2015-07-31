@@ -3,7 +3,6 @@ import os
 
 from pyramid.path import AssetResolver
 
-from clld import RESOURCES
 from clld import interfaces
 from clld.web.adapters.base import Index, Representation, Json, JsonIndex, SolrDoc
 from clld.web.adapters.geojson import (
@@ -41,8 +40,7 @@ def register_resource_adapters(config, rsc):
     specs = []
 
     if rsc.with_index:
-        specs.append(
-            (Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
+        specs.append((Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
         config.register_adapter(
             getattr(csv, rsc.name.capitalize() + 's', csv.CsvAdapter),
             interface,
@@ -58,8 +56,7 @@ def register_resource_adapters(config, rsc):
             cls, interface, to_=interfaces.IIndex, name=JsonIndex.mimetype)
         if template_exists(config, name + '/index_html.mako'):
             # ... as html index
-            specs.append(
-                (Index, 'text/html', 'html', name + '/index_html.mako', {}))
+            specs.append((Index, 'text/html', 'html', name + '/index_html.mako', {}))
 
     # ... as RDF in various notations
     rdf_resource_template = name + '/rdf.mako'
@@ -72,9 +69,8 @@ def register_resource_adapters(config, rsc):
             notation.mimetype,
             notation.extension,
             rdf_resource_template,
-            {
-                'name': 'RDF serialized as %s' % notation.name,
-                'rdflibname': notation.name}))
+            {'name': 'RDF serialized as %s' % notation.name, 'rdflibname': notation.name},
+        ))
 
     # ... as RDF collection index
     rdf_xml = RDF_NOTATIONS['xml']
@@ -82,17 +78,21 @@ def register_resource_adapters(config, rsc):
         RdfIndex,
         rdf_xml.mimetype,
         rdf_xml.extension,
-        'index_rdf.mako', {'rdflibname': rdf_xml.name}))
+        'index_rdf.mako',
+        {'rdflibname': rdf_xml.name}))
 
     if template_exists(config, name + '/detail_html.mako'):
         # ... as html details page
-        specs.append((
-            Representation, 'text/html', 'html', name + '/detail_html.mako', {}))
+        specs.append(
+            (Representation, 'text/html', 'html', name + '/detail_html.mako', {}))
     if template_exists(config, name + '/snippet_html.mako'):
         # ... as html snippet (if the template exists)
-        specs.append(
-            (Representation, 'application/vnd.clld.snippet+xml',
-            'snippet.html', name + '/snippet_html.mako', {'rel': None}))
+        specs.append((
+            Representation,
+            'application/vnd.clld.snippet+xml',
+            'snippet.html',
+            name + '/snippet_html.mako',
+            {'rel': None}))
 
     config.register_adapters([[interface] + list(spec) for spec in specs])
 
@@ -100,69 +100,6 @@ def register_resource_adapters(config, rsc):
 def includeme(config):
     """register adapters."""
     specs = []
-    #for rsc in RESOURCES:
-        ## each resource is available ...
-        #name, interface = rsc.name, rsc.interface
-
-        #config.register_adapter(
-        #    getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), interface)
-        #cls = type('Json%s' % rsc.model.__name__, (Json,), {})
-        #config.register_adapter(
-        #    cls, interface, to_=interfaces.IRepresentation, name=Json.mimetype)
-        #cls = type('Solr%s' % rsc.model.__name__, (SolrDoc,), {})
-        #config.register_adapter(
-        #    cls, interface, to_=interfaces.IRepresentation, name=SolrDoc.mimetype)
-
-        #if rsc.with_index:
-            ## ... as html index
-            #specs.append(
-            #    (interface, Index, 'text/html', 'html', name + '/index_html.mako', {}))
-            #specs.append(
-            #    (interface, Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
-
-            #config.register_adapter(
-            #    getattr(csv, rsc.name.capitalize() + 's', csv.CsvAdapter),
-            #    interface,
-            #    interfaces.IIndex,
-            #    name=csv.CsvAdapter.mimetype)
-            #config.register_adapter(
-            #    csv.CsvmJsonAdapter,
-            #    interface,
-            #    interfaces.IIndex,
-            #    name=csv.CsvmJsonAdapter.mimetype)
-            #cls = type('JsonIndex%s' % rsc.model.__name__, (JsonIndex,), {})
-            #config.register_adapter(
-            #    cls, interface, to_=interfaces.IIndex, name=JsonIndex.mimetype)
-
-        ## ... as html details page
-        #specs.append(
-        #    (interface, Representation, 'text/html', 'html', name + '/detail_html.mako',
-        #     {}))
-        ## ... as html snippet (if the template exists)
-        #specs.append(
-        #    (interface, Representation, 'application/vnd.clld.snippet+xml',
-        #     'snippet.html', name + '/snippet_html.mako', {'rel': None}))
-
-        ## ... as RDF in various notations
-        #for notation in RDF_NOTATIONS.values():
-        #    specs.append((
-        #        interface,
-        #        Rdf,
-        #        notation.mimetype,
-        #        notation.extension,
-        #        name + '/rdf.mako',
-        #        {
-        #            'name': 'RDF serialized as %s' % notation.name,
-        #            'rdflibname': notation.name}))
-
-        ## ... as RDF collection index
-        #rdf_xml = RDF_NOTATIONS['xml']
-        #specs.append((
-        #    interface,
-        #    RdfIndex,
-        #    rdf_xml.mimetype,
-        #    rdf_xml.extension,
-        #    'index_rdf.mako', {'rdflibname': rdf_xml.name}))
 
     # citeable resources are available as html page listing available metadata formats:
     for _if in [interfaces.IContribution, interfaces.IDataset]:
