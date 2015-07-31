@@ -31,6 +31,7 @@ from pyramid.threadlocal import get_current_request
 assert get_current_request
 from pyramid.interfaces import IRoutesMapper
 from purl import URL
+from zope.interface import providedBy
 
 import clld
 from clld import interfaces
@@ -710,3 +711,13 @@ def charis_font_spec_css():
         src: url('{0}/CharisSIL-BI.ttf');
     }}
 """.format(static_path('fonts'))
+
+
+def get_resource_type(obj):
+    """We rely on resource objects to implement just one interface.
+
+    :param obj:
+    :return: resource type as string
+    """
+    for interface in providedBy(obj):
+        return interface.__name__[1:].lower()
