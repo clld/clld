@@ -380,7 +380,7 @@ class DataTable(Component):
 
         :return: list of instances of :py:class:`clld.web.datatables.base.Col`.
         """
-        raise NotImplementedError  # pragma: no cover
+        return [LinkCol(self, 'name')]
 
     @cached_property()
     def cols(self):
