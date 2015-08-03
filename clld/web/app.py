@@ -109,8 +109,9 @@ class ClldRequest(Request):
             :py:class:`clld.web.datatables.base.DataTable` instance, if a datatable was
             registered for ``name``.
         """
-        dt = self.registry.getUtility(interfaces.IDataTable, name)
-        return dt(self, model, **kw)
+        dt = self.registry.queryUtility(interfaces.IDataTable, name=name)
+        if dt:
+            return dt(self, model, **kw)
 
     def get_map(self, name=None, **kw):
         """Convenient lookup and retrieval of initialized Map object.
@@ -391,9 +392,6 @@ def register_resource_routes_and_views(config, rsc):
             index_view,
             factory=partial(ctx_factory, rsc.model, 'index'))
 
-    config.register_datatable(
-        rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
-
 
 def register_resource(config, name, model, interface, with_index=False, **kw):
     """Directive to register custom resources.
@@ -408,6 +406,11 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
     rsc = Resource(name, model, interface, with_index=with_index)
     RESOURCES.append(rsc)
     config.register_resource_routes_and_views(rsc)
+
+    if not config.registry.queryUtility(interfaces.IDataTable, name=rsc.plural):
+        config.register_datatable(
+            rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
+
     register_resource_adapters(config, rsc)
 
 
@@ -551,6 +554,8 @@ def includeme(config):
 
     for rsc in RESOURCES:
         config.register_resource_routes_and_views(rsc)
+        config.register_datatable(
+            rsc.plural, getattr(datatables, rsc.plural.capitalize(), DataTable))
         register_resource_adapters(config, rsc)
 
     # maps

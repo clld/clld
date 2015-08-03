@@ -6,7 +6,7 @@
 
 ${util.data()}
 
-<% dt = request.registry.queryUtility(h.interfaces.IDataTable, 'values'); dt = dt(request, h.models.Value, contribution=ctx) %>
+<% dt = request.get_datatable('values', h.models.Value, contribution=ctx) %>
 % if dt:
 <div>
     ${dt.render()}
