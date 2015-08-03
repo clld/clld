@@ -6,6 +6,7 @@
         % if h.get_resource_type(ctx):
             <skos:scopeNote xml:lang="x-clld">${h.get_resource_type(ctx)}</skos:scopeNote>
         % endif
+        <skos:altLabel xml:lang="x-clld">${getattr(ctx, 'id', None)}</skos:altLabel>
         <dcterms:title xml:lang="en">${ctx}</dcterms:title>
         % if getattr(ctx, 'description'):
         <dcterms:description xml:lang="en">${ctx.description}</dcterms:description>
