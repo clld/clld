@@ -92,10 +92,6 @@ class Tests(TestWithEnv):
         class ILanguage(Interface):  # but there is one for 'languages'!
             pass
 
-        class TestTable(DataTable):
-            def col_defs(self):
-                return []
-
         classImplements(A, ILanguage)
-        dt = TestTable(self.env['request'], A)
+        dt = DataTable(self.env['request'], A)
         self.assertTrue('languages' in dt.options['sAjaxSource'])

@@ -3,6 +3,9 @@ from clld import RESOURCES
 
 
 class Tests(TestWithApp):
+    def _xml_findall(self, name):
+        return list(self.app.parsed_body.findall('.//%s' % name))
+
     def test_robots(self):
         self.app.get('/robots.txt')
 
@@ -31,8 +34,13 @@ class Tests(TestWithApp):
                 continue
             self.app.get_html('/{0}s/{0}'.format(rsc.name))
             self.app.get_html('/{0}s/{0}.snippet.html'.format(rsc.name), docroot='div')
-            res = self.app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
-            assert 'skos:scopeNote' in res
+            self.app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+            self.assertEquals(
+                len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}scopeNote')),
+                1)
+            self.assertEquals(
+                len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}altLabel')),
+                1)
             self.app.get_html('/%ss' % rsc.name)
             self.app.get_xml('/%ss.rdf' % rsc.name)
             self.app.get_json('/{0}s.json'.format(rsc.name))

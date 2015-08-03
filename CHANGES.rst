@@ -2,6 +2,12 @@
 Changes
 -------
 
+1.4.1
+~~~~~
+
+See https://github.com/clld/clld/milestones/clld%201.4.1
+
+
 1.4.0
 ~~~~~
 
