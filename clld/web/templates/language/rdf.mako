@@ -10,9 +10,8 @@
     <skos:altLabel${' xml:lang="'+identifier.lang+'"' if identifier.lang and len(identifier.lang) <= 3 else ''|n}>${identifier}</skos:altLabel>
     % endif
     % endfor
-    ##% for source in request.db.query(h.models.Source).join(h.models.LanguageSource).filter(h.models.LanguageSource.language_pk == ctx.pk):
     % for source in ctx.sources:
-    <dcterms:isReferencedBy rdf:resource="${request.resource_url(source)}"/>
+    <dcterms:description rdf:resource="${request.resource_url(source)}"/>
     % endfor
     % if ctx.iso_code:
     <lexvo:iso639P3PCode rdf:datatype="${h.rdf.url_for_qname('xsd:string')}">${ctx.iso_code}</lexvo:iso639P3PCode>

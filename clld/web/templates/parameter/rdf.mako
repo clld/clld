@@ -2,12 +2,15 @@
 <%block name="properties">
     <rdf:type rdf:resource="${str(h.rdf.NAMESPACES['skos']['Concept'])}"/>
     % for vs in ctx.valuesets:
-    <dcterms:isReferencedBy rdf:resource="${request.resource_url(vs)}"/>
+    <dcterms:hasPart rdf:resource="${request.resource_url(vs)}"/>
+    % endfor
+    % for de in ctx.domain:
+    <skos:narrower rdf:resource="${de.url(request)}"/>
     % endfor
 </%block>
 <%block name="resources">
     % for de in ctx.domain:
-    <rdf:Description rdf:about="${de.url(request)}">
+    <dcterms:Standard rdf:about="${de.url(request)}">
         <rdf:type rdf:resource="${str(h.rdf.NAMESPACES['skos']['Concept'])}"/>
         <rdfs:label xml:lang="en">${de}</rdfs:label>
         <skos:prefLabel xml:lang="en">${de}</skos:prefLabel>
@@ -19,6 +22,6 @@
         % if de.number is not None:
         <dcterms:description rdf:datatype="http://www.w3.org/2001/XMLSchema#int">${de.number}</dcterms:description>
         % endif
-    </rdf:Description>
+    </dcterms:Standard>
     % endfor
 </%block>

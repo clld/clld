@@ -30,12 +30,13 @@ class UnitDomainElement(Base,
                         HasDataMixin,
                         HasFilesMixin):
 
-    """Doamin element for the domain of a UnitParameter."""
+    """Domain element for the domain of a UnitParameter."""
 
     unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
     ord = Column(Integer)
 
-    # do we need a numeric value for these?
+    def url(self, request):
+        return request.resource_url(self.parameter, _anchor='DE-%s' % self.id)
 
 
 class UnitParameter_data(Base, Versioned, DataMixin):

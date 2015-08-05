@@ -6,7 +6,7 @@
 
     ##% for l in request.db.query(h.models.Language).join(h.models.LanguageSource).filter(h.models.LanguageSource.source_pk == ctx.pk):
     % for l in ctx.languages:
-    <dcterms:references rdf:resource="${request.resource_url(l)}"/>
+    <dcterms:language rdf:resource="${request.resource_url(l)}"/>
     % endfor
     % if getattr(ctx, 'url', None):
     <dcterms:hasFormat>${ctx.url|h.xmlchars}</dcterms:hasFormat>
