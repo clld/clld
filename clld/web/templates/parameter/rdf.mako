@@ -7,7 +7,7 @@
 </%block>
 <%block name="resources">
     % for de in ctx.domain:
-    <rdf:Description rdf:about="${request.resource_url(ctx, _anchor='DE-' + de.id)}">
+    <rdf:Description rdf:about="${de.url(request)}">
         <rdf:type rdf:resource="${str(h.rdf.NAMESPACES['skos']['Concept'])}"/>
         <rdfs:label xml:lang="en">${de}</rdfs:label>
         <skos:prefLabel xml:lang="en">${de}</skos:prefLabel>
