@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from clld.tests.util import TestWithDbAndData
@@ -24,7 +25,7 @@ class Tests(TestWithDbAndData):
         from clld.db.models.common import Dataset
         from clld.db.meta import DBSession
 
-        for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('set$', 1)]:
+        for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('setä$', 1)]:
             q = DBSession.query(Dataset).filter(icontains(Dataset.name, qs))
             self.assertEqual(q.count(), count)
 

@@ -32,8 +32,6 @@ except ImportError:  # pragma: no cover
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
-from clld.db.models import common
-from clld.db.util import set_alembic_version
 from clld.web.adapters import Representation
 from clld.web.icon import MapMarker
 from clld import interfaces
@@ -94,119 +92,10 @@ class TestWithDbAndData(TestWithDb):
     """For tests in need of a session bound to a db with sample data."""
 
     def setUp(self):
+        from clld.tests.fixtures import populate_test_db
+
         TestWithDb.setUp(self)
-        set_alembic_version(DBSession, '58559d4eea0d')
-
-        DBSession.add(common.Dataset(
-            id='dataset',
-            name='dätäset',
-            description='düscriptiön',
-            domain='clld',
-            jsondata={'license_icon': 'cc-by', 'license_url': 'http://example.org'}))
-
-        DBSession.add(common.Source(
-            id='replaced', active=False, jsondata={'__replacement_id__': 'source'}))
-        source = common.Source(id='source', name='the source')
-        contributors = {
-            'contributor': 'A Name',
-            'b': 'b Name',
-            'c': 'c Name',
-            'd': 'd Name'}
-        for id_, name in contributors.items():
-            contributors[id_] = common.Contributor(
-                id=id_, name=name, url='http://example.org')
-
-        contribution = common.Contribution(id='contribution', name='Contribution')
-        common.ContributionReference(contribution=contribution, source=source)
-        assert common.ContributionContributor(
-            contribution=contribution,
-            primary=True,
-            contributor=contributors['contributor'])
-        assert common.ContributionContributor(
-            contribution=contribution, primary=False, contributor=contributors['b'])
-        assert common.ContributionContributor(
-            contribution=contribution, primary=True, contributor=contributors['c'])
-        assert common.ContributionContributor(
-            contribution=contribution, primary=False, contributor=contributors['d'])
-
-        DBSession.add(contribution)
-
-        language = common.Language(
-            id='language', name='Language 1', latitude=10.5, longitude=0.3)
-        language.sources.append(source)
-        for i, type_ in enumerate(common.IdentifierType):
-            id_ = common.Identifier(type=type_.value, id=type_.value + str(i), name='abc')
-            common.LanguageIdentifier(language=language, identifier=id_)
-
-        for i in range(2, 102):
-            _l = common.Language(id='l%s' % i, name='Language %s' % i)
-            _i = common.Identifier(type='iso639-3', id='%.3i' % i, name='%.3i' % i)
-            common.LanguageIdentifier(language=_l, identifier=_i)
-            DBSession.add(_l)
-
-        param = common.Parameter(id='parameter', name='Parameter')
-        de = common.DomainElement(id='de', name='DomainElement', parameter=param)
-        de2 = common.DomainElement(id='de2', name='DomainElement2', parameter=param)
-        valueset = common.ValueSet(
-            id='valueset', language=language, parameter=param, contribution=contribution)
-        value = common.Value(
-            id='value',
-            domainelement=de,
-            valueset=valueset,
-            frequency=50,
-            confidence='high')
-        DBSession.add(value)
-        value2 = common.Value(
-            id='value2',
-            domainelement=de2,
-            valueset=valueset,
-            frequency=50,
-            confidence='high')
-        DBSession.add(value2)
-        paramnd = common.Parameter(id='no-domain', name='Parameter without domain')
-        valueset = common.ValueSet(
-            id='vs2', language=language, parameter=paramnd, contribution=contribution)
-        common.ValueSetReference(valueset=valueset, source=source, description='10-20')
-        value = common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
-        DBSession.add(value)
-
-        unit = common.Unit(id='unit', name='Unit', language=language)
-        up = common.UnitParameter(id='unitparameter', name='UnitParameter')
-        DBSession.add(unit)
-        DBSession.add(common.UnitValue(
-            id='unitvalue', name='UnitValue', unit=unit, unitparameter=up))
-
-        up2 = common.UnitParameter(id='up2', name='UnitParameter with domain')
-        de = common.UnitDomainElement(id='de', name='de', parameter=up2)
-        DBSession.add(common.UnitValue(
-            id='uv2',
-            name='UnitValue2',
-            unit=unit,
-            unitparameter=up2,
-            unitdomainelement=de))
-
-        DBSession.add(common.Source(id='s'))
-
-        sentence = common.Sentence(
-            id='sentence',
-            name='sentence name',
-            description='sentence description',
-            analyzed='a\tmorpheme\tdoes\tdo',
-            gloss='a\tmorpheme\t1SG\tdo.SG2',
-            source='own',
-            comment='comment',
-            original_script='a morpheme',
-            language=language,
-            jsondata={'alt_translation': 'Spanish: ...'})
-        common.SentenceReference(sentence=sentence, source=source)
-        DBSession.add(common.Config(key='key', value='value'))
-
-        common.Config.add_replacement('replaced', 'language', model=common.Language)
-        common.Config.add_replacement('gone', None, model=common.Language)
-        DBSession.flush()
-
-        for l in DBSession.query(common.Language):
-            assert l.pk
+        populate_test_db()
 
 
 class TestWithEnv(TestWithDbAndData):

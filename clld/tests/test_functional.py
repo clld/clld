@@ -38,9 +38,9 @@ class Tests(TestWithApp):
             self.assertEquals(
                 len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}scopeNote')),
                 1)
-            self.assertEquals(
+            self.assertGreater(
                 len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}altLabel')),
-                1)
+                0)
             self.app.get_html('/%ss' % rsc.name)
             self.app.get_xml('/%ss.rdf' % rsc.name)
             self.app.get_json('/{0}s.json'.format(rsc.name))
