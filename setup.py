@@ -95,7 +95,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
     ],
-    keywords='web pyramid',
+    keywords='web pyramid LRL Linguistics',
     author="Robert Forkel, MPI EVA",
     author_email="xrotwang+clld@googlemail.com",
     url="http://clld.org",
