@@ -11,6 +11,8 @@
         % if request.dataset.description:
         <dcterms:description xml:lang="en">${request.dataset.description}</dcterms:description>
         % endif
+        <skos:scopeNote xml:lang="x-clld">dataset</skos:scopeNote>
+        <skos:altLabel xml:lang="x-clld">${ctx.id}</skos:altLabel>
         <foaf:homepage>${request.route_url('dataset')}</foaf:homepage>
         <dcterms:license rdf:resource="${request.dataset.license}"/>
         <dcterms:rightsHolder rdf:resource="${request.dataset.publisher_url}"/>

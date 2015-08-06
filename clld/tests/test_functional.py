@@ -38,14 +38,15 @@ class Tests(TestWithApp):
             self.assertEquals(
                 len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}scopeNote')),
                 1)
-            self.assertEquals(
+            self.assertGreater(
                 len(self._xml_findall('{http://www.w3.org/2004/02/skos/core#}altLabel')),
-                1)
+                0)
             self.app.get_html('/%ss' % rsc.name)
             self.app.get_xml('/%ss.rdf' % rsc.name)
             self.app.get_json('/{0}s.json'.format(rsc.name))
             self.assertIn('columns', self.app.parsed_body)
             self.app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
+        self.app.get_xml('/unitparameters/up2.rdf')
         self.app.get_html('/combinations/parameter')
 
     def test_source(self):

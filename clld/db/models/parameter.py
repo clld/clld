@@ -52,6 +52,9 @@ class DomainElement(Base,
     abbr = Column(Unicode, doc='abbreviated name')
     """abbreviated name, e.g. as label for map legends"""
 
+    def url(self, request):
+        return request.resource_url(self.parameter, _anchor='DE-' + self.id)
+
 
 class Parameter_data(Base, Versioned, DataMixin):
     pass
