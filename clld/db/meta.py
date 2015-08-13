@@ -187,7 +187,8 @@ class CsvMixin(object):
 
     @classmethod
     def csv_query(cls, session):
-        return session.query(cls).order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
+        query = session.query(cls).filter_by(active=True)
+        return query.order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
 
 
 class Base(UnicodeMixin, CsvMixin, declarative_base()):
