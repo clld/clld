@@ -421,7 +421,7 @@ class Record(OrderedDict, _Convertable):
             getattr(self.genre, 'value', self.genre), self.id, ",\n".join(fields))
 
     _genre_note = {
-        'phdthesis': 'Doctoral disseration',
+        'phdthesis': 'Doctoral dissertation',
         'mastersthesis': 'MA thesis',
         'unpublished': 'unpublished',
     }
