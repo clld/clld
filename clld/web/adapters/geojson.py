@@ -191,7 +191,8 @@ class GeoJsonParameter(GeoJson):
     def feature_properties(self, ctx, req, valueset):
         return {
             'values': list(valueset.values),
-            'label': ', '.join(nfilter(v.name for v in valueset.values))}
+            'label': ', '.join(nfilter(v.name for v in valueset.values))
+            or self.get_language(ctx, req, valueset).name}
 
 
 class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
