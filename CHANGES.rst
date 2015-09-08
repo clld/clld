@@ -2,6 +2,14 @@
 Changes
 -------
 
+1.6.0
+~~~~~
+
+New feature: see https://github.com/clld/clld/issues/86
+
+Bugfix: see https://github.com/clld/clld/issues/85
+
+
 1.5.1
 ~~~~~
 
