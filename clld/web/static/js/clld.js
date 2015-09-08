@@ -535,7 +535,11 @@ CLLD.Map = function(eid, layers, options) {
         hash = new L.Hash(this.map);
     }
 
-    L.control.layers.provided(baseLayers, []).addTo(this.map);
+    if (this.options.tile_layer != undefined) {
+        L.tileLayer(this.options.tile_layer.url_pattern, this.options.tile_layer.options).addTo(this.map);
+    } else {
+        L.control.layers.provided(baseLayers, []).addTo(this.map);
+    }
 
     this.marker_map = {};
     this.layer_map = {};
