@@ -2,6 +2,15 @@
 Changes
 -------
 
+1.6.1
+~~~~~
+
+Bugfix release, fixes https://github.com/clld/clld/issues/86
+
+It seems sil.org will stick with www-01 as canonical subdomain for ISO 639-3
+related resources.
+
+
 1.6.0
 ~~~~~
 

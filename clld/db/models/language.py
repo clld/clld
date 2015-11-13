@@ -119,7 +119,7 @@ class IdentifierType(DeclEnum):
     """Known language identifiers."""
 
     iso = 'iso639-3', 'ISO 639-3', \
-          'http://www.sil.org/iso639-3/documentation.asp?id={0.name}'
+          'http://www-01.sil.org/iso639-3/documentation.asp?id={0.name}'
     wals = 'wals', 'WALS Code', 'http://wals.info/languoid/lect/wals_code_{0.name}'
     glottolog = 'glottolog', 'Glottocode', \
                 'http://glottolog.org/resource/languoid/id/{0.name}'
