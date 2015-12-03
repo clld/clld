@@ -2,6 +2,13 @@
 Changes
 -------
 
+1.7.1
+~~~~~
+
+Turns out we now rely on a rather recent feature of requests, so we better
+make this transparent in the requirements.
+
+
 1.7.0
 ~~~~~
 
