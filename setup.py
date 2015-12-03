@@ -42,7 +42,7 @@ install_requires = [
     'webassets',
     'yuicompressor',
     'markupsafe',
-    'requests',
+    'requests>=2.4.3',  # we use the support for connect timeouts introduced in 2.4.0
     'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
     'colander',
     'python-dateutil',
@@ -82,7 +82,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='1.7.0',
+    version='1.7.1',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,
