@@ -2,6 +2,14 @@
 Changes
 -------
 
+1.7.0
+~~~~~
+
+Due to the shutdown of the Google Feeds API the CLLD.Feed javascript component
+broke. This release provides functionality to help apps reimplement the lost
+functionality.
+
+
 1.6.1
 ~~~~~
 
