@@ -15,6 +15,21 @@ DATETIME_ISO_FORMAT = re.compile(
     '[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]+')
 
 
+def summary(text, max_length=70):
+    res = ''
+    words = list(reversed(text.split()))
+    while words:
+        nextword = words.pop()
+        if len(res) + len(nextword) + 1 > max_length:
+            # too long, add the word back onto the remainder
+            words.append(nextword)
+            break
+        res += ' ' + nextword
+    if words:
+        res += ' ...'
+    return res.strip()
+
+
 def parse_json_with_datetime(d):
     """
     convert iso formatted timestamps found as values in the dict d to datetime objects.

@@ -111,26 +111,27 @@ CLLD.MultiSelect = (function(){
 
 CLLD.Feed = (function(){
     var _init = function(spec) {
-        var feed = new google.feeds.Feed(spec.url);
+        $.get(spec.url, {}, function (data) {
+            $(data).find("entry").each(function (i, item) {
+                item = $(item);
+                var title,
+                    eid = $('#'+spec.eid),
+                    date = new Date(item.find("updated").text());
 
-        feed.setNumEntries(spec.numEntries == undefined ? 4 : spec.numEntries);
-        feed.load(function(result) {
-            if (!result.error) {
-                var title = spec.title == undefined ? result.feed.title : spec.title;
-                //var content = '<h3><a href="'+result.feed.link+'">'+title+'</a></h3>';
-                if (spec.linkTitle) {
-                    title = '<a href="'+spec.url+'">'+title+'</a>';
+                if (i == 0) {
+                    title = spec.title == undefined ? result.feed.title : spec.title;
+                    if (spec.linkTitle) {
+                        title = '<a href="'+spec.url+'">'+title+'</a>';
+                    }
+                    eid.html('<h3>'+title+'</h3>')
                 }
-                var content = '<h3>'+title+'</h3>';
-                for (var j = 0; j < result.feed.entries.length; j++) {
-                    var entry = result.feed.entries[j];
-                    content += '<h4><a href="'+entry.link+'">'+entry.title+'</a></h4>';
-                    content += '<p class="muted"><small>'+entry.publishedDate+'</small></p>';
-                    content += '<p>'+entry.contentSnippet+'</p>';
-                }
-                $('#'+spec.eid).html(content);
-            }
-        });
+
+                eid.append('<h4><a href="'+item.find("link").attr("href")+'">'+item.find("title").text()+'</a></h4>');
+                eid.append('<p class="muted"><small>'+date.toDateString()+'</small></p>');
+                eid.append('<p>'+item.find("summary").text()+'</p>');
+                return i < (spec.numEntries == undefined ? 4 : spec.numEntries) - 1;
+            });
+        }, 'xml');
     };
 
     return {

@@ -52,6 +52,7 @@ install_requires = [
     'xlwt-future',
     'webhelpers2>=2.0',
     'nameparser',
+    'feedparser',
 ]
 
 if not PY3:
