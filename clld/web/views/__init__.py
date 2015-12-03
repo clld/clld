@@ -2,12 +2,18 @@
 from json import dumps
 import re
 from functools import partial
+from datetime import datetime
+from time import mktime
 
+import requests
+from requests.exceptions import Timeout
+import feedparser
 from pyramid.response import Response
 import pyramid.httpexceptions
 from pyramid.interfaces import IRoutesMapper
 from pyramid.renderers import render, render_to_response
 
+from clld.util import summary
 from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld.web.adapters import get_adapter, get_adapters
 from clld.web.adapters.csv import CsvAdapter, CsvmJsonAdapter
@@ -264,3 +270,28 @@ def combined(ctx, req):  # pragma: no cover
     if urls:
         res['map'] = CombinedMap(urls, req)
     return res
+
+
+def atom_feed(request, feed_url):
+    """
+    Proxy feeds so they can be accessed via XHR requests.
+
+    We also convert RSS to ATOM so that the javascript Feed component can read them.
+    """
+    ctx = {'url': feed_url, 'title': None, 'entries': []}
+    try:
+        res = requests.get(ctx['url'], timeout=(3.05, 1))
+    except Timeout:
+        res = None
+    if res and res.status_code == 200:
+        d = feedparser.parse(res.content.strip())
+        ctx['title'] = d.feed.title
+        for e in d.entries:
+            ctx['entries'].append(dict(
+                title=e.title,
+                link=e.link,
+                updated=datetime.fromtimestamp(mktime(e.published_parsed)).isoformat(),
+                summary=summary(e.description)))
+    response = render_to_response('atom_feed.mako', ctx, request=request)
+    response.content_type = 'application/atom+xml'
+    return response

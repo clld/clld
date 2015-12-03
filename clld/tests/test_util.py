@@ -8,6 +8,18 @@ from six import binary_type
 from path import path
 
 
+def test_summary():
+    from clld.util import summary
+
+    # text consisting of unique words
+    text = "This is a long text, which we want to summarize."
+
+    assert summary(text[:20]) == text[:20]
+    assert summary(text, len(text) - 1).endswith('...')
+    assert summary('One verylongword', 10) == 'One ...'
+    assert summary('One verylongword', 2) == '...'
+
+
 def test_parse_json_with_datetime():
     from clld.util import parse_json_with_datetime
 

@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HTTPFound
-from mock import Mock
+from mock import Mock, patch
+from requests.exceptions import ReadTimeout
 
 from clld.tests.util import TestWithEnv, XmlResponse
 from clld.db.models import common
@@ -106,3 +109,44 @@ class Tests(TestWithEnv):
         self.set_request_properties(
             params={'format': 'bibtex', 'id': '/contributions/contribution'})
         unapi(self.env['request'])
+
+    def test_atom_feed(self):
+        from clld.web.views import atom_feed
+
+        class FeedResponse(object):
+            status_code = 200
+            content = b"""\
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:sy="http://purl.org/rss/1.0/modules/syndication/">
+<channel>
+    <title>Comments for The World Atlas of Language Structures Online</title>
+    <link>http://blog.wals.info</link>
+    <description>WALS Online Blog</description>
+        <item>
+        <title>Comment on Datapoint</title>
+        <link>http://blog.wals.info/datapoint</link>
+        <pubDate>Wed, 04 Nov 2015 22:11:03 +0000</pubDate>
+        <guid>http://blog.wals.info/datapoint-26a-wals_code_juk/</guid>
+        <description>Some description</description>
+        <content:encoded><![CDATA[<p>some description</p>
+]]></content:encoded>
+    </item>
+</channel>
+"""
+
+        class MockRequests(object):
+            get = Mock(return_value=FeedResponse)
+
+        class MockRequestsTimeout(object):
+            def get(self, *args, **kw):
+                raise ReadTimeout()
+
+        with patch('clld.web.views.requests', MockRequests()):
+            res = atom_feed(self.env['request'], None)
+            self.assertIn('<entry>', res.body.decode('utf8'))
+
+        with patch('clld.web.views.requests', MockRequestsTimeout()):
+            res = atom_feed(self.env['request'], None)
+            self.assertNotIn('<entry>', res.body.decode('utf8'))

@@ -52,6 +52,7 @@ install_requires = [
     'xlwt-future',
     'webhelpers2>=2.0',
     'nameparser',
+    'feedparser',
 ]
 
 if not PY3:
@@ -81,7 +82,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='1.6.1',
+    version='1.7.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,
