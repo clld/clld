@@ -42,7 +42,7 @@ install_requires = [
     'webassets',
     'yuicompressor',
     'markupsafe',
-    'requests',
+    'requests>=2.4.3',  # we use the support for connect timeouts introduced in 2.4.0
     'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
     'colander',
     'python-dateutil',
