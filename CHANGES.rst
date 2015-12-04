@@ -2,6 +2,12 @@
 Changes
 -------
 
+1.8.0
+~~~~~
+
+Removed obsolete functionality.
+
+
 1.7.1
 ~~~~~
 
