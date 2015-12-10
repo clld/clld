@@ -1,34 +1,35 @@
 # coding: utf8
 from __future__ import unicode_literals
 import logging
-logging.disable(logging.WARN)
 from tempfile import mkdtemp
 
 from sqlalchemy import create_engine, null
 from sqlalchemy.orm import sessionmaker
-from path import path
+from clldutils.path import Path, rmtree
 from mock import Mock
 
 from clld.tests.util import TestWithEnv
 from clld.db.meta import Base, DBSession
 from clld.db.models.common import Dataset, Language, Contribution
 
+logging.disable(logging.WARN)
+
 
 class Tests(TestWithEnv):
     def test_freeze(self):
         from clld.scripts.freeze import freeze_func, unfreeze_func
 
-        tmp = path(mkdtemp())
+        tmp = Path(mkdtemp())
         tmp.joinpath('data').mkdir()
         tmp.joinpath('appname').mkdir()
 
         class Args(object):
             env = self.env
-            module_dir = tmp.joinpath('appname')
+            module_dir = tmp.joinpath('appname').resolve()
             module = Mock(__name__='appname')
 
             def data_file(self, *comps):
-                return tmp.joinpath('data', *comps)
+                return tmp.resolve().joinpath('data', *comps)
 
         DBSession.flush()
         args = Args()
@@ -55,4 +56,4 @@ class Tests(TestWithEnv):
         self.assert_(contrib.primary_contributors)
         self.assert_(contrib.secondary_contributors)
 
-        tmp.rmtree(ignore_errors=True)
+        rmtree(tmp, ignore_errors=True)

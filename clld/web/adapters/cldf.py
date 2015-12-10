@@ -4,7 +4,8 @@ import json
 
 from sqlalchemy import true
 from sqlalchemy.orm import joinedload, joinedload_all
-from path import path
+from clldutils.path import Path, remove, move
+from clldutils.dsv import UnicodeWriter
 
 from clld.web.adapters.download import Download, README
 from clld.web.adapters.md import TxtCitation
@@ -14,7 +15,6 @@ from clld.db.models.common import (
     Value, ValueSet, ValueSetReference, Parameter, Language, LanguageIdentifier, Source,
 )
 from clld.db.util import page_query
-from clld.lib.dsv import UnicodeWriter
 from clld.lib.bibtex import Database
 
 
@@ -86,13 +86,13 @@ class CldfDownload(Download):
 
     def create(self, req, filename=None, verbose=True):
         p = self.abspath(req)
-        if not p.dirname().exists():  # pragma: no cover
-            p.dirname().mkdir()
-        tmp = path('%s.tmp' % p)
+        if not p.parent.exists():  # pragma: no cover
+            p.parent.mkdir()
+        tmp = Path('%s.tmp' % p)
 
         language_url_pattern = self.route_url_pattern(req, 'language')
 
-        with ZipFile(tmp, 'w', ZIP_DEFLATED) as zipfile:
+        with ZipFile(tmp.as_posix(), 'w', ZIP_DEFLATED) as zipfile:
             tables = []
             for param in DBSession.query(Parameter).options(joinedload(Parameter.domain)):
                 fname = '%s-%s.csv' % (req.dataset.id, param.id)
@@ -174,5 +174,5 @@ class CldfDownload(Download):
                     req.dataset.license,
                     TxtCitation(None).render(req.dataset, req)).encode('utf8'))
         if p.exists():  # pragma: no cover
-            p.remove()
-        tmp.move(p)
+            remove(p)
+        move(tmp, p)

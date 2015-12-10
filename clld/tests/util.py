@@ -11,12 +11,9 @@ from tempfile import mkdtemp
 from xml.etree import cElementTree as ElementTree
 from json import loads
 import warnings
-warnings.filterwarnings(
-    'ignore', message='At least one scoped session is already present.')
 
 from six import text_type
 from mock import Mock
-from path import path
 from pyramid.paster import bootstrap
 from pyramid.config import Configurator
 import transaction
@@ -29,6 +26,7 @@ try:
     from selenium.webdriver.support.ui import Select  # pragma: no cover
 except ImportError:  # pragma: no cover
     webdriver = None
+from clldutils.path import Path
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -36,9 +34,11 @@ from clld.web.adapters import Representation
 from clld.web.icon import MapMarker
 from clld import interfaces
 
+warnings.filterwarnings(
+    'ignore', message='At least one scoped session is already present.')
 
 ENV = None
-TESTS_DIR = path(clld.__file__).dirname().joinpath('tests')
+TESTS_DIR = Path(clld.__file__).parent.joinpath('tests')
 
 
 class Route(Mock):
@@ -102,7 +102,7 @@ class TestWithEnv(TestWithDbAndData):
 
     """For tests in need of a configured app."""
 
-    __cfg__ = TESTS_DIR.joinpath('test.ini').abspath()
+    __cfg__ = TESTS_DIR.joinpath('test.ini').resolve()
     __setup_db__ = True
 
     def setUp(self):
@@ -111,7 +111,7 @@ class TestWithEnv(TestWithDbAndData):
         global ENV
 
         if ENV is None:
-            ENV = bootstrap(self.__cfg__)
+            ENV = bootstrap(self.__cfg__.as_posix())
             ENV['request'].translate = lambda s, **kw: s
 
         self.env = ENV
@@ -416,12 +416,12 @@ class TestWithSelenium(unittest.TestCase):  # pragma: no cover
         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
         selenium_logger.setLevel(logging.WARNING)
 
-        cls.downloads = path(mkdtemp())
+        cls.downloads = Path(mkdtemp())
 
         profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         profile.set_preference("browser.download.folderList", 2)
         profile.set_preference("browser.download.manager.showWhenStarting", False)
-        profile.set_preference("browser.download.dir", str(cls.downloads))
+        profile.set_preference("browser.download.dir", cls.downloads.as_posix())
         profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/x-bibtex")
 
         cls.browser = webdriver.Firefox(firefox_profile=profile)

@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
-import codecs
 from functools import partial
 
 from six.moves.configparser import ConfigParser
+from clldutils.path import Path
 
 
 def get_config(p):
@@ -10,10 +10,12 @@ def get_config(p):
 
     :return: dict of ('section.option', value) pairs.
     """
+    if not isinstance(p, Path):
+        p = Path(p)
     cfg = {}
 
     parser = ConfigParser()
-    parser.readfp(codecs.open(p, encoding='utf8'))
+    parser.readfp(p.open(encoding='utf8'))
 
     for section in parser.sections():
         getters = {

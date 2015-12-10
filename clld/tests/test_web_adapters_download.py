@@ -6,8 +6,8 @@ from contextlib import closing
 from xml.etree import cElementTree as et
 
 from mock import Mock, MagicMock, patch
+from clldutils.misc import UnicodeMixin
 
-from clld.util import UnicodeMixin
 from clld.db.models.common import Language, Source, Dataset
 from clld.tests.util import TestWithEnv
 
@@ -32,16 +32,16 @@ class Tests(TestWithEnv):
 
         dl = TestDownload(Source, 'clld', ext='bib')
         abspath = dl.abspath(self.env['request'])
-        assert not os.path.exists(abspath)
+        assert not abspath.exists()
         dl.create(self.env['request'], verbose=False)
         dl.size(self.env['request'])
         dl.label(self.env['request'])
-        assert os.path.exists(abspath)
-        os.remove(abspath)
+        assert abspath.exists()
+        os.remove(abspath.as_posix())
 
         dl = TestDownload(Source, 'clld', ext='rdf')
         dl.create(self.env['request'], verbose=False)
-        os.remove(dl.abspath(self.env['request']))
+        os.remove(dl.abspath(self.env['request']).as_posix())
 
     def testDownload_url(self):
         from clld.web.adapters.download import Download
@@ -60,10 +60,12 @@ class Tests(TestWithEnv):
         tmp = mktemp()
 
         class Path(MagicMock, UnicodeMixin):
-            def splitext(self):
-                return self, ''
+            @property
+            def stem(self):
+                return 'a'
 
-            def dirname(self):
+            @property
+            def parent(self):
                 return Mock(exists=Mock(return_value=False))
 
             def open(self, mode):
@@ -72,10 +74,12 @@ class Tests(TestWithEnv):
         with patch.multiple(
             'clld.web.adapters.cldf',
             ZipFile=MagicMock(),
-            path=MagicMock(return_value=Path()),
+            Path=MagicMock(return_value=Path()),
+            move=Mock(),
+            remove=Mock(),
         ):
             with patch(
-                'clld.web.adapters.download.path',
+                'clld.web.adapters.download.Path',
                 new=MagicMock(return_value=Path()),
             ):
                 dl = CldfDownload(Dataset, 'clld')
@@ -84,7 +88,9 @@ class Tests(TestWithEnv):
         with patch.multiple(
             'clld.web.adapters.download',
             ZipFile=MagicMock(),
-            path=MagicMock(return_value=Path()),
+            Path=MagicMock(return_value=Path()),
+            move=Mock(),
+            remove=Mock(),
         ):
             dl = CsvDump(Language, 'clld')
             dl.create(self.env['request'], verbose=False)

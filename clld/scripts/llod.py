@@ -6,14 +6,14 @@ from tempfile import mkdtemp
 import json
 from subprocess import check_call
 
-from path import path
 from six import BytesIO, binary_type
 import requests
 from rdflib import Graph
 from sqlalchemy.exc import InvalidRequestError
+from clldutils.path import Path, as_posix
+from clldutils import jsonlib
 
 from clld.lib import rdf
-from clld.util import jsonload, jsondump
 from clld.db.util import page_query
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset
@@ -58,12 +58,12 @@ def get_graph(obj, req, rscname):  # pragma: no cover
 
 def llod_func(args):  # pragma: no cover
     """Create an RDF dump and compute some statistics about it."""
-    tmp = path(mkdtemp())
+    tmp = Path(mkdtemp())
     count_rsc = 0
     count_triples = 0
 
     tmp_dump = tmp.joinpath('rdf.n3')
-    with open(tmp_dump, 'w') as fp:
+    with open(as_posix(tmp_dump), 'w') as fp:
         for rsc in RESOURCES:
             args.log.info('Resource type %s ...' % rsc.name)
             try:
@@ -79,9 +79,9 @@ def llod_func(args):  # pragma: no cover
             args.log.info('... finished')
 
     # put in args.data_file('..', 'static', 'download')?
-    md = {'path': tmp, 'resources': count_rsc, 'triples': count_triples}
-    md.update(count_links(tmp_dump))
-    jsondump(md, args.data_file('rdf-metadata.json'))
+    md = {'path': as_posix(tmp), 'resources': count_rsc, 'triples': count_triples}
+    md.update(count_links(as_posix(tmp_dump)))
+    jsonlib.dump(md, args.data_file('rdf-metadata.json'))
     print(md)
 
     dataset = Dataset.first()
@@ -121,7 +121,7 @@ def register(args):  # pragma: no cover
             md['license_title'] = "Creative Commons Non-Commercial (Any)"
     rdf_md = args.data_file('rdf-metadata.json')
     if rdf_md.exists():
-        rdf_md = jsonload(rdf_md)
+        rdf_md = jsonlib.load(rdf_md)
         md['extras'] = [
             {'key': k, 'value': str(rdf_md[k])} for k in rdf_md.keys()
             if k.split(':')[0] in ['triples', 'resources', 'links']]

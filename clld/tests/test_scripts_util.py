@@ -2,16 +2,25 @@ from __future__ import unicode_literals
 import unittest
 from json import loads
 
+from sqlalchemy import create_engine
 from sqlalchemy.orm import joinedload
-from path import path
 from mock import patch, Mock
+from clldutils.path import Path
 
 import clld
 from clld.lib.bibtex import Record
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, TESTS_DIR
 
 
 class Tests(unittest.TestCase):
+    def test_setup_session(self):
+        from clld.scripts.util import setup_session
+
+        res = setup_session(
+            '%s#main' % TESTS_DIR.joinpath('test.ini').as_posix(),
+            create_engine('sqlite://'))
+        self.assertEquals(res, 'tests')
+
     def test_bibtex2source(self):
         from clld.scripts.util import bibtex2source
 
@@ -22,7 +31,7 @@ class Tests(unittest.TestCase):
     def test_parsed_args(self):
         from clld.scripts.util import parsed_args
 
-        parsed_args(args=[path(clld.__file__).dirname().joinpath('tests', 'test.ini')])
+        parsed_args(args=[TESTS_DIR.joinpath('test.ini').as_posix()])
 
     def test_glottocodes_by_isocode(self):
         from clld.scripts.util import glottocodes_by_isocode

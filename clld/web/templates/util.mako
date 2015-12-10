@@ -1,5 +1,5 @@
 <%! from json import dumps %>
-<%! from clld.util import slug %>
+<%! from clldutils.misc import slug %>
 ##
 ##
 ##

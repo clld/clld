@@ -1,9 +1,10 @@
+from clldutils.path import Path
 from clld.web.assets import environment
-from path import path
 
 import {{package}}
 
 
 environment.append_path(
-    path({{package}}.__file__).dirname().joinpath('static'), url='/{{package}}:static/')
+    Path({{package}}.__file__).parent.joinpath('static').as_posix(),
+    url='/{{package}}:static/')
 environment.load_path = list(reversed(environment.load_path))

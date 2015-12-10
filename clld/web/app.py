@@ -11,7 +11,6 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload_all, joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
-from path import path
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPGone
@@ -23,6 +22,7 @@ from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
 from purl import URL
 from six import string_types
+from clldutils.path import Path
 
 import clld
 assert clld
@@ -200,7 +200,7 @@ class ClldRequest(Request):
 
     def file_ospath(self, file_):
         if 'clld.files' in self.registry.settings:
-            return self.registry.settings['clld.files'].joinpath(file_.relpath)
+            return self.registry.settings['clld.files'].joinpath(file_.relpath).as_posix()
 
     def file_url(self, file_):
         if 'url' in file_.jsondata:
@@ -466,7 +466,7 @@ def includeme(config):
     root_package = config.root_package.__name__
     maybe_import('%s.assets' % root_package)
 
-    pkg_dir = path(config.root_package.__file__).dirname().abspath()
+    pkg_dir = Path(config.root_package.__file__).parent.resolve()
 
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
@@ -493,9 +493,9 @@ def includeme(config):
         'clld.parameters': {}})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files
-        abspath = path(config.registry.settings['clld.files']).abspath()
+        abspath = Path(config.registry.settings['clld.files']).resolve()
         config.add_settings({'clld.files': abspath})
-        config.add_static_view('files', abspath)
+        config.add_static_view('files', abspath.as_posix())
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
@@ -591,9 +591,9 @@ def includeme(config):
         home_comp[name] = template
 
     if pkg_dir.joinpath('templates').exists():
-        for p in pkg_dir.joinpath('templates').files():
-            if p.namebase in home_comp and p.ext == '.mako':
-                home_comp[p.namebase] = True
+        for p in pkg_dir.joinpath('templates').iterdir():
+            if p.stem in home_comp and p.suffix == '.mako':
+                home_comp[p.stem] = True
 
     views = maybe_import('%s.views' % root_package)
     for name, template in home_comp.items():

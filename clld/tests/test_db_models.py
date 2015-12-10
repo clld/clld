@@ -3,6 +3,7 @@ import os
 from tempfile import gettempdir
 
 from six import PY3
+from clldutils.path import Path
 
 from clld.tests.util import TestWithDb, TestWithDbAndData
 from clld.db.meta import DBSession
@@ -17,14 +18,13 @@ class Tests(TestWithDb):
 
     def test_Files(self):
         from clld.db.models.common import Sentence, Sentence_files
-        from path import path
 
         if PY3:
             return  # pragma: no cover
 
         l = Sentence(id='abc', name='Name')
         f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-        p = f.create(path(gettempdir()), 'content')
+        p = f.create(Path(gettempdir()), 'content')
         assert os.path.exists(p)
         os.remove(p)
         l._files.append(f)

@@ -5,8 +5,8 @@ import requests
 from sqlalchemy.orm import joinedload
 from six.moves.urllib.parse import quote_plus
 from six import text_type
+from clldutils.misc import slug
 
-from clld.util import slug
 from clld.scripts.util import confirm
 from clld.db.models import common
 from clld.db.meta import DBSession
