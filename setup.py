@@ -24,6 +24,7 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
+    'clldutils>=0.3',
     'setuptools>=0.8',
     'pyramid>=1.6a2',
     'pyramid_mako>=1.0',
