@@ -7,7 +7,6 @@ Functionality to handle bibligraphical data in the BibTeX format.
 from __future__ import unicode_literals, division, print_function, absolute_import
 from collections import OrderedDict
 import re
-import io
 
 from zope.interface import Interface, implementer
 from six import unichr, text_type, string_types, iteritems

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import unittest
-from io import open
 
 from mock import Mock, patch
 
