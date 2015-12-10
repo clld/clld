@@ -5,7 +5,6 @@ from json import loads
 from sqlalchemy import create_engine
 from sqlalchemy.orm import joinedload
 from mock import patch, Mock
-from clldutils.path import Path
 
 import clld
 from clld.lib.bibtex import Record
@@ -13,6 +12,11 @@ from clld.tests.util import TestWithEnv, TESTS_DIR
 
 
 class Tests(unittest.TestCase):
+    def test_data_file(self):
+        from clld.scripts.util import data_file
+
+        self.assertEquals(data_file(clld, 'util.py').stem, 'util')
+
     def test_setup_session(self):
         from clld.scripts.util import setup_session
 

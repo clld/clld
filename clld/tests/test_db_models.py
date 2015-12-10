@@ -24,7 +24,7 @@ class Tests(TestWithDb):
 
         l = Sentence(id='abc', name='Name')
         f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-        p = f.create(Path(gettempdir()), 'content')
+        p = f.create(Path(gettempdir()).joinpath('a').as_posix(), 'content')
         assert os.path.exists(p)
         os.remove(p)
         l._files.append(f)
