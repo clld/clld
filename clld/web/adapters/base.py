@@ -6,9 +6,9 @@ from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
 from six import text_type
+from clldutils.misc import to_binary, slug
 
 from clld import interfaces
-from clld.util import to_binary, slug
 
 
 class Renderable(object):

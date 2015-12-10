@@ -26,13 +26,17 @@ which can be edited by hand or with tools such as `Poedit <http://www.poedit.net
 
 The workflow to create alternative translations for core terms of a CLLD app is as follows:
 
-1. Look up the terms available for translation in ``clld/locale/en/LC_MESSAGES/clld.po``.
+1. Extract terms from your code to create the app specific translations file ``myapp/locale/en/LC_MESSAGES/clld.po``::
+
+    python setup.py extract_messages
+
+2. Look up the terms available for translation in ``clld/locale/en/LC_MESSAGES/clld.po``.
    If the term you want to translate is found, go on. Otherwise file an issue at https://github.com/clld/clld/issues
-2. Initialize a localized catalog for your app running::
+3. Initialize a localized catalog for your app running::
 
     python setup.py init_catalog -l en
 
-3. When installing ``clld`` tools have been installed to
+4. When installing ``clld`` tools have been installed to
    `extract terms from python code files <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#extracting-messages-from-code-and-templates>`_.
    To make the term available for extraction, include code like below in ``myapp``.
 
@@ -42,13 +46,13 @@ The workflow to create alternative translations for core terms of a CLLD app is 
     _ = lambda s: s
     _('term you wish to translate')
 
-4. Extract terms from your code and update the local ``myapp/locale/en/LC_MESSAGES/clld.po``::
+5. Extract terms from your code and update the local ``myapp/locale/en/LC_MESSAGES/clld.po``::
 
     python setup.py extract_messages
     python setup.py update_catalog
 
-5. Add a translation by editing ``myapp/locale/en/LC_MESSAGES/clld.po``.
-6. Compile the catalog::
+6. Add a translation by editing ``myapp/locale/en/LC_MESSAGES/clld.po``.
+7. Compile the catalog::
 
     python setup.py compile_catalog
 

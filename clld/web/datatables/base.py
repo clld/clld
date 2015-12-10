@@ -10,6 +10,7 @@ import re
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
+from clldutils.misc import cached_property, nfilter
 
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
@@ -20,7 +21,6 @@ from clld.web.util.helpers import (
 from clld.web.util.downloadwidget import DownloadWidget
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
-from clld.util import cached_property, nfilter
 
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')

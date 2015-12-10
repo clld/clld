@@ -18,9 +18,10 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.inspection import inspect
 
 from zope.sqlalchemy import ZopeTransactionExtension
+from clldutils.misc import NO_DEFAULT, UnicodeMixin
+from clldutils import jsonlib
 
 from clld.db.versioned import versioned_session
-from clld.util import NO_DEFAULT, UnicodeMixin, format_json
 
 
 @event.listens_for(Pool, "checkout")
@@ -314,7 +315,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             col.key for om in inspect(self).mapper.iterate_to_root()
             for col in om.local_table.c
             if col.key not in exclude and not exclude.add(col.key)]
-        return {col: format_json(getattr(self, col)) for col in cols}
+        return {col: jsonlib.format(getattr(self, col)) for col in cols}
 
     def __solr__(self, req):
         """Custom solr document representing the object.

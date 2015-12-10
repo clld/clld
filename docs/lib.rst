@@ -2,13 +2,6 @@
 Lib
 ---
 
-Reading delimiter-separated-values ``dsv``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: clld.lib.dsv
-    :members:
-
-
 iso
 ~~~
 

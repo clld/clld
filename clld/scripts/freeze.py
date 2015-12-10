@@ -13,7 +13,6 @@ files.
 """
 from __future__ import unicode_literals, division, absolute_import, print_function
 import os
-from io import open as ioopen
 from zipfile import ZipFile, ZIP_DEFLATED
 import json
 from tempfile import mkdtemp
@@ -21,7 +20,6 @@ from datetime import datetime, date
 import importlib
 
 from dateutil.parser import parse
-from path import path
 from sqlalchemy import Boolean
 from sqlalchemy.sql import select
 import requests
@@ -29,14 +27,16 @@ try:
     import github3
 except ImportError:
     github3 = None
+from clldutils import jsonlib
+from clldutils.path import Path, as_posix, rmtree
+from clldutils.dsv import reader, UnicodeWriter
 
 from clld.web.adapters.md import TxtCitation
 from clld.web.adapters.csv import CsvmJsonAdapter
 from clld.scripts.util import parsed_args
 from clld.db.meta import Base, DBSession, JSONEncodedDict
 from clld.db.util import set_alembic_version, get_alembic_version
-from clld.lib.dsv import reader, UnicodeWriter
-from clld.util import DeclEnumType, jsondump, jsonload
+from clld.util import DeclEnumType
 
 
 def create_release_func(args, tag=None, name=None, dataset=None):  # pragma: no cover
@@ -215,17 +215,17 @@ def _freeze(table, fpath):
 def freeze_func(args, dataset=None, with_history=True):
     dataset = dataset or args.env['request'].dataset
     dump_dir = args.data_file('dumps')
-
     if not dump_dir.exists():
         dump_dir.mkdir()
+    dump_dir = dump_dir.resolve()
 
-    with ioopen(dump_dir.joinpath('README.txt'), 'w', encoding='utf8') as fp:
+    with dump_dir.joinpath('README.txt').open('w', encoding='utf8') as fp:
         fp.write(freeze_readme(dataset, args.env['request']))
 
     db_version = get_alembic_version(DBSession)
 
     for table in Base.metadata.sorted_tables:
-        csv = dump_dir.joinpath('%s.csv' % table.name).abspath()
+        csv = dump_dir.joinpath('%s.csv' % table.name)
         if with_history or not table.name.endswith('_history'):
             _freeze(table, csv)
 
@@ -237,12 +237,14 @@ def freeze_func(args, dataset=None, with_history=True):
                 # We (ab)use a dc:identifier property to pass the alembic revision of the
                 # database to the unfreeze script.
                 doc["dc:identifier"] = db_version
-            jsondump(doc, dump_dir.joinpath(csvm).abspath())
+            jsonlib.dump(doc, dump_dir.joinpath(csvm))
 
-    with ZipFile(args.data_file('..', 'data.zip'), 'w', ZIP_DEFLATED) as zipfile:
-        for f in dump_dir.files():
-            with ioopen(f, 'rb') as fp:
-                zipfile.writestr(f.basename(), fp.read())
+    with ZipFile(
+            as_posix(args.data_file('..', 'data.zip')), 'w', ZIP_DEFLATED) as zipfile:
+        for f in dump_dir.iterdir():
+            if f.is_file():
+                with f.open('rb') as fp:
+                    zipfile.writestr(f.name, fp.read())
 
 
 TYPE_MAP = {
@@ -280,13 +282,10 @@ def converted(d, converter):
 
 
 def load(table, csv, engine):
-    schema = jsonload(csv.splitext()[0] + '.' + CsvmJsonAdapter.extension)
-    values = []
+    schema = jsonlib.load(csv.parent.joinpath(csv.stem + '.' + CsvmJsonAdapter.extension))
     converter = get_converter(schema['tableSchema'], table)
-    for d in reader(csv, dicts=True, delimiter=','):
-        values.append(converted(d, converter))
-
-    engine.execute(table.insert(), values)
+    engine.execute(
+        table.insert(), [converted(d, converter) for d in reader(csv, dicts=True)])
     return schema.get("dc:identifier")
 
 
@@ -296,10 +295,10 @@ def unfreeze_func(args, engine=None):
     except ImportError:
         pass  # pragma: no cover
     engine = engine or DBSession.get_bind()
-    data_dir = path(mkdtemp())
+    data_dir = Path(mkdtemp())
 
-    with ZipFile(args.module_dir.joinpath('..', 'data.zip')) as fp:
-        fp.extractall(data_dir)
+    with ZipFile(as_posix(args.module_dir.joinpath('..', 'data.zip'))) as fp:
+        fp.extractall(as_posix(data_dir))
 
     db_version = None
     for table in Base.metadata.sorted_tables:
@@ -310,4 +309,4 @@ def unfreeze_func(args, engine=None):
     if db_version:
         set_alembic_version(engine, db_version)
 
-    data_dir.rmtree()
+    rmtree(data_dir)

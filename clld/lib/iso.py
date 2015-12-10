@@ -52,7 +52,7 @@ import re
 import requests
 from bs4 import BeautifulSoup as bs
 
-from clld.lib import dsv
+from clldutils import dsv
 
 
 TAB_NAME_PATTERN = re.compile(
@@ -84,7 +84,8 @@ def get_taburls():
 
 def get_tab(name):
     """Generator for entries in a tab file specified by name."""
-    return dsv.reader(get(get_taburls()[name]).split('\n'), namedtuples=True)
+    return dsv.reader(
+        get(get_taburls()[name]).split('\n'), namedtuples=True, delimiter='\t')
 
 
 def _text(e):

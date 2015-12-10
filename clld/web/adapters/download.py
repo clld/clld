@@ -6,11 +6,13 @@ from gzip import GzipFile
 from contextlib import closing
 
 from six import string_types, BytesIO, text_type, StringIO, PY3
-from path import path
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
-from clld.lib.dsv import UnicodeWriter
+from clldutils.path import Path, remove, move
+from clldutils.dsv import UnicodeWriter
+from clldutils.misc import format_size, to_binary
+
 from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
@@ -19,7 +21,6 @@ from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.db.models.common import Language, Source, LanguageIdentifier
 from clld.db.util import page_query
-from clld.util import format_size, to_binary
 
 
 README = """
@@ -40,7 +41,7 @@ def pkg_name(pkg):
 
 
 def abspath(asset_spec):
-    return path(AssetResolver().resolve(asset_spec).abspath())
+    return Path(AssetResolver().resolve(asset_spec).abspath())
 
 
 def download_asset_spec(pkg, *comps):
@@ -84,16 +85,16 @@ class Download(object):
     def size(self, req):
         _path = self.abspath(req)
         if _path.exists():
-            return format_size(_path.size)
+            return format_size(_path.stat().st_size)
 
     def label(self, req):
         return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
 
     def create(self, req, filename=None, verbose=True):
         p = self.abspath(req)
-        if not p.dirname().exists():  # pragma: no cover
-            p.dirname().mkdir()
-        tmp = path('%s.tmp' % p)
+        if not p.parent.exists():  # pragma: no cover
+            p.parent.mkdir()
+        tmp = Path('%s.tmp' % p.as_posix())
 
         if self.rdf:
             # we do not create archives with a readme for rdf downloads, because each
@@ -103,14 +104,14 @@ class Download(object):
             # TODO: write test for the file name things!?
             #
             with closing(GzipFile(
-                    filename=str(tmp.splitext()[0].splitext()[0]), fileobj=tmp.open('wb')
+                    filename=Path(tmp.stem).stem, fileobj=tmp.open('wb')
             )) as fp:
                 self.before(req, fp)
                 for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                     self.dump(req, fp, item, i)
                 self.after(req, fp)
         else:
-            with ZipFile(tmp, 'w', ZIP_DEFLATED) as zipfile:
+            with ZipFile(tmp.as_posix(), 'w', ZIP_DEFLATED) as zipfile:
                 if not filename:
                     fp = self.get_stream()
                     self.before(req, fp)
@@ -131,8 +132,8 @@ class Download(object):
                         req.dataset.license,
                         TxtCitation(None).render(req.dataset, req)).encode('utf8'))
         if p.exists():  # pragma: no cover
-            p.remove()
-        tmp.move(p)
+            remove(p)
+        move(tmp, p)
 
     def get_stream(self):
         return BytesIO()

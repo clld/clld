@@ -2,6 +2,18 @@
 Changes
 -------
 
+2.0.0
+~~~~~
+
+Backwards incompatible changes:
+
+- clld now requires clldutils, thus all functionality now available in 
+  clldutils has been removed from clld.
+- clld does not depend on path.py anymore, but instead uses clldutils.path,
+  which in turn uses pathlib2 for python 2.7 and the standard library's
+  pathlib on python 3.4 for object oriented file system path handling.
+
+
 1.8.0
 ~~~~~
 

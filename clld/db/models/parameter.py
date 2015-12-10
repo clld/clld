@@ -7,11 +7,11 @@ from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship, joinedload_all
 
 from zope.interface import implementer
+from clldutils.misc import cached_property
 
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
 from clld.db.versioned import Versioned
 from clld import interfaces
-from clld.util import cached_property
 from clld.web.icon import ORDERED_ICONS
 
 from . import (

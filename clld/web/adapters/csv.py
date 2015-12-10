@@ -14,9 +14,9 @@ from itertools import chain
 from sqlalchemy import types, Column
 from sqlalchemy.inspection import inspect
 from pyramid.renderers import render as pyramid_render
+from clldutils.dsv import UnicodeWriter
 
 from clld.web.adapters.base import Index
-from clld.lib.dsv import UnicodeWriter
 
 QUERY_LIMIT = 2000
 

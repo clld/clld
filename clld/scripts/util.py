@@ -1,6 +1,5 @@
 """Shared functionality for clld console scripts."""
 from __future__ import unicode_literals, division, absolute_import, print_function
-import os
 import sys
 from distutils.util import strtobool
 from collections import defaultdict
@@ -13,15 +12,16 @@ from six.moves import input
 import transaction
 from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy.orm import joinedload
-from path import path
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
 from nameparser import HumanName
+from clldutils.path import Path, as_posix, remove
+from clldutils import jsonlib
+from clldutils.misc import slug
 
 from clld.db.meta import VersionedDBSession, DBSession, Base
 from clld.db.models import common
 from clld.db.util import page_query
-from clld.util import slug, jsonload, jsondump
 from clld.lib import bibtex
 
 
@@ -129,11 +129,8 @@ def confirm(question, default=False):  # pragma: no cover
 
 
 def data_file(module, *comps):
-    """Return path object of file in the data directory of an app.
-
-    >>> assert data_file(common)
-    """
-    return path(module.__file__).dirname().joinpath('..', 'data', *comps)
+    """Return Path object of file in the data directory of an app."""
+    return Path(module.__file__).parent.joinpath('..', 'data', *comps)
 
 
 def setup_session(config_uri, engine=None):
@@ -143,7 +140,7 @@ def setup_session(config_uri, engine=None):
     DBSession.configure(bind=engine)
     VersionedDBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-    return path(config_uri.split('#')[0]).abspath().dirname().basename()
+    return Path(config_uri.split('#')[0]).resolve().parent.name
 
 
 class ExistingDir(argparse.Action):  # pragma: no cover
@@ -151,10 +148,10 @@ class ExistingDir(argparse.Action):  # pragma: no cover
     """Action to select an existing directory."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        path_ = path(values)
+        path_ = Path(values)
         if not path_.exists():
             raise argparse.ArgumentError(self, 'path does not exist')
-        if not path_.isdir():
+        if not path_.is_dir():
             raise argparse.ArgumentError(self, 'path is no directory')
         setattr(namespace, self.dest, path_)
 
@@ -164,7 +161,7 @@ class ExistingConfig(argparse.Action):  # pragma: no cover
     """Action to select an existing config file."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        path_ = path(values.split('#')[0])
+        path_ = Path(values.split('#')[0])
         if not path_.exists():
             raise argparse.ArgumentError(self, 'file does not exist')
         setattr(namespace, self.dest, values)
@@ -221,9 +218,8 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     if engine:
         args.log.info('using bind %s' % engine)
     args.data_file = partial(data_file, args.module)
-    args.module_dir = path(args.module.__file__).dirname()
-    args.migrations_dir = path(
-        args.module.__file__).dirname().joinpath('..', 'migrations')
+    args.module_dir = Path(args.module.__file__).parent
+    args.migrations_dir = Path(args.module.__file__).parent.joinpath('..', 'migrations')
     return args
 
 
@@ -250,13 +246,13 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
     api_url = "https://www.googleapis.com/books/v1/volumes?"
 
     if command == 'cleanup':
-        for fname in args.data_file('gbs').files('*.json'):
+        for fname in args.data_file('gbs').glob('*.json'):
             try:
-                data = jsonload(fname)
+                data = jsonlib.load(fname)
                 if data.get('totalItems') == 0:
-                    os.remove(fname)
+                    remove(fname)
             except ValueError:
-                os.remove(fname)
+                remove(fname)
         return
 
     if not sources:
@@ -276,7 +272,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
         if command in ['verify', 'update']:
             if filepath.exists():
                 try:
-                    data = jsonload(filepath)
+                    data = jsonlib.load(filepath)
                 except ValueError:
                     log.warn('no JSON object found in: %s' % filepath)
                     continue
@@ -317,7 +313,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
                 log.info(source.publisher)
                 if not confirm('Are the records the same?'):
                     log.warn('---- removing ----')
-                    jsondump({"totalItems": 0}, filepath)
+                    jsonlib.dump({"totalItems": 0}, filepath)
         elif command == 'update':
             source.google_book_search_id = item['id']
             source.update_jsondata(gbs=item)
@@ -339,7 +335,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
                 r = requests.get(url, headers={'accept': 'application/json'})
                 log.info('%s - %s' % (r.status_code, url))
                 if r.status_code == 200:
-                    with open(filepath, 'w') as fp:
+                    with open(as_posix(filepath), 'w') as fp:
                         fp.write(r.text.encode('utf8'))
                 elif r.status_code == 403:
                     log.warn("limit reached")
@@ -356,9 +352,6 @@ class Data(defaultdict):
 
     The values are dictionaries, keyed by the name of the model class used to create the
     new objects.
-
-    >>> d = Data()
-    >>> assert d['k'] == {}
     """
 
     def __init__(self, **kw):

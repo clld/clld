@@ -24,15 +24,15 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
+    'clldutils>=0.5',
     'setuptools>=0.8',
-    'pyramid>=1.6a2',
+    'pyramid>=1.6b2',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',
     'PasteDeploy>=1.5.0',  # py3 compat
     'waitress',
     'purl>=0.5',
-    'path.py',
     'pyramid_exclog',
     'pytz',
     'zope.sqlalchemy',
@@ -82,7 +82,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='1.8.0',
+    version='2.0.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,

@@ -2,13 +2,13 @@
 from __future__ import unicode_literals, division, print_function, absolute_import
 import requests
 from six import string_types
+from clldutils.misc import cached_property
 
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
 from clld.web.util.htmllib import HTML
 from clld.web.util.component import Component
 from clld.web.adapters.geojson import GeoJson, GeoJsonCombinationDomainElement, get_lonlat
-from clld.util import cached_property
 
 
 class Layer(object):

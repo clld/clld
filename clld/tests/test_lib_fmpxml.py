@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import unittest
-from io import open
 
 from mock import Mock, patch
 
@@ -8,10 +7,13 @@ from clld.tests.util import TESTS_DIR
 
 
 class Tests(unittest.TestCase):
+    def get_result(self):
+        return TESTS_DIR.joinpath('fmpxmlresult.xml').open(encoding='utf8').read()
+
     def test_Result(self):
         from clld.lib.fmpxml import Result
 
-        Result(open(TESTS_DIR.joinpath('fmpxmlresult.xml'), encoding='utf8').read())
+        Result(self.get_result())
 
     def test_normalize_markup(self):
         from clld.lib.fmpxml import normalize_markup
@@ -31,9 +33,7 @@ class Tests(unittest.TestCase):
     def test_Client(self):
         from clld.lib.fmpxml import Client
 
-        r = Mock(
-            text=open(TESTS_DIR.joinpath('fmpxmlresult.xml'), encoding='utf8').read())
-
+        r = Mock(text=self.get_result())
         with patch('clld.lib.fmpxml.requests', Mock(get=lambda *a, **kw: r)):
             c = Client(None, None, None, None, verbose=False)
             c.get('stuff')

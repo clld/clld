@@ -9,9 +9,9 @@ from itertools import groupby
 from zope.interface import implementer
 from pyramid.renderers import render as pyramid_render
 from sqlalchemy.orm import joinedload
+from clldutils.misc import nfilter
 
 from clld.web.adapters.base import Renderable
-from clld.util import nfilter
 from clld import interfaces
 from clld.db.meta import DBSession
 from clld.db.models.common import ValueSet, Value, Language

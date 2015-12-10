@@ -7,14 +7,14 @@ Functionality to handle bibligraphical data in the BibTeX format.
 from __future__ import unicode_literals, division, print_function, absolute_import
 from collections import OrderedDict
 import re
-import io
 
-from path import path
 from zope.interface import Interface, implementer
 from six import unichr, text_type, string_types, iteritems
 from six.moves import filter
+from clldutils.path import Path
+from clldutils.misc import UnicodeMixin, to_binary
 
-from clld.util import UnicodeMixin, DeclEnum, to_binary
+from clld.util import DeclEnum
 from clld.lib.bibutils import convert
 from clld.lib import latex
 
@@ -548,8 +548,10 @@ class Database(_Convertable):
 
         @param bibFile: path of the bibtex-database-file to be read.
         """
-        if path(bibFile).exists():
-            with io.open(bibFile, encoding=encoding) as fp:
+        if not isinstance(bibFile, Path):
+            bibFile = Path(bibFile)
+        if bibFile.exists():
+            with bibFile.open(encoding=encoding) as fp:
                 content = fp.read()
         else:
             content = ''

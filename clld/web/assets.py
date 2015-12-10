@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
+
 from webassets import Environment, Bundle
-from path import path
+from clldutils.path import Path
 
 import clld
 
@@ -9,14 +10,10 @@ def skip(_in, out, **kw):
     """filter to skip content of assets which are fetched from CDN in production."""
     out.write('')  # pragma: no cover
 
+_static_path = Path(clld.__file__).parent.joinpath('web', 'static').as_posix()
 environment = Environment(
-    path(clld.__file__).dirname().joinpath('web', 'static'),
-    '/clld:web/static/',
-    manifest='json:',
-    auto_build=False)
-
-environment.append_path(
-    path(clld.__file__).dirname().joinpath('web', 'static'), url='/clld:web/static/')
+    _static_path, '/clld:web/static/', manifest='json:', auto_build=False)
+environment.append_path(_static_path, url='/clld:web/static/')
 
 bundles = {
     'js': [

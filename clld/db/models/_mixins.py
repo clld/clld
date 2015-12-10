@@ -5,6 +5,7 @@ import os
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
+from clldutils.path import Path
 
 __all__ = (
     'IdNameDescriptionMixin',
@@ -80,11 +81,14 @@ class FilesMixin(IdNameDescriptionMixin):
 
         :return: File-system path of the file that was created.
         """
+        if not isinstance(dir_, Path):
+            dir_ = Path(dir_)
         p = dir_.joinpath(self.relpath)
-        p.dirname().makedirs_p()
-        with open(p, 'wb') as fp:
+        if not p.parent.exists():
+            p.parent.mkdir(parents=True)
+        with open(p.as_posix(), 'wb') as fp:
             fp.write(content)
-        return p
+        return p.as_posix()
 
 
 class HasFilesMixin(object):
