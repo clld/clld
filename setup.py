@@ -26,7 +26,7 @@ except IOError:
 install_requires = [
     'clldutils>=0.5',
     'setuptools>=0.8',
-    'pyramid>=1.6a2',
+    'pyramid>=1.6b2',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',

@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 import os
-from tempfile import gettempdir
+from tempfile import mkdtemp
 
 from six import PY3
-from clldutils.path import Path
+from clldutils.path import Path, rmtree
 
 from clld.tests.util import TestWithDb, TestWithDbAndData
 from clld.db.meta import DBSession
@@ -24,9 +24,9 @@ class Tests(TestWithDb):
 
         l = Sentence(id='abc', name='Name')
         f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-        p = f.create(Path(gettempdir()).joinpath('a').as_posix(), 'content')
+        p = f.create(Path(mkdtemp()).joinpath('clldtest').as_posix(), 'content')
         assert os.path.exists(p)
-        os.remove(p)
+        rmtree(Path(p).parent.parent)
         l._files.append(f)
         DBSession.add(l)
         DBSession.flush()
