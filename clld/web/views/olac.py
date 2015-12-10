@@ -11,8 +11,8 @@ from collections import namedtuple
 from pyramid.renderers import render
 from pyramid.response import Response
 from sqlalchemy.orm import joinedload_all, undefer
+from clldutils.misc import UnicodeMixin
 
-from clld.util import UnicodeMixin
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
 from clld.interfaces import IOlacConfig
 

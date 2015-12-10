@@ -1,8 +1,7 @@
 """Implementation of a component concept."""
 from markupsafe import Markup
 from pyramid.renderers import render
-
-from clld.util import cached_property
+from clldutils.misc import cached_property
 
 
 class Component(object):

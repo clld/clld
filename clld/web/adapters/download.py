@@ -11,6 +11,7 @@ from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
 from clldutils.path import Path, remove, move
 from clldutils.dsv import UnicodeWriter
+from clldutils.misc import format_size, to_binary
 
 from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
@@ -20,7 +21,6 @@ from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
 from clld.db.models.common import Language, Source, LanguageIdentifier
 from clld.db.util import page_query
-from clld.util import format_size, to_binary
 
 
 README = """

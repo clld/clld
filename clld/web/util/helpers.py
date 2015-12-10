@@ -7,9 +7,7 @@ from __future__ import unicode_literals
 import os
 import re
 from itertools import groupby  # we just import this to have it available in templates!
-assert groupby  # appease pyflakes
 import datetime  # we just import this to have it available in templates!
-assert datetime
 from base64 import b64encode
 from math import floor
 
@@ -28,10 +26,10 @@ from sqlalchemy.orm import joinedload_all
 from markupsafe import Markup
 from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
-assert get_current_request
 from pyramid.interfaces import IRoutesMapper
 from purl import URL
 from zope.interface import providedBy
+from clldutils.misc import xmlchars
 
 import clld
 from clld import interfaces
@@ -41,14 +39,17 @@ from clld.web.util.downloadwidget import DownloadWidget
 from clld.db.meta import DBSession
 from clld.db.models import common as models
 from clld.web.adapters import get_adapter, get_adapters
-assert get_adapter
-assert get_adapters
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 from clld.lib import rdf
-from clld.util import xmlchars
-assert xmlchars
 
+# appease pyflakes
+assert get_adapter
+assert get_adapters
+assert get_current_request
+assert datetime
+assert xmlchars
+assert groupby
 
 #: dimension of marker images on maps, legends and in datatables.
 MARKER_IMG_DIM = '20'

@@ -13,8 +13,9 @@ from zope.interface import Interface, implementer
 from six import unichr, text_type, string_types, iteritems
 from six.moves import filter
 from clldutils.path import Path
+from clldutils.misc import UnicodeMixin, to_binary
 
-from clld.util import UnicodeMixin, DeclEnum, to_binary
+from clld.util import DeclEnum
 from clld.lib.bibutils import convert
 from clld.lib import latex
 

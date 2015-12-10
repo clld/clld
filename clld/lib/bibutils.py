@@ -5,7 +5,7 @@ python interface to bibutils.
 """
 from subprocess import Popen, PIPE
 
-from clld.util import encoded
+from clldutils.misc import encoded
 
 
 FORMATS = ['bib', 'end', 'ris']

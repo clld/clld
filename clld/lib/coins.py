@@ -9,7 +9,7 @@ import re
 from six import string_types, binary_type
 from six.moves.urllib.parse import urlencode
 
-from clld.util import UnicodeMixin, encoded, to_binary
+from clldutils.misc import UnicodeMixin, encoded, to_binary
 
 
 FIELDS = {

@@ -5,10 +5,6 @@ import re
 from six import add_metaclass
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 from clldutils import misc
-from clldutils import jsonlib
-
-
-DATETIME_ISO_FORMAT = jsonlib.DATETIME_ISO_FORMAT
 
 
 def summary(text, max_length=70):
@@ -26,30 +22,10 @@ def summary(text, max_length=70):
     return res.strip()
 
 
-parse_json_with_datetime = jsonlib.parse
-format_json = jsonlib.format
-jsondump = jsonlib.dump
-jsonload = jsonlib.load
-nfilter = misc.nfilter
-to_binary = misc.to_binary
-dict_merged = misc.dict_merged
-
-#: A singleton which can be used to distinguish no-argument-passed from None passed as
-#: argument in callables with optional arguments.
-NO_DEFAULT = misc.NO_DEFAULT
-
-xmlchars = misc.xmlchars
-UnicodeMixin = misc.UnicodeMixin
-format_size = misc.format_size
-slug = misc.slug
-encoded = misc.encoded
-cached_property = misc.cached_property
-
-
 #
 # From "The Enum Recipe": http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/
 #
-class EnumSymbol(UnicodeMixin):
+class EnumSymbol(misc.UnicodeMixin):
 
     """Define a fixed symbol tied to a parent class."""
 

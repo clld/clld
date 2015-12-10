@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 from collections import namedtuple
 
 from six import string_types, BytesIO
+from clldutils.misc import encoded
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import (
     Namespace, DC, DCTERMS, DOAP, FOAF, OWL, RDF, RDFS, SKOS, VOID, XMLNS, XSD,
@@ -10,8 +11,6 @@ from rdflib.namespace import (
 # make flake8 happy, but still have the following importable from here:
 assert DOAP
 assert XMLNS
-
-from clld.util import encoded
 
 
 Notation = namedtuple('Notation', 'name extension mimetype uri')

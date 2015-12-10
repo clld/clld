@@ -33,7 +33,6 @@ install_requires = [
     'PasteDeploy>=1.5.0',  # py3 compat
     'waitress',
     'purl>=0.5',
-    'path.py',
     'pyramid_exclog',
     'pytz',
     'zope.sqlalchemy',

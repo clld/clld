@@ -1,9 +1,9 @@
 """Functionality to represent clld objects as RDF graphs and serializations."""
 from sqlalchemy.orm import load_only
+from clldutils.misc import xmlchars
 
 from clld.web.adapters.base import Representation, Index
 from clld.lib.rdf import convert
-from clld.util import xmlchars
 
 
 class Rdf(Representation):
