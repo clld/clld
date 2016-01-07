@@ -26,7 +26,7 @@ except IOError:
 install_requires = [
     'clldutils>=0.5',
     'setuptools>=0.8',
-    'pyramid>=1.6b2',
+    'pyramid>=1.6',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',
@@ -82,7 +82,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='2.0.0',
+    version='2.1.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,
@@ -104,9 +104,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires = install_requires,
-    extras_require = {'testing': testing_extras, 'docs': docs_extras},
-    tests_require = tests_require,
+    install_requires=install_requires,
+    extras_require={'testing': testing_extras, 'docs': docs_extras},
+    tests_require=tests_require,
     test_suite="clld.tests",
     message_extractors={'clld': [
         ('**.py', 'python', None),

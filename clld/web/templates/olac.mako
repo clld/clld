@@ -6,8 +6,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
                              http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-<%namespace name="olac_record" file="olac_record.mako"/>
-<%namespace name="olac_archive" file="olac_archive.mako"/>
+    <%namespace name="olac_record" file="olac_record.mako"/>
+    <%namespace name="olac_archive" file="olac_archive.mako"/>
+
 <%def name="header(lang)">
   <oai:header>
     <oai:identifier>${cfg.format_identifier(request, lang)}</oai:identifier>
@@ -35,7 +36,7 @@
       <oai:repositoryName>${request.dataset}</oai:repositoryName>
       <oai:baseURL>${request.route_url('olac')}</oai:baseURL>
       <oai:protocolVersion>2.0</oai:protocolVersion>
-      <oai:adminEmail>robert_forkel@eva.mpg.de</oai:adminEmail>
+      <oai:adminEmail>${cfg.admin(request).email}</oai:adminEmail>
       <oai:earliestDatestamp>${date(earliest.updated)}</oai:earliestDatestamp>
       <oai:deletedRecord>no</oai:deletedRecord>
       <oai:granularity>YYYY-MM-DD</oai:granularity>

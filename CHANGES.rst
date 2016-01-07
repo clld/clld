@@ -2,6 +2,12 @@
 Changes
 -------
 
+2.1.0
+~~~~~
+
+Better configurability of the OLAC interface.
+
+
 2.0.0
 ~~~~~
 
