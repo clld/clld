@@ -144,17 +144,37 @@ class OlacConfig(object):
         assert self.delimiter in id_
         return id_.split(self.delimiter)[-1]
 
+    def admin(self, req):
+        """Configure the archive participant with role admin.
+
+        Note: According to http://www.language-archives.org/OLAC/repositories.html the
+        list of participants
+        > must include the system administrator whose email address is given in the
+        > <oai:adminEmail> element of the Identify response.
+
+        :param req: The current request.
+        :return: A suitable `Participant` instance or None.
+        """
+        return Participant("Admin", "Archive Admin", req.dataset.contact)
+
     def description(self, req):
+        # Note: According to http://www.language-archives.org/OLAC/repositories.html the
+        # list of participants
+        # > must include the system administrator whose email address is given in the
+        # > <oai:adminEmail> element of the Identify response.
+        participants = [self.admin(req)]
+        for ed in req.dataset.editors:
+            participants.append(Participant(
+                "Editor",
+                ed.contributor.name,
+                ed.contributor.email or req.dataset.contact))
         return {
             'archiveURL': 'http://%s/' % req.dataset.domain,
-            'participants': [
-                Participant("Admin", 'Robert Forkel', 'robert_forkel@eva.mpg.de'),
-            ] + [Participant("Editor", ed.contributor.name, ed.contributor.email
-                             or req.dataset.contact) for ed in req.dataset.editors],
+            'participants': participants,
             'institution': Institution(
                 req.dataset.publisher_name,
                 req.dataset.publisher_url,
-                '%s, Germany' % req.dataset.publisher_place,
+                req.dataset.publisher_place,
             ),
             'synopsis': req.dataset.description or '',
         }

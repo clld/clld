@@ -55,7 +55,9 @@ ${TxtCitation.render(request.dataset, request)}
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
         <skos:prefLabel xml:lang="en">${request.dataset.publisher_name}</skos:prefLabel>
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>
-        <foaf:mbox>${request.dataset.id}@eva.mpg.de</foaf:mbox>
+        % if request.dataset.contact:
+            <foaf:mbox>${request.dataset.contact}</foaf:mbox>
+        % endif
     </foaf:Organization>
     <dctype:Software rdf:about="https://github.com/clld/clld">
         <dcterms:identifier rdf:resource="https://github.com/clld/clld/releases/tag/${__version__}"/>
