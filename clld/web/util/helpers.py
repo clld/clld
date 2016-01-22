@@ -141,7 +141,7 @@ def dumps(obj):
 def data_uri(filename, mimetype):
     with open(filename, mode='rb') as fp:
         content = fp.read()
-    return 'data:%s;base64,%s' % (mimetype, b64encode(content))
+    return 'data:%s;base64,%s' % (mimetype, b64encode(content).decode())
 
 
 class JS(object):

@@ -85,7 +85,8 @@ class Tests(TestWithEnv):
     def test_data_uri(self):
         from clld.web.util.helpers import data_uri
 
-        data_uri(__file__, 'text/plain')
+        res = data_uri(__file__, 'text/plain')
+        self.assertFalse(res.split(',')[1].startswith("b'"))
 
     def test_gbs_link(self):
         from clld.web.util.helpers import gbs_link
