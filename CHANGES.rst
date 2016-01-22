@@ -2,6 +2,12 @@
 Changes
 -------
 
+2.1.1
+~~~~~
+
+Bugfix release. Fixes #94 and #95.
+
+
 2.1.0
 ~~~~~
 
