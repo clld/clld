@@ -285,7 +285,7 @@ def atom_feed(request, feed_url):
         res = None
     if res and res.status_code == 200:
         d = feedparser.parse(res.content.strip())
-        ctx['title'] = d.feed.title
+        ctx['title'] = getattr(d.feed, 'title', None)
         for e in d.entries:
             ctx['entries'].append(dict(
                 title=e.title,

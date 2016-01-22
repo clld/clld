@@ -113,7 +113,7 @@ class Tests(TestWithEnv):
     def test_atom_feed(self):
         from clld.web.views import atom_feed
 
-        class FeedResponse(object):
+        class FeedResponseWithTitle(object):
             status_code = 200
             content = b"""\
 <?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
@@ -136,16 +136,36 @@ class Tests(TestWithEnv):
 </channel>
 """
 
-        class MockRequests(object):
-            get = Mock(return_value=FeedResponse)
+        class FeedResponseWithoutTitle(object):
+            status_code = 200
+            content = b"""\
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:sy="http://purl.org/rss/1.0/modules/syndication/">
+<channel>
+    <link>http://blog.wals.info</link>
+    <description>WALS Online Blog</description>
+</channel>
+"""
+
+        class MockRequests1(object):
+            get = Mock(return_value=FeedResponseWithTitle)
+
+        class MockRequests2(object):
+            get = Mock(return_value=FeedResponseWithoutTitle)
 
         class MockRequestsTimeout(object):
             def get(self, *args, **kw):
                 raise ReadTimeout()
 
-        with patch('clld.web.views.requests', MockRequests()):
+        with patch('clld.web.views.requests', MockRequests1()):
             res = atom_feed(self.env['request'], None)
             self.assertIn('<entry>', res.body.decode('utf8'))
+
+        with patch('clld.web.views.requests', MockRequests2()):
+            res = atom_feed(self.env['request'], None)
+            self.assertNotIn('<entry>', res.body.decode('utf8'))
 
         with patch('clld.web.views.requests', MockRequestsTimeout()):
             res = atom_feed(self.env['request'], None)
