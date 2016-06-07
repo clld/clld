@@ -45,6 +45,7 @@ Contents:
     :maxdepth: 2
 
     tutorial
+    initializedb
     resources
     datamodeling
     extending
