@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 VENVS=~/venvs
 
 cd $VENVS/cheesecake
@@ -25,7 +26,7 @@ cd $VENVS
 rm -rf testapp
 
 cd $VENVS
-/opt/python3.4/bin/pyvenv testapp
+virtualenv --python=python3.4 testapp
 cd testapp
 . bin/activate
 pip install "$VENVS/cheesecake/clld/dist/clld-$1.tar.gz"

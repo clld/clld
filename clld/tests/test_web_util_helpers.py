@@ -11,6 +11,11 @@ from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
+    def test_newline2br(self):
+        from clld.web.util.helpers import newline2br
+
+        self.assertEqual(newline2br(None), '')
+
     def test_charis_font_spec_css(self):
         from clld.web.util.helpers import charis_font_spec_css
 
@@ -149,6 +154,12 @@ class Tests(TestWithEnv):
         from clld.web.util.helpers import text2html
 
         self.assertTrue('<br' in text2html('abc\ndef'))
+        self.assertIn('div', text_type(text2html('chunk', mode='p')))
+
+    def test_partitioned(self):
+        from clld.web.util.helpers import partitioned
+
+        self.assertEqual(list(partitioned(range(10)))[0], [0, 1, 2, 3])
 
     def test_contactmail(self):
         from clld.web.util.helpers import contactmail

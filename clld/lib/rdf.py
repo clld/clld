@@ -45,11 +45,6 @@ NAMESPACES = {
 def expand_prefix(p):
     """Expand default prefixes if possible.
 
-    >>> assert str(expand_prefix('dcterms:title')) == 'http://purl.org/dc/terms/title'
-    >>> assert expand_prefix('noprefix:lname') == 'noprefix:lname'
-    >>> assert expand_prefix('rdf:nolname') == 'rdf:nolname'
-    >>> assert expand_prefix('nocolon') == 'nocolon'
-
     :param p: a qualified name in prefix:localname notation or a URL.
     :return: a string URL or a URIRef
     """
@@ -64,10 +59,7 @@ def expand_prefix(p):
 
 
 def url_for_qname(qname):
-    """Expand qname to full URL respecting our default prefixes.
-
-    >>> assert url_for_qname('dcterms:title') == 'http://purl.org/dc/terms/title'
-    """
+    """Expand qname to full URL respecting our default prefixes."""
     return str(expand_prefix(qname))
 
 

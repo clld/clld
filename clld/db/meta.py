@@ -1,7 +1,7 @@
 """We provide some infrastructure to build extensible database models."""
-try:
+try:  # pragma: no cover
     import simplejson as json
-except ImportError:
+except ImportError:  # pragma: no cover
     import json
 
 from six import string_types, text_type, PY2
