@@ -509,10 +509,7 @@ def contactmail(req, ctx=None, title='contact maintainer'):
 
 
 def newline2br(text):
-    """Replace newlines in text with HTML br tags.
-
-    >>> assert newline2br(None) == ''
-    """
+    """Replace newlines in text with HTML br tags."""
     if not text:
         return ''
     chunks = []
@@ -524,10 +521,7 @@ def newline2br(text):
 
 
 def text2html(text, mode='br', sep='\n\n'):
-    """Turn plain text into simple HTML.
-
-    >>> assert 'div' in text_type(text2html('chunk', mode='p'))
-    """
+    """Turn plain text into simple HTML."""
     if mode == 'p':
         return HTML.div(*[HTML.p(literal(newline2br(line))) for line in text.split(sep)])
     return HTML.p(literal(newline2br(text)))
@@ -625,10 +619,7 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
 
 
 def partitioned(items, n=3):
-    """Partition items into n buckets.
-
-    >>> assert list(partitioned(range(10)))[0] == [0, 1, 2, 3]
-    """
+    """Partition items into n buckets."""
     max_items_per_bucket, rem = divmod(len(items), n)
     if rem:
         max_items_per_bucket += 1

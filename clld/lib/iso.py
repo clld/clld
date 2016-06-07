@@ -67,7 +67,7 @@ def get(path):
 
 def get_taburls():
     """Retrieve the current (date-stamped) file names for download files from sil."""
-    soup = bs(get('download.asp'))
+    soup = bs(get('download.asp'), "html5lib")
     name_map = {
         None: 'codes',
         '_Name_Index': 'names',
@@ -94,7 +94,7 @@ def _text(e):
 
 def get_documentation(code):
     """Scrape information about a iso 639-3 code from the documentation page."""
-    soup = bs(get('documentation.asp?id=' + code))
+    soup = bs(get('documentation.asp?id=' + code), "html5lib")
     assert code in soup.find_all('h1', limit=1)[0].text
 
     info = {}

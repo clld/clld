@@ -13,7 +13,8 @@ class Tests(unittest.TestCase):
     def test_Result(self):
         from clld.lib.fmpxml import Result
 
-        Result(self.get_result())
+        r = Result(self.get_result())
+        self.assertIn('Data_record_id', list(r)[0])
 
     def test_normalize_markup(self):
         from clld.lib.fmpxml import normalize_markup

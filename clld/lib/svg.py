@@ -40,7 +40,6 @@ def pie(data, colors, width=34):
         paths = []
         for index, value in enumerate(data):
             percent = percent_scale * value
-            radians = prev_percent * rad_mult
             radians = (prev_percent + percent) * rad_mult
             path = ' '.join((
                 "M%(radius)s,%(radius)s",

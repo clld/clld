@@ -68,6 +68,11 @@ def icontains(col, qs):
     """Infix search condition.
 
     Basic support is provided for specifying matches at beginning or end of the text.
+    In addition, every special search syntax recognized by the ``LIKE`` operator of the
+    underlying SQL dialect will work. Thus, to match strings with a specific <prefix>
+    and <suffix>, a query string of the form "^<prefix>%<suffix>$" will do on PostgreSQL.
+
+    .. seealso:: https://www.postgresql.org/docs/9.1/static/functions-matching.html
     """
     spattern = re.compile('^(\^|\\\\b)')
     epattern = re.compile('(\$|\\\\b)$')

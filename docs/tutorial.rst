@@ -133,6 +133,35 @@ Adding objects to the database is done by instantiating model objects and
 to ``clld.db.meta.DBSession``. (This session is already initialized when your code in ``initializedb.py`` runs.)
 For more information about database objects read the chapter :ref:`db_objects`.
 
+A minimal example (building upon the default ``main`` function in ``initializedb.py`` as created
+for the app skeleton) adding just two `Value` objects may look as follows
+
+.. code-block:: python
+
+    def main(args):
+        data = Data()
+
+        dataset = common.Dataset(id=myapp.__name__, domain='myapp.clld.org')
+        DBSession.add(dataset)
+
+        # All ValueSets must be related to a contribution:
+        contrib = common.Contribution(id='contrib', name='the contribution')
+
+        # All ValueSets must be related to a Language:
+        lang = common.Language(id='lang', name='A Language', latitude=20, longitude=20)
+
+        param = common.Parameter(id='param', name='Feature 1')
+
+        # ValueSets group Values related to the same Language, Contribution and
+        # Parameter
+        vs = common.ValueSet(id='vs', language=lang, parameter=param, contribution=contrib)
+
+        # Values store the actual "measurements":
+        DBSession.add(common.Value(id='v1', name='value 1', valueset=vs))
+        DBSession.add(common.Value(id='v2', name='value 2', valueset=vs))
+
+A more involved example, creating instances of all core model classes, is available in chapter :ref:`initializedb`.
+
 The ``data`` object present in the ``main`` function in ``initializedb.py`` is an instance of
 
 .. autoclass:: clld.scripts.util.Data

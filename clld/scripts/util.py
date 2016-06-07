@@ -352,6 +352,10 @@ class Data(defaultdict):
 
     The values are dictionaries, keyed by the name of the model class used to create the
     new objects.
+
+    >>> data = Data()
+    >>> l = data.add(common.Language, 'l', id='abc', name='Abc Language')
+    >>> assert l == data['Language']['l']
     """
 
     def __init__(self, **kw):
@@ -359,6 +363,14 @@ class Data(defaultdict):
         self.defaults = kw
 
     def add(self, model, key, **kw):
+        """
+        Create an instance of a model class to be persisted in the database.
+
+        :param model: The model class we want to create an instance of.
+        :param key: A key which can be used to retrieve the instance later.
+        :param kw: Keyword parameters passed to model class for initialisation.
+        :return: The newly created instance of model class.
+        """
         if '.' in kw.get('id', ''):
             raise ValueError('Object id contains illegal character "."')
         if list(kw.keys()) == ['_obj']:

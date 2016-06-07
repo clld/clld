@@ -2,6 +2,12 @@
 Changes
 -------
 
+2.1.2
+~~~~~
+
+More and better docs and a release procedure adapted to Ubuntu 14.04.
+
+
 2.1.1
 ~~~~~
 

@@ -13,15 +13,15 @@ Releasing clld
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4):
 
-  $ ./venvs/clld-clld/clld/build.sh "<prev-rel-no>"
+  $ ./venvs/clld/clld/build.sh "<prev-rel-no>"
 
-- Make sure javascript tests pass with coverage of clld.js at > 86%::
+- Make sure javascript tests pass with coverage of clld.js at > 82%::
 
   $ java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 
 - Make sure flake8 passes::
 
-  $ flake8 --ignore=E711,E712,D100,D101,D103,D102,D301,E402,E731 --max-line-length=100 clld
+  $ flake8 --ignore=E711,E712,D100,D101,D103,D102,D301,E402,E731,W503 --max-line-length=100 clld
 
 - Make sure docs render OK::
 
