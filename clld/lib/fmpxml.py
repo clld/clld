@@ -6,6 +6,8 @@ We use the FileMaker *Custom Web Publishing with XML* protocol.
 """
 from __future__ import print_function, unicode_literals, division, absolute_import
 import re
+from collections import OrderedDict
+
 from bs4 import BeautifulSoup as bs
 from logging import getLogger
 log = getLogger(__name__)
@@ -26,7 +28,7 @@ def normalize_markup(s):
     """normalize markup in filemaker data."""
     if not s:
         return
-    soup = bs(s.strip().replace('\n', ' ').replace('<BR>', '\n'))
+    soup = bs(s.strip().replace('\n', ' ').replace('<BR>', '\n'), "html5lib")
     # remove empty, i.e. unstyled span tags
     for span in soup.find_all('span'):
         new_style = []
@@ -59,7 +61,7 @@ class Result(object):
         self.total = int(resultset.get('FOUND'))
         self.items = []
         for row in self._find('row', resultset):
-            item = {}
+            item = OrderedDict()
             for i, col in enumerate(self._find('col', row)):
                 name, type_ = fields[i]
                 data = self._find('data', col)
@@ -82,6 +84,9 @@ class Result(object):
                             pass
                 item[name] = val
             self.items.append(item)
+
+    def __iter__(self):
+        return iter(self.items)
 
     def _find(self, localname, e=None, path=''):
         e = e or self._root
