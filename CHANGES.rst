@@ -2,6 +2,12 @@
 Changes
 -------
 
+2.1.3
+~~~~~
+
+Updated requirements, fixed tox config.
+
+
 2.1.2
 ~~~~~
 
