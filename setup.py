@@ -47,7 +47,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.999999',  # our tests rely on the childNodes attribute
+    'html5lib==0.9999999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
     'webhelpers2>=2.0',
@@ -61,7 +61,7 @@ if not PY3:
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pep8',
-    'mock==1.0',
+    'mock>=2.0',
     'selenium',
 ]
 
