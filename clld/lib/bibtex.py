@@ -13,6 +13,7 @@ from six import unichr, text_type, string_types, iteritems
 from six.moves import filter
 from clldutils.path import Path
 from clldutils.misc import UnicodeMixin, to_binary
+from clldutils.source import Source
 
 from clld.util import DeclEnum
 from clld.lib.bibutils import convert
@@ -291,7 +292,7 @@ class IRecord(Interface):
 
 
 @implementer(IRecord)
-class Record(OrderedDict, _Convertable):
+class Record(Source, _Convertable):
 
     """A BibTeX record is an ordered dict with two special properties - id and genre.
 
@@ -309,14 +310,13 @@ class Record(OrderedDict, _Convertable):
     """
 
     def __init__(self, genre, id_, *args, **kw):
-        if isinstance(genre, string_types):
-            try:
-                genre = EntryType.from_string(genre.lower())
-            except ValueError:
-                genre = EntryType.misc
-        self.genre = genre
+        super(Record, self).__init__(genre, 'a', args, **kw)
         self.id = id_
-        super(Record, self).__init__(args, **kw)
+        if isinstance(self.genre, string_types):
+            try:
+                self.genre = EntryType.from_string(genre.lower())
+            except ValueError:
+                self.genre = EntryType.misc
 
     @classmethod
     def from_object(cls, obj, **kw):
@@ -332,56 +332,7 @@ class Record(OrderedDict, _Convertable):
 
     @classmethod
     def from_string(cls, bibtexString, lowercase=False):
-        id_, genre, data = None, None, {}
-
-        # the following patterns are designed to match preprocessed input lines.
-        # i.e. the configuration values given in the bibtool resource file used to
-        # generate the bib-file have to correspond to these patterns.
-
-        # in particular, we assume all key-value-pairs to fit on one line,
-        # because we don't want to deal with nested curly braces!
-        lines = bibtexString.strip().split('\n')
-
-        # genre and key are parsed from the @-line:
-        atLine = re.compile("^@(?P<genre>[a-zA-Z_]+)\s*{\s*(?P<key>[^,]*)\s*,\s*")
-
-        # since all key-value pairs fit on one line, it's easy to determine the
-        # end of the value: right before the last closing brace!
-        fieldLine = re.compile('\s*(?P<field>[a-zA-Z_]+)\s*=\s*(\{|")(?P<value>.+)')
-
-        endLine = re.compile("}\s*")
-
-        # flag to signal, whether the @-line - starting each bibtex record - was
-        # already encountered:
-        inRecord = False
-
-        while lines:
-            line = lines.pop(0)
-            if not inRecord:
-                m = atLine.match(line)
-                if m:
-                    id_ = m.group('key').strip()
-                    genre = m.group('genre').strip().lower()
-                    inRecord = True
-            else:
-                m = fieldLine.match(line)
-                if m:
-                    value = m.group('value').strip()
-                    if value.endswith(','):
-                        value = value[:-1].strip()
-                    if value.endswith('}') or value.endswith('"'):
-                        field = m.group('field')
-                        if lowercase:
-                            field = field.lower()
-                        data[field] = value[:-1].strip()
-                else:
-                    m = endLine.match(line)
-                    if m:
-                        break
-                    # Note: fields with names not matching the expected pattern are simply
-                    # ignored.
-
-        return cls(genre, id_, **data)
+        return cls.from_bibtex(bibtexString, lowercase=lowercase)
 
     @staticmethod
     def sep(key):
@@ -420,103 +371,6 @@ class Record(OrderedDict, _Convertable):
         return "@%s{%s,\n%s\n}" % (
             getattr(self.genre, 'value', self.genre), self.id, ",\n".join(fields))
 
-    _genre_note = {
-        'phdthesis': 'Doctoral dissertation',
-        'mastersthesis': 'MA thesis',
-        'unpublished': 'unpublished',
-    }
-
-    def text(self):
-        """Linearize the bib record according to the rules of the unified style.
-
-        Book:
-        author. year. booktitle. (series, volume.) address: publisher.
-
-        Article:
-        author. year. title. journal volume(issue). pages.
-
-        Incollection:
-        author. year. title. In editor (ed.), booktitle, pages. address: publisher.
-
-        .. seealso::
-
-            http://celxj.org/downloads/UnifiedStyleSheet.pdf
-            https://github.com/citation-style-language/styles/blob/master/\
-            unified-style-linguistics.csl
-        """
-        genre = getattr(self.genre, 'value', self.genre)
-        pages_at_end = genre in (
-            'book', 'phdthesis', 'mastersthesis', 'misc', 'techreport')
-
-        if self.get('editor'):
-            editors = self['editor']
-            affix = 'eds' if ' and ' in editors or '&' in editors else 'ed'
-            editors = " %s (%s.)" % (editors, affix)
-        else:
-            editors = None
-
-        res = [self.get('author', editors), self.get('year', 'n.d')]
-        if genre == 'book':
-            res.append(self.get('booktitle') or self.get('title'))
-            series = ', '.join(filter(None, [self.get('series'), self.get('volume')]))
-            if series:
-                res.append('(%s.)' % series)
-        elif genre == 'misc':
-            # in case of misc records, we use the note field in case a title is missing.
-            res.append(self.get('title') or self.get('note'))
-        else:
-            res.append(self.get('title'))
-
-        if genre == 'article':
-            atom = ' '.join(filter(None, [self.get('journal'), self.get('volume')]))
-            if self.get('issue'):
-                atom += '(%s)' % self['issue']
-            res.append(atom)
-            res.append(self.get('pages'))
-        elif genre == 'incollection' or genre == 'inproceedings':
-            prefix = 'In'
-            atom = ''
-            if editors:
-                atom += editors
-            if self.get('booktitle'):
-                if atom:
-                    atom += ','
-                atom += " %s" % self['booktitle']
-            if self.get('pages'):
-                atom += ", %s" % self['pages']
-            res.append(prefix + atom)
-        else:
-            # check for author to make sure we haven't included the editors yet.
-            if editors and self.get('author'):
-                res.append("In %s" % editors)
-
-            for attr in [
-                'school',
-                'journal',
-                'volume' if genre != 'book' else None,
-            ]:
-                if attr and self.get(attr):
-                    res.append(self.get(attr))
-
-            if self.get('issue'):
-                res.append("(%s)" % self['issue'])
-
-            if not pages_at_end and self.get('pages'):
-                res.append(self['pages'])
-
-        if self.get('publisher'):
-            res.append(": ".join(filter(None, [self.get('address'), self['publisher']])))
-
-        if pages_at_end and self.get('pages'):
-            res.append(self['pages'] + 'pp')
-
-        note = self.get('note') or self._genre_note.get(genre)
-        if note and note not in res:
-            res.append('(%s)' % note)
-
-        return ' '.join(
-            x if x.endswith(('.', '.)')) else '%s.' % x for x in res if x)
-
 
 class IDatabase(Interface):
 
@@ -529,7 +383,7 @@ class Database(_Convertable):
     """Represents a bibtex databases, i.e. a container class for Record instances."""
 
     def __init__(self, records):
-        self.records = [r for r in records if r.genre and r.id]
+        self.records = [r for r in records if r and r.genre and r.id]
         self._keymap = None
 
     def __unicode__(self):
