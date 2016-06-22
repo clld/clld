@@ -80,7 +80,7 @@ data can be modeled using :py:class:`clld.db.models.common.Unit` and
     # Part of speech is a typical parameter which can be "measured" for words or lexemes.
     pos = common.UnitParameter(id='pos', name='part of speech')
 
-    DBSession.add(common.UnitValue(id='unit-pos', name='noun', unitparameter=pos, contribution=contrib))
+    DBSession.add(common.UnitValue(id='unit-pos', name='noun', unit=unit, unitparameter=pos, contribution=contrib))
 
 .. note::
 
