@@ -11,6 +11,13 @@ from clld.web.adapters.download import N3Dump
 
 
 class Tests(TestWithEnv):
+    def test_get_url_template(self):
+        from clld.web.util.helpers import get_url_template
+
+        self.assertEqual(
+            get_url_template(self.env['request'], 'parameter', variable_map={'id': 'ID'}),
+            '/parameters/{ID}')
+
     def test_newline2br(self):
         from clld.web.util.helpers import newline2br
 

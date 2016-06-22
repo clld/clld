@@ -117,13 +117,16 @@ def get_valueset(req, ctx):
     return query.first()
 
 
-def get_url_template(req, route, relative=True):
+def get_url_template(req, route, relative=True, variable_map=None):
+    variable_map = variable_map or {}
     if isinstance(route, string_types):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
     if route:
         res = '' if relative else req.application_url
         param_pattern = re.compile('\{(?P<name>[a-z]+)(:[^\}]+)?\}')
-        return res + param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
+        return res + param_pattern.sub(
+            lambda m: '{%s}' % variable_map.get(m.group('name'), m.group('name')),
+            route.pattern)
 
 
 def rdf_namespace_attrs():
