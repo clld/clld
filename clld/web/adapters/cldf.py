@@ -65,8 +65,11 @@ class CldfDataset(object):
                 bibrecord = r.source.bibtex()
                 refs.append('%s%s' % (r.source.id, _desc(r.description)))
                 bibrecord['%s_url' % req.dataset.id] = req.resource_url(r.source)
-                sources.append(
-                    Source(bibrecord.genre or 'misc', r.source.id, **bibrecord))
+                sources.append(Source(
+                    getattr(bibrecord.genre, 'value', bibrecord.genre)
+                    if bibrecord.genre else 'misc',
+                    r.source.id,
+                    **bibrecord))
         return ';'.join(refs), sources
 
     def value_query(self):
