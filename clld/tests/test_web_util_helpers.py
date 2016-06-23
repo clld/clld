@@ -152,6 +152,7 @@ class Tests(TestWithEnv):
     def test_linked_references(self):
         from clld.web.util.helpers import linked_references
 
+        self.assertEqual(linked_references(self.env['request'], None), '')
         with patch('clld.web.util.helpers.link'):
             linked_references(
                 self.env['request'], Mock(

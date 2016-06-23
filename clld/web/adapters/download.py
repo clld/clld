@@ -9,10 +9,11 @@ from six import string_types, BytesIO, text_type, StringIO, PY3
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
-from clldutils.path import Path, remove, move
+from clldutils.path import Path
 from clldutils.dsv import UnicodeWriter
 from clldutils.misc import format_size, to_binary
 
+from clld.util import safe_overwrite
 from clld.lib.rdf import FORMATS
 from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
@@ -34,6 +35,14 @@ It should be cited as
 
 {3}
 """
+
+
+def format_readme(req):
+    return README.format(
+        req.dataset.name,
+        '=' * (len(req.dataset.name) + len(' data download')),
+        req.dataset.license,
+        TxtCitation(None).render(req.dataset, req))
 
 
 def pkg_name(pkg):
@@ -90,50 +99,35 @@ class Download(object):
     def label(self, req):
         return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
 
-    def create(self, req, filename=None, verbose=True):
-        p = self.abspath(req)
-        if not p.parent.exists():  # pragma: no cover
-            p.parent.mkdir()
-        tmp = Path('%s.tmp' % p.as_posix())
-
-        if self.rdf:
-            # we do not create archives with a readme for rdf downloads, because each
-            # RDF entity points to the dataset and the void description of the dataset
-            # covers all relevant metadata.
-            #
-            # TODO: write test for the file name things!?
-            #
-            with closing(GzipFile(
+    def create(self, req, filename=None, verbose=True, outfile=None):
+        with safe_overwrite(outfile or self.abspath(req)) as tmp:
+            if self.rdf:
+                # we do not create archives with a readme for rdf downloads, because each
+                # RDF entity points to the dataset and the void description of the dataset
+                # covers all relevant metadata.
+                #
+                # TODO: write test for the file name things!?
+                #
+                with closing(GzipFile(
                     filename=Path(tmp.stem).stem, fileobj=tmp.open('wb')
-            )) as fp:
-                self.before(req, fp)
-                for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
-                    self.dump(req, fp, item, i)
-                self.after(req, fp)
-        else:
-            with ZipFile(tmp.as_posix(), 'w', ZIP_DEFLATED) as zipfile:
-                if not filename:
-                    fp = self.get_stream()
+                )) as fp:
                     self.before(req, fp)
-                    for i, item in enumerate(
-                            page_query(self.query(req), verbose=verbose)):
+                    for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
-                    zipfile.writestr(self.name, self.read_stream(fp))
-                else:  # pragma: no cover
-                    zipfile.write(filename, self.name)
-                zipfile.writestr(
-                    'README.txt',
-                    README.format(
-                        req.dataset.name,
-                        '=' * (
-                            len(req.dataset.name)
-                            + len(' data download')),
-                        req.dataset.license,
-                        TxtCitation(None).render(req.dataset, req)).encode('utf8'))
-        if p.exists():  # pragma: no cover
-            remove(p)
-        move(tmp, p)
+            else:
+                with ZipFile(tmp.as_posix(), 'w', ZIP_DEFLATED) as zipfile:
+                    if not filename:
+                        fp = self.get_stream()
+                        self.before(req, fp)
+                        for i, item in enumerate(
+                                page_query(self.query(req), verbose=verbose)):
+                            self.dump(req, fp, item, i)
+                        self.after(req, fp)
+                        zipfile.writestr(self.name, self.read_stream(fp))
+                    else:  # pragma: no cover
+                        zipfile.write(Path(filename).as_posix(), self.name)
+                    zipfile.writestr('README.txt', format_readme(req).encode('utf8'))
 
     def get_stream(self):
         return BytesIO()

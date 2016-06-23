@@ -89,6 +89,7 @@ def populate_test_db():
         language=data[cm.Language],
         parameter=param,
         contribution=data[cm.Contribution])
+    cm.ValueSetReference(valueset=valueset, source=data[cm.Source], description='10-20')
 
     data.add_default(
         cm.Value,

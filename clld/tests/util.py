@@ -27,6 +27,7 @@ try:
 except ImportError:  # pragma: no cover
     webdriver = None
 from clldutils.path import Path
+from clldutils.testing import WithTempDir
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -66,25 +67,30 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 
 
-class TestWithDb(unittest.TestCase):
+class TestWithDb(WithTempDir):
 
     """For tests in need of a session bound to an empty db."""
 
     __with_custom_language__ = True
+    __setup_db__ = True
 
     def setUp(self):
-        if self.__with_custom_language__:
-            from clld.tests.fixtures import CustomLanguage
-            assert CustomLanguage
+        WithTempDir.setUp(self)
+        if self.__setup_db__:
+            if self.__with_custom_language__:
+                from clld.tests.fixtures import CustomLanguage
+                assert CustomLanguage
 
-        engine = create_engine('sqlite://')
-        DBSession.configure(bind=engine)
-        VersionedDBSession.configure(bind=engine)
-        Base.metadata.bind = engine
-        Base.metadata.create_all()
+            engine = create_engine('sqlite://')
+            DBSession.configure(bind=engine)
+            VersionedDBSession.configure(bind=engine)
+            Base.metadata.bind = engine
+            Base.metadata.create_all()
 
     def tearDown(self):
-        transaction.abort()
+        if self.__setup_db__:
+            transaction.abort()
+        WithTempDir.tearDown(self)
 
 
 class TestWithDbAndData(TestWithDb):
@@ -95,7 +101,8 @@ class TestWithDbAndData(TestWithDb):
         from clld.tests.fixtures import populate_test_db
 
         TestWithDb.setUp(self)
-        populate_test_db()
+        if self.__setup_db__:
+            populate_test_db()
 
 
 class TestWithEnv(TestWithDbAndData):
@@ -103,11 +110,9 @@ class TestWithEnv(TestWithDbAndData):
     """For tests in need of a configured app."""
 
     __cfg__ = TESTS_DIR.joinpath('test.ini').resolve()
-    __setup_db__ = True
 
     def setUp(self):
-        if self.__setup_db__:
-            TestWithDbAndData.setUp(self)
+        TestWithDbAndData.setUp(self)
         global ENV
 
         if ENV is None:
@@ -163,8 +168,7 @@ class TestWithEnv(TestWithDbAndData):
             self._set_request_property(k, v)
         self.env['request'].environ.pop('HTTP_X_REQUESTED_WITH', None)
         environ_add_POST(self.env['request'].environ, {})
-        if self.__setup_db__:
-            TestWithDbAndData.tearDown(self)
+        TestWithDbAndData.tearDown(self)
 
 
 def _add_header(headers, name, value):

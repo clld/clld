@@ -25,6 +25,7 @@ except IOError:
 
 install_requires = [
     'clldutils>=0.9.1',
+    'pycldf>=0.4.1',
     'setuptools>=0.8',
     'pyramid>=1.6',
     'pyramid_mako>=1.0',

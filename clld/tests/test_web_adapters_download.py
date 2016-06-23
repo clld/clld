@@ -5,10 +5,9 @@ import gzip
 from contextlib import closing
 from xml.etree import cElementTree as et
 
-from mock import Mock, MagicMock, patch
-from clldutils.misc import UnicodeMixin
+from mock import Mock, patch
 
-from clld.db.models.common import Language, Source, Dataset
+from clld.db.models.common import Language, Source
 from clld.tests.util import TestWithEnv
 
 
@@ -43,7 +42,7 @@ class Tests(TestWithEnv):
         dl.create(self.env['request'], verbose=False)
         os.remove(dl.abspath(self.env['request']).as_posix())
 
-    def testDownload_url(self):
+    def test_Download_url(self):
         from clld.web.adapters.download import Download
 
         with patch.multiple(
@@ -53,61 +52,19 @@ class Tests(TestWithEnv):
             dl = Download(Source, 'clld', ext='bib')
             assert dl.url(self.env['request'])
 
-    def testDownload2(self):
+    def test_Download2(self):
         from clld.web.adapters.download import CsvDump, N3Dump, RdfXmlDump
-        from clld.web.adapters.cldf import CldfDownload
 
-        tmp = mktemp()
+        out = self.tmp_path('dl')
+        dl = CsvDump(Language, 'clld')
+        dl.create(self.env['request'], verbose=False, outfile=out)
+        self.assertTrue(out.exists())
+        dl.create(self.env['request'], filename=out, verbose=False, outfile=out)
+        dl = N3Dump(Language, 'clld')
+        self.assertEqual(dl.abspath(self.env['request']).name, 'dataset-language.n3.gz')
+        dl.create(self.env['request'], verbose=False, outfile=out)
+        dl = RdfXmlDump(Language, 'clld')
+        dl.create(self.env['request'], verbose=False, outfile=out)
 
-        class Path(MagicMock, UnicodeMixin):
-            @property
-            def stem(self):
-                return 'a'
-
-            @property
-            def parent(self):
-                return Mock(exists=Mock(return_value=False))
-
-            def open(self, mode):
-                return open(tmp, mode)
-
-        with patch.multiple(
-            'clld.web.adapters.cldf',
-            ZipFile=MagicMock(),
-            Path=MagicMock(return_value=Path()),
-            move=Mock(),
-            remove=Mock(),
-        ):
-            with patch(
-                'clld.web.adapters.download.Path',
-                new=MagicMock(return_value=Path()),
-            ):
-                dl = CldfDownload(Dataset, 'clld')
-                dl.create(self.env['request'], verbose=False)
-
-        with patch.multiple(
-            'clld.web.adapters.download',
-            ZipFile=MagicMock(),
-            Path=MagicMock(return_value=Path()),
-            move=Mock(),
-            remove=Mock(),
-        ):
-            dl = CsvDump(Language, 'clld')
-            dl.create(self.env['request'], verbose=False)
-            dl.create(self.env['request'], filename='name.n3', verbose=False)
-            dl = N3Dump(Language, 'clld')
-            dl.create(self.env['request'], verbose=False)
-            if os.path.exists(tmp):
-                os.remove(tmp)
-            else:  # pragma: no cover
-                raise ValueError
-            dl = RdfXmlDump(Language, 'clld')
-            dl.create(self.env['request'], verbose=False)
-
-        with closing(gzip.open(tmp, 'rb')) as fp:
+        with closing(gzip.open(out.as_posix(), 'rb')) as fp:
             assert et.fromstring(fp.read())
-
-        if os.path.exists(tmp):
-            os.remove(tmp)
-        else:  # pragma: no cover
-            raise ValueError

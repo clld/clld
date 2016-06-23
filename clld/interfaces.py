@@ -6,6 +6,11 @@ from zope.interface import (
 )
 
 
+class ICldfDataset(Interface):
+    def write(request, archive):
+        """Write the files making up the CLDF dataset to a zip archive."""
+
+
 # ---------------------------------------------------------------------------
 # Interfaces for model classes
 # ---------------------------------------------------------------------------
