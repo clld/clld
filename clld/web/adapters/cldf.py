@@ -78,8 +78,7 @@ class CldfDataset(object):
                 joinedload(Value.valueset, ValueSet.contribution),
                 joinedload(Value.domainelement),
                 joinedload_all(
-                    Value.valueset, ValueSet.references, ValueSetReference.source)
-            )\
+                    Value.valueset, ValueSet.references, ValueSetReference.source))\
             .order_by(ValueSet.parameter_pk, ValueSet.language_pk, Value.pk)
 
     def dataset(self, req):
