@@ -11,7 +11,7 @@ Releasing clld
 
   Make sure statement coverage is at 100%::
 
-- Make sure all scaffold tests pass (Py 2.7, 3.4):
+- Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
 
   $ ./venvs/clld/clld/build.sh "<prev-rel-no>"
 
