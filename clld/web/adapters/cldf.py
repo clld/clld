@@ -15,6 +15,10 @@ from clld.db.models.common import (
 from clld.web.util.helpers import text_citation, get_url_template
 
 
+def url_template(req, route, id_name):
+    return get_url_template(req, route, relative=False, variable_map={'id': id_name})
+
+
 class CldfDataset(object):
     def __init__(self, obj):
         self.obj = obj
@@ -28,13 +32,11 @@ class CldfDataset(object):
             'ID',
             {
                 'name': 'Language_ID',
-                'valueUrl': get_url_template(
-                    req, 'language', variable_map={'id': 'Language_ID'})},
+                'valueUrl': url_template(req, 'language', 'Language_ID')},
             'Language_name',
             {
                 'name': 'Parameter_ID',
-                'valueUrl': get_url_template(
-                    req, 'parameter', variable_map={'id': 'Parameter_ID'})},
+                'valueUrl': url_template(req, 'parameter', 'Parameter_ID')},
             'Parameter_name',
             'Value',
             'Source',
@@ -89,7 +91,7 @@ class CldfDataset(object):
             req.dataset.id, self.obj.__class__.__name__.lower(), self.obj.id))
         cols = self.columns(req)
         ds.fields = tuple(col['name'] if isinstance(col, dict) else col for col in cols)
-        ds.table.schema.aboutUrl = get_url_template(req, 'value').replace('{id}', '{ID}')
+        ds.table.schema.aboutUrl = url_template(req, 'value', '{ID}')
 
         for col in cols:
             if isinstance(col, dict):

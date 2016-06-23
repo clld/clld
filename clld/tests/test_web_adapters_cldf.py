@@ -16,4 +16,7 @@ class CldfTests(TestWithEnv):
         dl.create(self.env['request'], verbose=False, outfile=tmp)
         ds = CldfDataset.from_zip(tmp)
         self.assertEqual(ds.name, 'dataset-contribution-contribution')
+        self.assertEqual(
+            'http://localhost/languages/{Language_ID}',
+            ds.table.schema.columns['Language_ID'].valueUrl)
         self.assertEqual(len(ds.rows), 3)
