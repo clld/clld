@@ -53,14 +53,14 @@ class CldfDataset(object):
             value.valueset.source or '',
         ]
 
-    def refs_and_sources(self, req, value):
+    def refs_and_sources(self, req, obj):
         def _desc(d):
             return '[%s]' % d.replace(';', '.').replace('[', '{').replace(']', '}') \
                 if d else ''
 
         sources = []
         refs = []
-        for r in value.valueset.references:
+        for r in obj.references:
             if r.source:
                 bibrecord = r.source.bibtex()
                 refs.append('%s%s' % (r.source.id, _desc(r.description)))
@@ -72,10 +72,10 @@ class CldfDataset(object):
     def value_query(self):
         return DBSession.query(Value)\
             .join(Value.valueset)\
-            .filter(ValueSet.parameter_pk == self.obj.pk)\
+            .filter(ValueSet.contribution_pk == self.obj.pk)\
             .options(
                 joinedload(Value.valueset, ValueSet.language),
-                joinedload(Value.valueset, ValueSet.contribution),
+                joinedload(Value.valueset, ValueSet.parameter),
                 joinedload(Value.domainelement),
                 joinedload_all(
                     Value.valueset, ValueSet.references, ValueSetReference.source))\
@@ -106,7 +106,7 @@ class CldfDataset(object):
         ds.metadata['dcat:accessURL'] = req.route_url('download')
 
         for value in self.value_query():
-            refs, sources = self.refs_and_sources(req, value)
+            refs, sources = self.refs_and_sources(req, value.valueset)
             ds.sources.add(*sources)
             ds.add_row(self.row(req, value, refs))
         return ds
