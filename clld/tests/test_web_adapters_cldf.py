@@ -16,4 +16,4 @@ class CldfTests(TestWithEnv):
         dl.create(self.env['request'], verbose=False, outfile=tmp)
         ds = CldfDataset.from_zip(tmp)
         self.assertEqual(ds.name, 'dataset-contribution-contribution')
-        self.assertEqual(len(ds.rows), 2)
+        self.assertEqual(len(ds.rows), 3)
