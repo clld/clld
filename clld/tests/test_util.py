@@ -1,6 +1,34 @@
 # coding: utf8
 from __future__ import unicode_literals
 
+from clldutils.testing import WithTempDir
+
+
+class Tests(WithTempDir):
+    def test_safe_overwrite(self):
+        from clld.util import safe_overwrite
+
+        target = self.tmp_path('a', 'b')
+        with safe_overwrite(target) as tmp:
+            with tmp.open('w', encoding='utf8') as fp:
+                fp.write('stuff')
+
+        self.assertFalse(tmp.exists())
+        self.assertTrue(target.exists())
+
+        with safe_overwrite(target) as tmp:
+            with tmp.open('w', encoding='utf8') as fp:
+                fp.write('other')
+
+        with target.open(encoding='utf8') as fp:
+            self.assertEqual(fp.read(), 'other')
+
+
+def test_random_string():
+    from clld.util import random_string
+
+    assert len(random_string(5)) == 5
+
 
 def test_summary():
     from clld.util import summary

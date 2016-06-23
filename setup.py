@@ -24,7 +24,8 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
-    'clldutils>=0.7',
+    'clldutils>=0.9.1',
+    'pycldf>=0.4.1',
     'setuptools>=0.8',
     'pyramid>=1.6',
     'pyramid_mako>=1.0',
@@ -82,12 +83,13 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='2.1.3',
+    version='2.2.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",

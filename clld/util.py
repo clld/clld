@@ -1,10 +1,33 @@
 """Generic utility functions."""
 from __future__ import unicode_literals, print_function, division, absolute_import
 import re
+import random
+from string import ascii_lowercase
+from contextlib import contextmanager
 
 from six import add_metaclass
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 from clldutils import misc
+from clldutils.path import remove, move, Path
+
+
+def random_string(length):
+    return ''.join(random.choice(ascii_lowercase) for _ in range(length))
+
+
+@contextmanager
+def safe_overwrite(fname):
+    fname = Path(fname)
+    if not fname.parent.exists():
+        fname.parent.mkdir()
+    assert fname.parent.exists()
+    tmp = fname.parent
+    while tmp.exists():
+        tmp = fname.parent.joinpath('%s.%s' % (fname.name, random_string(6)))
+    yield tmp
+    if fname.exists():
+        remove(fname)
+    move(tmp, fname)
 
 
 def summary(text, max_length=70):

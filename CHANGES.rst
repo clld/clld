@@ -2,6 +2,12 @@
 Changes
 -------
 
+2.2.0
+~~~~~
+
+Updated support for creating CLDF downloads.
+
+
 2.1.3
 ~~~~~
 
