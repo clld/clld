@@ -99,7 +99,7 @@ class CldfDataset(object):
             req.dataset.id, self.obj.__class__.__name__.lower(), self.obj.id))
         cols = self.columns(req)
         ds.fields = tuple(col['name'] if isinstance(col, dict) else col for col in cols)
-        ds.table.schema.aboutUrl = url_template(req, 'value', '{ID}')
+        ds.table.schema.aboutUrl = url_template(req, 'value', 'ID')
 
         for col in cols:
             if isinstance(col, dict):
