@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import OrderedDict
 
 from sqlalchemy.orm import joinedload_all, joinedload
 from pycldf.dataset import Dataset
@@ -15,6 +16,23 @@ from clld.db.models.common import (
 from clld.web.util.helpers import text_citation, get_url_template
 
 
+def url_template(req, route, id_name):
+    return get_url_template(req, route, relative=False, variable_map={'id': id_name})
+
+
+def source2source(req, source):
+    """Harmonize the different Source implementations in clld and pycldf."""
+    bibrecord = source.bibtex()
+    fields = OrderedDict({'%s_url' % req.dataset.id: req.resource_url(source)})
+    for key, value in bibrecord.items():
+        fields[key] = '; '.join(value) if isinstance(value, list) else value
+    return Source(
+        getattr(bibrecord.genre, 'value', bibrecord.genre)
+        if bibrecord.genre else 'misc',
+        source.id,
+        **fields)
+
+
 class CldfDataset(object):
     def __init__(self, obj):
         self.obj = obj
@@ -28,13 +46,11 @@ class CldfDataset(object):
             'ID',
             {
                 'name': 'Language_ID',
-                'valueUrl': get_url_template(
-                    req, 'language', variable_map={'id': 'Language_ID'})},
+                'valueUrl': url_template(req, 'language', 'Language_ID')},
             'Language_name',
             {
                 'name': 'Parameter_ID',
-                'valueUrl': get_url_template(
-                    req, 'parameter', variable_map={'id': 'Parameter_ID'})},
+                'valueUrl': url_template(req, 'parameter', 'Parameter_ID')},
             'Parameter_name',
             'Value',
             'Source',
@@ -62,14 +78,8 @@ class CldfDataset(object):
         refs = []
         for r in obj.references:
             if r.source:
-                bibrecord = r.source.bibtex()
                 refs.append('%s%s' % (r.source.id, _desc(r.description)))
-                bibrecord['%s_url' % req.dataset.id] = req.resource_url(r.source)
-                sources.append(Source(
-                    getattr(bibrecord.genre, 'value', bibrecord.genre)
-                    if bibrecord.genre else 'misc',
-                    r.source.id,
-                    **bibrecord))
+                sources.append(source2source(req, r.source))
         return ';'.join(refs), sources
 
     def value_query(self):
@@ -89,7 +99,7 @@ class CldfDataset(object):
             req.dataset.id, self.obj.__class__.__name__.lower(), self.obj.id))
         cols = self.columns(req)
         ds.fields = tuple(col['name'] if isinstance(col, dict) else col for col in cols)
-        ds.table.schema.aboutUrl = get_url_template(req, 'value').replace('{id}', '{ID}')
+        ds.table.schema.aboutUrl = url_template(req, 'value', '{ID}')
 
         for col in cols:
             if isinstance(col, dict):
