@@ -124,8 +124,10 @@ class CldfDataset(object):
 
         for value in self.value_query():
             refs, sources = self.refs_and_sources(req, value)
-            ds.sources.add(*sources)
-            ds.add_row(self.row(req, value, refs))
+            row = self.row(req, value, refs)
+            if row:
+                ds.sources.add(*sources)
+                ds.add_row(row)
         return ds
 
 
