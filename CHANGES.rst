@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.0.1
+~~~~~
+
+fixing bugs in CLDF export.
+
+
 3.0.0
 ~~~~~
 
