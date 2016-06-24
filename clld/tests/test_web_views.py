@@ -5,12 +5,12 @@ from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HT
 from mock import Mock, patch
 from requests.exceptions import ReadTimeout
 
-from clld.tests.util import TestWithEnv, XmlResponse
+from clld.tests.util import TestWithEnv, XmlResponse, WithDbAndDataMixin
 from clld.db.models import common
 from clld.interfaces import IDataTable
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_index_view(self):
         from clld.web.views import index_view
 

@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import unittest
 
-from clld.tests.util import TestWithDb
+from clld.tests.util import WithDbMixin
 
 
-class Tests(TestWithDb):
+class Tests(WithDbMixin, unittest.TestCase):
     def test_Versioning(self):
         from clld.db.models.common import Language, Language_data
         from clld.db.meta import VersionedDBSession

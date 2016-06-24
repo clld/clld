@@ -1,8 +1,11 @@
-from clld.tests.util import TestWithApp
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from clld.tests.util import TestWithApp, WithDbAndDataMixin
 from clld import RESOURCES
 
 
-class Tests(TestWithApp):
+class Tests(WithDbAndDataMixin, TestWithApp):
     def _xml_findall(self, name):
         return list(self.app.parsed_body.findall('.//%s' % name))
 

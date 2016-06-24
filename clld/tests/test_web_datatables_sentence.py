@@ -1,10 +1,13 @@
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
+
 from mock import Mock
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.db.models import common
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def _run(self, **kw):
         from clld.web.datatables.sentence import Sentences
         self.handle_dt(Sentences, common.Sentence, **kw)

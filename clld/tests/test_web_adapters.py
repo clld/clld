@@ -1,9 +1,11 @@
+# coding: utf8
+from __future__ import unicode_literals
 from clld.interfaces import IIndex, IRepresentation
 from clld.db.models.common import Contribution, Language, Dataset
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_BibTex(self):
         from clld.web.adapters import BibTex
 

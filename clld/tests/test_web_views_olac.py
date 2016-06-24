@@ -1,6 +1,8 @@
+# coding: utf8
+from __future__ import unicode_literals
 from datetime import date
 
-from clld.tests.util import TestWithEnv, XmlResponse
+from clld.tests.util import TestWithEnv, XmlResponse, WithDbAndDataMixin
 
 
 class OaiPmhResponse(XmlResponse):
@@ -19,7 +21,7 @@ def test_ResumptionToken():
     assert ResumptionToken(from_=date.today(), until=date.today()).__unicode__()
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def with_params(self, **kw):
         from clld.web.views.olac import olac
 

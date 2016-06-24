@@ -1,8 +1,11 @@
-from clld.tests.util import TestWithEnv
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
+
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.db.models import common
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def _run(self, **kw):
         from clld.web.datatables.value import Values
         return self.handle_dt(Values, common.Value, **kw)

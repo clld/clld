@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import unittest
 
-from clld.tests.util import TestWithDbAndData
+from clld.tests.util import WithDbAndDataMixin
 
 
-class Tests(TestWithDbAndData):
+class Tests(WithDbAndDataMixin, unittest.TestCase):
     def test_compute_language_sources(self):
         from clld.db.util import compute_language_sources
         from clld.db.models.common import Source, Sentence, Language, SentenceReference

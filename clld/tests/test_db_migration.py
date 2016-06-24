@@ -1,14 +1,16 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import unittest
 
 from sqlalchemy.orm import undefer
 from sqlalchemy.exc import InvalidRequestError
 
-from clld.tests.util import TestWithDb
+from clld.tests.util import WithDbMixin, WithCustomLanguageMixin
 from clld.db.meta import DBSession
 from clld.db.models import common
 
 
-class Tests(TestWithDb):
+class Tests(WithCustomLanguageMixin, WithDbMixin, unittest.TestCase):
     def test_crud(self):
         from clld.db.migration import Connection
 

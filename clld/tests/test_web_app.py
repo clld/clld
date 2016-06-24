@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
 import importlib
 
 from zope.interface import Interface
@@ -6,12 +8,12 @@ from pyramid.httpexceptions import HTTPNotFound
 from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
-from clld.tests.util import TestWithEnv, Route, TESTS_DIR
+from clld.tests.util import TestWithEnv, Route, TESTS_DIR, WithDbAndDataMixin
 from clld.interfaces import IMapMarker
 from clld.web.adapters.download import N3Dump
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_CLLDRequest(self):
         self.assertTrue(isinstance(self.env['request'].purl, URL))
         c = self.env['request'].db.query(Contribution).first()

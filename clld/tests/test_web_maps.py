@@ -1,18 +1,19 @@
-from mock import Mock
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin, Route
 from clld.db.models import common
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
+    def set_route(self, name='language'):
+        self.set_request_properties(matched_route=Route(name))
+
     def test_Map(self):
         from clld.web.maps import Map
 
-        class MockRoute(Mock):
-            name = 'language'
-
-        self.set_request_properties(
-            matched_route=MockRoute(), params=dict(z=3, lat=1, lng=1))
+        self.set_route()
+        self.set_request_properties(params=dict(z=3, lat=1, lng=1))
 
         dt = Map(common.Parameter.first(), self.env['request'])
         dt.render()
@@ -24,10 +25,7 @@ class Tests(TestWithEnv):
     def test_ParameterMap(self):
         from clld.web.maps import ParameterMap
 
-        class MockRoute(Mock):
-            name = 'parameter'
-
-        self.set_request_properties(matched_route=MockRoute())
+        self.set_route('parameter')
 
         dt = ParameterMap(common.Parameter.get('parameter'), self.env['request'])
         for l in dt.layers:
@@ -40,11 +38,7 @@ class Tests(TestWithEnv):
     def test_LanguageMap(self):
         from clld.web.maps import LanguageMap
 
-        class MockRoute(Mock):
-            name = 'language'
-
-        self.set_request_properties(matched_route=MockRoute())
-
+        self.set_route()
         dt = LanguageMap(common.Language.first(), self.env['request'])
         dt.render()
 
@@ -81,5 +75,6 @@ class Tests(TestWithEnv):
                     col='name',
                     dt=FLanguages(self.req, common.Language))
 
+        self.set_route()
         map_ = FMap(common.Language.first(), self.env['request'])
         map_.render()

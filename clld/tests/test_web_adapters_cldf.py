@@ -2,14 +2,15 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
 from pycldf.dataset import Dataset as CldfDataset
+from clldutils.testing import WithTempDirMixin
 
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset, Source
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 
 
-class CldfTests(TestWithEnv):
-    def source2source(self):
+class CldfTests(WithDbAndDataMixin, WithTempDirMixin, TestWithEnv):
+    def test_source2source(self):
         from clld.web.adapters.cldf import source2source
 
         for source in DBSession.query(Source):

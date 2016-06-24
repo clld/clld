@@ -1,13 +1,16 @@
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
+
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.types import Integer
 from six import text_type
 from zope.interface import Interface, classImplements
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.db.models import common
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_DataTable(self):
         from clld.web.datatables.base import (
             DataTable, Col, LinkCol, DetailsRowLinkCol, LinkToMapCol, IntegerIdCol, IdCol,

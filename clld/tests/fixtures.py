@@ -26,8 +26,8 @@ class TestData(Data):
         return obj
 
 
-def populate_test_db():
-    set_alembic_version(DBSession, '58559d4eea0d')
+def populate_test_db(engine):
+    set_alembic_version(engine, '58559d4eea0d')
 
     data = TestData()
     data.add_default(

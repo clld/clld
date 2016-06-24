@@ -1,16 +1,18 @@
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
 import json
 
 from mock import Mock
 
 from clld.db.models.common import Parameter, Language
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.web.adapters import geojson
 from clld.web.datatables.base import DataTable
 
 geojson.pacific_centered()
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_GeoJson(self):
         adapter = geojson.GeoJson(None)
         self.assertEquals(len(list(adapter.feature_iterator(None, None))), 0)
