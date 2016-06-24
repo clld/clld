@@ -74,6 +74,10 @@ class CldfDataset(object):
             return '[%s]' % d.replace(';', '.').replace('[', '{').replace(']', '}') \
                 if d else ''
 
+        # For backwards compatibility:
+        if not hasattr(obj, 'references') and hasattr(obj, 'valueset'):
+            obj = obj.valueset
+
         sources = []
         refs = []
         for r in obj.references:
@@ -119,9 +123,11 @@ class CldfDataset(object):
         ds.metadata['dcat:accessURL'] = req.route_url('download')
 
         for value in self.value_query():
-            refs, sources = self.refs_and_sources(req, value.valueset)
-            ds.sources.add(*sources)
-            ds.add_row(self.row(req, value, refs))
+            refs, sources = self.refs_and_sources(req, value)
+            row = self.row(req, value, refs)
+            if row:
+                ds.sources.add(*sources)
+                ds.add_row(row)
         return ds
 
 

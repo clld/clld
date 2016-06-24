@@ -32,3 +32,4 @@ class CldfTests(WithDbAndDataMixin, WithTempDirMixin, TestWithEnv):
             'http://localhost/languages/{Language_ID}',
             ds.table.schema.columns['Language_ID'].valueUrl)
         self.assertEqual(len(ds.rows), 3)
+        self.assertIn('10-20', ds['value2']['Source'])
