@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 
 import os
 
+from six import text_type
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
@@ -81,12 +82,12 @@ class FilesMixin(IdNameDescriptionMixin):
 
         :return: File-system path of the file that was created.
         """
-        if not isinstance(dir_, Path):
-            dir_ = Path(dir_)
-        p = dir_.joinpath(self.relpath)
+        p = Path(dir_).joinpath(self.relpath)
         if not p.parent.exists():
             p.parent.mkdir(parents=True)
         with open(p.as_posix(), 'wb') as fp:
+            if isinstance(content, text_type):
+                content = content.encode('utf8')
             fp.write(content)
         return p.as_posix()
 

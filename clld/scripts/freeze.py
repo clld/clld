@@ -236,7 +236,7 @@ def freeze_func(args, dataset=None, with_history=True):
             if db_version:
                 # We (ab)use a dc:identifier property to pass the alembic revision of the
                 # database to the unfreeze script.
-                doc["dc:identifier"] = db_version
+                doc["dc:identifier"] = db_version  # pragma: no cover
             jsonlib.dump(doc, dump_dir.joinpath(csvm))
 
     with ZipFile(
@@ -307,6 +307,6 @@ def unfreeze_func(args, engine=None):
             db_version = load(table, csv, engine)
 
     if db_version:
-        set_alembic_version(engine, db_version)
+        set_alembic_version(engine, db_version)  # pragma: no cover
 
     rmtree(data_dir)

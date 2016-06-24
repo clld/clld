@@ -9,7 +9,7 @@ from pyramid.renderers import render
 from rdflib import Graph, URIRef
 import html5lib
 
-from clld.tests.util import TestWithEnv, Route
+from clld.tests.util import TestWithEnv, Route, WithDbAndDataMixin
 from clld import RESOURCES
 from clld.lib import rdf
 from clld.db.models.common import Parameter
@@ -18,7 +18,7 @@ from clld.db.models.common import Parameter
 _RESOURCES = [_rsc for _rsc in RESOURCES if _rsc.name != 'testresource']
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_detail_html(self):
         self.set_request_properties(matched_route=Route(), map=None)
         for rsc in _RESOURCES:

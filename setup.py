@@ -5,26 +5,16 @@ import sys
 from setuptools import setup, find_packages
 
 
-py_version = sys.version_info[:2]
+PY3 = sys.version_info.major == 3
 
-PY3 = py_version[0] == 3
-
-if PY3:
-    if py_version < (3, 4):
-        raise RuntimeError('clld requires Python 3.4 or better')
-else:
-    if py_version < (2, 7):
-        raise RuntimeError('clld requires Python 2.7 or better')
-
-here = os.path.abspath(os.path.dirname(__file__))
 try:
-    README = open(os.path.join(here, 'README.rst')).read()
-    CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
+    README = open(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')).read()
 except IOError:
-    README = CHANGES = ''
+    README = ''
 
 install_requires = [
-    'clldutils>=0.9.1',
+    'clldutils>=1.0.1',
     'pycldf>=0.4.1',
     'setuptools>=0.8',
     'pyramid>=1.6',
@@ -83,10 +73,10 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='2.2.4',
+    version='3.0.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
-    long_description=README + '\n\n' + CHANGES,
+    long_description=README,
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
@@ -99,8 +89,8 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI",
     ],
     keywords='web pyramid LRL Linguistics',
-    author="Robert Forkel, MPI EVA",
-    author_email="xrotwang+clld@googlemail.com",
+    author="Robert Forkel, MPI SHH",
+    author_email="forkel@shh.mpg.de",
     url="http://clld.org",
     license="Apache Software License",
     packages=find_packages(),

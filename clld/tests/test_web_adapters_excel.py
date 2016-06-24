@@ -1,9 +1,12 @@
+# coding: utf8
+from __future__ import unicode_literals, print_function, division, absolute_import
+
 from clld.web import datatables
 from clld.db.models.common import Language, Value, Sentence
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_Languages(self):
         from clld.web.adapters.excel import Languages
 

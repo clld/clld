@@ -1,37 +1,35 @@
 # coding: utf8
 from __future__ import unicode_literals
 import logging
-from tempfile import mkdtemp
 
 from sqlalchemy import create_engine, null
 from sqlalchemy.orm import sessionmaker
-from clldutils.path import Path, rmtree
+from clldutils.testing import WithTempDirMixin
 from mock import Mock
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.db.meta import Base, DBSession
 from clld.db.models.common import Dataset, Language, Contribution
 
 logging.disable(logging.WARN)
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, WithTempDirMixin, TestWithEnv):
     def test_freeze(self):
         from clld.scripts.freeze import freeze_func, unfreeze_func
 
-        tmp = Path(mkdtemp())
-        tmp.joinpath('data').mkdir()
-        tmp.joinpath('appname').mkdir()
+        tmp = self.tmp_path().resolve()
+        self.tmp_path('data').mkdir()
+        self.tmp_path('appname').mkdir()
 
         class Args(object):
             env = self.env
-            module_dir = tmp.joinpath('appname').resolve()
+            module_dir = self.tmp_path('appname').resolve()
             module = Mock(__name__='appname')
 
             def data_file(self, *comps):
-                return tmp.resolve().joinpath('data', *comps)
+                return tmp.joinpath('data', *comps)
 
-        DBSession.flush()
         args = Args()
         freeze_func(args, dataset=Dataset.first(), with_history=False)
         self.assert_(tmp.joinpath('data.zip').exists())
@@ -55,5 +53,3 @@ class Tests(TestWithEnv):
         contrib = s2.query(Contribution).filter(Contribution.id == 'contribution').one()
         self.assert_(contrib.primary_contributors)
         self.assert_(contrib.secondary_contributors)
-
-        rmtree(tmp, ignore_errors=True)

@@ -8,7 +8,7 @@ from mock import patch, Mock
 
 import clld
 from clld.lib.bibtex import Record
-from clld.tests.util import TestWithEnv, TESTS_DIR
+from clld.tests.util import TestWithEnv, TESTS_DIR, WithDbAndDataMixin
 
 
 class Tests(unittest.TestCase):
@@ -107,7 +107,7 @@ class Tests(unittest.TestCase):
         add_language_codes(Data(), Language(), 'iso', glottocodes=dict(iso='glot1234'))
 
 
-class Tests2(TestWithEnv):
+class Tests2(WithDbAndDataMixin, TestWithEnv):
     def test_index(self):
         from clld.db.models.common import Language
         from clld.scripts.util import index

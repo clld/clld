@@ -4,13 +4,13 @@ from __future__ import unicode_literals
 from mock import Mock, patch, MagicMock
 from six import text_type
 
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 from clld.db.models import common
 from clld.interfaces import ILinkAttrs, IFrequencyMarker, IDownload
 from clld.web.adapters.download import N3Dump
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_get_url_template(self):
         from clld.web.util.helpers import get_url_template
 

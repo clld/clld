@@ -3,10 +3,10 @@ import json
 
 from clld.web import datatables
 from clld.db.models.common import Language, ValueSet
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, TestWithEnv):
     def test_CsvAdapter(self):
         from clld.web.adapters.csv import CsvAdapter
 

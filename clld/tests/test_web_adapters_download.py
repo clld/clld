@@ -6,12 +6,13 @@ from contextlib import closing
 from xml.etree import cElementTree as et
 
 from mock import Mock, patch
+from clldutils.testing import WithTempDirMixin
 
 from clld.db.models.common import Language, Source
-from clld.tests.util import TestWithEnv
+from clld.tests.util import TestWithEnv, WithDbAndDataMixin
 
 
-class Tests(TestWithEnv):
+class Tests(WithDbAndDataMixin, WithTempDirMixin, TestWithEnv):
     def test_download_dir(self):
         from clld.web.adapters.download import download_dir
 

@@ -1,16 +1,17 @@
 from __future__ import unicode_literals
 import json
+import unittest
 
 from sqlalchemy.orm.exc import NoResultFound
 from nose.tools import assert_almost_equal
 from six import PY3
 
-from clld.tests.util import TestWithDb
+from clld.tests.util import WithDbMixin, WithCustomLanguageMixin
 from clld.db.models.common import Language
 from clld.db.meta import DBSession, VersionedDBSession
 
 
-class Tests(TestWithDb):
+class Tests(WithCustomLanguageMixin, WithDbMixin, unittest.TestCase):
 
     def test_JSONEncodedDict(self):
         l = Language(id='abc', name='Name', jsondata={'i': 2})

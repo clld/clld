@@ -1,15 +1,14 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import os
-from tempfile import mkdtemp
 
-from six import PY3
-from clldutils.path import Path, rmtree
+from clldutils.path import Path
+from clldutils.testing import WithTempDir
 
-from clld.tests.util import TestWithDb, TestWithDbAndData
+from clld.tests.util import WithCustomLanguageMixin, WithDbMixin, WithDbAndDataMixin
 from clld.db.meta import DBSession
 
 
-class Tests(TestWithDb):
+class Tests(WithCustomLanguageMixin, WithDbMixin, WithTempDir):
     def test_Config(self):
         from clld.db.models.common import Config
 
@@ -19,14 +18,11 @@ class Tests(TestWithDb):
     def test_Files(self):
         from clld.db.models.common import Sentence, Sentence_files
 
-        if PY3:
-            return  # pragma: no cover
-
         l = Sentence(id='abc', name='Name')
         f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-        p = f.create(Path(mkdtemp()).joinpath('clldtest').as_posix(), 'content')
-        assert os.path.exists(p)
-        rmtree(Path(p).parent.parent)
+        p = f.create(self.tmp_path('clldtest'), 'content')
+        assert Path(p).exists()
+
         l._files.append(f)
         DBSession.add(l)
         DBSession.flush()
@@ -135,7 +131,7 @@ class Tests(TestWithDb):
         assert i.url() is None
 
 
-class MoreTests(TestWithDbAndData):
+class MoreTests(WithCustomLanguageMixin, WithDbAndDataMixin, WithTempDir):
     def test_Contribution(self):
         from clld.db.models.common import Contribution
 

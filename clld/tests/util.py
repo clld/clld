@@ -27,7 +27,6 @@ try:
 except ImportError:  # pragma: no cover
     webdriver = None
 from clldutils.path import Path
-from clldutils.testing import WithTempDir
 
 import clld
 from clld.db.meta import DBSession, VersionedDBSession, Base
@@ -67,52 +66,58 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 
 
-class TestWithDb(WithTempDir):
+class WithCustomLanguageMixin(object):
+    def setUp(self):
+        from clld.tests.fixtures import CustomLanguage
+        assert CustomLanguage
+
+        super(WithCustomLanguageMixin, self).setUp()
+
+
+def init_db():
+    engine = create_engine('sqlite://')
+    DBSession.configure(bind=engine)
+    VersionedDBSession.configure(bind=engine)
+    Base.metadata.bind = engine
+    Base.metadata.create_all()
+    return engine
+
+
+class WithDbMixin(object):
 
     """For tests in need of a session bound to an empty db."""
 
-    __with_custom_language__ = True
-    __setup_db__ = True
-
     def setUp(self):
-        WithTempDir.setUp(self)
-        if self.__setup_db__:
-            if self.__with_custom_language__:
-                from clld.tests.fixtures import CustomLanguage
-                assert CustomLanguage
-
-            engine = create_engine('sqlite://')
-            DBSession.configure(bind=engine)
-            VersionedDBSession.configure(bind=engine)
-            Base.metadata.bind = engine
-            Base.metadata.create_all()
+        super(WithDbMixin, self).setUp()
+        init_db()
 
     def tearDown(self):
-        if self.__setup_db__:
-            transaction.abort()
-        WithTempDir.tearDown(self)
+        transaction.abort()
+        super(WithDbMixin, self).tearDown()
 
 
-class TestWithDbAndData(TestWithDb):
+class WithDbAndDataMixin(object):
 
     """For tests in need of a session bound to a db with sample data."""
 
     def setUp(self):
         from clld.tests.fixtures import populate_test_db
 
-        TestWithDb.setUp(self)
-        if self.__setup_db__:
-            populate_test_db()
+        super(WithDbAndDataMixin, self).setUp()
+        populate_test_db(init_db())
+
+    def tearDown(self):
+        transaction.abort()
+        super(WithDbAndDataMixin, self).tearDown()
 
 
-class TestWithEnv(TestWithDbAndData):
+class TestWithEnv(unittest.TestCase):
 
     """For tests in need of a configured app."""
 
     __cfg__ = TESTS_DIR.joinpath('test.ini').resolve()
 
     def setUp(self):
-        TestWithDbAndData.setUp(self)
         global ENV
 
         if ENV is None:
@@ -168,7 +173,6 @@ class TestWithEnv(TestWithDbAndData):
             self._set_request_property(k, v)
         self.env['request'].environ.pop('HTTP_X_REQUESTED_WITH', None)
         environ_add_POST(self.env['request'].environ, {})
-        TestWithDbAndData.tearDown(self)
 
 
 def _add_header(headers, name, value):
