@@ -73,7 +73,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='2.2.4',
+    version='3.0.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README,

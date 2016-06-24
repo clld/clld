@@ -2,6 +2,17 @@
 Changes
 -------
 
+3.0.0
+~~~~~
+
+Backwards incompatible changes:
+
+- clld does no longer provide support for imeji metadata files.
+- The test utilities have been refactored. For typical clld apps,
+  which used `TestWithEnv` and `TestWithApp` with `__setup_db__==False`
+  this should not change anything.
+
+
 2.2.1-4
 ~~~~~~~
 
