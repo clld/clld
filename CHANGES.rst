@@ -2,6 +2,14 @@
 Changes
 -------
 
+3.0.2
+~~~~~
+
+Bugfixes:
+- https://github.com/clld/clld/issues/108
+- https://github.com/clld/clld/issues/109
+
+
 3.0.1
 ~~~~~
 

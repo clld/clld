@@ -48,6 +48,8 @@ class CldfDataset(object):
                 'name': 'Language_ID',
                 'valueUrl': url_template(req, 'language', 'Language_ID')},
             'Language_name',
+            'Language_glottocode',
+            'Language_iso',
             {
                 'name': 'Parameter_ID',
                 'valueUrl': url_template(req, 'parameter', 'Parameter_ID')},
@@ -62,6 +64,8 @@ class CldfDataset(object):
             value.id,
             value.valueset.language.id,
             value.valueset.language.name,
+            value.valueset.language.glottocode,
+            value.valueset.language.iso_code,
             value.valueset.parameter.id,
             value.valueset.parameter.name,
             '%s' % value,
