@@ -394,21 +394,25 @@ CLLD.Map = function(eid, layers, options) {
 
     var i, hash, opts, name,
         local_data = false,
+        baseLayersMap = {},
         baseLayers = [
-        "Thunderforest.Landscape",
-        "Thunderforest.Transport",
-        "OpenStreetMap.Mapnik",
-        "OpenStreetMap.BlackAndWhite",
-        "MapQuestOpen.OSM",
-        "MapQuestOpen.Aerial",
-        "Stamen.Watercolor",
-        "Esri.WorldStreetMap",
-        "Esri.DeLorme",
-        "Esri.WorldTopoMap",
-        "Esri.WorldImagery",
-        "Esri.WorldTerrain",
-        "Esri.WorldShadedRelief",
-        "Esri.WorldPhysical"];
+            "Thunderforest.Landscape",
+            "Thunderforest.Transport",
+            "OpenStreetMap.Mapnik",
+            "OpenStreetMap.BlackAndWhite",
+            "OpenTopoMap",
+            "OpenMapSurfer.Roads",
+            "Stamen.Watercolor",
+            "Stamen.Terrain",
+            "Stamen.TerrainBackground",
+            "Esri.WorldStreetMap",
+            "Esri.DeLorme",
+            "Esri.WorldTopoMap",
+            "Esri.WorldImagery",
+            "Esri.WorldTerrain",
+            "Esri.WorldShadedRelief",
+            "Esri.WorldPhysical"
+        ];
 
     if (this.options.base_layer) {
         baseLayers = [this.options.base_layer].concat(baseLayers);
@@ -539,7 +543,13 @@ CLLD.Map = function(eid, layers, options) {
     if (this.options.tile_layer != undefined) {
         L.tileLayer(this.options.tile_layer.url_pattern, this.options.tile_layer.options).addTo(this.map);
     } else {
-        L.control.layers.provided(baseLayers, []).addTo(this.map);
+        for (i = 0; i < baseLayers.length; ++i) {
+            baseLayersMap[baseLayers[i]] = L.tileLayer.provider(baseLayers[i]);
+            if (i == 0) {
+                baseLayersMap[baseLayers[i]].addTo(this.map)
+            }
+        }
+        L.control.layers(baseLayersMap).addTo(this.map);
     }
 
     this.marker_map = {};
