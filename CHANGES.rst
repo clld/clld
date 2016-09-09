@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.1.0
+~~~~~
+
+Upgraded leaflet and leaflet-provider plugin.
+
+
 3.0.2
 ~~~~~
 
