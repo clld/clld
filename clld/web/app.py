@@ -449,6 +449,15 @@ def add_410(config, pattern, name=None):
     _route_and_view(config, pattern, gone, name=name)
 
 
+def add_page(config, name, pattern=None, view=None, template=None, views=None):
+    views = views or maybe_import('%s.views' % config.root_package.__name__)
+    config.add_route_and_view(
+        name,
+        pattern or '/' + name,
+        view or getattr(views, name, lambda r: {}),
+        renderer=template or name + '.mako')
+
+
 def includeme(config):
     """Upgrading:
 
@@ -520,6 +529,7 @@ def includeme(config):
         'add_settings_from_file': add_settings_from_file,
         'add_301': add_301,
         'add_410': add_410,
+        'add_page': add_page,
         'register_resource_routes_and_views': register_resource_routes_and_views,
     }.items():
         config.add_directive(name, func)
@@ -595,14 +605,9 @@ def includeme(config):
             if p.stem in home_comp and p.suffix == '.mako':
                 home_comp[p.stem] = True
 
-    views = maybe_import('%s.views' % root_package)
     for name, template in home_comp.items():
         if template:
-            config.add_route_and_view(
-                name,
-                '/' + name,
-                getattr(views, name, lambda r: {}),
-                renderer=name + '.mako')
+            config.add_page(name)
 
     config.add_settings({'home_comp': [k for k in home_comp.keys() if home_comp[k]]})
 

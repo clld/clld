@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.1.1
+~~~~~
+
+Added shortcut config method to add simple template-based pages to clld apps.
+
+
 3.1.0
 ~~~~~
 
