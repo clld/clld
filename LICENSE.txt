@@ -9,6 +9,10 @@ jquery is provided via a
 leaflet is provided via
 `this <https://raw.github.com/Leaflet/Leaflet/master/LICENSE>`_ license.
 
+Leaflet.fullscreen is provided via
+`this <https://raw.githubusercontent.com/Leaflet/Leaflet.fullscreen/gh-pages/LICENSE`_
+license.
+
 jquery dataTables is provided via
 `this <https://raw.github.com/DataTables/DataTables/master/license-bsd.txt>`_ license.
 

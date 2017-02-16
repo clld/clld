@@ -499,7 +499,7 @@ CLLD.Map = function(eid, layers, options) {
         }
         map.oms.addMarker(layer);
         map.marker_map[feature.properties.language.id] = layer;
-        layer.bindLabel(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
+        layer.bindTooltip(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
     };
 
     var _zoomToExtent = function() {
@@ -579,7 +579,7 @@ CLLD.Map = function(eid, layers, options) {
                     map.layer_map[data.properties.layer].addData(data);
                     _zoomToExtent();
                     if (map.options.show_labels) {
-                        map.eachMarker(function(marker){marker.showLabel()})
+                        map.eachMarker(function(marker){marker.openTooltip()})
                     }
                 });
             } else {
@@ -592,7 +592,7 @@ CLLD.Map = function(eid, layers, options) {
     if (local_data) {
         _zoomToExtent();
         if (this.options.show_labels) {
-            this.eachMarker(function(marker){marker.showLabel()})
+            this.eachMarker(function(marker){marker.openTooltip()})
         }
     }
 
@@ -616,9 +616,9 @@ CLLD.mapToggleLabels = function(eid, ctrl){
         map = CLLD.Maps[eid];
     map.eachMarker(function(marker){
         if (display && marker._icon.style.display != 'none') {
-            marker.showLabel();
+            marker.openTooltip();
         } else {
-            marker.hideLabel();
+            marker.closeTooltip();
         }
     });
 };
@@ -658,11 +658,11 @@ CLLD.mapFilterMarkers = function(eid, show){
         if (show(marker)) {
             marker._icon.style.display = 'block';
             if (show_label) {
-                marker.showLabel();
+                marker.openTooltip();
             }
         } else {
             marker._icon.style.display = 'none';
-            marker.hideLabel();
+            marker.closeTooltip();
         }
     });
 };

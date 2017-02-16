@@ -20,6 +20,7 @@ bundles = {
         Bundle(
             'js/jquery.js',
             'js/leaflet-src.js',
+            'js/Leaflet.fullscreen.js',
             filters=(skip,)),
         'js/bootstrap.min.js',
         'js/jquery.dataTables.min.js',
@@ -28,8 +29,6 @@ bundles = {
             'js/bootstrapx-clickover.js',
             'js/tree.jquery.js',
             'js/leaflet-providers.js',
-            'js/leaflet.label.js',
-            'js/Control.FullScreen.js',
             'js/leaflet-hash.js',
             'js/clld.js',
             'project.js',
@@ -38,11 +37,11 @@ bundles = {
     'css': [
         Bundle(
             'css/leaflet.css',
+            'css/leaflet.fullscreen.css',
             filters=(skip,)),
         Bundle(
             'css/clld.css',
             'css/jqtree.css',
-            'css/leaflet.label.css',
             'css/hint.css',
             'css/jquery.dataTables.css',
             filters='yui_css'),
