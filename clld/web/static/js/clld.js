@@ -388,7 +388,7 @@ CLLD.Map = function(eid, layers, options) {
             scrollWheelZoom: false,
             maxZoom: this.options.max_zoom == undefined ? 6 : this.options.max_zoom,
             fullscreenControl: true,
-            attributionControl: false
+            attributionControl: true
         }
     );
 
