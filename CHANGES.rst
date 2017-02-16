@@ -2,6 +2,14 @@
 Changes
 -------
 
+
+3.2.0
+~~~~~
+
+- factored out DeclEnum and LGR_ABBRS to clldutils
+- upgraded leaflet to version 1.0.3
+
+
 3.1.1
 ~~~~~
 
