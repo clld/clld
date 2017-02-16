@@ -9,6 +9,10 @@ jquery is provided via a
 leaflet is provided via
 `this <https://raw.github.com/Leaflet/Leaflet/master/LICENSE>`_ license.
 
+Leaflet.fullscreen is provided via
+`this <https://raw.githubusercontent.com/Leaflet/Leaflet.fullscreen/gh-pages/LICENSE`_
+license.
+
 jquery dataTables is provided via
 `this <https://raw.github.com/DataTables/DataTables/master/license-bsd.txt>`_ license.
 
@@ -19,9 +23,6 @@ jqTree is provided via a
 `Apache <https://github.com/mbraak/jqTree/blob/master/LICENSE>`_ license.
 
 intro.js is provided via a
-`MIT <http://opensource.org/licenses/MIT>`_ license.
-
-audio.js is provided via a
 `MIT <http://opensource.org/licenses/MIT>`_ license.
 
 hint.css is provided via a

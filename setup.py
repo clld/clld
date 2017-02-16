@@ -14,7 +14,7 @@ except IOError:
     README = ''
 
 install_requires = [
-    'clldutils>=1.0.1',
+    'clldutils>=1.9.0',
     'pycldf>=0.5.2',
     'setuptools>=0.8',
     'pyramid>=1.6',
@@ -73,7 +73,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='3.1.1',
+    version='3.2.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README,
