@@ -396,8 +396,6 @@ CLLD.Map = function(eid, layers, options) {
         local_data = false,
         baseLayersMap = {},
         baseLayers = [
-            "Thunderforest.Landscape",
-            "Thunderforest.Transport",
             "OpenStreetMap.Mapnik",
             "OpenStreetMap.BlackAndWhite",
             "OpenTopoMap",
