@@ -21,6 +21,7 @@ develop-eggs
 .installed.cfg
 lib64
 .webassets-*
+.eggs
 
 # Installer logs
 pip-log.txt

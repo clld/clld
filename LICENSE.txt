@@ -21,9 +21,6 @@ jqTree is provided via a
 intro.js is provided via a
 `MIT <http://opensource.org/licenses/MIT>`_ license.
 
-audio.js is provided via a
-`MIT <http://opensource.org/licenses/MIT>`_ license.
-
 hint.css is provided via a
 `MIT <http://opensource.org/licenses/MIT>`_ license.
 
