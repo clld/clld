@@ -1,4 +1,5 @@
 """We provide some infrastructure to build extensible database models."""
+import sqlite3
 try:  # pragma: no cover
     import simplejson as json
 except ImportError:  # pragma: no cover
@@ -41,6 +42,8 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor = dbapi_connection.cursor()
     try:
         cursor.execute("SELECT 1")
+        if not isinstance(dbapi_connection, sqlite3.Connection):  # pragma: no cover
+            cursor.execute("SET default_text_search_config TO 'english'")
     except:  # pragma: no cover
         # dispose the whole pool instead of invalidating one at a time
         connection_proxy._pool.dispose()
