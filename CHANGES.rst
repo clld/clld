@@ -2,6 +2,11 @@
 Changes
 -------
 
+3.2.1
+~~~~~
+
+- some support for fulltext search using PostgreSQL TSVECTOR columns
+
 
 3.2.0
 ~~~~~
