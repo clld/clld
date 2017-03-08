@@ -17,6 +17,7 @@ from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.orm.query import Query
 from sqlalchemy.inspection import inspect
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from zope.sqlalchemy import ZopeTransactionExtension
 from clldutils.misc import NO_DEFAULT, UnicodeMixin
@@ -137,7 +138,9 @@ class CsvMixin(object):
         cols = sorted(
             col.key for om in inspect(cls).iterate_to_root()
             for col in om.local_table.c
-            if col.key not in exclude and not exclude.add(col.key))
+            if (col.key not in exclude
+                and col.type.__class__ not in [TSVECTOR]
+                and not exclude.add(col.key)))
         return cols
 
     def value_to_csv(self, attr, ctx=None, req=None):
