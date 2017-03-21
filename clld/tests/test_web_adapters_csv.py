@@ -22,11 +22,17 @@ class Tests(WithDbAndDataMixin, TestWithEnv):
         from clld.web.adapters.csv import CsvmJsonAdapter
 
         adapter = CsvmJsonAdapter(None)
-        res = adapter.render(
-            datatables.Languages(self.env['request'], Language), self.env['request'])
-        self.assertIn('tableSchema', json.loads(res))
+        res = json.loads(adapter.render(
+            datatables.Languages(self.env['request'], Language), self.env['request']))
+        self.assertNotEqual(res['tableSchema']['columns'], [])
+
         res = adapter.render(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
         self.assertIn('foreignKeys', json.loads(res)['tableSchema'])
         adapter.render_to_response(
             datatables.Valuesets(self.env['request'], ValueSet), self.env['request'])
+
+        self._set_request_property('params', {'sSearch_0': 'xyz'})
+        res = json.loads(adapter.render(
+            datatables.Languages(self.env['request'], Language), self.env['request']))
+        self.assertEqual(res['tableSchema']['columns'], [])
