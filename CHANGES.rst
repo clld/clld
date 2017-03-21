@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.2.3
+~~~~~
+
+- fixes https://github.com/clld/clld/issues/122
+
+
 3.2.2
 ~~~~~
 

@@ -129,10 +129,11 @@ class CsvmJsonAdapter(Index):
 
     def render(self, ctx, req):
         item = ctx.get_query(limit=1).first()
+        fields = item.csv_head() if item else []
         cls = inspect(item).class_ if item else None
         doc = self.csvm_doc(
             req.url.replace('.csv-metadata.json', '.csv'),
             req,
-            [(field, getattr(cls, field, None)) for field in item.csv_head()])
+            [(field, getattr(cls, field, None)) for field in fields])
         doc["dc:title"] = "{0} - {1}".format(req.dataset.name, ctx)
         return pyramid_render('json', doc, request=req)
