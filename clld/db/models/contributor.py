@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 from sqlalchemy import Column, String, Unicode, UniqueConstraint
 
 from zope.interface import implementer
+from nameparser import HumanName
 
 from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
@@ -40,6 +41,6 @@ class Contributor(Base,
     address = Column(Unicode)
 
     def last_first(self):
-        """ad hoc - possibly incorrect - way of formatting the name as "last, first"."""
-        parts = (self.name or '').split()
-        return '' if not parts else ', '.join([parts[-1], ' '.join(parts[:-1])])
+        if not self.name:
+            return ''
+        return '{0.last}, {0.first} {0.middle}'.format(HumanName(self.name)).strip()

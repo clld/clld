@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.2.4
+~~~~~
+
+- more reliable name parsing
+
+
 3.2.3
 ~~~~~
 
