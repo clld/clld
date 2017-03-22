@@ -46,7 +46,9 @@ class Tests(WithCustomLanguageMixin, WithDbMixin, WithTempDir):
         d = Contributor(id='abc')
         d.last_first()
         d = Contributor(id='abc', name='Robert Forkel')
-        self.assertTrue(d.last_first().startswith('Forkel'))
+        self.assertEqual(d.last_first(), 'Forkel, Robert')
+        d = Contributor(id='abc', name='Hans Robert von Forkel')
+        self.assertEqual(d.last_first(), 'von Forkel, Hans Robert')
 
     def test_Language(self):
         from clld.db.models.common import Language
