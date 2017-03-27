@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.2.5
+~~~~~
+
+- fixing another edge case in the csv metadata adapter
+
+
 3.2.4
 ~~~~~
 
