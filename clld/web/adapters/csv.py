@@ -96,12 +96,15 @@ class CsvmJsonAdapter(Index):
             spec = {
                 'name': name,
                 'datatype': {'@id': 'http://www.w3.org/2001/XMLSchema#string'}}
-            if col is not None and not isinstance(col, Column):
-                try:
-                    col = col.property.columns[0]
-                except AttributeError:  # pragma: no cover
-                    col = None
-                    raise
+            if isinstance(col, property):
+                col = None  # pragma: no cover
+            else:
+                if col is not None and not isinstance(col, Column):
+                    try:
+                        col = col.property.columns[0]
+                    except AttributeError:  # pragma: no cover
+                        col = None
+                        raise
             if col is not None:
                 if len(col.foreign_keys) == 1:
                     fk = list(col.foreign_keys)[0]
