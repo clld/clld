@@ -26,7 +26,7 @@ class MetadataFromRec(Metadata):
     def rec(self, ctx, req):
         data = {}
         if interfaces.IContribution.providedBy(ctx):
-            genre = 'inbook'
+            genre = 'incollection'
             data['author'] = [
                 c.name for c in
                 chain(ctx.primary_contributors, ctx.secondary_contributors)]
