@@ -2,6 +2,13 @@
 Changes
 -------
 
+3.2.7
+~~~~~
+
+- closes https://github.com/clld/clld/issues/127
+
+
+
 3.2.6
 ~~~~~
 
