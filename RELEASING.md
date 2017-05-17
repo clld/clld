@@ -11,7 +11,12 @@ tox -r
 ./venvs/clld/clld/build.sh "<prev-rel-no>"
 ```
 
-- Make sure javascript tests pass with coverage of clld.js at > 82%::
+- Make sure javascript and css can be minified:
+```
+webassets -m clld.web.assets build
+```
+
+- Make sure javascript tests pass with coverage of clld.js at > 82%:
 ```
 java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 ```
