@@ -26,7 +26,7 @@ class Tests(WithDbAndDataMixin, unittest.TestCase):
         from clld.db.models.common import Dataset
         from clld.db.meta import DBSession
 
-        for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('setä$', 1)]:
+        for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('setä$', 1), ('\\\\b', 0)]:
             q = DBSession.query(Dataset).filter(icontains(Dataset.name, qs))
             self.assertEqual(q.count(), count)
 
