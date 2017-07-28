@@ -57,6 +57,7 @@ class DownloadWidget(Component):
         adapters = [a for n, a in
                     self.req.registry.getAdapters([self.obj], self.interface)
                     if a.extension not in set(self.options['exclude'])]
+        adapters = sorted(adapters, key=lambda x: x.extension)
         adoc = []
         for adapter in adapters:
             if adapter.__doc__:
