@@ -86,6 +86,9 @@ def icontains(col, qs):
         qs = epattern.sub('', qs)
         suffix = ''
 
+    # Prevent invalid LIKE patterns:
+    if qs.endswith('\\') and not qs.endswith('\\\\'):
+        qs += '\\'
     return col.ilike(prefix + qs + suffix)
 
 
