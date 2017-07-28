@@ -76,7 +76,8 @@ git push --tags
 - Make sure your system Python has ``setuptools-git`` installed and release to
   PyPI:
 ```
-./pypi.sh <release number>
+python setup.py sdist
+~/venvs/py34/bin/twine upload dist/clld-<version>.tar.gz
 ```
 
 - Make sure the new version is installed locally:
