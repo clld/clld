@@ -99,8 +99,6 @@ def register_resource_adapters(config, rsc):
 
 def includeme(config):
     """register adapters."""
-    from clld.web.adapters import cldf
-
     specs = []
 
     # citeable resources are available as html page listing available metadata formats:
@@ -140,11 +138,6 @@ def includeme(config):
         GeoJsonParameterFlatProperties,
         interfaces.IParameter,
         name=GeoJsonParameterFlatProperties.mimetype)
-    config.register_adapter(
-        cldf.CldfDataset,
-        interfaces.IContribution,
-        interfaces.ICldfDataset,
-        name='cldf')
     config.include(biblio)
 
 

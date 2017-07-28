@@ -1,5 +1,6 @@
 # coding: utf8
 from __future__ import unicode_literals, print_function, division, absolute_import
+from zipfile import ZipFile
 
 from pycldf.dataset import Dataset as CldfDataset
 from clldutils.testing import WithTempDirMixin
@@ -23,14 +24,14 @@ class CldfTests(WithDbAndDataMixin, WithTempDirMixin, TestWithEnv):
         tmp = self.tmp_path('dl.zip')
         dl = CldfDownload(Dataset, 'clld')
         dl.create(self.env['request'], verbose=False, outfile=tmp)
-        ds = CldfDataset.from_zip(tmp)
-        self.assertEqual(ds.name, 'dataset-contribution-contribution')
-        self.assertEqual(
-            'http://localhost/values/{ID}',
-            ds.table.schema.aboutUrl)
-        self.assertEqual(
-            'http://localhost/languages/{Language_ID}',
-            ds.table.schema.columns['Language_ID'].valueUrl)
-        self.assertEqual(len(ds.rows), 3)
-        self.assertIn('Language_glottocode', ds[0])
-        self.assertIn('10-20', ds['value2']['Source'])
+
+        with ZipFile(tmp.as_posix()) as zip:
+            self.assertIn('Wordlist-metadata.json', zip.namelist())
+            zip.extractall(self.tmp_path('cldf').as_posix())
+
+        ds = CldfDataset.from_metadata(self.tmp_path('cldf', 'Wordlist-metadata.json'))
+        self.assertEqual(ds.module, 'Wordlist')
+        values = list(ds[ds.primary_table])
+        self.assertEqual(len(values), 3)
+        for v in values:
+            list(ds.sources.expand_refs(v['Source']))
