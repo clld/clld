@@ -1,23 +1,25 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
+import shutil
 
 from sqlalchemy.orm import joinedload_all, joinedload
-from pycldf.dataset import Dataset
-from pycldf.util import Archive
-from pycldf.sources import Source
+from pycldf import dataset
+from pycldf import sources
+from pycldf.terms import term_uri
+from clldutils.path import TemporaryDirectory
+from clldutils.csvw.metadata import URITemplate, Column
 
-from clld.util import safe_overwrite
-from clld.interfaces import ICldfDataset
-from clld.web.adapters.download import Download, format_readme
+from clld.web.adapters.download import Download
 from clld.db.meta import DBSession
 from clld.db.models.common import (
-    Contribution, ContributionContributor, ValueSet, Value, ValueSetReference,
+    ValueSet, Value, Parameter, Language, Contribution, Source, Sentence,
 )
 from clld.web.util.helpers import text_citation, get_url_template
 
 
 def url_template(req, route, id_name):
-    return get_url_template(req, route, relative=False, variable_map={'id': id_name})
+    return URITemplate(get_url_template(
+        req, route, relative=False, variable_map={'id': id_name}))
 
 
 def source2source(req, source):
@@ -26,129 +28,124 @@ def source2source(req, source):
     fields = OrderedDict({'%s_url' % req.dataset.id: req.resource_url(source)})
     for key, value in bibrecord.items():
         fields[key] = '; '.join(value) if isinstance(value, list) else value
-    return Source(
-        getattr(bibrecord.genre, 'value', bibrecord.genre)
-        if bibrecord.genre else 'misc',
+    return sources.Source(
+        getattr(bibrecord.genre, 'value', bibrecord.genre) if bibrecord.genre else 'misc',
         source.id,
         **fields)
 
 
-class CldfDataset(object):
-    def __init__(self, obj):
-        self.obj = obj
+def iterrefs(obj):
+    def _desc(d):
+        return '[%s]' % d.replace(';', '.').replace('[', '{').replace(']', '}') \
+            if d else ''
 
-    def write(self, req, archive):
-        ds = self.dataset(req)
-        ds.write(archive=archive)
+    # For backwards compatibility:
+    if not hasattr(obj, 'references') and hasattr(obj, 'valueset'):
+        obj = obj.valueset
 
-    def columns(self, req):
-        return [
-            'ID',
-            {
-                'name': 'Language_ID',
-                'valueUrl': url_template(req, 'language', 'Language_ID')},
-            'Language_name',
-            'Language_glottocode',
-            'Language_iso',
-            {
-                'name': 'Parameter_ID',
-                'valueUrl': url_template(req, 'parameter', 'Parameter_ID')},
-            'Parameter_name',
-            'Value',
-            'Source',
-            'Comment',
-        ]
-
-    def row(self, req, value, refs):
-        return [
-            value.id,
-            value.valueset.language.id,
-            value.valueset.language.name,
-            value.valueset.language.glottocode,
-            value.valueset.language.iso_code,
-            value.valueset.parameter.id,
-            value.valueset.parameter.name,
-            '%s' % value,
-            refs,
-            value.valueset.source or '',
-        ]
-
-    def refs_and_sources(self, req, obj):
-        def _desc(d):
-            return '[%s]' % d.replace(';', '.').replace('[', '{').replace(']', '}') \
-                if d else ''
-
-        # For backwards compatibility:
-        if not hasattr(obj, 'references') and hasattr(obj, 'valueset'):
-            obj = obj.valueset
-
-        sources = []
-        refs = []
-        for r in obj.references:
-            if r.source:
-                refs.append('%s%s' % (r.source.id, _desc(r.description)))
-                sources.append(source2source(req, r.source))
-        return ';'.join(refs), sources
-
-    def value_query(self):
-        return DBSession.query(Value)\
-            .join(Value.valueset)\
-            .filter(ValueSet.contribution_pk == self.obj.pk)\
-            .options(
-                joinedload(Value.valueset, ValueSet.language),
-                joinedload(Value.valueset, ValueSet.parameter),
-                joinedload(Value.domainelement),
-                joinedload_all(
-                    Value.valueset, ValueSet.references, ValueSetReference.source))\
-            .order_by(ValueSet.parameter_pk, ValueSet.language_pk, Value.pk)
-
-    def dataset(self, req):
-        ds = Dataset('%s-%s-%s' % (
-            req.dataset.id, self.obj.__class__.__name__.lower(), self.obj.id))
-        cols = self.columns(req)
-        ds.fields = tuple(col['name'] if isinstance(col, dict) else col for col in cols)
-        ds.table.schema.aboutUrl = url_template(req, 'value', 'ID')
-
-        for col in cols:
-            if isinstance(col, dict):
-                name = col.pop('name')
-                for attr, value in col.items():
-                    setattr(ds.table.schema.columns[name], attr, value)
-
-        ds.metadata['dc:bibliographicCitation '] = text_citation(req, self.obj)
-        ds.metadata['dc:publisher'] = '%s, %s' % (
-            req.dataset.publisher_name, req.dataset.publisher_place)
-        ds.metadata['dc:license'] = req.dataset.license
-        ds.metadata['dc:issued'] = req.dataset.published.isoformat()
-        ds.metadata['dc:title'] = self.obj.name
-        ds.metadata['dc:creator'] = self.obj.formatted_contributors()
-        ds.metadata['dc:identifier'] = req.resource_url(self.obj)
-        ds.metadata['dc:isPartOf'] = req.resource_url(req.dataset)
-        ds.metadata['dcat:accessURL'] = req.route_url('download')
-
-        for value in self.value_query():
-            refs, sources = self.refs_and_sources(req, value)
-            row = self.row(req, value, refs)
-            if row:
-                ds.sources.add(*sources)
-                ds.add_row(row)
-        return ds
+    for r in obj.references:
+        if r.source_pk:
+            yield r.source_pk, _desc(r.description)
 
 
 class CldfDownload(Download):
     ext = 'cldf'
     description = "Dataset in CLDF"
 
-    def iterdatasets(self):
-        for contrib in DBSession.query(Contribution) \
-            .options(joinedload_all(
-                Contribution.contributor_assocs, ContributionContributor.contributor)):
-            yield contrib
-
     def create(self, req, filename=None, verbose=True, outfile=None):
-        with safe_overwrite(outfile or self.abspath(req)) as tmp:
-            with Archive(tmp, 'w') as zipfile:
-                for contrib in self.iterdatasets():
-                    ds = req.registry.getAdapter(contrib, ICldfDataset, 'cldf')
-                    ds.write(req, zipfile)
-                zipfile.write_text(format_readme(req), 'README.txt')
+        with TemporaryDirectory() as tmpd:
+            # what CLDF module are we dealing with?
+            cldf_module = req.registry.settings.get('cldf_module', 'Wordlist')
+            cls = getattr(dataset, cldf_module)
+            ds = cls.in_dir(tmpd)
+            ds.properties['dc:bibliographicCitation '] = text_citation(req, req.dataset)
+            ds.properties['dc:publisher'] = '%s, %s' % (
+                req.dataset.publisher_name, req.dataset.publisher_place)
+            ds.properties['dc:license'] = req.dataset.license
+            ds.properties['dc:issued'] = req.dataset.published.isoformat()
+            ds.properties['dc:title'] = req.dataset.name
+            ds.properties['dc:creator'] = req.dataset.formatted_editors()
+            ds.properties['dc:identifier'] = req.resource_url(req.dataset)
+            ds.properties['dcat:accessURL'] = req.route_url('download')
+            ds.properties['dc:hasPart'] = []
+            contribs = {}
+            for contrib in DBSession.query(Contribution):
+                contribs[contrib.pk] = contrib.id
+                ds.properties['dc:hasPart'].append(req.resource_url(contrib))
+
+            ds.add_component('ExampleTable')
+            ds.add_component('ParameterTable')
+            ds.add_component(
+                'LanguageTable',
+                {
+                    'name': 'glottocode',
+                    'datatype': 'string',
+                    'valueUrl': 'http://glottolog.org/resource/languoid/id/{glottocode}',
+                    'propertyUrl': term_uri('glottocode')},
+                {
+                    'name': 'iso_code',
+                    'datatype': 'string',
+                    'propertyUrl': term_uri('iso639P3code')},
+            )
+            ds[ds.primary_table].tableSchema.columns.append(Column.fromvalue(
+                {
+                    'name': 'contribution',
+                    'datatype': 'string',
+                    'valueUrl': url_template(req, 'contribution', 'contribution').uri,
+                }))
+
+            ds['LanguageTable'].aboutUrl = url_template(req, 'language', 'ID')
+            ds['ParameterTable'].aboutUrl = url_template(req, 'parameter', 'ID')
+            ds[ds.primary_table].aboutUrl = url_template(req, 'value', 'ID')
+
+            #
+            # FIXME: add exmaples!
+            #
+            sources = {}
+            for src in DBSession.query(Source):
+                sources[src.pk] = src.id
+                ds.sources.add(source2source(req, src))
+            ds.write()
+            params = OrderedDict()
+            for o in DBSession.query(Parameter):
+                params[o.pk] = {
+                    'ID': o.id,
+                    'name': o.name,
+                }
+            langs = OrderedDict()
+            for o in DBSession.query(Language):
+                langs[o.pk] = {
+                    'ID': o.id,
+                    'name': o.name,
+                    'glottocode': o.glottocode}
+
+            ds['ParameterTable'].write(params.values())
+            ds['LanguageTable'].write(langs.values())
+            ds['ExampleTable'].write([
+                {
+                    'ID': o.id,
+                    'Language_ID': langs[o.language_pk]['ID'],
+                    'Primary': o.name,
+                    'Analyzed': o.analyzed.split('\t') if o.analyzed else [],
+                    'Gloss': o.gloss.split('\t') if o.gloss else [],
+                    'Translation': o.description} for o in DBSession.query(Sentence)])
+
+            values = []
+            for v in DBSession.query(Value).join(Value.valueset).options(
+                    joinedload_all(Value.valueset, ValueSet.references),
+                    joinedload(Value.domainelement)):
+                values.append({
+                    'ID': v.id,
+                    'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
+                    'Language_ID': langs[v.valueset.language_pk]['ID'],
+                    'Parameter_ID': params[v.valueset.parameter_pk]['ID'],
+                    'Source': [
+                        '{0}{1}'.format(sources[spk], d) for spk, d in iterrefs(v)],
+                    'contribution': contribs[v.valueset.contribution_pk],
+                })
+            ds[ds.primary_table].write(values)
+            ds.validate()
+
+            fname = outfile or self.abspath(req)
+            shutil.make_archive(
+                fname.parent.joinpath(fname.stem).as_posix(), 'zip', tmpd.as_posix())

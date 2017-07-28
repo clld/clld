@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.3.0
+~~~~~
+
+- CLDF has reached 1.0rc1, and we update the CLDF export accordingly.
+
+
 3.2.7
 ~~~~~
 
