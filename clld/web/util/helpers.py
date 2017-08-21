@@ -471,7 +471,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
                 HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
                 class_='gloss-unit'))
 
-    return HTML.p(
+    return HTML.div(
         HTML.div(
             HTML.div(
                 HTML.div(sentence.original_script, class_='original-script')
@@ -486,7 +486,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             ),
             class_="sentence",
         ),
-        class_="sentence",
+        class_="sentence-wrapper",
     )
 
 
