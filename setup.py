@@ -16,7 +16,7 @@ except IOError:
 install_requires = [
     'clldutils>=1.13.6',
     'pycldf>=1.0.2',
-    'setuptools>=0.8',
+    'setuptools>=25',
     'pyramid>=1.6',
     'pyramid_mako>=1.0',
     'pyramid_tm',
@@ -27,6 +27,8 @@ install_requires = [
     'pyramid_exclog',
     'pytz',
     'zope.sqlalchemy',
+    # Only required by WebTest, but because of pinned html5lib must be pinned, too:
+    'beautifulsoup4>=4.6.0',
     'WebTest',
     'six>=1.7.3',  # webassets needs add_metaclass!
     'alembic>=0.7.1',
@@ -73,7 +75,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='3.3.2',
+    version='3.3.3',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README,
