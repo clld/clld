@@ -485,7 +485,7 @@ CLLD.Map = function(eid, layers, options) {
      * @private
      */
     var _onEachFeature = function(feature, layer) {
-        var size = 30,
+        var size = 20,
             map = CLLD.Maps[eid];
         if (feature.properties.icon_size) {
             size = feature.properties.icon_size;
