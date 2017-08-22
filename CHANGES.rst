@@ -2,6 +2,12 @@
 Changes
 -------
 
+3.3.3
+~~~~~
+
+Try to clean up the mess of dependencies around html5lib.
+
+
 3.3.2
 ~~~~~
 
