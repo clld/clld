@@ -14,7 +14,7 @@ except IOError:
     README = ''
 
 install_requires = [
-    'clldutils>=1.9.0',
+    'clldutils>=1.13.6',
     'pycldf>=1.0.2',
     'setuptools>=0.8',
     'pyramid>=1.6',
@@ -38,7 +38,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.9999999',  # our tests rely on the childNodes attribute
+    'html5lib==0.999999999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
     'webhelpers2>=2.0',
@@ -73,7 +73,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='3.3.1',
+    version='3.3.2',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README,
