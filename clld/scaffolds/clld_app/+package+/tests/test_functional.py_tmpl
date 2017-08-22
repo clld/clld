@@ -10,7 +10,7 @@ class Tests(TestWithApp):
 
     def test_install(self):
         from bs4 import BeautifulSoup
-        assert bs4
+        assert BeautifulSoup
 
     def test_home(self):
         res = self.app.get('/', status=200)
