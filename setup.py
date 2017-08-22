@@ -14,7 +14,7 @@ except IOError:
     README = ''
 
 install_requires = [
-    'clldutils>=1.9.0',
+    'clldutils>=1.13.6',
     'pycldf>=1.0.2',
     'setuptools>=0.8',
     'pyramid>=1.6',
