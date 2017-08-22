@@ -38,7 +38,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.9999999',  # our tests rely on the childNodes attribute
+    'html5lib==0.999999999',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt-future',
     'webhelpers2>=2.0',
