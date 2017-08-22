@@ -2,6 +2,13 @@
 Changes
 -------
 
+3.3.2
+~~~~~
+
+- closes https://github.com/clld/clld/issues/133
+- closes https://github.com/clld/clld/issues/119
+
+
 3.3.1
 ~~~~~
 
