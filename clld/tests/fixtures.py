@@ -68,7 +68,7 @@ def populate_test_db(engine):
     for i, type_ in enumerate(cm.IdentifierType):
         cm.LanguageIdentifier(
             language=data[cm.Language],
-            identifier=cm.Identifier(type=type_.value, id=type_.value + str(i), name='a'))
+            identifier=cm.Identifier(type=type_.value, id=type_.value + str(i), name='glot1234'))
 
     cm.LanguageIdentifier(
         language=data[cm.Language],

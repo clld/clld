@@ -75,18 +75,7 @@ class CldfDownload(Download):
 
             ds.add_component('ExampleTable')
             ds.add_component('ParameterTable')
-            ds.add_component(
-                'LanguageTable',
-                {
-                    'name': 'glottocode',
-                    'datatype': 'string',
-                    'valueUrl': 'http://glottolog.org/resource/languoid/id/{glottocode}',
-                    'propertyUrl': term_uri('glottocode')},
-                {
-                    'name': 'iso_code',
-                    'datatype': 'string',
-                    'propertyUrl': term_uri('iso639P3code')},
-            )
+            ds.add_component('LanguageTable')
             ds[ds.primary_table].tableSchema.columns.append(Column.fromvalue(
                 {
                     'name': 'contribution',
@@ -136,9 +125,10 @@ class CldfDownload(Download):
                     joinedload(Value.domainelement)):
                 values.append({
                     'ID': v.id,
-                    'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
                     'Language_ID': langs[v.valueset.language_pk]['ID'],
                     'Parameter_ID': params[v.valueset.parameter_pk]['ID'],
+                    #'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
+                    'Form': 'spam',
                     'Source': [
                         '{0}{1}'.format(sources[spk], d) for spk, d in iterrefs(v)],
                     'contribution': contribs[v.valueset.contribution_pk],
