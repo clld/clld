@@ -200,7 +200,7 @@ class ClldRequest(Request):
 
     def file_ospath(self, file_):
         if 'clld.files' in self.registry.settings:
-            return self.registry.settings['clld.files'].joinpath(file_.relpath).as_posix()
+            return str(self.registry.settings['clld.files'].joinpath(file_.relpath))
 
     def file_url(self, file_):
         if 'url' in file_.jsondata:
@@ -504,7 +504,7 @@ def includeme(config):
         # deployment-specific location of static data files
         abspath = Path(config.registry.settings['clld.files']).resolve()
         config.add_settings({'clld.files': abspath})
-        config.add_static_view('files', abspath.as_posix())
+        config.add_static_view('files', str(abspath))
 
     # event subscribers:
     config.add_subscriber(add_localizer, events.NewRequest)
