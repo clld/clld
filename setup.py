@@ -42,7 +42,7 @@ install_requires = [
     'paginate',
     'html5lib==0.999999999',  # our tests rely on the childNodes attribute
     'xlrd',
-    'xlwt-future',
+    'xlwt',
     'webhelpers2>=2.0',
     'nameparser',
     'feedparser',
