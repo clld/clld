@@ -1,14 +1,15 @@
 language: python
 python:
-  - "3.4"
   - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+cache: pip
+before_cache:
+- rm -f $HOME/.cache/pip/log/debug.log
 install:
-  - pip install -U setuptools
-  - pip install coveralls
-  - pip install coverage
-  - pip install nose
+  - pip install . nose coverage coveralls
 script:
-  - python setup.py install
   - nosetests --with-coverage --cover-package=clld
 after_success:
   - coveralls
