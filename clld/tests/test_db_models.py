@@ -105,11 +105,15 @@ class Tests(WithCustomLanguageMixin, WithDbMixin, WithTempDir):
         assert u.__solr__(None)
 
     def test_UnitValue(self):
-        from clld.db.models.common import UnitParameter, UnitValue, UnitDomainElement
+        from clld.db.models.common import Unit, Language, UnitParameter, UnitValue, UnitDomainElement
 
+        u = Unit(name='unit', language=Language(name='language'))
         p1 = UnitParameter()
         p2 = UnitParameter()
+        # NOTE: we assume paramter of UnitValue and UnitDomainElement are identical
+        #       (i.e. we do not enforce/check this)
         v = UnitValue(
+            unit=u, unitparameter=p1,
             unitdomainelement=UnitDomainElement(parameter=p1, name='ude'))
         self.assertEqual(str(v), 'ude')
         DBSession.add(v)
