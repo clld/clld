@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, Boolean, Date, ForeignKey, UniqueConstraint
+from sqlalchemy import (Column, Integer, Boolean, Date, ForeignKey,
+    UniqueConstraint, Index, text)
 from sqlalchemy.orm import relationship
 
 from zope.interface import implementer
@@ -62,7 +63,10 @@ class ContributionReference(Base, Versioned, HasSourceNotNullMixin):
 
     """Association table."""
 
-    __table_args__ = (UniqueConstraint('contribution_pk', 'source_pk', 'description'),)
+    __table_args__ = (
+        Index('ix_contributionreference_ak', 'contribution_pk', 'source_pk',
+              text("coalesce(description, '')"), unique=True),
+    )
 
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'), nullable=False)
     contribution = relationship(Contribution, innerjoin=True, backref="references")

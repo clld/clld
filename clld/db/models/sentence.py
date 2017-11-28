@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, Unicode, ForeignKey, Index, text
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -82,7 +82,10 @@ class SentenceReference(Base, Versioned, HasSourceNotNullMixin):
 
     """Association table."""
 
-    __table_args__ = (UniqueConstraint('sentence_pk', 'source_pk'),)
+    __table_args__ = (
+        Index('ix_sentencereference_ak', 'sentence_pk', 'source_pk',
+              text("coalesce(description, '')"), unique=True),
+    )
 
     sentence_pk = Column(Integer, ForeignKey('sentence.pk'), nullable=False)
     sentence = relationship(Sentence, innerjoin=True, backref="references")

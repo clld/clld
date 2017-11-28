@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, Unicode, ForeignKey, Index, text
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -36,9 +36,13 @@ class ValueSet(Base,
                HasDataMixin,
                HasFilesMixin):
 
-    """The intersection of Language and Parameter."""
+    """The intersection of Language, Parameter, and optionally Contribution."""
 
-    __table_args__ = (UniqueConstraint('language_pk', 'parameter_pk', 'contribution_pk'),)
+    __table_args__ = (
+        Index('ix_valueset_ak', 'language_pk', 'parameter_pk',
+              text("coalesce(contribution_pk, -1)"),
+              unique=True),
+    )
 
     language_pk = Column(Integer, ForeignKey('language.pk'), nullable=False)
     parameter_pk = Column(Integer, ForeignKey('parameter.pk'), nullable=False)
@@ -70,7 +74,10 @@ class ValueSetReference(Base, Versioned, HasSourceNotNullMixin):
     certain values for a parameter, too.
     """
 
-    __table_args__ = (UniqueConstraint('valueset_pk', 'source_pk', 'description'),)
+    __table_args__ = (
+        Index('ix_valuesetreference_ak', 'valueset_pk', 'source_pk',
+              text("coalesce(description, '')"), unique=True),
+    )
 
     valueset_pk = Column(Integer, ForeignKey('valueset.pk'), nullable=False)
     valueset = relationship(ValueSet, innerjoin=True, backref="references")

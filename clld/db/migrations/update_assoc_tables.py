@@ -1,30 +1,55 @@
 # update_assoc_tables.py - adapt unique and nullable
 
-# TODO: consider UNIQUE(..., coalesce(description, '')) in *reference
-# TODO: consider UNIQUE(..., coalesce(name, '')) in *value
-# TODO: consider UNIQUE(..., coalesce(contribution_pk, -1), coalesce(*domainelement_pk, -1)) in *value*
-# TODO: check for more innerjoin=True
+# FIXME: functional indexes since https://www.sqlite.org/releaselog/3_9_0.html
+#        trusty has 3.8.2 (xenial 3.11.0)
+
+# TODO: DomainElement: reverse UNIQUE(name, parameter_pk)?, parameter_pk NOT NULL?
+# TODO: Unit: language_pk NOT_NULL, innerjoin=True?
+# TODO: UnitDomainElement: add UNIQUE(unitparameter_pk, name)?, unitparameter_pk NOT NULL?
 
 import sqlalchemy as sa
 
 UNIQUE_NULL = [
-    ('contributioncontributor', ['contribution_pk', 'contributor_pk'], []),
-    # TODO: unique without description?
-    ('contributionreference', ['contribution_pk', 'source_pk', 'description'], []),  
-    ('editor', ['dataset_pk', 'contributor_pk'], []),
-    ('languageidentifier', ['language_pk', 'identifier_pk'], []),
-    ('languagesource', ['language_pk', 'source_pk'], []),
-    # TODO: unique without description?
-    ('sentencereference', ['sentence_pk', 'source_pk', 'description'], []),  
-    # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
-    ('unitvalue', ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'], ['contribution_pk', 'name', 'unitdomainelement_pk']),
-    # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
-    ('value', ['valueset_pk', 'name', 'domainelement_pk'], ['name', 'domainelement_pk']),
-    ('valuesentence', ['value_pk', 'sentence_pk'], []),
-    # TODO: mention contribution in docstring
-    ('valueset', ['language_pk', 'parameter_pk', 'contribution_pk'], ['contribution_pk']),
-    # TODO: unique without description?
-    ('valuesetreference', ['valueset_pk', 'source_pk', 'description'], []),
+    ('contributioncontributor',
+        ['contribution_pk', 'contributor_pk'],
+        []),
+    ('contributionreference',
+        ['contribution_pk', 'source_pk',
+         sa.text("coalesce(description, '')")],
+        ['description']),
+    ('editor',
+        ['dataset_pk', 'contributor_pk'],
+        []),
+    ('languageidentifier',
+        ['language_pk', 'identifier_pk'],
+        []),
+    ('languagesource',  # FIXME: orm.relationships missing?
+        ['language_pk', 'source_pk'],
+        []),
+    ('sentencereference',
+        ['sentence_pk', 'source_pk',
+         sa.text("coalesce(description, '')")],
+        ['description']),
+    ('unitvalue',  # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
+        ['unit_pk', 'unitparameter_pk',
+         sa.text("coalesce(contribution_pk, -1)"),
+         sa.text("coalesce(name, '')"), sa.text("coalesce(unitdomainelement_pk, -1)")],
+        ['contribution_pk', 'name', 'unitdomainelement_pk']),
+    ('value',  # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
+        ['valueset_pk',
+         sa.text("coalesce(name, '')"), sa.text("coalesce(domainelement_pk, -1)")],
+        ['name', 'domainelement_pk']),
+    ('valuesentence',
+        ['value_pk', 'sentence_pk'],
+        []),
+    ('valueset',
+        ['language_pk', 'parameter_pk',
+         sa.text("coalesce(contribution_pk, -1)")],
+        ['contribution_pk']),
+    ('valuesetreference',
+        ['valueset_pk', 'source_pk',
+         text("coalesce(description, '')")],
+        ['description']),
 ]
 
 UNIQUE = [(tab, cols) for tab, cols, nullable in UNIQUE_NULL]
