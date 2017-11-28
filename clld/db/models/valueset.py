@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, Unicode, ForeignKey
+from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -13,7 +13,7 @@ from clld import interfaces
 from . import (
     IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
-    HasSourceMixin,
+    HasSourceNotNullMixin,
     parameter as _parameter)  # needed to initalize relationship
 assert _parameter
 
@@ -38,12 +38,14 @@ class ValueSet(Base,
 
     """The intersection of Language and Parameter."""
 
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    __table_args__ = (UniqueConstraint('language_pk', 'parameter_pk', 'contribution_pk'),)
+
+    language_pk = Column(Integer, ForeignKey('language.pk'), nullable=False)
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'), nullable=False)
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
     source = Column(Unicode, doc='textual description of the source for the valueset')
 
-    parameter = relationship('Parameter', backref='valuesets')
+    parameter = relationship('Parameter', innerjoin=True, backref='valuesets')
 
     @declared_attr
     def contribution(cls):
@@ -53,14 +55,14 @@ class ValueSet(Base,
     @declared_attr
     def language(cls):
         return relationship(
-            'Language', backref=backref('valuesets', order_by=cls.language_pk))
+            'Language', innerjoin=True, backref=backref('valuesets', order_by=cls.language_pk))
 
     @property
     def name(self):
         return self.language.name + ' / ' + self.parameter.name
 
 
-class ValueSetReference(Base, Versioned, HasSourceMixin):
+class ValueSetReference(Base, Versioned, HasSourceNotNullMixin):
 
     """References for a set of values (related to one parameter and one language).
 
@@ -68,5 +70,7 @@ class ValueSetReference(Base, Versioned, HasSourceMixin):
     certain values for a parameter, too.
     """
 
-    valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
-    valueset = relationship(ValueSet, backref="references")
+    __table_args__ = (UniqueConstraint('valueset_pk', 'source_pk', 'description'),)
+
+    valueset_pk = Column(Integer, ForeignKey('valueset.pk'), nullable=False)
+    valueset = relationship(ValueSet, innerjoin=True, backref="references")

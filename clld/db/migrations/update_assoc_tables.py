@@ -1,23 +1,30 @@
-# fix_assoc_tables.py - adapt unique and nullable
+# update_assoc_tables.py - adapt unique and nullable
+
+# TODO: consider UNIQUE(..., coalesce(description, '')) in *reference
+# TODO: consider UNIQUE(..., coalesce(name, '')) in *value
+# TODO: consider UNIQUE(..., coalesce(contribution_pk, -1), coalesce(*domainelement_pk, -1)) in *value*
+# TODO: check for more innerjoin=True
 
 import sqlalchemy as sa
 
 UNIQUE_NULL = [
-    # TODO: make empty page reference description = '' in *reference
     ('contributioncontributor', ['contribution_pk', 'contributor_pk'], []),
-    ('contributionreference', ['contribution_pk', 'source_pk', 'description'], []),  # FIXME: unique without description?
+    # TODO: unique without description?
+    ('contributionreference', ['contribution_pk', 'source_pk', 'description'], []),  
     ('editor', ['dataset_pk', 'contributor_pk'], []),
     ('languageidentifier', ['language_pk', 'identifier_pk'], []),
     ('languagesource', ['language_pk', 'source_pk'], []),
-    ('sentencereference', ['sentence_pk', 'source_pk', 'description'], []),  # FIXME: unique without description?
-    # FIXME: <unit, unitparameter> can have multiple values but only one unitdomainelement? NO
-    ('unitvalue', ['unit_pk', 'unitparameter_pk', 'unitdomainelement_pk'], ['unitdomainelement_pk']),
-    # FIXME: valueset can have multiple values but only one domainelement? NO
-    ('value', ['valueset_pk', 'domainelement_pk'], ['domainelement_pk']),
+    # TODO: unique without description?
+    ('sentencereference', ['sentence_pk', 'source_pk', 'description'], []),  
+    # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
+    ('unitvalue', ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'], ['contribution_pk', 'name', 'unitdomainelement_pk']),
+    # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
+    ('value', ['valueset_pk', 'name', 'domainelement_pk'], ['name', 'domainelement_pk']),
     ('valuesentence', ['value_pk', 'sentence_pk'], []),
-    # TODO: revisit contribution in valueset docstring
-    ('valueset', ['language_pk', 'parameter_pk', 'contribution_pk'], []),  # FIXME: unique without contribution_pk? NO, and can also be NULL
-    ('valuesetreference', ['valueset_pk', 'source_pk', 'description'], []),  # FIXME: unique without description?
+    # TODO: mention contribution in docstring
+    ('valueset', ['language_pk', 'parameter_pk', 'contribution_pk'], ['contribution_pk']),
+    # TODO: unique without description?
+    ('valuesetreference', ['valueset_pk', 'source_pk', 'description'], []),
 ]
 
 UNIQUE = [(tab, cols) for tab, cols, nullable in UNIQUE_NULL]

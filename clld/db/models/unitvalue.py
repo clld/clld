@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Float, Integer, ForeignKey
+from sqlalchemy import Column, Float, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, validates, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -35,8 +35,10 @@ class UnitValue(Base,
                 HasDataMixin,
                 HasFilesMixin):
 
-    unit_pk = Column(Integer, ForeignKey('unit.pk'))
-    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
+    __table_args__ = (UniqueConstraint('unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'),)
+
+    unit_pk = Column(Integer, ForeignKey('unit.pk'), nullable=False)
+    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'), nullable=False)
     contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
 
     # Values may be taken from a domain.
@@ -46,13 +48,13 @@ class UnitValue(Base,
     # frequency can be stored here.
     frequency = Column(Float)
 
-    unitparameter = relationship('UnitParameter', backref='unitvalues')
+    unitparameter = relationship('UnitParameter', innerjoin=True, backref='unitvalues')
     unitdomainelement = relationship('UnitDomainElement', backref='unitvalues')
     contribution = relationship('Contribution', backref='unitvalues')
 
     @declared_attr
     def unit(cls):
-        return relationship('Unit', backref=backref('unitvalues', order_by=cls.unit_pk))
+        return relationship('Unit', innerjoin=True, backref=backref('unitvalues', order_by=cls.unit_pk))
 
     @validates('unitparameter_pk')
     def validate_parameter_pk(self, key, unitparameter_pk):

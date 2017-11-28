@@ -12,7 +12,7 @@ from clld import interfaces
 from . import (
     IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
-    HasSourceMixin, Contributor)
+    HasSourceNotNullMixin, Contributor)
 
 __all__ = ('Contribution', 'ContributionReference', 'ContributionContributor')
 
@@ -58,20 +58,24 @@ class Contribution(Base,
         return ' with '.join(contribs)
 
 
-class ContributionReference(Base, Versioned, HasSourceMixin):
+class ContributionReference(Base, Versioned, HasSourceNotNullMixin):
 
     """Association table."""
 
-    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
-    contribution = relationship(Contribution, backref="references")
+    __table_args__ = (UniqueConstraint('contribution_pk', 'source_pk', 'description'),)
+
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'), nullable=False)
+    contribution = relationship(Contribution, innerjoin=True, backref="references")
 
 
 class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
 
     """Many-to-many association between contributors and contributions."""
 
-    contribution_pk = Column(Integer, ForeignKey('contribution.pk'))
-    contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
+    __table_args__ = (UniqueConstraint('contribution_pk', 'contributor_pk'),)
+
+    contribution_pk = Column(Integer, ForeignKey('contribution.pk'), nullable=False)
+    contributor_pk = Column(Integer, ForeignKey('contributor.pk'), nullable=False)
 
     # contributors are ordered.
     ord = Column(Integer, default=1)
@@ -79,5 +83,5 @@ class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
     # we distinguish between primary and secondary (a.k.a. 'with ...') contributors.
     primary = Column(Boolean, default=True)
 
-    contribution = relationship(Contribution, backref='contributor_assocs')
-    contributor = relationship(Contributor, lazy=False, backref='contribution_assocs')
+    contribution = relationship(Contribution, innerjoin=True, backref='contributor_assocs')
+    contributor = relationship(Contributor, innerjoin=True, lazy=False, backref='contribution_assocs')

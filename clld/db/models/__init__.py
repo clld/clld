@@ -15,7 +15,8 @@ from .language import (Language_data, Language_files, Language,
 
 from .gloss import GlossAbbreviation
 
-from .source import Source_data, Source_files, Source, HasSourceMixin
+from .source import (Source_data, Source_files, Source, HasSourceMixin,
+    HasSourceNotNullMixin)
 
 from .contributor import Contributor_data, Contributor_files, Contributor
 
