@@ -79,24 +79,36 @@ def upgrade(dry=True, verbose=True):
         for r in rows:
             print('    %r' % dict(r))
 
-    pgc = sa.table('pg_class', *map(sa.column, ['oid', 'relname']))
+    class regclass(sa.types.UserDefinedType):
+        def get_col_spec(self):
+            return 'regclass'
+
     pga = sa.table('pg_attribute', *map(sa.column, ['attrelid', 'attname', 'attnum', 'attnotnull']))
 
     select_nullable = sa.select([pga.c.attname], bind=conn)\
-        .where(pga.c.attrelid == sa.select([pgc.c.oid]).where(pgc.c.relname == sa.bindparam('table')))\
+        .where(pga.c.attrelid == sa.cast(sa.bindparam('table'), regclass))\
         .where(pga.c.attname == sa.func.any(sa.bindparam('notnull')))\
         .where(~pga.c.attnotnull)\
         .order_by(pga.c.attnum)
 
-    select_const = sa.text('SELECT name, definition FROM ('
-        'SELECT c.conname AS name, pg_get_constraintdef(c.oid) AS definition, '
-        'array(SELECT a.attname::text FROM unnest(c.conkey) AS n '
-        'JOIN pg_attribute AS a ON a.attrelid = c.conrelid AND a.attnum = n '
-        'ORDER BY a.attname) AS names '
-        'FROM pg_constraint AS c WHERE c.contype = :type AND c.conrelid = '
-        '(SELECT oid FROM pg_class AS t WHERE t.relname = :table)) AS s '
-        'WHERE s.names @> :cols AND s.names <@ :cols',
-        conn).bindparams(type='u')
+    pgco = sa.table('pg_constraint', *map(sa.column,
+                    ['oid', 'conname', 'contype', 'conrelid', 'conkey']))
+
+    sq = sa.select([
+            pgco.c.conname.label('name'),
+            sa.func.pg_get_constraintdef(pgco.c.oid).label('definition'),
+            sa.func.array(
+                sa.select([sa.cast(pga.c.attname, sa.Text)])
+                .where(pga.c.attrelid == pgco.c.conrelid)
+                .where(pga.c.attnum == sa.func.any(pgco.c.conkey))
+                .as_scalar()).label('names'),
+        ]).where(pgco.c.contype == 'u')\
+        .where(pgco.c.conrelid == sa.cast(sa.bindparam('table'), regclass))\
+        .alias()
+
+    select_const = sa.select([sq.c.name, sq.c.definition], bind=conn)\
+        .where(sq.c.names.op('@>')(sa.bindparam('cols')))\
+        .where(sq.c.names.op('<@')(sa.bindparam('cols')))
 
     for table, unique, null in UNIQUE_NULL:
         print(table)
