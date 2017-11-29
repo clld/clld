@@ -114,10 +114,10 @@ class CldfDownload(Download):
                 {
                     'ID': o.id,
                     'Language_ID': langs[o.language_pk]['ID'],
-                    'Primary': o.name,
-                    'Analyzed': o.analyzed.split('\t') if o.analyzed else [],
+                    'Primary_Text': o.name,
+                    'Analyzed_Word': o.analyzed.split('\t') if o.analyzed else [],
                     'Gloss': o.gloss.split('\t') if o.gloss else [],
-                    'Translation': o.description} for o in DBSession.query(Sentence)])
+                    'Translated_Text': o.description} for o in DBSession.query(Sentence)])
 
             values = []
             for v in DBSession.query(Value).join(Value.valueset).options(
