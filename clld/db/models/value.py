@@ -7,8 +7,6 @@ from sqlalchemy import (
     Unicode,
     ForeignKey,
     UniqueConstraint,
-    Index,
-    text,
 )
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
@@ -48,9 +46,7 @@ class Value(Base,
     """A measurement of a parameter for a particular language."""
 
     __table_args__ = (
-        Index('ix_value_ak', 'valueset_pk',
-              text("coalesce(name, '')"), text("coalesce(domainelement_pk, -1)"),
-              unique=True),
+        UniqueConstraint('valueset_pk', 'name', 'domainelement_pk'),
     )
 
     # we must override the pk col declaration from Base to have it available for ordering.

@@ -1,9 +1,7 @@
 # update_assoc_tables.py - adapt unique and nullable
 
-# FIXME: functional indexes since https://www.sqlite.org/releaselog/3_9_0.html
-#        trusty has 3.8.2 (xenial 3.11.0)
-
 # TODO: DomainElement: reverse UNIQUE(name, parameter_pk)?, parameter_pk NOT NULL?
+# TODO: LanguageSource: orm.relationships missing?
 # TODO: Unit: language_pk NOT_NULL, innerjoin=True?
 # TODO: UnitDomainElement: add UNIQUE(unitparameter_pk, name)?, unitparameter_pk NOT NULL?
 
@@ -11,44 +9,32 @@ import sqlalchemy as sa
 
 UNIQUE_NULL = [
     ('contributioncontributor',
-        ['contribution_pk', 'contributor_pk'],
-        []),
+        ['contribution_pk', 'contributor_pk'], []),
     ('contributionreference',
-        ['contribution_pk', 'source_pk',
-         sa.text("coalesce(description, '')")],
+        ['contribution_pk', 'source_pk', 'description'],
         ['description']),
     ('editor',
-        ['dataset_pk', 'contributor_pk'],
-        []),
+        ['dataset_pk', 'contributor_pk'], []),
     ('languageidentifier',
-        ['language_pk', 'identifier_pk'],
-        []),
-    ('languagesource',  # FIXME: orm.relationships missing?
-        ['language_pk', 'source_pk'],
-        []),
+        ['language_pk', 'identifier_pk'], []),
+    ('languagesource',
+        ['language_pk', 'source_pk'], []),
     ('sentencereference',
-        ['sentence_pk', 'source_pk',
-         sa.text("coalesce(description, '')")],
+        ['sentence_pk', 'source_pk', 'description'],
         ['description']),
     ('unitvalue',  # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
-        ['unit_pk', 'unitparameter_pk',
-         sa.text("coalesce(contribution_pk, -1)"),
-         sa.text("coalesce(name, '')"), sa.text("coalesce(unitdomainelement_pk, -1)")],
+        ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'],
         ['contribution_pk', 'name', 'unitdomainelement_pk']),
     ('value',  # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
-        ['valueset_pk',
-         sa.text("coalesce(name, '')"), sa.text("coalesce(domainelement_pk, -1)")],
+        ['valueset_pk', 'name', 'domainelement_pk'],
         ['name', 'domainelement_pk']),
     ('valuesentence',
-        ['value_pk', 'sentence_pk'],
-        []),
+        ['value_pk', 'sentence_pk'], []),
     ('valueset',
-        ['language_pk', 'parameter_pk',
-         sa.text("coalesce(contribution_pk, -1)")],
+        ['language_pk', 'parameter_pk', 'contribution_pk'],
         ['contribution_pk']),
     ('valuesetreference',
-        ['valueset_pk', 'source_pk',
-         text("coalesce(description, '')")],
+        ['valueset_pk', 'source_pk', 'description'],
         ['description']),
 ]
 

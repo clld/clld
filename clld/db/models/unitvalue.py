@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Float, Integer, ForeignKey, Index, text
+from sqlalchemy import Column, Float, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, validates, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -36,10 +36,7 @@ class UnitValue(Base,
                 HasFilesMixin):
 
     __table_args__ = (
-        Index('ix_unitvalue_ak', 'unit_pk', 'unitparameter_pk',
-              text("coalesce(contribution_pk, -1)"),
-              text("coalesce(name, '')"), text("coalesce(unitdomainelement_pk, -1)"),
-              unique=True),
+        UniqueConstraint('unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'),
     )
 
     unit_pk = Column(Integer, ForeignKey('unit.pk'), nullable=False)
