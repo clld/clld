@@ -64,14 +64,13 @@ def upgrade(dry=True, verbose=True):
     def delete_null_duplicates(tablename, columns, notnull, returning=sa.text('*')):
         assert columns
         table = sa.table(tablename, *map(sa.column, ['pk'] + columns))
-        yield table.delete(bind=conn).where(sa.or_(table.c[n] == sa.null() for n in notnull))\
-            .returning(returning)
+        any_null = sa.or_(table.c[n] == sa.null() for n in notnull)
+        yield table.delete(bind=conn).where(any_null).returning(returning)
         other = table.alias()
-        yield table.delete(bind=conn).where(sa.and_(table.c[n] != sa.null() for n in notnull))\
+        yield table.delete(bind=conn).where(~any_null).returning(returning)\
             .where(sa.exists()
                 .where(sa.and_(table.c[c] == other.c[c] for c in columns))
-                .where(table.c.pk > other.c.pk))\
-            .returning(returning)
+                .where(table.c.pk > other.c.pk))
 
     def print_rows(rows, verbose=verbose):
         if not verbose:
