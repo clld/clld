@@ -13,5 +13,6 @@ def index(name, col, bind):  # pragma: no cover
 
 
 def search(col, qs):  # pragma: no cover
-    qs = qs.replace('\\', '\\\\')
-    return col.match('{0}'.format(' & '.join(qs.split())), postgresql_regconfig='english')
+    # https://bitbucket.org/zzzeek/sqlalchemy/issues/3160/postgresql-to_tsquery-docs-and
+    query = func.plainto_tsquery('english', qs)
+    return col.op('@@')(query)
