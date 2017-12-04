@@ -41,10 +41,11 @@ class DomainElement(Base,
     """DomainElements can be used to model controlled lists of values for a Parameter."""
 
     __table_args__ = (
-        UniqueConstraint('name', 'parameter_pk'),
-        UniqueConstraint('number', 'parameter_pk'))
+        UniqueConstraint('parameter_pk', 'name'),
+        UniqueConstraint('parameter_pk', 'number'),
+    )
 
-    parameter_pk = Column(Integer, ForeignKey('parameter.pk'))
+    parameter_pk = Column(Integer, ForeignKey('parameter.pk'), nullable=False)
 
     number = Column(Integer, doc='numerical value of the domain element')
     """the number is used to sort domain elements within the domain of one parameter"""

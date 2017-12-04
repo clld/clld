@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from zope.interface import implementer
@@ -32,11 +32,12 @@ class Unit(Base,
            IdNameDescriptionMixin,
            HasDataMixin,
            HasFilesMixin):
-
     """A linguistic unit of a language."""
 
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    language = relationship(Language)
+    __table_args__ = (UniqueConstraint('language_pk', 'id'),)
+
+    language_pk = Column(Integer, ForeignKey('language.pk'), nullable=False)
+    language = relationship(Language, innerjoin=True)
 
     def __solr__(self, req):
         return _add_solr_language_info(Base.__solr__(self, req), self)

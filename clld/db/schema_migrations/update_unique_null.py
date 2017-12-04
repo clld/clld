@@ -1,9 +1,4 @@
-# update_assoc_tables.py - adapt unique and nullable
-
-# TODO: DomainElement: reverse UNIQUE(name, parameter_pk)?, parameter_pk NOT NULL?
-# TODO: LanguageSource: orm.relationships missing?
-# TODO: Unit: language_pk NOT_NULL, innerjoin=True?
-# TODO: UnitDomainElement: add UNIQUE(unitparameter_pk, name)?, unitparameter_pk NOT NULL?
+# update_unique_null.py - adapt composite unique constraints and nullables
 
 from __future__ import unicode_literals
 
@@ -30,6 +25,12 @@ UNIQUE_NULL = [
     ('contributionreference',
         ['contribution_pk', 'source_pk', 'description'],
         ['description']),
+    ('domainelement',
+        ['parameter_pk', 'name'],
+        ['name']),
+    ('domainelement',
+        ['parameter_pk', 'number'],
+        ['number']),
     ('editor',
         ['dataset_pk', 'contributor_pk'], []),
     ('languageidentifier',
@@ -39,6 +40,15 @@ UNIQUE_NULL = [
     ('sentencereference',
         ['sentence_pk', 'source_pk', 'description'],
         ['description']),
+    ('unit',
+        ['language_pk', 'id'],  # FIXME: or rather name?
+        ['id']),
+    ('unitdomainelement',
+        ['unitparameter_pk', 'name'],
+        ['name']),
+    ('unitdomainelement',
+        ['unitparameter_pk', 'ord'],
+        ['ord']),
     ('unitvalue',  # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
         ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'],
         ['contribution_pk', 'name', 'unitdomainelement_pk']),
