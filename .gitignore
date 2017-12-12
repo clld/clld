@@ -39,3 +39,5 @@ yolk.txt
 .project
 .pydevproject
 .idea
+
+/clld/tests/dbschema.sql

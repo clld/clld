@@ -74,13 +74,23 @@ class WithCustomLanguageMixin(object):
         super(WithCustomLanguageMixin, self).setUp()
 
 
-def init_db():
-    engine = create_engine('sqlite://')
-    DBSession.configure(bind=engine)
-    VersionedDBSession.configure(bind=engine)
+def init_db(engine_url='sqlite://'):
+    engine = create_engine(engine_url)
     Base.metadata.bind = engine
     Base.metadata.create_all()
+    DBSession.configure(bind=engine)
+    VersionedDBSession.configure(bind=engine)
     return engine
+
+
+def dbschema(engine_url='sqlite://'):
+    engine = create_engine(engine_url)
+    result = []
+    def dump(sql):
+        result.append(sql.compile(dialect=engine.dialect).string)
+    mock_engine = create_engine(engine.url, strategy='mock', executor=dump)
+    Base.metadata.create_all(mock_engine, checkfirst=False)
+    return ''.join(result)
 
 
 class WithDbMixin(object):
