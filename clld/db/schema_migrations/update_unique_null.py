@@ -8,13 +8,16 @@ down_revision = ''
 
 # INSTRUCTIONS:
 # - cd into the clld app directory
-# - $ alembic revision -m "update assoc tables"
-# - edit migrations/versions/<...>_update_assoc_tables.py
-# - replace the content after 'down_revision = <...>' with the content below
+# - $ alembic revision -m "update unique null"
+# - edit migrations/versions/<...>_update_unique_null.py
+# - replace the content after the line with 'down_revision = <...>' with the content below
 # - $ alembic upgrade head
-# - check the output of your "update assoc tables" migration (will end with a RuntimeError)
-# - if the changes are as intended, change 'dry=False' to 'dry=True' below
-# - run alembic upgrade head once again to apply them
+# - check the output of your "update unique null" migration (will end with a DryRunException):
+#   - displays which columns will be set to NOT NULL ('alter column')
+#   - displays which columns will set to UNIQUE ('create constraint')
+#   - displays any violating rows that will be deleted ('delete N row(s)')
+# - if the changes are as intended, change 'dry=False' to 'dry=True' in <...>_update_unique_null.py
+# - run alembic upgrade head once again to apply the changes to your database
 
 from alembic import op
 import sqlalchemy as sa
@@ -41,7 +44,7 @@ UNIQUE_NULL = [
         ['sentence_pk', 'source_pk', 'description'],
         ['description']),
     ('unit',
-        ['language_pk', 'id'],  # FIXME: or rather name?
+        ['language_pk', 'id'],
         ['id']),
     ('unitdomainelement',
         ['unitparameter_pk', 'name'],
@@ -49,10 +52,12 @@ UNIQUE_NULL = [
     ('unitdomainelement',
         ['unitparameter_pk', 'ord'],
         ['ord']),
-    ('unitvalue',  # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
+    # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
+    ('unitvalue',
         ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'],
         ['contribution_pk', 'name', 'unitdomainelement_pk']),
-    ('value',  # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
+    # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
+    ('value',
         ['valueset_pk', 'name', 'domainelement_pk'],
         ['name', 'domainelement_pk']),
     ('valuesentence',
@@ -64,6 +69,10 @@ UNIQUE_NULL = [
         ['valueset_pk', 'source_pk', 'description'],
         ['description']),
 ]
+
+
+class DryRunException(Exception):
+    """Raised at the end of a dry run so the database transaction is not comitted."""
 
 
 def upgrade(dry=True, verbose=True):
@@ -154,7 +163,7 @@ def upgrade(dry=True, verbose=True):
         print('')
 
     if dry:
-        raise RuntimeError('set dry=False to apply these changes')
+        raise DryRunException('set dry=False to apply these changes')
 
 
 def downgrade():
