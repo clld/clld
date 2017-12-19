@@ -2,6 +2,19 @@
 Changes
 -------
 
+
+4.0.0
+~~~~~
+
+Backwards incompatible.
+
+Make the database schema more strict (identify data issues early, improve performance):
+- add NOT NULL to columns where this was not enforces previously
+- add UNIQUE constraints over column combinations where this was not enforced previously
+
+For instructions on upgrading a present database see clld/db/schema_migrations/update_unique_null.py
+
+
 3.3.3
 ~~~~~
 
