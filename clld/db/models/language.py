@@ -110,8 +110,8 @@ class LanguageSource(Base, Versioned):
 
     __table_args__ = (UniqueConstraint('language_pk', 'source_pk'),)
 
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    source_pk = Column(Integer, ForeignKey('source.pk'))
+    language_pk = Column(Integer, ForeignKey('language.pk'), nullable=False)
+    source_pk = Column(Integer, ForeignKey('source.pk'), nullable=False)
 
 
 class IdentifierType(DeclEnum):
@@ -156,11 +156,13 @@ class LanguageIdentifier(Base, Versioned):
     linkage, e.g. 'is dialect of'.
     """
 
-    language_pk = Column(Integer, ForeignKey('language.pk'))
-    identifier_pk = Column(Integer, ForeignKey('identifier.pk'))
+    __table_args__ = (UniqueConstraint('language_pk', 'identifier_pk'),)
+
+    language_pk = Column(Integer, ForeignKey('language.pk'), nullable=False)
+    identifier_pk = Column(Integer, ForeignKey('identifier.pk'), nullable=False)
     description = Column(Unicode)
 
-    identifier = relationship(Identifier)
+    identifier = relationship(Identifier, innerjoin=True)
     language = relationship(
-        Language,
+        Language, innerjoin=True,
         backref=backref("languageidentifier", cascade="all, delete-orphan"))

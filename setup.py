@@ -75,7 +75,7 @@ testing_extras = tests_require + [
 
 setup(
     name='clld',
-    version='3.3.3',
+    version='4.0.0.dev0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=README,
@@ -86,6 +86,8 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",

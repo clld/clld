@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, Unicode, ForeignKey
+from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -13,7 +13,7 @@ from clld import interfaces
 from . import (
     IdNameDescriptionMixin,
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
-    _add_solr_language_info, HasSourceMixin)
+    _add_solr_language_info, HasSourceNotNullMixin)
 
 __all__ = ('Sentence', 'SentenceReference')
 
@@ -78,9 +78,13 @@ class Sentence(Base,
                 return f
 
 
-class SentenceReference(Base, Versioned, HasSourceMixin):
+class SentenceReference(Base, Versioned, HasSourceNotNullMixin):
 
     """Association table."""
 
-    sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
-    sentence = relationship(Sentence, backref="references")
+    __table_args__ = (
+        UniqueConstraint('sentence_pk', 'source_pk', 'description'),
+    )
+
+    sentence_pk = Column(Integer, ForeignKey('sentence.pk'), nullable=False)
+    sentence = relationship(Sentence, innerjoin=True, backref="references")

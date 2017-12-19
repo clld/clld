@@ -6,6 +6,7 @@ from sqlalchemy import (
     Integer,
     Unicode,
     ForeignKey,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
@@ -44,9 +45,13 @@ class Value(Base,
 
     """A measurement of a parameter for a particular language."""
 
+    __table_args__ = (
+        UniqueConstraint('valueset_pk', 'name', 'domainelement_pk'),
+    )
+
     # we must override the pk col declaration from Base to have it available for ordering.
     pk = Column(Integer, primary_key=True)
-    valueset_pk = Column(Integer, ForeignKey('valueset.pk'))
+    valueset_pk = Column(Integer, ForeignKey('valueset.pk'), nullable=False)
     # Values may be taken from a domain.
     domainelement_pk = Column(Integer, ForeignKey('domainelement.pk'))
 
@@ -63,7 +68,7 @@ class Value(Base,
     @declared_attr
     def valueset(cls):
         return relationship(
-            ValueSet,
+            ValueSet, innerjoin=True,
             backref=backref(
                 'values', order_by=[cls.frequency.desc(), cls.confidence, cls.pk]))
 
@@ -82,9 +87,11 @@ class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
 
     """Association between values and sentences given as explanation of a value."""
 
-    value_pk = Column(Integer, ForeignKey('value.pk'))
-    sentence_pk = Column(Integer, ForeignKey('sentence.pk'))
+    __table_args__ = (UniqueConstraint('value_pk', 'sentence_pk'),)
+
+    value_pk = Column(Integer, ForeignKey('value.pk'), nullable=False)
+    sentence_pk = Column(Integer, ForeignKey('sentence.pk'), nullable=False)
     description = Column(Unicode())
 
-    value = relationship(Value, backref='sentence_assocs')
-    sentence = relationship(Sentence, backref='value_assocs', order_by=Sentence.id)
+    value = relationship(Value, innerjoin=True, backref='sentence_assocs')
+    sentence = relationship(Sentence, innerjoin=True, backref='value_assocs', order_by=Sentence.id)

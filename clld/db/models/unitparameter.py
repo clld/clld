@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from zope.interface import implementer
@@ -32,7 +32,12 @@ class UnitDomainElement(Base,
 
     """Domain element for the domain of a UnitParameter."""
 
-    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'))
+    __table_args__ = (
+        UniqueConstraint('unitparameter_pk', 'name'),
+        UniqueConstraint('unitparameter_pk', 'ord'),
+    )
+
+    unitparameter_pk = Column(Integer, ForeignKey('unitparameter.pk'), nullable=False)
     ord = Column(Integer)
 
     def url(self, request):

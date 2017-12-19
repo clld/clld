@@ -19,7 +19,7 @@ from . import (
     DataMixin, HasDataMixin, FilesMixin, HasFilesMixin,
     Language, LanguageSource)
 
-__all__ = ('Source', 'HasSourceMixin')
+__all__ = ('Source', 'HasSourceMixin', 'HasSourceNotNullMixin')
 
 
 class Source_data(Base, Versioned, DataMixin):
@@ -124,3 +124,14 @@ class HasSourceMixin(object):
     @declared_attr
     def source(cls):
         return relationship(Source, backref=cls.__name__.lower() + 's')
+
+
+class HasSourceNotNullMixin(HasSourceMixin):
+
+    @declared_attr
+    def source_pk(cls):
+        return Column(Integer, ForeignKey('source.pk'), nullable=False)
+
+    @declared_attr
+    def source(cls):
+        return relationship(Source, innerjoin=True, backref=cls.__name__.lower() + 's')

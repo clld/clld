@@ -4,7 +4,8 @@ from collections import OrderedDict
 from datetime import date
 
 from sqlalchemy import (
-    Column, String, Unicode, Date, Integer, ForeignKey, Boolean)
+    Column, String, Unicode, Date, Integer, ForeignKey, Boolean,
+    UniqueConstraint)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -89,8 +90,10 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
 
     """Many-to-many association between contributors and dataset."""
 
-    dataset_pk = Column(Integer, ForeignKey('dataset.pk'))
-    contributor_pk = Column(Integer, ForeignKey('contributor.pk'))
+    __table_args__ = (UniqueConstraint('dataset_pk', 'contributor_pk'),)
+
+    dataset_pk = Column(Integer, ForeignKey('dataset.pk'), nullable=False)
+    contributor_pk = Column(Integer, ForeignKey('contributor.pk'), nullable=False)
 
     # contributors are ordered.
     ord = Column(Integer, default=1)
@@ -99,10 +102,10 @@ class Editor(Base, PolymorphicBaseMixin, Versioned):
     primary = Column(Boolean, default=True)
 
     contributor = relationship(
-        Contributor, lazy=False, backref=backref('editor', uselist=False))
+        Contributor, innerjoin=True, lazy=False, backref=backref('editor', uselist=False))
 
     @declared_attr
     def dataset(cls):
         return relationship(
-            Dataset, backref=backref(
+            Dataset, innerjoin=True, backref=backref(
                 'editors', order_by=[cls.primary.desc(), cls.ord], lazy=False))
