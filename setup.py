@@ -27,8 +27,6 @@ install_requires = [
     'pyramid_exclog',
     'pytz',
     'zope.sqlalchemy',
-    # Only required by WebTest, but because of pinned html5lib must be pinned, too:
-    'beautifulsoup4>=4.6.0',
     'WebTest',
     'six>=1.7.3',  # webassets needs add_metaclass!
     'alembic>=0.7.1',
@@ -40,7 +38,7 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib==0.999999999',  # our tests rely on the childNodes attribute
+    'html5lib>=1.0.1',  # our tests rely on the childNodes attribute
     'xlrd',
     'xlwt',
     'webhelpers2>=2.0',

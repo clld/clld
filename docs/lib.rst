@@ -2,13 +2,6 @@
 Lib
 ---
 
-iso
-~~~
-
-.. automodule:: clld.lib.iso
-    :members:
-
-
 rdf
 ~~~
 
@@ -27,11 +20,4 @@ coins
 ~~~~~
 
 .. automodule:: clld.lib.coins
-    :members:
-
-
-fmpxml
-~~~~~~
-
-.. automodule:: clld.lib.fmpxml
     :members:
