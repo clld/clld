@@ -1,4 +1,20 @@
+[run]
+branch = False
+source = clld
+
+[paths]
+source =
+    src/clld
+    .tox/*/lib/python*/site-packages/clld
+
 [report]
+exclude_lines =
+    if self.debug:
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+ignore_errors = True
 omit =
-    */python?.?/*
-    */site-packages/nose/*
+    tests/*
+show_missing = True
+

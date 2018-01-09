@@ -1,15 +1,17 @@
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+matrix:
+  fast_finish: true
+  include:
+    - python: "2.7"
+      env: TOXENV=py27
+    - python: "3.4"
+      env: TOXENV=py34
 cache: pip
-before_cache:
-- rm -f $HOME/.cache/pip/log/debug.log
-install:
-  - pip install . nose coverage coveralls
-script:
-  - nosetests --with-coverage --cover-package=clld
+before_cache: rm -f $HOME/.cache/pip/log/debug.log
+before_install: pip install codecov
+install: pip install tox
+script: tox
 after_success:
-  - coveralls
+  - tox -e coverage-report
+  - codecov
+

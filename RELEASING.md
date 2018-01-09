@@ -1,6 +1,8 @@
 Releasing clld
 ==============
 
+- Make sure all changes are committed and pushed with a *.devN version number.
+
 - Do platform test via tox (making sure statement coverage is at 100%):
 ```
 tox -r
@@ -8,7 +10,7 @@ tox -r
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
 ```
-./venvs/clld/clld/build.sh "<prev-rel-no>"
+./venvs/clld/clld/build.sh "rel-no.dev0"
 ```
 
 - Make sure javascript and css can be minified:
@@ -21,20 +23,22 @@ webassets -m clld.web.assets build
 java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 ```
 
-- Make sure flake8 passes::
+- Make sure flake8 passes
 ```
 flake8 --ignore=E711,E712,D100,D101,D103,D102,D301,E402,E731,W503 --max-line-length=100 clld
 ```
 
-- Make sure docs render OK::
+- Make sure docs render OK
 ```
 cd docs
 make clean html
 cd ..
 ```
 
-- Update translations (using a py3 env with babel patched for py3 compatibility).
+- Update translations
 ```
+python setup.py extract_messages
+python setup.py update_catalog
 python setup.py compile_catalog
 ```
 

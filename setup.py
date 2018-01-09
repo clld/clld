@@ -1,11 +1,7 @@
-from __future__ import unicode_literals
 import os
-import sys
 
 from setuptools import setup, find_packages
 
-
-PY3 = sys.version_info.major == 3
 
 try:
     README = open(
@@ -14,20 +10,21 @@ except IOError:
     README = ''
 
 install_requires = [
-    'clldutils>=1.13.6',
+    'Babel; python_version < "3.1"',
+    'csvw~=1.0',
+    'clldutils~=2.0',
     'pycldf>=1.0.7',
     'setuptools>=25',
     'pyramid>=1.6',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',
-    'PasteDeploy>=1.5.0',  # py3 compat
-    'waitress',
+    #'PasteDeploy>=1.5.0',  # py3 compat
+    #'waitress',
     'purl>=0.5',
-    'pyramid_exclog',
+    #'pyramid_exclog',  # FIXME: really required?
     'pytz',
     'zope.sqlalchemy',
-    'WebTest',
     'six>=1.7.3',  # webassets needs add_metaclass!
     'alembic>=0.7.1',
     'webassets',
@@ -38,38 +35,12 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'html5lib>=1.0.1',  # our tests rely on the childNodes attribute
-    'xlrd',
     'xlwt',
     'webhelpers2>=2.0',
     'nameparser',
     'feedparser',
 ]
 
-if not PY3:
-    install_requires.append('Babel')
-
-tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'pep8',
-    'mock>=2.0',
-    'selenium',
-]
-
-if not PY3:
-    tests_require.append('zope.component>=3.11.0')
-
-docs_extras = [
-    'Sphinx',
-    'docutils',
-    'repoze.sphinx.autointerface',
-]
-
-testing_extras = tests_require + [
-    'nose',
-    'coverage',
-    'virtualenv',  # for scaffolding tests
-]
 
 setup(
     name='clld',
@@ -95,24 +66,42 @@ setup(
     author_email="forkel@shh.mpg.de",
     url="http://clld.org",
     license="Apache Software License",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
+    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     install_requires=install_requires,
-    extras_require={'testing': testing_extras, 'docs': docs_extras},
-    tests_require=tests_require,
-    test_suite="clld.tests",
-    message_extractors={'clld': [
+    extras_require={
+        'dev': [
+            'waitress', 
+            'flake8', 
+            'wheel', 
+            'twine',
+        ],
+        'test': [
+            'mock',
+            'pytest>=3.1',
+            'pytest-clld',
+            'pytest-mock',
+            'pytest-cov',
+            'coverage>=4.2',
+            'zope.component>=3.11.0',
+        ],
+        'docs': [
+            'Sphinx',
+            'docutils',
+            'repoze.sphinx.autointerface',
+        ],
+    },
+    message_extractors={'src/clld': [
         ('**.py', 'python', None),
-        ('**.mako', 'mako', None),
+        ('**.mako', 'mako', {'encoding': 'utf8'}),
         ('web/static/**', 'ignore', None)]},
     entry_points="""\
         [pyramid.scaffold]
         clld_app=clld.scaffolds:ClldAppTemplate
         [console_scripts]
-        clld-freeze = clld.scripts.cli:freeze
-        clld-unfreeze = clld.scripts.cli:unfreeze
-        clld-llod = clld.scripts.cli:llod
         clld-google-books = clld.scripts.cli:google_books
         clld-internetarchive = clld.scripts.cli:internetarchive
         clld-create-downloads = clld.scripts.cli:create_downloads

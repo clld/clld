@@ -1,0 +1,180 @@
+# Translations template for clld.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the clld project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: clld 4.0.0.dev0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-01-09 14:02+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.2\n"
+
+#: src/clld/web/datatables/sentence.py:20
+#: src/clld/web/templates/sentence/detail_html.mako:33
+msgid "Type"
+msgstr ""
+
+#: src/clld/web/datatables/sentence.py:92
+msgid "Translation"
+msgstr ""
+
+#: src/clld/web/datatables/value.py:113
+#: src/clld/web/templates/combination/detail_html.mako:20
+#: src/clld/web/templates/parameter/detail_html.mako:4
+#: src/clld/web/templates/parameter/detail_html.mako:6
+#: src/clld/web/templates/valueset/detail_html.mako:46
+msgid "Parameter"
+msgstr ""
+
+#: src/clld/web/templates/sentence/detail_html.mako:19
+#: src/clld/web/templates/util.mako:228
+msgid "Sentence"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:272
+msgid "Alternative names"
+msgstr ""
+
+#: src/clld/web/templates/unit/detail_html.mako:21
+#: src/clld/web/templates/util.mako:338
+#: src/clld/web/templates/value/index_html.mako:6
+#: src/clld/web/templates/valueset/detail_html.mako:12
+#: src/clld/web/templates/valueset/snippet_html.mako:8
+msgid "Values"
+msgstr ""
+
+#: src/clld/web/templates/source/detail_html.mako:61
+#: src/clld/web/templates/util.mako:339
+#: src/clld/web/templates/value/detail_html.mako:24
+#: src/clld/web/templates/valueset/snippet_html.mako:20
+msgid "Sentences"
+msgstr ""
+
+#: src/clld/web/templates/combination/detail_html.mako:5
+#: src/clld/web/templates/combination/detail_html.mako:12
+msgid "Combination"
+msgstr ""
+
+#: src/clld/web/templates/combination/detail_html.mako:19
+#: src/clld/web/templates/parameter/index_html.mako:4
+msgid "Parameters"
+msgstr ""
+
+#: src/clld/web/templates/contribution/detail_html.mako:5
+#: src/clld/web/templates/valueset/detail_html.mako:37
+msgid "Contribution"
+msgstr ""
+
+#: src/clld/web/templates/contribution/index_html.mako:4
+#: src/clld/web/templates/contribution/index_html.mako:6
+#: src/clld/web/templates/contributor/detail_html.mako:32
+#: src/clld/web/templates/source/detail_html.mako:49
+msgid "Contributions"
+msgstr ""
+
+#: src/clld/web/templates/contributor/detail_html.mako:14
+msgid "Address"
+msgstr ""
+
+#: src/clld/web/templates/contributor/detail_html.mako:22
+msgid "Web:"
+msgstr ""
+
+#: src/clld/web/templates/contributor/detail_html.mako:26
+msgid "Mail:"
+msgstr ""
+
+#: src/clld/web/templates/contributor/index_html.mako:6
+msgid "Contributors"
+msgstr ""
+
+#: src/clld/web/templates/language/detail_html.mako:4
+#: src/clld/web/templates/language/detail_html.mako:6
+#: src/clld/web/templates/sentence/detail_html.mako:21
+#: src/clld/web/templates/valueset/detail_html.mako:44
+msgid "Language"
+msgstr ""
+
+#: src/clld/web/templates/language/index_html.mako:4
+#: src/clld/web/templates/language/index_html.mako:6
+#: src/clld/web/templates/language/kml.mako:5
+#: src/clld/web/templates/language/map_html.mako:4
+#: src/clld/web/templates/language/map_html.mako:6
+#: src/clld/web/templates/source/detail_html.mako:43
+msgid "Languages"
+msgstr ""
+
+#: src/clld/web/templates/language/snippet_html.mako:10
+#: src/clld/web/templates/value/detail_html.mako:6
+msgid "Value"
+msgstr ""
+
+#: src/clld/web/templates/language/snippet_html.mako:21
+#: src/clld/web/templates/sentence/detail_html.mako:37
+#: src/clld/web/templates/valueset/detail_html.mako:49
+msgid "Source"
+msgstr ""
+
+#: src/clld/web/templates/sentence/detail_html.mako:7
+msgid "Datapoints"
+msgstr ""
+
+#: src/clld/web/templates/sentence/index_html.mako:6
+msgid "Examples"
+msgstr ""
+
+#: src/clld/web/templates/source/detail_html.mako:55
+msgid "ValueSets"
+msgstr ""
+
+#: src/clld/web/templates/source/index_html.mako:4
+#: src/clld/web/templates/source/index_html.mako:6
+msgid "Sources"
+msgstr ""
+
+#: src/clld/web/templates/unit/detail_html.mako:6
+msgid "Unit"
+msgstr ""
+
+#: src/clld/web/templates/unit/index_html.mako:6
+msgid "Units"
+msgstr ""
+
+#: src/clld/web/templates/unitparameter/detail_html.mako:5
+msgid "Unit Parameter"
+msgstr ""
+
+#: src/clld/web/templates/unitparameter/index_html.mako:6
+msgid "Unit Parameters"
+msgstr ""
+
+#: src/clld/web/templates/unitvalue/detail_html.mako:5
+msgid "Unit Value"
+msgstr ""
+
+#: src/clld/web/templates/unitvalue/index_html.mako:6
+msgid "Unit Values"
+msgstr ""
+
+#: src/clld/web/templates/value/snippet_html.mako:10
+#: src/clld/web/templates/valueset/detail_html.mako:27
+#: src/clld/web/templates/valueset/snippet_html.mako:15
+msgid "Confidence"
+msgstr ""
+
+#: src/clld/web/templates/valueset/detail_html.mako:6
+msgid "Value Set"
+msgstr ""
+
+#: src/clld/web/templates/valueset/index_html.mako:6
+msgid "Value Sets"
+msgstr ""
+
