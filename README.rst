@@ -7,8 +7,8 @@ maintained by the `Cross Linguistic Linked Data`_ project.
 .. image:: https://travis-ci.org/clld/clld.png
 	:target: https://travis-ci.org/clld/clld
 	:alt: Build Status
-.. image:: https://img.shields.io/coveralls/clld/clld.svg
-	:target: https://coveralls.io/r/clld/clld?branch=master
+.. image:: https://codecov.io/gh/clld/clld/branch/master/graph/badge.svg
+	:target: https://codecov.io/gh/clld/clld
 	:alt: Test Coverage Status
 .. image:: https://requires.io/github/clld/clld/requirements.svg?branch=master
 	:target: https://requires.io/github/clld/clld/requirements/?branch=master
