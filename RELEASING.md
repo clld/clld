@@ -3,7 +3,7 @@ Releasing clld
 
 - Make sure all changes are committed and pushed with a *.devN version number.
 
-- Do platform test via tox (making sure statement coverage is at 100%):
+- Do platform test via tox (making sure statement coverage is >= 99%):
 ```
 tox -r
 ```

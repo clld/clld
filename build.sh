@@ -3,6 +3,7 @@ VENVS=~/venvs
 
 cd $VENVS/cheesecake
 . bin/activate
+pip install -U setuptools
 cd clld
 git checkout master
 git pull origin master
@@ -13,6 +14,8 @@ cd $VENVS
 virtualenv testapp
 cd testapp
 . bin/activate
+pip install -U setuptools
+pip install -U pip
 pip install "$VENVS/cheesecake/clld/dist/clld-$1.tar.gz"
 pcreate -t clld_app testapp
 cd testapp
@@ -26,6 +29,8 @@ cd $VENVS
 virtualenv --python=python3.4 testapp
 cd testapp
 . bin/activate
+pip install -U setuptools
+pip install -U pip
 pip install "$VENVS/cheesecake/clld/dist/clld-$1.tar.gz"
 pcreate -t clld_app testapp
 cd testapp

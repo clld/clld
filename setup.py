@@ -19,10 +19,7 @@ install_requires = [
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',
-    #'PasteDeploy>=1.5.0',  # py3 compat
-    #'waitress',
     'purl>=0.5',
-    #'pyramid_exclog',  # FIXME: really required?
     'pytz',
     'zope.sqlalchemy',
     'six>=1.7.3',  # webassets needs add_metaclass!
