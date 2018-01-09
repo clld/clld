@@ -77,6 +77,7 @@ setup(
             'twine',
         ],
         'test': [
+            'xlrd',
             'mock',
             'pytest>=3.1',
             'pytest-clld',
