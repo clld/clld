@@ -14,6 +14,11 @@ Make the database schema more strict (identify data issues early, improve perfor
 
 For instructions on upgrading a present database see clld/db/schema_migrations/update_unique_null.py
 
+Switch to using pytest for testing of clld as well as clld apps. Support for simpler
+testing of apps has been moved to a pytest plugin pytest-clld.
+
+Some obsolete functionality has been dropped.
+
 
 3.3.3
 ~~~~~
