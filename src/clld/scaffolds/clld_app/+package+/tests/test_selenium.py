@@ -3,5 +3,5 @@ import time
 
 
 def test_ui(selenium):
-    selenium.get(selenium.url('/feature'))
+    selenium.browser.get(selenium.url('/feature'))
     time.sleep(3)
