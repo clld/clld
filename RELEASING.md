@@ -10,7 +10,7 @@ tox -r
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
 ```
-./venvs/clld/clld/build.sh "rel-no.dev0"
+./venvs/clld/clld/build.sh "<rel-no>.dev0"
 ```
 
 - Make sure javascript and css can be minified:

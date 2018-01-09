@@ -9,14 +9,14 @@ import {{package}}
 from {{package}} import models
 
 
-def main(args):  # pragma: no cover
+def main(args):
     data = Data()
 
     dataset = common.Dataset(id={{package}}.__name__, domain='{{package}}.clld.org')
     DBSession.add(dataset)
 
 
-def prime_cache(args):  # pragma: no cover
+def prime_cache(args):
     """If data needs to be denormalized for lookup, do that here.
     This procedure should be separate from the db initialization, because
     it will have to be run periodiucally whenever data has been updated.
