@@ -5,10 +5,10 @@ Getting started
 Requirements
 ~~~~~~~~~~~~
 
-Starting with version 0.13 ``clld`` works with python 2.7 and 3.4. It has been installed and run successfully on
-Ubuntu 12.04, Mac OSX (see :ref:`install_mac`) and Windows (see :ref:`install_win`).
+``clld`` works with python 2.7 and >=3.4. It has been installed and run successfully on
+Ubuntu (12.04, 14.04, 16.04), Mac OSX (see :ref:`install_mac`) and Windows (see :ref:`install_win`).
 While it might be possible to use sqlite as database backend, all production installations
-of ``clld`` and most development is done with postgresql 9.1.
+of ``clld`` and most development is done with postgresql (9.1 or 9.3).
 To retrieve the ``clld`` software from GitHub, ``git`` must be installed on the system.
 
 .. _install:
@@ -20,12 +20,12 @@ To install the python package from pypi run
 
     pip install clld
 
-To install from a git repository,
+To install from a git repository (if you want to hack on ``clld``),
 you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_::
 
     git clone git@github.com:clld/clld.git
     cd clld
-    python setup.py develop
+    pip install -e .[dev,test]
 
 Alternatively, you may want to fork ``clld`` first and then work with your fork.
 
@@ -51,7 +51,6 @@ This will create a python package ``myapp`` with the following layout::
     (clld)robert@astroman:~/venvs/clld$ tree myapp/
     myapp/                           # project directory
     ├── development.ini              # deployment settings
-    ├── fabfile.py                   # fabric tasks for managing the application
     ├── MANIFEST.in
     ├── myapp                        # package directory
     │   ├── adapters.py              # custom adapters
@@ -75,7 +74,7 @@ This will create a python package ``myapp`` with the following layout::
     │   │   │   └── detail_html.mako # the home page of the app
     │   │   └── myapp.mako           # custom site template
     │   ├── tests
-    │   │   ├── __init__.py
+    │   │   ├── conftest.py
     │   │   ├── test_functional.py
     │   │   └── test_selenium.py
     │   └── views.py
@@ -87,7 +86,7 @@ This will create a python package ``myapp`` with the following layout::
 Running::
 
     cd myapp
-    python setup.py develop
+    pip install -e .[dev,test]
 
 will install your app as Python package in development mode, i.e. will create a link to
 your app's code in the ``site-packages`` directory.

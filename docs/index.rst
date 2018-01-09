@@ -55,7 +55,6 @@ Contents:
     lib
     linkeddata
     protocols
-    deployment
     tools
     trees
     advanced

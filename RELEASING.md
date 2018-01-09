@@ -1,6 +1,13 @@
 Releasing clld
 ==============
 
+- Update translations
+```
+python setup.py extract_messages
+python setup.py update_catalog
+python setup.py compile_catalog
+```
+
 - Make sure all changes are committed and pushed with a *.devN version number.
 
 - Do platform test via tox (making sure statement coverage is >= 99%):
@@ -36,23 +43,10 @@ make clean html
 cd ..
 ```
 
-- Update translations
-```
-python setup.py extract_messages
-python setup.py update_catalog
-python setup.py compile_catalog
-```
-
-- Start a release
-```
-git flow release start <release number>
-```
-
-- Change clld/__init__.py to the new version number.
-
-- Change setup.py version to the new version number.
-
-- Change docs/conf.py version to the new version number.
+- Update the version number, by removing the trailing `.dev0`:
+  - `src/clld/__init__.py`
+  - `setup.py`
+  - `docs/conf.py`
 
 - Change CHANGES.rst heading to reflect the new version number.
 
@@ -63,31 +57,27 @@ git commit -a -m"bumped version number"
 
 - Create a release tag:
 ```
-git flow release finish <release number>
+git tag -a v<version> -m"..."
 ```
 
 - Push to github:
 ```
-git push origin develop
-git checkout master
-git push origin master
-git checkout develop
+git push origin
 git push --tags
 ```
 
+- Release to PyPI:
+```
+git checkout tags/v$1
+rm dist/*
+python setup.py sdist bdist_wheel
+twine upload dist/*
+```
+
 - Re-release using the same tag on GitHub, to trigger the ZENODO hook.
-  update the DOI badge (later?)
+  update the DOI badge.
 
-- Make sure your system Python has ``setuptools-git`` installed and release to
-  PyPI:
-```
-python setup.py sdist
-~/venvs/py34/bin/twine upload dist/clld-<version>.tar.gz
-```
-
-- Make sure the new version is installed locally:
-```
-python setup.py develop
-```
-
-- Update the version number to the new development cycle.
+- Update the version number to the new development cycle:
+  - `src/clld/__init__.py`
+  - `setup.py`
+  - `docs/conf.py`

@@ -3,9 +3,9 @@ Database
 --------
 
 The ``clld`` database models are declared using SQLAlchemy's
-`declarative <http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html>`_
+`declarative <http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/index.html>`_
 extension. In particular we follow the approach of
-`mixins and custom base class <http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html#mixin-and-custom-base-classes>`_,
+`mixins and custom base class <http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/mixins.html>`_,
 to provide building blocks with enough shared commonality for custom data models.
 
 .. _db_objects:

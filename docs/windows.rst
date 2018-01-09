@@ -4,13 +4,13 @@ An installation for Windows 7
 -----------------------------
 
 1. Install `python 2.7 <http://python.org>`_ following the instructions
-   `here <http://docs.python-guide.org/en/latest/starting/install/win/>`_.
+   `at python.org <http://docs.python-guide.org/en/latest/starting/install/win/>`_.
 
 2. Install `git <http://git-scm.com>`_ following the instructions
    `here <http://guides.beanstalkapp.com/version-control/git-on-windows.html>`_.
 
 3. Install `PostgreSQL <http://www.postgresql.org/>`_ (> 9.0) following the instructions
-   `here <https://wiki.postgresql.org/wiki/Running_%26_Installing_PostgreSQL_On_Native_Windows>`_.
+   `at postgresql.org <https://wiki.postgresql.org/wiki/Running_%26_Installing_PostgreSQL_On_Native_Windows>`_.
 
 .. note::
 

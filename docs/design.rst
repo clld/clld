@@ -15,9 +15,6 @@ The following goals directed the design:
 
 These constraints led to the following design decisions:
 
-- We target Ubuntu 12.04 with postgresql 9.1 and python 2.7 as primary deployment platform.
-  As of version 0.13 ``clld`` does also work with python 3.4, the version of python3 that
-  comes packaged with Ubuntu 14.04.
 - Use `sqlalchemy <http://sqlalchemy.org>`_ and it's implementation of
   `joined table inheritance <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#joined-table-inheritance>`_
   to provide a core database model that can easily be extended.
