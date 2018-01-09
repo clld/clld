@@ -80,7 +80,9 @@ class ResumptionToken(UnicodeMixin):
     limit = 100
 
     def __init__(self, url_arg=None, offset=None, from_=None, until=None):
-        datetime_from_iso = lambda s: datetime(*map(int, s.split('-')))
+        def datetime_from_iso(s):
+            return datetime(*map(int, s.split('-')))
+
         self.offset = offset or 0
         self.from_ = from_
         self.until = until
@@ -228,9 +230,6 @@ def olac_with_cfg(req, cfg):
             return error("cannotDisseminateFormat")
 
         try:
-            #
-            #
-            #
             res['language'] = res['cfg'].get_record(req, args['identifier'])
         except AssertionError:
             return error("idDoesNotExist")

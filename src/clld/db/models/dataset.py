@@ -67,7 +67,9 @@ class Dataset(Base,
         return res
 
     def formatted_editors(self):
-        _format = lambda eds: ' & '.join(ed.contributor.last_first() for ed in eds)
+        def _format(eds):
+            return ' & '.join(ed.contributor.last_first() for ed in eds)
+
         res = _format([e for e in self.editors if e.primary])
         secondary = [e for e in self.editors if not e.primary]
         if secondary:

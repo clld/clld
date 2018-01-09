@@ -23,6 +23,6 @@ def prime_cache(args):  # pragma: no cover
     """
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     initializedb(create=main, prime_cache=prime_cache)
     sys.exit(0)

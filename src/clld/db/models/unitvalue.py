@@ -35,8 +35,8 @@ class UnitValue(Base,
                 HasDataMixin,
                 HasFilesMixin):
 
-    __table_args__ = (
-        UniqueConstraint('unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'),
+    __table_args__ = (UniqueConstraint(
+        'unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'),
     )
 
     unit_pk = Column(Integer, ForeignKey('unit.pk'), nullable=False)
@@ -56,7 +56,8 @@ class UnitValue(Base,
 
     @declared_attr
     def unit(cls):
-        return relationship('Unit', innerjoin=True, backref=backref('unitvalues', order_by=cls.unit_pk))
+        return relationship(
+            'Unit', innerjoin=True, backref=backref('unitvalues', order_by=cls.unit_pk))
 
     @validates('unitparameter_pk')
     def validate_parameter_pk(self, key, unitparameter_pk):

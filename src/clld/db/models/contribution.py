@@ -85,5 +85,7 @@ class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
     # we distinguish between primary and secondary (a.k.a. 'with ...') contributors.
     primary = Column(Boolean, default=True)
 
-    contribution = relationship(Contribution, innerjoin=True, backref='contributor_assocs')
-    contributor = relationship(Contributor, innerjoin=True, lazy=False, backref='contribution_assocs')
+    contribution = relationship(
+        Contribution, innerjoin=True, backref='contributor_assocs')
+    contributor = relationship(
+        Contributor, innerjoin=True, lazy=False, backref='contribution_assocs')

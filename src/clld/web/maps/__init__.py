@@ -258,10 +258,11 @@ class Map(Component):
             items,
             label='Icon size')
 
-        item = lambda layer: HTML.a(
-            layer.name,
-            onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
-            href=layer.data if isinstance(layer.data, string_types) else '#')
+        def item(layer):
+            return HTML.a(
+                layer.name,
+                onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
+                href=layer.data if isinstance(layer.data, string_types) else '#')
         yield Legend(
             self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 

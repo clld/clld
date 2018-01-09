@@ -1,16 +1,11 @@
 language: python
-matrix:
-  fast_finish: true
-  include:
-    - python: "2.7"
-      env: TOXENV=py27
-    - python: "3.4"
-      env: TOXENV=py34
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 cache: pip
 before_cache: rm -f $HOME/.cache/pip/log/debug.log
-before_install: pip install codecov
-install: pip install tox
-script: tox
-after_success:
-  - tox -e coverage-report
-  - codecov
+install: pip install .[test] codecov
+script: pytest
+after_success: codecov

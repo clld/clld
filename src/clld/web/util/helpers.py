@@ -14,13 +14,6 @@ from math import floor
 from six import text_type, string_types
 from six.moves.urllib.parse import quote, urlencode
 
-try:  # pragma: no cover
-    import newrelic.agent
-    assert newrelic.agent
-    NEWRELIC = True
-except ImportError:  # pragma: no cover
-    NEWRELIC = False
-
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload_all
 from markupsafe import Markup
@@ -651,9 +644,11 @@ def icons(req, param):
     :return: HTML element
     """
     iconlist = req.registry.queryUtility(interfaces.IIconList)
-    td = lambda icon: HTML.td(
-        marker_img(icon.url(req)),
-        onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
+
+    def td(icon):
+        return HTML.td(
+            marker_img(icon.url(req)),
+            onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
     rows = [
         HTML.tr(*map(td, icons)) for c, icons in
         groupby(sorted(iconlist, key=lambda i: i.name[1:]), lambda i: i.name[1:])]

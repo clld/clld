@@ -39,7 +39,9 @@ class Valuesets(DataTable):
     def col_defs(self):
         refs_col = RefsCol(self, 'references')
         res = [DetailsRowLinkCol(self, 'd')]
-        get = lambda what, i: getattr(i, {'p': 'parameter', 'l': 'language'}[what])
+
+        def get(what, i):
+            return getattr(i, {'p': 'parameter', 'l': 'language'}[what])
 
         if self.parameter:
             return res + [

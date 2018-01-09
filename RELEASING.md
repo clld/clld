@@ -16,6 +16,7 @@ tox -r
 - Make sure javascript and css can be minified:
 ```
 webassets -m clld.web.assets build
+rm -i src/clld/web/static/*/packed.*
 ```
 
 - Make sure javascript tests pass with coverage of clld.js at > 82%:
@@ -25,7 +26,7 @@ java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromi
 
 - Make sure flake8 passes
 ```
-flake8 --ignore=E711,E712,D100,D101,D103,D102,D301,E402,E731,W503 --max-line-length=100 clld
+flake8 src/
 ```
 
 - Make sure docs render OK
@@ -88,3 +89,5 @@ python setup.py sdist
 ```
 python setup.py develop
 ```
+
+- Update the version number to the new development cycle.

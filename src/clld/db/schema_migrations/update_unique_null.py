@@ -2,6 +2,9 @@
 
 from __future__ import unicode_literals
 
+from alembic import op
+import sqlalchemy as sa
+
 # revision identifiers, used by Alembic.
 revision = ''
 down_revision = ''
@@ -18,9 +21,6 @@ down_revision = ''
 #   - displays any violating rows that will be deleted ('delete N row(s)')
 # - if the changes are as intended, change 'dry=False' to 'dry=True' in <...>_update_unique_null.py
 # - run alembic upgrade head once again to apply the changes to your database
-
-from alembic import op
-import sqlalchemy as sa
 
 UNIQUE_NULL = [
     ('contributioncontributor',
@@ -52,11 +52,18 @@ UNIQUE_NULL = [
     ('unitdomainelement',
         ['unitparameter_pk', 'ord'],
         ['ord']),
-    # NOTE: <unit, unitparameter, contribution> can have multiple values and also multiple unitdomainelements
+    # NOTE: <unit, unitparameter, contribution> can have multiple values and also
+    # multiple unitdomainelements
     ('unitvalue',
-        ['unit_pk', 'unitparameter_pk', 'contribution_pk', 'name', 'unitdomainelement_pk'],
+        [
+            'unit_pk',
+            'unitparameter_pk',
+            'contribution_pk',
+            'name',
+            'unitdomainelement_pk'],
         ['contribution_pk', 'name', 'unitdomainelement_pk']),
-    # NOTE: <language, parameter, contribution> can have multiple values and also multiple domainelements
+    # NOTE: <language, parameter, contribution> can have multiple values and also
+    # multiple domainelements
     ('value',
         ['valueset_pk', 'name', 'domainelement_pk'],
         ['name', 'domainelement_pk']),
@@ -87,7 +94,8 @@ def upgrade(dry=True, verbose=True):
         yield table.delete(bind=conn).where(any_null).returning(returning)
         other = table.alias()
         yield table.delete(bind=conn).where(~any_null).returning(returning)\
-            .where(sa.exists()
+            .where(
+                sa.exists()
                 .where(sa.and_(table.c[c] == other.c[c] for c in columns))
                 .where(table.c.pk > other.c.pk))
 
@@ -101,7 +109,8 @@ def upgrade(dry=True, verbose=True):
         def get_col_spec(self):
             return 'regclass'
 
-    pga = sa.table('pg_attribute', *map(sa.column, ['attrelid', 'attname', 'attnum', 'attnotnull']))
+    pga = sa.table(
+        'pg_attribute', *map(sa.column, ['attrelid', 'attname', 'attnum', 'attnotnull']))
 
     select_nullable = sa.select([pga.c.attname], bind=conn)\
         .where(pga.c.attrelid == sa.cast(sa.bindparam('table'), regclass))\
@@ -113,14 +122,15 @@ def upgrade(dry=True, verbose=True):
                     ['oid', 'conname', 'contype', 'conrelid', 'conkey']))
 
     sq = sa.select([
-            pgco.c.conname.label('name'),
-            sa.func.pg_get_constraintdef(pgco.c.oid).label('definition'),
-            sa.func.array(
-                sa.select([sa.cast(pga.c.attname, sa.Text)])
-                .where(pga.c.attrelid == pgco.c.conrelid)
-                .where(pga.c.attnum == sa.func.any(pgco.c.conkey))
-                .as_scalar()).label('names'),
-        ]).where(pgco.c.contype == 'u')\
+        pgco.c.conname.label('name'),
+        sa.func.pg_get_constraintdef(pgco.c.oid).label('definition'),
+        sa.func.array(
+            sa.select([sa.cast(pga.c.attname, sa.Text)])
+            .where(pga.c.attrelid == pgco.c.conrelid)
+            .where(pga.c.attnum == sa.func.any(pgco.c.conkey))
+            .as_scalar()).label('names'),
+    ])\
+        .where(pgco.c.contype == 'u')\
         .where(pgco.c.conrelid == sa.cast(sa.bindparam('table'), regclass))\
         .alias()
 
@@ -135,12 +145,14 @@ def upgrade(dry=True, verbose=True):
 
         nulls = delete_null.execute().fetchall()
         if nulls:
-            print('%s delete %d row(s) violating NOT NULL(%s)' % (table, len(nulls), ', '.join(notnull)))
+            print('%s delete %d row(s) violating NOT NULL(%s)' % (
+                table, len(nulls), ', '.join(notnull)))
             print_rows(nulls)
 
         duplicates = delete_duplicates.execute().fetchall()
         if duplicates:
-            print('%s delete %d row(s) violating UNIQUE(%s)' % (table, len(duplicates), ', '.join(unique)))
+            print('%s delete %d row(s) violating UNIQUE(%s)' % (
+                table, len(duplicates), ', '.join(unique)))
             print_rows(duplicates)
 
         for col, in select_nullable.execute(table=table, notnull=notnull):

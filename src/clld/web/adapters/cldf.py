@@ -86,9 +86,6 @@ class CldfDownload(Download):
             ds['ParameterTable'].aboutUrl = url_template(req, 'parameter', 'ID')
             ds[ds.primary_table].aboutUrl = url_template(req, 'value', 'ID')
 
-            #
-            # FIXME: add exmaples!
-            #
             sources = {}
             for src in DBSession.query(Source):
                 sources[src.pk] = src.id
@@ -126,7 +123,7 @@ class CldfDownload(Download):
                     'ID': v.id,
                     'Language_ID': langs[v.valueset.language_pk]['ID'],
                     'Parameter_ID': params[v.valueset.parameter_pk]['ID'],
-                    #'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
+                    'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
                     'Form': 'spam',
                     'Source': [
                         '{0}{1}'.format(sources[spk], d) for spk, d in iterrefs(v)],

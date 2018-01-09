@@ -3,7 +3,6 @@ from functools import partial
 from collections import OrderedDict, namedtuple
 import re
 import importlib
-from hashlib import md5
 from uuid import uuid4
 import datetime
 
@@ -22,10 +21,9 @@ from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
 from purl import URL
 from six import string_types
-from clldutils.path import Path
+from clldutils.path import Path, md5
 
 import clld
-assert clld
 from clld.config import get_config
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
@@ -47,6 +45,8 @@ from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap, CombinationMap
 from clld.web.icon import ICONS, ORDERED_ICONS, MapMarker
 from clld.web import assets
+
+assert clld
 assert assets
 
 
@@ -619,11 +619,9 @@ def includeme(config):
             favicon['clld.favicon'] = root_package + ':static/favicon.ico'
         config.add_settings(favicon)
 
-    with open(abspath_from_asset_spec(
-            config.registry.settings['clld.favicon']), mode='rb') as fp:
-        fh = md5()
-        fh.update(fp.read())
-        config.add_settings({'clld.favicon_hash': fh.hexdigest()})
+    config.add_settings({
+        'clld.favicon_hash': md5(abspath_from_asset_spec(
+            config.registry.settings['clld.favicon']))})
 
     translation_dirs = ['clld:locale']
     if pkg_dir.joinpath('locale').exists():

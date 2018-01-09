@@ -1,12 +1,9 @@
 """We provide some infrastructure to build extensible database models."""
 import sqlite3
-try:  # pragma: no cover
-    import simplejson as json
-except ImportError:  # pragma: no cover
-    import json
+import json
 
-from six import string_types, text_type, PY2
-from pytz import UTC
+from six import string_types, PY2
+
 from sqlalchemy import (
     Column, Integer, Float, String, Boolean, DateTime, func, event)
 from sqlalchemy.exc import DisconnectionError
