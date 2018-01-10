@@ -21,7 +21,7 @@ from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
 from purl import URL
 from six import string_types
-from clldutils.path import Path, md5
+from clldutils.path import Path, md5, git_describe
 
 import clld
 from clld.config import get_config
@@ -496,9 +496,15 @@ def includeme(config):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
+    try:
+        git_tag = git_describe(Path(pkg_dir).parent)
+    except ValueError:  # pragma: no cover
+        git_tag = None
+
     config.add_settings({
         'pyramid.default_locale_name': 'en',
         'clld.pkg': root_package,
+        'clld.git_tag': git_tag,
         'clld.parameters': {}})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files

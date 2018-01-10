@@ -166,7 +166,11 @@
                             % if request.registry.settings.get('clld.github_repos'):
                             <a href="https://github.com/${request.registry.settings['clld.github_repos']}">
                                 <i class="icon-share">&nbsp;</i>
-                                Application source on<br/>
+                                Application source
+                                % if request.registry.settings['clld.git_tag']:
+                                    (${request.registry.settings['clld.git_tag']})
+                                % endif
+                                on<br/>
                                 <img height="25" src="${request.static_url('clld:web/static/images/GitHub_Logo.png')}" />
                             </a>
                             % endif

@@ -8,6 +8,8 @@ Changes
 
 UNRELEASED
 
+- closes https://github.com/clld/clld/issues/134
+
 
 4.0.0
 ~~~~~
