@@ -103,7 +103,7 @@ def bibtex2source(rec, cls=common.Source):
         authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(
-        id=slug(rec.id),
+        id=slug(rec.id, lowercase=False),
         name=('%s %s' % (authors, year)).strip(),
         description=bibtex.unescape(rec.get('title', rec.get('booktitle', ''))),
         jsondata=jsondata,

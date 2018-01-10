@@ -30,6 +30,7 @@ def test_bibtex2source():
     bibtex2source(Record('book', 'id', author='M, R and G, H and Z, U'))
     bibtex2source(Record('book', 'id', editor='M, R and G, H'))
     bibtex2source(Record('book', 'id', title='tb', customfield='cf', year="1920}"))
+    assert bibtex2source(Record('misc', 'Id', title='title')).id == 'Id'
 
 
 def test_parsed_args(testsdir):
