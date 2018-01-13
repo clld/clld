@@ -80,3 +80,21 @@ def test_config():
     config.register_download(N3Dump(Language, 'clld'))
     config.add_301('/301pattern', 'http://example.org')
     config.add_410('/410pattern')
+
+
+def test_includeme_error(tmpdir, capsys):
+    import sys
+    sys.path.append(str(tmpdir))
+    pkg = tmpdir.join('failingapp')
+    pkg.mkdir()
+    pkg.join('__init__.py').write_text('#\n', 'ascii')
+    pkg.join('util.py').write_text('import xyzxyz', 'ascii')
+    config = Configurator(
+        root_package=importlib.import_module('failingapp'),
+        settings={'sqlalchemy.url': 'sqlite://'})
+    with pytest.raises(ImportError):
+        config.include('clld.web.app')
+    out, err = capsys.readouterr()
+    assert 'failingapp.util' in out
+    sys.path.pop()
+

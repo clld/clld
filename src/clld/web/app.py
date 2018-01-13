@@ -308,10 +308,23 @@ def ctx_factory(model, type_, req):
         raise HTTPNotFound()
 
 
-def maybe_import(name):
+def maybe_import(name, pkg_dir=None):
+    exists = False
+    if pkg_dir:
+        rel_path = name.split('.')[1:] if '.' in name else []
+        rel_path.append('__init__.py')
+        exists = pkg_dir.joinpath(*rel_path).exists()
+        if not exists:
+            rel_path.pop()
+            if rel_path:
+                rel_path[-1] += '.py'
+            exists = pkg_dir.joinpath(*rel_path).exists()
     try:
         return importlib.import_module(name)
     except ImportError:
+        if pkg_dir and exists:
+            print('failed to import existing module {0}'.format(name))
+            raise
         return None
 
 
@@ -473,9 +486,8 @@ def includeme(config):
     # note: the following exploits the import time side effect of modifying the webassets
     # environment!
     root_package = config.root_package.__name__
-    maybe_import('%s.assets' % root_package)
-
     pkg_dir = Path(config.root_package.__file__).parent.resolve()
+    maybe_import('%s.assets' % root_package, pkg_dir=pkg_dir)
 
     json_renderer = JSON()
     json_renderer.add_adapter(datetime.datetime, lambda obj, req: obj.isoformat())
@@ -516,7 +528,9 @@ def includeme(config):
     config.add_subscriber(add_localizer, events.NewRequest)
     config.add_subscriber(init_map, events.ContextFound)
     config.add_subscriber(
-        partial(add_renderer_globals, maybe_import('%s.util' % root_package)),
+        partial(
+            add_renderer_globals, 
+            maybe_import('%s.util' % root_package, pkg_dir=pkg_dir)),
         events.BeforeRender)
 
     #
@@ -641,7 +655,7 @@ def includeme(config):
     if asbool(config.registry.settings.get('clld.pacific_centered_maps')):
         geojson.pacific_centered()
 
-    v = maybe_import('%s.views' % root_package)
+    v = maybe_import('%s.views' % root_package, pkg_dir=pkg_dir)
     if v:
         config.scan(v)  # pragma: no cover
 
@@ -653,7 +667,7 @@ def includeme(config):
     config.include('pyramid_mako')
 
     for name in ['adapters', 'datatables', 'maps']:
-        mod = maybe_import('%s.%s' % (root_package, name))
+        mod = maybe_import('%s.%s' % (root_package, name), pkg_dir=pkg_dir)
         if mod and hasattr(mod, 'includeme'):
             config.include(mod)
 
