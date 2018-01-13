@@ -36,6 +36,7 @@ install_requires = [
     'webhelpers2>=2.0',
     'nameparser',
     'feedparser',
+    'waitress',
 ]
 
 
