@@ -529,7 +529,7 @@ def includeme(config):
     config.add_subscriber(init_map, events.ContextFound)
     config.add_subscriber(
         partial(
-            add_renderer_globals, 
+            add_renderer_globals,
             maybe_import('%s.util' % root_package, pkg_dir=pkg_dir)),
         events.BeforeRender)
 
