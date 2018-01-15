@@ -33,7 +33,7 @@ def type_coerce(type_, value, fallback):
     # turn user parameters into int/float where there is no try/except already
     try:
         return type_(value)
-    except ValueError:  # pragma: no cover
+    except ValueError:
         return fallback
 
 
