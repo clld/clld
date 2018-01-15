@@ -50,6 +50,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
@@ -72,9 +73,11 @@ setup(
     install_requires=install_requires,
     extras_require={
         'dev': [
-            'waitress', 
-            'flake8', 
-            'wheel', 
+            'waitress',
+            'pyramid_debugtoolbar',
+            'tox',
+            'flake8',
+            'wheel',
             'twine',
         ],
         'test': [
@@ -104,4 +107,5 @@ setup(
         clld-google-books = clld.scripts.cli:google_books
         clld-internetarchive = clld.scripts.cli:internetarchive
         clld-create-downloads = clld.scripts.cli:create_downloads
-    """)
+    """
+)
