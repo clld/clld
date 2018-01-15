@@ -25,6 +25,17 @@ from clld.interfaces import IDataTable, IIndex
 
 OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
+DISPLAY_LENGTH, DISPLAY_LIMIT = 100, 1000
+
+
+def type_coerce(type_, value, fallback):
+    """Return type_(value), on ValueError return fallback."""
+    # turn user parameters into int/float where there is no try/except already
+    try:
+        return type_(value)
+    except ValueError:  # pragma: no cover
+        return fallback
+
 
 def filter_number(col, qs, type_=None, qs_weight=1):
     """Extended filter operators for numbers.
@@ -418,7 +429,7 @@ class DataTable(Component):
             "bAutoWidth": False,
             "sPaginationType": "bootstrap",
             "aoColumns": [col.js_args for col in self.cols],
-            "iDisplayLength": 100,
+            "iDisplayLength": DISPLAY_LENGTH,
             "aLengthMenu": [[50, 100, 200], [50, 100, 200]],
             'sAjaxSource': data_url,
         }
@@ -439,7 +450,7 @@ class DataTable(Component):
     def default_order(self):
         return self.db_model().pk
 
-    def get_query(self, limit=1000, offset=0, undefer_cols=()):
+    def get_query(self, limit=DISPLAY_LIMIT, offset=0, undefer_cols=()):
         query = self.base_query(
             DBSession.query(self.db_model()).filter(self.db_model().active == True))
         self.count_all = query.count()
@@ -465,10 +476,7 @@ class DataTable(Component):
 
         self.count_filtered = query.count()
 
-        try:
-            iSortingCols = int(self.req.params.get('iSortingCols', 0))
-        except ValueError:
-            iSortingCols = 0
+        iSortingCols = type_coerce(int, self.req.params.get('iSortingCols', 0), 0)
 
         for index in range(iSortingCols):
             try:
@@ -491,11 +499,12 @@ class DataTable(Component):
         query = query.order_by(*clauses)
 
         if 'iDisplayLength' in self.req.params:
-            # make sure no more than 1000 items can be selected
-            limit = min([int(self.req.params['iDisplayLength']), 1000])
+            limit = type_coerce(int, self.req.params['iDisplayLength'], DISPLAY_LENGTH)
+            # make sure no more than DISPLAY_LIMIT items can be selected
+            limit = min(limit, DISPLAY_LIMIT)
         query = query\
-            .limit(limit if limit != -1 else 1000)\
-            .offset(int(self.req.params.get('iDisplayStart', offset)))
+            .limit(DISPLAY_LIMIT if limit == -1 else limit)\
+            .offset(type_coerce(int, self.req.params.get('iDisplayStart', offset), offset))
 
         if undefer_cols:
             query = query.options(*(undefer(c) for c in undefer_cols))
