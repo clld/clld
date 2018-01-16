@@ -39,22 +39,23 @@ def test_DataTable(env, request_factory):
     dt.get_query(undefer_cols=['updated']).all()
 
 
-@pytest.mark.parametrize(
-    "params",
-    [
-        {},
-        {
-            'sSearch_0': '1..1000000',
-            'sSearch_4': 'True',
-            'sSearch_6': 'e',
-            'iSortingCols': '1',
-            'iSortCol_0': '0',
-            'sSortDir_0': 'desc'},
-        {'iSortingCols': 'x'},
-        {'iSortingCols': '1', 'iSortCol_0': '7'},
-        {'sSearch_7': '1'},
-        {'sSearch_8': 'id'},
-    ])
+@pytest.mark.parametrize('params', [
+    {},
+    {
+        'sSearch_0': '1..1000000',
+        'sSearch_4': 'True',
+        'sSearch_6': 'e',
+        'iSortingCols': '1',
+        'iSortCol_0': '0',
+        'sSortDir_0': 'desc',
+    },
+    {'iSortingCols': 'x'},
+    {'iSortingCols': '1', 'iSortCol_0': '7'},
+    {'sSearch_7': '1'},
+    {'sSearch_8': 'id'},
+    {'iDisplayLength': 'nonnumber'},
+    {'iDisplayStart': 'nonnumber'},
+])
 def test_DataTable_cols(request_factory, params):
     with request_factory(params=params) as req:
         handle_dt(req, Table, common.Contributor)

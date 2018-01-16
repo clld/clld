@@ -18,14 +18,18 @@ Installation
 
 To install the python package from pypi run
 
-    pip install clld
+.. code:: bash
+
+    $ pip install clld
 
 To install from a git repository (if you want to hack on ``clld``),
-you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_::
+you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_:
 
-    git clone git@github.com:clld/clld.git
-    cd clld
-    pip install -e .[dev,test]
+.. code:: bash
+
+    $ git clone https://github.com/clld/clld.git
+    $ cd clld
+    $ pip install -r requirements.txt
 
 Alternatively, you may want to fork ``clld`` first and then work with your fork.
 
@@ -38,9 +42,11 @@ A ``clld`` app is a python package implementing a
 web application.
 
 The ``clld`` package provides a pyramid application scaffold to create the initial package directory
-layout for a ``clld`` app::
+layout for a ``clld`` app:
 
-    pcreate -t clld_app myapp
+.. code:: bash
+
+    $ pcreate -t clld_app myapp
 
 .. note::
 
@@ -83,10 +89,12 @@ This will create a python package ``myapp`` with the following layout::
     └── setup.py
 
 
-Running::
+Running
 
-    cd myapp
-    pip install -e .[dev,test]
+.. code:: bash
+
+    $ cd myapp
+    $ pip install -r requirements.txt
 
 will install your app as Python package in development mode, i.e. will create a link to
 your app's code in the ``site-packages`` directory.
@@ -96,9 +104,11 @@ Now edit the `configuration file <http://docs.pylonsproject.org/projects/pyramid
 The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_ given in this
 setting must point to an existing (but empty) database if the ``postgresql`` dialect is chosen.
 
-Running::
+Running
 
-    python myapp/scripts/initializedb.py development.ini
+.. code:: bash
+
+    $ python myapp/scripts/initializedb.py development.ini
 
 will then create the database for your app. Whenever you edit the database initialization
 script, you have to re-run the above command.
@@ -109,9 +119,11 @@ script, you have to re-run the above command.
     an existing database, so before running it, you have to drop and re-create and empty
     database "by hand".
 
-You are now ready to run::
+You are now ready to run
 
-    pserve --reload development.ini
+.. code:: bash
+
+    $ pserve --reload development.ini
 
 and navigate with your browser to http://127.0.0.1:6543 to visit your application.
 
@@ -123,9 +135,11 @@ Populating the database
 
 The ``clld`` framework does not provide any GUI or web interface for populating the database.
 Instead, this is assumed to be done with a script.
-You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run::
+You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run
 
-    python myapp/scripts/initializedb.py development.ini
+.. code:: bash
+
+    $ python myapp/scripts/initializedb.py development.ini
 
 Adding objects to the database is done by instantiating model objects and
 `adding them <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#adding-new-objects>`_
