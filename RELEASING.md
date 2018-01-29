@@ -60,18 +60,18 @@ git commit -a -m "release <VERSION>"
 git tag -a v<VERSION> -m "<VERSION> release"
 ```
 
-- Push to github:
-```shell
-git push origin
-git push --tags origin
-```
-
 - Release to PyPI:
 ```shell
 git checkout tags/v<VERSION>
 rm dist/*
 python setup.py sdist bdist_wheel
 twine upload dist/*
+```
+
+- Push to github:
+```shell
+git push origin
+git push --tags origin
 ```
 
 - Re-release using the same tag on GitHub, to trigger the ZENODO hook.

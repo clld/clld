@@ -3,10 +3,11 @@ Changes
 -------
 
 
-4.1.0.dev0
-~~~~~~~~~~
+4.0.2
+~~~~~
 
-UNRELEASED
+- fixed scope of db fixture to work with latest pytest-clld
+- removed whitespace before punctuation in footer of app template
 
 
 4.0.1
