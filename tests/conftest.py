@@ -6,14 +6,12 @@ import os
 import pytest
 from clldutils.path import Path
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
-from clld.db.meta import CustomModelMixin, DBSession
+from clld.db.meta import CustomModelMixin, DBSession, VersionedDBSession
 from clld.db.models import common
 from clld.db.util import set_alembic_version
 from clld.scripts.util import Data
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
-
-pytest_plugins = ["clld"]
 
 
 class CustomLanguage(CustomModelMixin, common.Language):
@@ -174,6 +172,15 @@ def populate_test_db(engine):
     common.Config.add_replacement('replaced', 'language', model=common.Language)
     common.Config.add_replacement('gone', None, model=common.Language)
     DBSession.flush()
+
+
+@pytest.fixture
+def db(db):
+    try:
+        yield db
+    finally:
+        DBSession.rollback()
+        VersionedDBSession.rollback()
 
 
 @pytest.fixture

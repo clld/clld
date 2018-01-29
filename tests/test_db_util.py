@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 def test_alembic_version(db):
     from clld.db.util import set_alembic_version, get_alembic_version
 
-    assert get_alembic_version(db) is None
+    assert get_alembic_version(db) != '1234'
     set_alembic_version(db, '1234')
     assert get_alembic_version(db) == '1234'
 
