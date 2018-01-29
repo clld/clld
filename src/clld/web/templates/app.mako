@@ -157,8 +157,7 @@
                             <br />
                             is licensed under a
                             <a rel="license" href="${request.dataset.license}">
-                                ${request.dataset.jsondata.get('license_name', request.dataset.license)}
-                            </a>.
+                                ${request.dataset.jsondata.get('license_name', request.dataset.license)}</a>.
                         </div>
                         <div class="span3" style="text-align: right;">
                             <a href="${request.route_url('legal')}">disclaimer</a>
