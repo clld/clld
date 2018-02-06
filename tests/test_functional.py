@@ -51,6 +51,7 @@ def test_resources(app):
         app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
     app.get_xml('/unitparameters/up2.rdf')
     app.get_html('/combinations/parameter')
+    app.get_xml('/combinations/parameter.rdf')
 
 
 def test_source(app):

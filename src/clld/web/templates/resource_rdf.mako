@@ -8,7 +8,7 @@
         % endif
         <skos:altLabel xml:lang="x-clld">${getattr(ctx, 'id', None)}</skos:altLabel>
         <dcterms:title xml:lang="en">${ctx}</dcterms:title>
-        % if getattr(ctx, 'description'):
+        % if getattr(ctx, 'description', None):
         <dcterms:description xml:lang="en">${ctx.description}</dcterms:description>
         % endif
         <%block name="properties"></%block>
