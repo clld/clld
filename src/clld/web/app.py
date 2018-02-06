@@ -244,27 +244,25 @@ class CtxFactoryQuery(object):
 
         if query == custom_query:
             # no customizations done, apply the defaults
-            if model == common.Contribution:
-                query = query.options(
-                    joinedload_all(
-                        common.Contribution.valuesets,
-                        common.ValueSet.parameter,
-                    ),
-                    joinedload_all(
-                        common.Contribution.valuesets,
-                        common.ValueSet.values,
-                        common.Value.domainelement),
-                    joinedload_all(
-                        common.Contribution.references,
-                        common.ContributionReference.source),
-                    joinedload(common.Contribution.data),
-                )
-            if model == common.ValueSet:
-                query = query.options(
-                    joinedload(common.ValueSet.values),
-                    joinedload(common.ValueSet.parameter),
-                    joinedload(common.ValueSet.language),
-                )
+            f = getattr(model, 'refine_factory_query', None)
+            if f:
+                query = f(query)
+            else:
+                if model == common.Contribution:
+                    query = query.options(
+                        joinedload_all(
+                            common.Contribution.valuesets,
+                            common.ValueSet.parameter,
+                        ),
+                        joinedload_all(
+                            common.Contribution.valuesets,
+                            common.ValueSet.values,
+                            common.Value.domainelement),
+                        joinedload_all(
+                            common.Contribution.references,
+                            common.ContributionReference.source),
+                        joinedload(common.Contribution.data),
+                    )
         else:
             query = custom_query  # pragma: no cover
 

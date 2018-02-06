@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 
 from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, joinedload
 from sqlalchemy.ext.declarative import declared_attr
 
 from zope.interface import implementer
@@ -48,6 +48,14 @@ class ValueSet(Base,
     source = Column(Unicode, doc='textual description of the source for the valueset')
 
     parameter = relationship('Parameter', innerjoin=True, backref='valuesets')
+
+    @staticmethod
+    def refine_factory_query(query):
+        return query.options(
+            joinedload(ValueSet.values),
+            joinedload(ValueSet.parameter),
+            joinedload(ValueSet.language),
+        )
 
     @declared_attr
     def contribution(cls):
