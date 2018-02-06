@@ -40,7 +40,8 @@ def test_resources(app):
             continue
         app.get_html('/{0}s/{0}'.format(rsc.name))
         app.get_html('/{0}s/{0}.snippet.html'.format(rsc.name), docroot='div')
-        app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+        res = app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+        assert res.headers['Vary'] == 'Accept'
         assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}scopeNote')) == 1
         assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}altLabel')) > 0
         app.get_html('/%ss' % rsc.name)

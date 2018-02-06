@@ -6,7 +6,7 @@ from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
 from six import text_type
-from clldutils.misc import to_binary, slug
+from clldutils.misc import slug
 
 from clld import interfaces
 
@@ -44,7 +44,7 @@ class Renderable(object):
 
     def render_to_response(self, ctx, req):
         res = Response(self.render(ctx, req))
-        res.vary = to_binary('Accept')
+        res.vary = str('Accept')
         res.content_type = str(self.send_mimetype or self.mimetype)
         if self.charset:
             res.content_type += str('; charset=') + str(self.charset)
