@@ -219,9 +219,9 @@ td.gloss, div.gloss {
   margin-top: -0.5em;
 }
 
-div.popover {width: 500px !important;}
+div.popover {width: 500px;}
 div.popover-content {
-        height: 250px !important;
+        height: 250px;
         overflow-y: scroll;
         overflow-x: hidden;}
 
