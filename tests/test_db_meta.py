@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from six import PY3
 
 from clld.db.models.common import Language
-from clld.db.meta import DBSession, VersionedDBSession
+from clld.db.meta import DBSession, VersionedDBSession, is_base
 
 
 def test_JSONEncodedDict(db):
@@ -30,6 +30,9 @@ def test_CustomModelMixin(db, custom_language):
 
 def test_CustomModelMixin_polymorphic(db, custom_language):
     lang = Language(id='def', name='Name')
+    assert repr(lang).startswith("<Language ")
+    assert is_base(Language)
+    assert not is_base(custom_language)
     clang = custom_language(id='abc', name='Name', custom='c')
     DBSession.add_all([lang, clang])
     DBSession.flush()

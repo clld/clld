@@ -5,6 +5,7 @@ import pytest
 from clld.db.models import common
 from clld.web.maps import (
     Map, ParameterMap, LanguageMap, SelectedLanguagesMap, CombinationMap, FilterLegend,
+    Layer,
 )
 
 
@@ -34,6 +35,16 @@ def test_CombinationMap(env):
     ctx.multiple = [common.Language.first()]
     dt = CombinationMap(ctx, env['request'])
     dt.render()
+
+
+def test_layers(env):
+    class TestMap(Map):
+        def get_layers(self):
+            yield Layer('l1', 'ln1', [], representation=555)
+            yield Layer('l2', 'ln2', [], representation=333)
+
+    m = TestMap(None, env['request'])
+    assert '888' in m.render()
 
 
 def test_FilterLegend(request_factory):

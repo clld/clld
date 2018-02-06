@@ -97,4 +97,3 @@ def test_includeme_error(tmpdir, capsys):
     out, err = capsys.readouterr()
     assert 'failingapp.util' in out
     sys.path.pop()
-

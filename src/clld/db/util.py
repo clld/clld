@@ -172,5 +172,5 @@ def set_alembic_version(engine, db_version):
 def get_alembic_version(engine):
     try:
         return engine.execute("SELECT version_num FROM alembic_version").fetchone()[0]
-    except:
+    except:  # pragma: no cover
         return None
