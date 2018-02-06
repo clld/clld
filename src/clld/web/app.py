@@ -329,10 +329,15 @@ def maybe_import(name, pkg_dir=None):
 #
 # configurator directives:
 #
-def register_cls(interface, config, route, cls):
-    config.registry.registerUtility(cls, provided=interface, name=route)
+def register_utility(config, cls, interface, name='', overwrite=True):
+    if overwrite or not config.registry.queryUtility(interface, name=name):
+        config.registry.registerUtility(cls, provided=interface, name=name)
+
+
+def register_cls(interface, config, route, cls, overwrite=True):
+    register_utility(config, cls, interface, name=route, overwrite=overwrite)
     if not route.endswith('_alt'):
-        config.registry.registerUtility(cls, provided=interface, name=route + '_alt')
+        register_utility(config, cls, interface, name=route + '_alt', overwrite=overwrite)
 
 
 def register_adapter(config, cls, from_, to_=None, name=None):
@@ -535,6 +540,7 @@ def includeme(config):
     # make it easy to register custom functionality
     #
     for name, func in {
+        'register_utility': register_utility,
         'register_datatable': partial(register_cls, interfaces.IDataTable),
         'register_map': partial(register_cls, interfaces.IMap),
         'register_menu': register_menu,

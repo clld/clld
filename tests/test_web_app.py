@@ -9,8 +9,19 @@ from pyramid.httpexceptions import HTTPNotFound
 from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
-from clld.interfaces import IMapMarker
+from clld.interfaces import IMapMarker, IDataTable
 from clld.web.adapters.download import N3Dump
+
+
+@pytest.fixture
+def config():
+    config_ = Configurator(
+        root_package=importlib.import_module('clld.web'),
+        settings={
+            'sqlalchemy.url': 'sqlite://',
+            'clld.pacific_centered_maps': True})
+    config_.include('clld.web.app')
+    return config_
 
 
 def test_CLLDRequest(env):
@@ -62,16 +73,10 @@ def test_add_config_from_file(testsdir):
     assert 'app:main.use' in config.registry.settings
 
 
-def test_config():
+def test_config(config):
     class IF(Interface):
         pass
 
-    config = Configurator(
-        root_package=importlib.import_module('clld.web'),
-        settings={
-            'sqlalchemy.url': 'sqlite://',
-            'clld.pacific_centered_maps': True})
-    config.include('clld.web.app')
     # should have no effect, because a resource with this name is registered by
     # default:
     config.register_menu('languages', ('sources', dict(label='References')))
@@ -80,6 +85,20 @@ def test_config():
     config.register_download(N3Dump(Language, 'clld'))
     config.add_301('/301pattern', 'http://example.org')
     config.add_410('/410pattern')
+
+
+def test_no_overwrite_registration(config):
+    config.register_utility(1, IMapMarker)
+    assert config.registry.queryUtility(IMapMarker) == 1
+    config.register_utility(2, IMapMarker)
+    assert config.registry.queryUtility(IMapMarker) == 2
+    config.register_utility(3, IMapMarker, overwrite=False)
+    assert config.registry.queryUtility(IMapMarker) == 2
+
+    config.register_datatable('route', 1)
+    assert config.registry.queryUtility(IDataTable, name='route') == 1
+    config.register_datatable('route', 2, overwrite=False)
+    assert config.registry.queryUtility(IDataTable, name='route') == 1
 
 
 def test_includeme_error(tmpdir, capsys):
