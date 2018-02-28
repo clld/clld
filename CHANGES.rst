@@ -3,6 +3,12 @@ Changes
 -------
 
 
+4.1.0
+~~~~~
+
+Better support for color handling and SVG icons.
+
+
 4.0.3
 ~~~~~
 
