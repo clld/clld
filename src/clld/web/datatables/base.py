@@ -478,7 +478,7 @@ class DataTable(Component):
 
         iSortingCols = type_coerce(int, self.req.params.get('iSortingCols', 0), 0)
 
-        for index in range(iSortingCols):
+        for index in range(max(iSortingCols, 10)):
             try:
                 col = self.cols[int(self.req.params.get('iSortCol_%s' % index))]
             except (TypeError, ValueError, IndexError):  # pragma: no cover
