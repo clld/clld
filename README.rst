@@ -22,11 +22,7 @@ maintained by the `Cross Linguistic Linked Data`_ project.
 
 Code is at github_.
 
-Cite version 4.0.0 as
-
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1143639.svg
-	:target: https://doi.org/10.5281/zenodo.1143639
+Cite most recent version as https://doi.org/10.5281/zenodo.592412
 
 .. _Cross Linguistic Linked Data: http://clld.org/
 .. _github: https://github.com/clld/clld
-
