@@ -306,7 +306,7 @@ class RefsCol(Col):
     def format(self, item):
         vs = self.get_obj(item)
         return ', '.join(
-            nfilter([getattr(vs, 'source'), linked_references(self.dt.req, vs)]))
+            nfilter([getattr(vs, 'source', None), linked_references(self.dt.req, vs)]))
 
 
 class Toolbar(DownloadWidget):
