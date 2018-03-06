@@ -70,6 +70,7 @@ twine upload dist/*
 
 - Push to github:
 ```shell
+git checkout master
 git push origin
 git push --tags origin
 ```
@@ -77,12 +78,10 @@ git push --tags origin
 - Re-release using the same tag on GitHub, to trigger the ZENODO hook.
   update the DOI badge.
 
-- Append `.dev0` to the version number for the new development cycle:
+- Increment version number and append `.dev0` to the version number for the new development cycle:
   - `src/clld/__init__.py`
   - `setup.py`
   - `docs/conf.py`
-
-- Add a new `.dev0`version heading to CHANGES.rst for the new development version (unreleased).
 
 - Commit/push the version change:
 ```shell
