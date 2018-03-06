@@ -10,6 +10,7 @@ def skip(_in, out, **kw):
     """filter to skip content of assets which are fetched from CDN in production."""
     out.write('')  # pragma: no cover
 
+
 _static_path = Path(clld.__file__).parent.joinpath('web', 'static').as_posix()
 environment = Environment(
     _static_path, '/clld:web/static/', manifest='json:', auto_build=False)

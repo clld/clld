@@ -53,7 +53,7 @@ def _registry(encoding):
                     try:
                         output.append(c.encode(encoding))
                         continue
-                    except:
+                    except Exception:
                         pass
                 if ord(c) in latex_equivalents:
                     output.append(latex_equivalents[ord(c)])
@@ -207,6 +207,7 @@ class _unlatex(Iterator):  # pragma: no cover
             elif q:
                 yield 2, (t, q)
             yield 1, t
+
 
 latex_equivalents = {
     0x0009: ' ',

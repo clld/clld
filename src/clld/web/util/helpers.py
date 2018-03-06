@@ -187,6 +187,7 @@ class JSNamespace(object):
     def __getattr__(self, name):
         return JS(self.prefix + '.' + name)
 
+
 JS_CLLD = JSNamespace('CLLD')
 
 
