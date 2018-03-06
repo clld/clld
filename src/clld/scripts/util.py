@@ -75,7 +75,7 @@ def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
             language=lang, identifier=identifier('glottolog', glottocode)))
 
 
-def bibtex2source(rec, cls=common.Source):
+def bibtex2source(rec, cls=common.Source, lowercase_id=False):
     year = bibtex.unescape(rec.get('year', 'nd'))
     fields = {}
     jsondata = {}
@@ -103,7 +103,7 @@ def bibtex2source(rec, cls=common.Source):
         authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(
-        id=slug(rec.id, lowercase=False),
+        id=slug(rec.id, lowercase=lowercase_id),
         name=('%s %s' % (authors, year)).strip(),
         description=bibtex.unescape(rec.get('title', rec.get('booktitle', ''))),
         jsondata=jsondata,

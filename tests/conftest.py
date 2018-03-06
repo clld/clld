@@ -11,6 +11,11 @@ from clld.db.models import common
 from clld.db.util import set_alembic_version
 from clld.scripts.util import Data
 
+try:
+    import pathlib2 as pathlib
+except ImportError:
+    import pathlib
+
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 
@@ -187,3 +192,8 @@ def db(db):
 def data(db):
     populate_test_db(db)
     yield db
+
+
+@pytest.fixture()
+def tmppath(tmpdir):
+    return pathlib.Path(str(tmpdir))

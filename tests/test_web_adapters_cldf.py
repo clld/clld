@@ -17,14 +17,14 @@ def test_source2source(env):
         assert len(res) >= 1
 
 
-def test_CldfDownload(env, tmpdir):
+def test_CldfDownload(env, tmppath):
     from clld.web.adapters.cldf import CldfDownload
 
-    tmp = Path(tmpdir) / 'dl.zip'
+    tmp = tmppath / 'dl.zip'
     dl = CldfDownload(Dataset, 'clld')
     dl.create(env['request'], verbose=False, outfile=tmp)
 
-    outdir = Path(tmpdir) / 'cldf'
+    outdir = tmppath / 'cldf'
     with ZipFile(tmp.as_posix()) as zip:
         assert 'Wordlist-metadata.json' in zip.namelist()
         zip.extractall(outdir.as_posix())
