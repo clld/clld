@@ -15,5 +15,5 @@ Documentation for the code base and its use is available at http://clld.readthed
 Cite
 ----
 
-Version 4.0.0:
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1143639.svg)](https://doi.org/10.5281/zenodo.1143639)
+Most recent version:
+https://doi.org/10.5281/zenodo.592412
