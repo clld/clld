@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 from clldutils.path import Path
 
 
-def test_safe_overwrite(tmpdir):
+def test_safe_overwrite(tmppath):
     from clld.util import safe_overwrite
 
-    target = Path(tmpdir) / 'a' / 'b'
+    target = tmppath / 'a' / 'b'
     with safe_overwrite(target) as tmp:
         with tmp.open('w', encoding='utf8') as fp:
             fp.write('stuff')
