@@ -3,7 +3,6 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 from zipfile import ZipFile
 
 from pycldf.dataset import Dataset as CldfDataset
-from clldutils.path import Path
 
 from clld.db.meta import DBSession
 from clld.db.models.common import Dataset, Source
