@@ -55,7 +55,7 @@ class _CollKey(object):
     def get_version_number(self):  # pragma: no cover
         version = DBSession.bind.dialect.name == 'postgresql'\
                 and DBSession.scalar(self._pg_version)
-        self.__dict__['version_number'] = version
+        self.__dict__['version_number'] = int(version)
         return int(version)
 
     def __call__(self, col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
