@@ -6,11 +6,6 @@ from zope.interface import (
 )
 
 
-class ICldfDataset(Interface):
-    def write(request, archive):
-        """Write the files making up the CLDF dataset to a zip archive."""
-
-
 # ---------------------------------------------------------------------------
 # Interfaces for model classes
 # ---------------------------------------------------------------------------
@@ -201,6 +196,11 @@ class ICtxFactoryQuery(Interface):
 
     def __call__(self, model, req):
         """modified query."""
+
+
+class ICldfConfig(Interface):
+
+    """marker."""
 
 
 class IOlacConfig(Interface):

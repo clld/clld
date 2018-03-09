@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import shutil
 
+import transaction
+from zope.interface import implementer
 from sqlalchemy.orm import joinedload_all, joinedload
 from pycldf import dataset
 from pycldf import sources
@@ -12,8 +14,10 @@ from clld.web.adapters.download import Download
 from clld.db.meta import DBSession
 from clld.db.models.common import (
     ValueSet, Value, Parameter, Language, Contribution, Source, Sentence,
+    ContributionContributor, DomainElement,
 )
 from clld.web.util.helpers import text_citation, get_url_template
+from clld.interfaces import ICldfConfig
 
 
 def url_template(req, route, id_name):
@@ -47,15 +51,107 @@ def iterrefs(obj):
             yield r.source_pk, _desc(r.description)
 
 
+@implementer(ICldfConfig)
+class CldfConfig(object):
+    module = 'Wordlist'
+    pk2id = defaultdict(dict)
+
+    def custom_schema(self, req, ds):
+        return
+
+    def query(self, model):
+        q = DBSession.query(model).order_by(model.pk)
+        if model == Contribution:
+            return q.options(joinedload_all(
+                Contribution.contributor_assocs,
+                ContributionContributor.contributor))
+        if model == Sentence:
+            return q.options(joinedload(Sentence.language))
+        if model == DomainElement:
+            return q.order_by(None).order_by(model.parameter_pk, model.number, model.pk)
+        if model == Value:
+            return q.join(ValueSet)\
+                .order_by(None)\
+                .order_by(
+                    ValueSet.parameter_pk,
+                    ValueSet.language_pk,
+                    ValueSet.contribution_pk,
+                    Value.pk)\
+                .options(
+                    joinedload_all(Value.valueset, ValueSet.references),
+                    joinedload(Value.domainelement))
+        return q
+
+    def convert(self, model, item, req):
+        self.pk2id[model.__name__][item.pk] = item.id
+        if model == Parameter:
+            return {'ID': item.id, 'Name': item.name, 'Description': item.description}
+        if model == DomainElement:
+            return {
+                'ID': item.id,
+                'Name': item.name,
+                'Description': item.description,
+                'Parameter_ID': self.pk2id['Parameter'][item.parameter_pk],
+                'Number': item.number,
+            }
+        if model == Language:
+            return {
+                'ID': item.id,
+                'Name': item.name,
+                'Glottocode': item.glottocode,
+                'ISO639P3code': item.iso_code,
+                'Latitude': item.latitude,
+                'Longitude': item.longitude,
+            }
+        if model == Contribution:
+            return {
+                'ID': item.id,
+                'Name': item.name,
+                'Description': item.description,
+                'Contributors': item.formatted_contributors(),
+            }
+        if model == Sentence:
+            return {
+                'ID': item.id,
+                'Language_ID': self.pk2id['Language'][item.language_pk],
+                'Primary_Text': item.name,
+                'Analyzed_Word': item.analyzed.split('\t') if item.analyzed else [],
+                'Gloss': item.gloss.split('\t') if item.gloss else [],
+                'Translated_Text': item.description,
+                'Comment': item.comment,
+            }
+        if model == Source:
+            return source2source(req, item)
+        if model == Value:
+            res = {
+                'ID': item.id,
+                'Language_ID': self.pk2id['Language'][item.valueset.language_pk],
+                'Parameter_ID': self.pk2id['Parameter'][item.valueset.parameter_pk],
+                'Contribution_ID': self.pk2id['Contribution'][item.valueset.contribution_pk],
+                'Value': (item.domainelement.name if item.domainelement else item.name) or '-',
+                'Source': [
+                    '{0}{1}'.format(self.pk2id['Source'][spk], d) for spk, d in iterrefs(item)],
+            }
+            if item.domainelement_pk:
+                res['Code_ID'] = self.pk2id['DomainElement'][item.domainelement_pk]
+            if self.module == 'Wordlist':
+                res['Form'] = res['Value']
+            return res
+        raise Value(model)  # pragma: no cover
+
+    def custom_tabledata(self, req, tabledata):
+        return tabledata
+
+
 class CldfDownload(Download):
     ext = 'cldf'
     description = "Dataset in CLDF"
 
     def create(self, req, filename=None, verbose=True, outfile=None):
+        cldf_cfg = req.registry.getUtility(ICldfConfig)
+
         with TemporaryDirectory() as tmpd:
-            # what CLDF module are we dealing with?
-            cldf_module = req.registry.settings.get('cldf_module', 'Wordlist')
-            cls = getattr(dataset, cldf_module)
+            cls = getattr(dataset, cldf_cfg.module)
             ds = cls.in_dir(tmpd)
             ds.properties['dc:bibliographicCitation '] = text_citation(req, req.dataset)
             ds.properties['dc:publisher'] = '%s, %s' % (
@@ -66,72 +162,54 @@ class CldfDownload(Download):
             ds.properties['dc:creator'] = req.dataset.formatted_editors()
             ds.properties['dc:identifier'] = req.resource_url(req.dataset)
             ds.properties['dcat:accessURL'] = req.route_url('download')
-            ds.properties['dc:hasPart'] = []
-            contribs = {}
-            for contrib in DBSession.query(Contribution):
-                contribs[contrib.pk] = contrib.id
-                ds.properties['dc:hasPart'].append(req.resource_url(contrib))
-
-            ds.add_component('ExampleTable')
+            if DBSession.query(Sentence).count():
+                ds.add_component('ExampleTable')
+            if DBSession.query(DomainElement).count():
+                ds.add_component('CodeTable', {'name': 'Number', 'datatype': 'integer'})
             ds.add_component('ParameterTable')
             ds.add_component('LanguageTable')
-            ds[ds.primary_table].tableSchema.columns.append(Column.fromvalue(
+            ds.add_table('contributions.csv', 'ID', 'Name', 'Description', 'Contributors')
+            ds.add_columns(ds.primary_table, Column.fromvalue(
                 {
-                    'name': 'contribution',
+                    'name': 'Contribution_ID',
                     'datatype': 'string',
                     'valueUrl': url_template(req, 'contribution', 'contribution').uri,
                 }))
-
+            ds.add_foreign_key(
+                ds.primary_table, 'Contribution_ID', 'contributions.csv', 'ID')
             ds['LanguageTable'].aboutUrl = url_template(req, 'language', 'ID')
             ds['ParameterTable'].aboutUrl = url_template(req, 'parameter', 'ID')
             ds[ds.primary_table].aboutUrl = url_template(req, 'value', 'ID')
 
-            sources = {}
-            for src in DBSession.query(Source):
-                sources[src.pk] = src.id
-                ds.sources.add(source2source(req, src))
-            ds.write()
-            params = OrderedDict()
-            for o in DBSession.query(Parameter):
-                params[o.pk] = {
-                    'ID': o.id,
-                    'name': o.name,
-                }
-            langs = OrderedDict()
-            for o in DBSession.query(Language):
-                langs[o.pk] = {
-                    'ID': o.id,
-                    'name': o.name,
-                    'glottocode': o.glottocode}
+            cldf_cfg.custom_schema(req, ds)
 
-            ds['ParameterTable'].write(params.values())
-            ds['LanguageTable'].write(langs.values())
-            ds['ExampleTable'].write([
-                {
-                    'ID': o.id,
-                    'Language_ID': langs[o.language_pk]['ID'],
-                    'Primary_Text': o.name,
-                    'Analyzed_Word': o.analyzed.split('\t') if o.analyzed else [],
-                    'Gloss': o.gloss.split('\t') if o.gloss else [],
-                    'Translated_Text': o.description} for o in DBSession.query(Sentence)])
+            for src in cldf_cfg.query(Source):
+                ds.sources.add(cldf_cfg.convert(Source, src, req))
+            fname = outfile or self.abspath(req)
 
-            values = []
-            for v in DBSession.query(Value).join(Value.valueset).options(
-                    joinedload_all(Value.valueset, ValueSet.references),
-                    joinedload(Value.domainelement)):
-                values.append({
-                    'ID': v.id,
-                    'Language_ID': langs[v.valueset.language_pk]['ID'],
-                    'Parameter_ID': params[v.valueset.parameter_pk]['ID'],
-                    'Value': (v.domainelement.name if v.domainelement else v.name) or '-',
-                    'Form': 'spam',
-                    'Source': [
-                        '{0}{1}'.format(sources[spk], d) for spk, d in iterrefs(v)],
-                    'contribution': contribs[v.valueset.contribution_pk],
-                })
-            ds[ds.primary_table].write(values)
+            transaction.abort()
+
+            tabledata = defaultdict(list)
+            for table, model in [
+                ('ParameterTable', Parameter),
+                ('CodeTable', DomainElement),
+                ('LanguageTable', Language),
+                ('ExampleTable', Sentence),
+                ('contributions.csv', Contribution),
+                (ds.primary_table, Value),
+            ]:
+                if verbose:
+                    print('exporting {0} ...'.format(model))
+                transaction.begin()
+                for item in cldf_cfg.query(model):
+                    tabledata[table].append(cldf_cfg.convert(model, item, req))
+                transaction.abort()
+                if verbose:
+                    print('... done')
+
+            transaction.begin()
+            ds.write(**cldf_cfg.custom_tabledata(req, tabledata))
             ds.validate()
 
-            fname = outfile or self.abspath(req)
             shutil.make_archive(
                 fname.parent.joinpath(fname.stem).as_posix(), 'zip', tmpd.as_posix())

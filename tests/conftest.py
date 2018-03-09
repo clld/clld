@@ -92,7 +92,9 @@ def populate_test_db(engine):
         common.LanguageIdentifier(
             language=data[common.Language],
             identifier=common.Identifier(
-                type=type_.value, id=type_.value + str(i), name='glot1234'))
+                type=type_.value,
+                id=type_.value + str(i),
+                name='abc' if type_.name == 'iso' else 'glot1234'))
 
     common.LanguageIdentifier(
         language=data[common.Language],
@@ -100,7 +102,7 @@ def populate_test_db(engine):
 
     for i in range(2, 102):
         _l = common.Language(id='l%s' % i, name='Language %s' % i)
-        _i = common.Identifier(type='iso639-3', id='%.3i' % i, name='%.3i' % i)
+        _i = common.Identifier(type='iso639-3', id='%.3i' % i, name='abc')
         common.LanguageIdentifier(language=_l, identifier=_i)
         DBSession.add(_l)
 
