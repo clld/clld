@@ -20,7 +20,7 @@ from clld.web.adapters.md import TxtCitation
 from clld.web.util.helpers import rdf_namespace_attrs
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
-from clld.db.models.common import Language, Source, LanguageIdentifier
+from clld.db.models.common import Language, Source, LanguageIdentifier, Dataset
 from clld.db.util import page_query
 
 __all__ = ['download_dir', 'Download', 'N3Dump', 'CsvDump', 'RdfXmlDump']
@@ -38,12 +38,12 @@ It should be cited as
 """
 
 
-def format_readme(req):
+def format_readme(req, dataset):
     return README.format(
-        req.dataset.name,
-        '=' * (len(req.dataset.name) + len(' data download')),
-        req.dataset.license,
-        TxtCitation(None).render(req.dataset, req))
+        dataset.name,
+        '=' * (len(dataset.name) + len(' data download')),
+        dataset.license,
+        TxtCitation(None).render(dataset, req))
 
 
 def pkg_name(pkg):
@@ -83,8 +83,9 @@ class Download(object):
         return '%s.%s' % (class_mapper(self.model).class_.__name__.lower(), self.ext)
 
     def asset_spec(self, req):
+        dataset = req.db.query(Dataset).first()
         return download_asset_spec(self.pkg, '%s-%s.%s' % (
-            req.dataset.id, self.name, 'gz' if self.rdf else 'zip'))
+            dataset.id, self.name, 'gz' if self.rdf else 'zip'))
 
     def url(self, req):
         return req.static_url(self.asset_spec(req))
@@ -128,7 +129,9 @@ class Download(object):
                         zipfile.writestr(self.name, self.read_stream(fp))
                     else:  # pragma: no cover
                         zipfile.write(Path(filename).as_posix(), self.name)
-                    zipfile.writestr('README.txt', format_readme(req).encode('utf8'))
+                    zipfile.writestr(
+                        'README.txt',
+                        format_readme(req, req.db.query(Dataset).first()).encode('utf8'))
 
     def get_stream(self):
         return BytesIO()

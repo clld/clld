@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 import shutil
 
+import transaction
 from zope.interface import implementer
 from sqlalchemy.orm import joinedload_all, joinedload
 from pycldf import dataset
@@ -13,7 +14,7 @@ from clld.web.adapters.download import Download
 from clld.db.meta import DBSession
 from clld.db.models.common import (
     ValueSet, Value, Parameter, Language, Contribution, Source, Sentence,
-    ContributionContributor,
+    ContributionContributor, DomainElement,
 )
 from clld.web.util.helpers import text_citation, get_url_template
 from clld.interfaces import ICldfConfig
@@ -53,33 +54,46 @@ def iterrefs(obj):
 @implementer(ICldfConfig)
 class CldfConfig(object):
     module = 'Wordlist'
-    __cache__ = defaultdict(dict)
+    pk2id = defaultdict(dict)
 
     def custom_schema(self, req, ds):
         return
 
     def query(self, model):
-        if model == Parameter:
-            return DBSession.query(Parameter)
-        if model == Language:
-            return DBSession.query(Language)
+        q = DBSession.query(model).order_by(model.pk)
         if model == Contribution:
-            return DBSession.query(Contribution).options(joinedload_all(
+            return q.options(joinedload_all(
                 Contribution.contributor_assocs,
                 ContributionContributor.contributor))
         if model == Sentence:
-            return DBSession.query(Sentence).options(joinedload(Sentence.language))
-        if model == Source:
-            return DBSession.query(Source)
+            return q.options(joinedload(Sentence.language))
+        if model == DomainElement:
+            return q.order_by(None).order_by(model.parameter_pk, model.number, model.pk)
         if model == Value:
-            return DBSession.query(Value).options(
-                joinedload_all(Value.valueset, ValueSet.references),
-                joinedload(Value.domainelement))
+            return q.join(ValueSet)\
+                .order_by(None)\
+                .order_by(
+                    ValueSet.parameter_pk,
+                    ValueSet.language_pk,
+                    ValueSet.contribution_pk,
+                    Value.pk)\
+                .options(
+                    joinedload_all(Value.valueset, ValueSet.references),
+                    joinedload(Value.domainelement))
+        return q
 
     def convert(self, model, item, req):
-        self.__cache__[model.__name__][item.pk] = item.id
+        self.pk2id[model.__name__][item.pk] = item.id
         if model == Parameter:
             return {'ID': item.id, 'Name': item.name, 'Description': item.description}
+        if model == DomainElement:
+            return {
+                'ID': item.id,
+                'Name': item.name,
+                'Description': item.description,
+                'Parameter_ID': self.pk2id['Parameter'][item.parameter_pk],
+                'Number': item.number,
+            }
         if model == Language:
             return {
                 'ID': item.id,
@@ -99,7 +113,7 @@ class CldfConfig(object):
         if model == Sentence:
             return {
                 'ID': item.id,
-                'Language_ID': self.__cache__['Language'][item.language_pk],
+                'Language_ID': self.pk2id['Language'][item.language_pk],
                 'Primary_Text': item.name,
                 'Analyzed_Word': item.analyzed.split('\t') if item.analyzed else [],
                 'Gloss': item.gloss.split('\t') if item.gloss else [],
@@ -111,17 +125,19 @@ class CldfConfig(object):
         if model == Value:
             res = {
                 'ID': item.id,
-                'Language_ID': self.__cache__['Language'][item.valueset.language_pk],
-                'Parameter_ID': self.__cache__['Parameter'][item.valueset.parameter_pk],
-                'Contribution_ID': self.__cache__['Contribution'][item.valueset.contribution_pk],
+                'Language_ID': self.pk2id['Language'][item.valueset.language_pk],
+                'Parameter_ID': self.pk2id['Parameter'][item.valueset.parameter_pk],
+                'Contribution_ID': self.pk2id['Contribution'][item.valueset.contribution_pk],
                 'Value': (item.domainelement.name if item.domainelement else item.name) or '-',
                 'Source': [
-                    '{0}{1}'.format(self.__cache__['Source'][spk], d) for spk, d in iterrefs(item)],
+                    '{0}{1}'.format(self.pk2id['Source'][spk], d) for spk, d in iterrefs(item)],
             }
+            if item.domainelement_pk:
+                res['Code_ID'] = self.pk2id['DomainElement'][item.domainelement_pk]
             if self.module == 'Wordlist':
                 res['Form'] = res['Value']
             return res
-        return {}  # pragma: no cover
+        raise Value(model)  # pragma: no cover
 
     def custom_tabledata(self, req, tabledata):
         return tabledata
@@ -148,6 +164,8 @@ class CldfDownload(Download):
             ds.properties['dcat:accessURL'] = req.route_url('download')
             if DBSession.query(Sentence).count():
                 ds.add_component('ExampleTable')
+            if DBSession.query(DomainElement).count():
+                ds.add_component('CodeTable', {'name': 'Number', 'datatype': 'integer'})
             ds.add_component('ParameterTable')
             ds.add_component('LanguageTable')
             ds.add_table('contributions.csv', 'ID', 'Name', 'Description', 'Contributors')
@@ -167,20 +185,31 @@ class CldfDownload(Download):
 
             for src in cldf_cfg.query(Source):
                 ds.sources.add(cldf_cfg.convert(Source, src, req))
+            fname = outfile or self.abspath(req)
+
+            transaction.abort()
 
             tabledata = defaultdict(list)
             for table, model in [
                 ('ParameterTable', Parameter),
+                ('CodeTable', DomainElement),
                 ('LanguageTable', Language),
                 ('ExampleTable', Sentence),
                 ('contributions.csv', Contribution),
                 (ds.primary_table, Value),
             ]:
+                if verbose:
+                    print('exporting {0} ...'.format(model))
+                transaction.begin()
                 for item in cldf_cfg.query(model):
                     tabledata[table].append(cldf_cfg.convert(model, item, req))
+                transaction.abort()
+                if verbose:
+                    print('... done')
+
+            transaction.begin()
             ds.write(**cldf_cfg.custom_tabledata(req, tabledata))
             ds.validate()
 
-            fname = outfile or self.abspath(req)
             shutil.make_archive(
                 fname.parent.joinpath(fname.stem).as_posix(), 'zip', tmpd.as_posix())
