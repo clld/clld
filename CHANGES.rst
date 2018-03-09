@@ -2,6 +2,13 @@
 Changes
 -------
 
+
+4.2.0
+~~~~~
+
+Support for creating valid customizable CLDF 1.0 downloads.
+
+
 4.1.2
 ~~~~~
 
