@@ -2,6 +2,12 @@
 Changes
 -------
 
+4.2.1
+~~~~~
+
+Bugfix and support for link to privacy policy in footer.
+
+
 
 4.2.0
 ~~~~~
