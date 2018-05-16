@@ -1,13 +1,4 @@
-import os
-
 from setuptools import setup, find_packages
-
-
-try:
-    README = open(
-        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')).read()
-except IOError:
-    README = ''
 
 install_requires = [
     'Babel',
@@ -45,7 +36,8 @@ setup(
     version='4.2.2.dev0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
-    long_description=README,
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
