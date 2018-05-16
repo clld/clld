@@ -160,6 +160,9 @@
                                 ${request.dataset.jsondata.get('license_name', request.dataset.license)}</a>.
                         </div>
                         <div class="span3" style="text-align: right;">
+                            % if request.registry.settings.get('clld.privacy_policy_url'):
+                                <a href="${request.registry.settings['clld.privacy_policy_url']}"></a><br/>
+                            % endif
                             <a href="${request.route_url('legal')}">disclaimer</a>
                             <br/>
                             % if request.registry.settings.get('clld.github_repos'):

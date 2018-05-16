@@ -25,6 +25,8 @@ def test_detail_html(request_factory):
             res = render(
                 '%s/detail_html.mako' % rsc.name, {'ctx': rsc.model.first()}, request=req)
             html5lib.parse(res)
+            if rsc.name == 'dataset':
+                assert 'http://example.org/privacy' in res
 
 
 def test_index_html(request_factory):
