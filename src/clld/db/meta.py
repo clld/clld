@@ -42,7 +42,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
         cursor.execute("SELECT 1")
         if not isinstance(dbapi_connection, sqlite3.Connection):  # pragma: no cover
             cursor.execute("SET default_text_search_config TO 'english'")
-    except:  # pragma: no cover
+    except:  # noqa: E722; # pragma: no cover
         # dispose the whole pool instead of invalidating one at a time
         connection_proxy._pool.dispose()
 

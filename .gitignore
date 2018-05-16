@@ -43,3 +43,4 @@ yolk.txt
 .idea
 
 /clld/tests/dbschema.sql
+.pytest_cache/

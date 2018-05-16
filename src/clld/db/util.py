@@ -54,7 +54,7 @@ class _CollKey(object):
     @property
     def get_version_number(self):  # pragma: no cover
         version = DBSession.bind.dialect.name == 'postgresql'\
-                and DBSession.scalar(self._pg_version)
+            and DBSession.scalar(self._pg_version)
         self.__dict__['version_number'] = int(version)
         return int(version)
 
@@ -181,5 +181,5 @@ def set_alembic_version(engine, db_version):
 def get_alembic_version(engine):
     try:
         return engine.execute("SELECT version_num FROM alembic_version").fetchone()[0]
-    except:  # pragma: no cover
+    except:  # noqa: E722; # pragma: no cover
         return None
