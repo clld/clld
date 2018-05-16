@@ -10,7 +10,7 @@ except IOError:
     README = ''
 
 install_requires = [
-    'Babel; python_version < "3.1"',
+    'Babel',
     'csvw~=1.0',
     'clldutils~=2.0',
     'pycldf>=1.0.7',
