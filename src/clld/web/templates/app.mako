@@ -161,9 +161,9 @@
                         </div>
                         <div class="span3" style="text-align: right;">
                             % if request.registry.settings.get('clld.privacy_policy_url'):
-                                <a href="${request.registry.settings['clld.privacy_policy_url']}"></a><br/>
+                                <a class="clld-privacy-policy" href="${request.registry.settings['clld.privacy_policy_url']}">${_('Privacy Policy')}</a><br/>
                             % endif
-                            <a href="${request.route_url('legal')}">disclaimer</a>
+                            <a class="clld-disclaimer" href="${request.route_url('legal')}">${_('Disclaimer')}</a>
                             <br/>
                             % if request.registry.settings.get('clld.github_repos'):
                             <a href="https://github.com/${request.registry.settings['clld.github_repos']}">

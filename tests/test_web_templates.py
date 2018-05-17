@@ -27,6 +27,7 @@ def test_detail_html(request_factory):
             html5lib.parse(res)
             if rsc.name == 'dataset':
                 assert 'http://example.org/privacy' in res
+                assert 'Privacy Policy' in res
 
 
 def test_index_html(request_factory):
