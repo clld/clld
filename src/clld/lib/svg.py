@@ -1,8 +1,9 @@
 """Provides functionality to create simple SVG pie charts."""
 from __future__ import unicode_literals, division, absolute_import, print_function
-from base64 import b64encode
 import math
 from xml.sax.saxutils import escape
+
+import clldutils.misc
 
 from clld.lib.color import rgb_as_hex
 
@@ -34,8 +35,7 @@ def style(stroke=None, fill=None, stroke_width='1px', opacity=None):
 
 
 def data_url(svgxml):
-    return "data:image/svg+xml;base64,{0}".format(
-        b64encode(svgxml.encode('utf8')).decode())
+    return clldutils.misc.data_url(svgxml, mimetype='image/svg+xml')
 
 
 def icon(spec, opacity=None):
@@ -56,6 +56,9 @@ def pie(data, colors, titles=None, width=34, stroke_circle=False):
 
     :return: SVG representation of the data as pie chart.
     """
+    assert len(data) == len(colors)
+    zipped = [(d, c) for d, c in zip(data, colors) if d != 0]
+    data, colors = [z[0] for z in zipped], [z[1] for z in zipped]
     cx = cy = round(width / 2, 1)
     radius = round((width - 2) / 2, 1)
     current_angle_rad = 0

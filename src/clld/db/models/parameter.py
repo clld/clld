@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship, joinedload_all
 
 from zope.interface import implementer
-from clldutils.misc import cached_property
+from clldutils.misc import lazyproperty
 
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
 from clld.db.versioned import Versioned
@@ -123,7 +123,7 @@ class Combination(object):
                 .one())
         return cls(*params)
 
-    @cached_property()
+    @lazyproperty
     def domain(self):
         """Compute the domain as cartesian product of constituent domains.
 
@@ -156,7 +156,7 @@ class Combination(object):
         self.multiple = set(self.multiple)
         return list(d.values())
 
-    @cached_property()
+    @lazyproperty
     def values(self):
         from . import ValueSet, Value
 

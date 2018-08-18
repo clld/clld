@@ -10,7 +10,7 @@ import re
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
-from clldutils.misc import cached_property, nfilter
+from clldutils.misc import lazyproperty, nfilter
 
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
@@ -393,7 +393,7 @@ class DataTable(Component):
         """
         return [LinkCol(self, 'name')]
 
-    @cached_property()
+    @lazyproperty
     def cols(self):
         return self.col_defs()
 

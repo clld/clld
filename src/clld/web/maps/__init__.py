@@ -1,7 +1,7 @@
 """Functionality to configure leaflet maps from python."""
 from __future__ import unicode_literals, division, print_function, absolute_import
 from six import string_types
-from clldutils.misc import cached_property
+from clldutils.misc import lazyproperty
 
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
@@ -174,7 +174,7 @@ class Map(Component):
             pass
         return res
 
-    @cached_property()
+    @lazyproperty
     def layers(self):
         """The list of layers of the map.
 
@@ -200,7 +200,7 @@ class Map(Component):
             '%s' % self.ctx,
             self.req.route_url(route_name, **route_params))
 
-    @cached_property()
+    @lazyproperty
     def legends(self):
         return list(self.get_legends())
 
