@@ -2,6 +2,14 @@
 Changes
 -------
 
+4.3.0
+~~~~~
+
+- Support for links to Concepticon
+- Fixed bug in `svg.pie`
+
+
+
 4.2.1
 ~~~~~
 
