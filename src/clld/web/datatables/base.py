@@ -447,6 +447,12 @@ class DataTable(Component):
         """
         return query
 
+    def rdf_index_query(self, query):
+        """Custom DataTables can overwrite this method to apply filters. They should
+        however, not add any performance overhead like joins or joinedload options.
+        """
+        return query
+
     def default_order(self):
         return self.db_model().pk
 

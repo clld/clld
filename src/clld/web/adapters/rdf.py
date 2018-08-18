@@ -23,8 +23,10 @@ class RdfIndex(Index):
 
     .. note::
 
-        To make this reasonably performant even for large collections of resources -
-        think glottolog refs - we only pass resource ids to the template.
+        To make this reasonably performant even for large collections of resources,
+        we only pass resource ids and names to the template. This may still be not enough -
+        think Glottolog refs - in which case the DataTable should implement a suitable
+        `rdf_index_query`, e.g. with a LIMIT clause.
     """
 
     rdflibname = None
@@ -35,7 +37,7 @@ class RdfIndex(Index):
             items = ctx.get_query(limit=1000)
         else:
             # triggered without any filter parameters
-            items = req.db.query(ctx.model).order_by(ctx.model.pk)
+            items = ctx.rdf_index_query(req.db.query(ctx.db_model()).order_by(ctx.db_model().pk))
         if isinstance(ctx.model.name, property):
             items = [(item.id, None) for item in items.options(load_only('id'))]
         else:
