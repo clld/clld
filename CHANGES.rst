@@ -2,6 +2,12 @@
 Changes
 -------
 
+4.4.0
+~~~~~
+
+- Support for links to Glottolog
+
+
 4.3.0
 ~~~~~
 
