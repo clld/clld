@@ -2,6 +2,12 @@
 Changes
 -------
 
+4.4.1
+~~~~~
+
+- Load external resources only via HTTPS
+
+
 4.4.0
 ~~~~~
 
