@@ -2,12 +2,19 @@
 VENVS=~/venvs
 
 cd $VENVS
+
+cd clld
+. bin/activate
+cd clld
+python setup.py sdist
+cd ../..
+
 virtualenv testapp
 cd testapp
 . bin/activate
 pip install -U setuptools
 pip install -U pip
-pip install "$VENVS/cheesecake/clld/dist/clld-$1.tar.gz"
+pip install "$VENVS/clld/clld/dist/clld-$1.tar.gz"
 pcreate -t clld_app testapp
 cd testapp
 pip install -e .[test]
