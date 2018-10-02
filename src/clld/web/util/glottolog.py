@@ -1,5 +1,4 @@
 from clld.web.util.htmllib import HTML
-from clld.web.util.helpers import external_link
 
 __all__ = ['BASE_URL', 'url', 'logo', 'link']
 
@@ -14,7 +13,10 @@ def url(id=None, obj_type='languoid'):
 
 
 def logo(req, width='20'):
-    return HTML.img(src=req.static_url('clld:web/static/images/glottolog.png'), width=width, style="margin-top: -2px")
+    return HTML.img(
+        src=req.static_url('clld:web/static/images/glottolog.png'),
+        width=width,
+        style="margin-top: -2px")
 
 
 def link(req, id=None, obj_type='languoid', label=None):
