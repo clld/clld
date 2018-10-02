@@ -49,8 +49,8 @@ MARKER_IMG_DIM = '20'
 
 
 def cc_link(req, license_url, button='regular'):
-    if license_url == 'http://en.wikipedia.org/wiki/Public_domain':
-        license_url = 'http://creativecommons.org/publicdomain/zero/1.0/'
+    if license_url == 'https://en.wikipedia.org/wiki/Public_domain':
+        license_url = 'https://creativecommons.org/publicdomain/zero/1.0/'
     license_url = URL(license_url)
     if license_url.host() != 'creativecommons.org':
         return
@@ -229,7 +229,7 @@ def format_gbs_identifier(source):
 def format_coordinates(obj, no_seconds=True, wgs_link=True):
     """Format WGS84 coordinates as HTML.
 
-    .. seealso:: http://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
+    .. seealso:: https://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
     """
     def degminsec(dec, hemispheres):
         _dec = abs(dec)
@@ -261,7 +261,7 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
                 HTML.td(
                     'Coordinates ',
                     external_link(
-                        'http://en.wikipedia.org/wiki/World_Geodetic_System_1984',
+                        'https://en.wikipedia.org/wiki/World_Geodetic_System_1984',
                         label="WGS84") if wgs_link else ''),
                 HTML.td(
                     HTML.span('%s, %s' % (
@@ -364,7 +364,7 @@ def gbs_link(source, pages=None):
     return HTML.a(
         HTML.img(src="https://www.google.com/intl/en/googlebooks/images/"
                  "gbs_preview_button1.gif"),
-        href="http://books.google.com/books?id=%s&lpg=PP1&pg=%s" % (
+        href="https://books.google.com/books?id=%s&lpg=PP1&pg=%s" % (
             source.google_book_search_id, pg)
     )
 

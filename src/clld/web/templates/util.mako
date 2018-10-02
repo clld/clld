@@ -287,7 +287,7 @@ $(document).ready(function() {
 ##
 ##
 <%def name="gbs_links(ids)">
-    <script src="http://books.google.com/books?jscmd=viewapi&bibkeys=${','.join(ids)}&callback=CLLD.process_gbs_info">
+    <script src="https://books.google.com/books?jscmd=viewapi&bibkeys=${','.join(ids)}&callback=CLLD.process_gbs_info">
     </script>
 </%def>
 

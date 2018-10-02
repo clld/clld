@@ -20,22 +20,17 @@
         % endfor
 
         % if request.registry.settings.get('clld.environment') == 'production':
-        <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" />
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <link href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" rel="stylesheet" />
         <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
         <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
         <link href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" rel="stylesheet" />
-        ## http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js
+        ## https://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js
         % endif
 
         % for asset in assets['js'].urls():
         <script src="${request.static_url(asset[1:])}"></script>
         % endfor
-
-        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-        <!--[if lt IE 9]>
-        ##  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
 
         <link rel="unapi-server" type="application/xml" title="unAPI" href="${request.route_url('unapi')}">
         <script src="${request.route_url('_js', _query=request.query_params)}"></script>
@@ -148,7 +143,7 @@
                             <%block name="footer_citation">
                             ${request.dataset.formatted_name()}
                             edited by
-                            <span xmlns:cc="http://creativecommons.org/ns#"
+                            <span xmlns:cc="https://creativecommons.org/ns#"
                                   property="cc:attributionName"
                                   rel="cc:attributionURL">
                                 ${request.dataset.formatted_editors()}
