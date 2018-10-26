@@ -168,11 +168,14 @@ def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
         adapter = adapters.get(name)
     else:
         # or by content negotiation
-        #
-        # TODO: iterate over req.accept (i.e. over the accepted mimetypes in order of
-        # preference) and match them to what we have to offer (in order of preference).
-        #
-        adapter = adapters.get(req.accept.best_match(adapters.keys()))
+        if not hasattr(req.accept, 'acceptable_offers'):  # pragma: no cover
+            # pre WebOb 1.8 (should be dropped once pyramid requires WebOb>=1.8):
+            adapter = adapters.get(req.accept.best_match(adapters.keys()))
+        else:
+            try:
+                adapter = adapters.get(req.accept.acceptable_offers(list(adapters.keys()))[0][0])
+            except IndexError:
+                adapter = None
 
     res = None
     if isinstance(adapter, list):

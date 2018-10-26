@@ -6,7 +6,7 @@ install_requires = [
     'clldutils~=2.4',
     'pycldf>=1.0.7',
     'setuptools>=25',
-    'pyramid>=1.6',
+    'pyramid>=1.9',
     'pyramid_mako>=1.0',
     'pyramid_tm',
     'SQLAlchemy>=1.0.6',

@@ -29,7 +29,12 @@ def test_dataset(app):
     res = app.get_html('/?__admin__=1')
     assert 'notexisting.css' in res
     assert 'notexisting.js' in res
+    # Test content negotiation:
+    app.get('/', accept='image/png', status=406)
     app.get_xml('/', accept='application/rdf+xml')
+    assert app.parsed_body.find(
+        './/{http://rdfs.org/ns/void#}Dataset').get(
+        '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about')
     app.get('/void.md.ris')
     assert 'skos:example' in app.get_xml('/void.rdf')
 
