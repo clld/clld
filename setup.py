@@ -4,7 +4,7 @@ install_requires = [
     'Babel',
     'csvw~=1.0',
     'clldutils~=2.4',
-    'pycldf>=1.0.7',
+    'pycldf>=1.5.1',
     'setuptools>=25',
     'pyramid>=1.9',
     'pyramid_mako>=1.0',
