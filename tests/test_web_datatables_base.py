@@ -17,6 +17,8 @@ from testutils import handle_dt
 
 
 class Table(DataTable):
+    __toolbar_kw__ = dict(exclude=['atom'])
+
     def col_defs(self):
         return [
             Col(self, 'pk'),
@@ -34,6 +36,7 @@ class Table(DataTable):
 
 def test_DataTable(env, request_factory):
     dt = Table(env['request'], common.Contributor)
+    assert 'exclude' in dt._toolbar.options
     assert text_type(dt) == 'Contributors'
     assert repr(dt) == 'Contributors'
     dt.get_query(undefer_cols=['updated']).all()

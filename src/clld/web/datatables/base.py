@@ -350,6 +350,7 @@ class DataTable(Component):
 
     __template__ = 'clld:web/templates/datatable.mako'
     __constraints__ = []
+    __toolbar_kw__ = {}
 
     def __init__(self, req, model, eid=None, **kw):
         """Initialize.
@@ -365,7 +366,12 @@ class DataTable(Component):
         self.count_filtered = None
         self.filters = []
         self._toolbar = Toolbar(
-            req, self, model(), JSDataTable.current_url(self.eid, '%s'), IIndex)
+            req,
+            self,
+            model(),
+            JSDataTable.current_url(self.eid, '%s'),
+            IIndex,
+            **self.__toolbar_kw__ or {})
 
         for _model in self.__constraints__:
             attr = self.attr_from_constraint(_model)
