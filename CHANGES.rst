@@ -2,6 +2,12 @@
 Changes
 -------
 
+4.4.2
+~~~~~
+
+- Support passing keyword arguments from DataTable to Toolbar
+
+
 4.4.1
 ~~~~~
 
