@@ -17,7 +17,7 @@ def test_Files(db, tmppath):
 
     l = Sentence(id='abc', name='Name')
     f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-    p = f.create(tmppath, 'content')
+    p = f.create(Path(tmppath), 'content')
     assert Path(p).exists()
 
     l._files.append(f)

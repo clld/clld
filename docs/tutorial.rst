@@ -94,7 +94,7 @@ Running
 .. code:: bash
 
     $ cd myapp
-    $ pip install -r requirements.txt
+    $ pip install -e .
 
 will install your app as Python package in development mode, i.e. will create a link to
 your app's code in the ``site-packages`` directory.

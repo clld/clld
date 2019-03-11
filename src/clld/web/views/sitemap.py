@@ -105,7 +105,7 @@ def resourcemap(req):
             common.Language.longitude,
             common.Identifier.type.label('itype'),
             common.Identifier.name.label('iname')
-        ).outerjoin(join(
+        ).select_from(common.Language).outerjoin(join(
             common.LanguageIdentifier,
             common.Identifier, and_(
                 common.LanguageIdentifier.identifier_pk == common.Identifier.pk,

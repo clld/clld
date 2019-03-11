@@ -11,9 +11,9 @@ from clld.db.models import common
 from clld.db.util import set_alembic_version
 from clld.scripts.util import Data
 
-try:
+if sys.version_info < (3, 5):  # pragma: no cover
     import pathlib2 as pathlib
-except ImportError:
+else:
     import pathlib
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
