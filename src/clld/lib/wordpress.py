@@ -19,7 +19,7 @@ XMLRPC_PATH = 'xmlrpc.php'
 
 def sluggify(phrase):
     phrase = phrase.lower().strip()
-    phrase = re.sub('\s+', '-', phrase)
+    phrase = re.sub(r'\s+', '-', phrase)
     return phrase
 
 
@@ -119,12 +119,12 @@ class Client(object):
         else:
             assert res  # pragma: no cover
         m = re.search(
-            """\s+name=('|")comment_post_ID('|")\s+value=('|")(?P<id>[0-9]+)('|")""",
+            r"""\s+name=('|")comment_post_ID('|")\s+value=('|")(?P<id>[0-9]+)('|")""",
             res.text)
         if m:
             return int(m.group('id'))
         else:
-            p = '\<div\s+class\=\"post\"\s+id\=\"post\-(?P<id>[0-9]+)\"\>'
+            p = r'\<div\s+class\=\"post\"\s+id\=\"post\-(?P<id>[0-9]+)\"\>'
             if len(re.findall(p, res.text)) == 1:
                 m = re.search(p, res.text)
                 return int(m.group('id'))

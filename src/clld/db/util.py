@@ -83,8 +83,8 @@ def icontains(col, qs):
 
     .. seealso:: https://www.postgresql.org/docs/9.1/static/functions-matching.html
     """
-    spattern = re.compile('^(\^|\\\\b)')
-    epattern = re.compile('(\$|\\\\b)$')
+    spattern = re.compile(r'^(\^|\\b)')
+    epattern = re.compile(r'(\$|\\b)$')
 
     prefix, suffix = '%', '%'
     if spattern.search(qs):

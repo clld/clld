@@ -163,7 +163,7 @@ class ClldRequest(Request):
         info = mapper(WebobRequest({'PATH_INFO': _path}))
         if not info['route']:
             # FIXME: hack to cater to deployments under a path prefix
-            info = mapper(WebobRequest({'PATH_INFO': re.sub('^\/[a-z]+', '', _path)}))
+            info = mapper(WebobRequest({'PATH_INFO': re.sub(r'^\/[a-z]+', '', _path)}))
         if info['route']:
             for rsc in RESOURCES:
                 if rsc.name == info['route'].name:
@@ -398,7 +398,7 @@ def register_resource_routes_and_views(config, rsc):
         pattern = '/'
         kw['alt_route_pattern'] = '/void.{ext}'
     else:
-        pattern = '/%s/{id:[^/\.]+}' % rsc.plural
+        pattern = r'/%s/{id:[^/\.]+}' % rsc.plural
 
     config.add_route_and_view(rsc.name, pattern, resource_view, **kw)
     if rsc.with_index:

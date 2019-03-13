@@ -155,7 +155,7 @@ def datatable_xhr_view(ctx, req):
 
 
 def js(req):
-    param_pattern = re.compile('\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
+    param_pattern = re.compile(r'\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
 
     res = [
         "CLLD.base_url = %s;" % dumps(req.application_url),

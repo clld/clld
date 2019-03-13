@@ -50,7 +50,7 @@ ERRORS = {
 
 MD_PREFIX = 'olac'
 
-TIMESTAMP_REGEX = '[0-9]{4}\-[0-9]{2}\-[0-9]{2}'
+TIMESTAMP_REGEX = r'[0-9]{4}\-[0-9]{2}\-[0-9]{2}'
 TIMESTAMP_PATTERN = re.compile(TIMESTAMP_REGEX + '$')
 
 Participant = namedtuple('Participant', 'role name email')
