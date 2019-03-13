@@ -15,7 +15,7 @@ from six import text_type, string_types
 from six.moves.urllib.parse import quote, urlencode
 
 from sqlalchemy import or_
-from sqlalchemy.orm import joinedload_all
+from sqlalchemy.orm import joinedload
 from markupsafe import Markup
 from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
@@ -593,8 +593,8 @@ def get_referents(source, exclude=None):
         q = DBSession.query(obj_cls).join(ref_cls).filter(ref_cls.source_pk == source.pk)
         if obj_cls == models.ValueSet:
             q = q.options(
-                joinedload_all(models.ValueSet.parameter),
-                joinedload_all(models.ValueSet.language))
+                joinedload(models.ValueSet.parameter),
+                joinedload(models.ValueSet.language))
         res[obj_cls.__name__.lower()] = q.all()
     return res
 

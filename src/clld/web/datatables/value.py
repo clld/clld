@@ -65,7 +65,13 @@ class Values(DataTable):
 
     def base_query(self, query):
         query = query.join(ValueSet).options(
-            joinedload_all(Value.valueset, ValueSet.references, ValueSetReference.source)
+            joinedload(
+                Value.valueset
+            ).joinedload(
+                ValueSet.references
+            ).joinedload(
+                ValueSetReference.source
+            )
         )
 
         if self.language:

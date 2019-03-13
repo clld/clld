@@ -8,7 +8,7 @@ from contextlib import closing
 from six import string_types, BytesIO, text_type, StringIO, PY3
 from zope.interface import implementer
 from pyramid.path import AssetResolver
-from sqlalchemy.orm import joinedload, joinedload_all, class_mapper
+from sqlalchemy.orm import joinedload, class_mapper
 from csvw.dsv import UnicodeWriter
 from clldutils.path import Path
 from clldutils.misc import format_size, to_binary
@@ -144,8 +144,11 @@ class Download(object):
         q = DBSession.query(self.model).filter(self.model.active == True)
         if self.model == Language:  # pragma: no cover
             q = q.options(
-                joinedload_all(
-                    Language.languageidentifier, LanguageIdentifier.identifier),
+                joinedload(
+                    Language.languageidentifier
+                ).joinedload(
+                    LanguageIdentifier.identifier
+                )
             )
         if self.model == Source:
             q = q.options(joinedload(Source.languages))

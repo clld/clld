@@ -10,7 +10,7 @@ from collections import namedtuple
 
 from pyramid.renderers import render
 from pyramid.response import Response
-from sqlalchemy.orm import joinedload_all, undefer
+from sqlalchemy.orm import joinedload, undefer
 from clldutils.misc import UnicodeMixin
 
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
@@ -120,8 +120,12 @@ class OlacConfig(object):
             .join(LanguageIdentifier)\
             .filter_by(language_pk=Language.pk)
         return req.db.query(Language).filter(subquery.exists())\
-            .options(undefer('updated'), joinedload_all(
-                Language.languageidentifier, LanguageIdentifier.identifier))
+            .options(undefer('updated'),
+                     joinedload(
+                Language.languageidentifier
+                     ).joinedload(
+                         LanguageIdentifier.identifier
+                     ))
 
     def get_earliest_record(self, req):
         return self._query(req).order_by(Language.updated, Language.pk).first()

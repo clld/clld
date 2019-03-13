@@ -1,7 +1,7 @@
 """Default DataTable for ValueSet objects."""
 from functools import partial
 
-from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm import joinedload
 
 from clld.db.models.common import (
     ValueSet, Parameter, Language, Contribution, ValueSetReference,
@@ -20,8 +20,14 @@ class Valuesets(DataTable):
     def base_query(self, query):
         query = query.join(Language)\
             .options(
-                joinedload(ValueSet.language),
-                joinedload_all(ValueSet.references, ValueSetReference.source))
+                joinedload(
+                    ValueSet.language
+                ),
+                joinedload(
+                    ValueSet.references
+                ).joinedload(
+                    ValueSetReference.source
+                ))
 
         if self.language:
             query = query.join(Parameter).options(joinedload(ValueSet.parameter))
