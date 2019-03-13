@@ -4,7 +4,7 @@ import shutil
 
 import transaction
 from zope.interface import implementer
-from sqlalchemy.orm import joinedload_all, joinedload
+from sqlalchemy.orm import joinedload
 from pycldf import dataset
 from pycldf import sources
 from clldutils.path import TemporaryDirectory
@@ -62,9 +62,11 @@ class CldfConfig(object):
     def query(self, model):
         q = DBSession.query(model).order_by(model.pk)
         if model == Contribution:
-            return q.options(joinedload_all(
-                Contribution.contributor_assocs,
-                ContributionContributor.contributor))
+            return q.options(joinedload(
+                Contribution.contributor_assocs
+            ).joinedload(
+                ContributionContributor.contributor
+            ))
         if model == Sentence:
             return q.options(joinedload(Sentence.language))
         if model == DomainElement:
@@ -78,7 +80,11 @@ class CldfConfig(object):
                     ValueSet.contribution_pk,
                     Value.pk)\
                 .options(
-                    joinedload_all(Value.valueset, ValueSet.references),
+                    joinedload(
+                        Value.valueset
+                    ).joinedload(
+                        ValueSet.references
+                    ),
                     joinedload(Value.domainelement))
         return q
 

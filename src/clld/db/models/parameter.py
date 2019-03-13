@@ -4,7 +4,7 @@ from collections import OrderedDict
 from itertools import product, groupby
 
 from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey
-from sqlalchemy.orm import relationship, joinedload_all
+from sqlalchemy.orm import relationship, joinedload
 
 from zope.interface import implementer
 from clldutils.misc import lazyproperty
@@ -119,7 +119,7 @@ class Combination(object):
             params.append(
                 DBSession.query(Parameter)
                 .filter(Parameter.id == pid)
-                .options(joinedload_all(Parameter.domain))
+                .options(joinedload(Parameter.domain))
                 .one())
         return cls(*params)
 
@@ -177,6 +177,6 @@ class Combination(object):
             .join(ValueSet.parameter)
             .filter(ValueSet.language_pk.in_(languages))
             .options(
-                joinedload_all(Value.domainelement),
-                joinedload_all(Value.valueset, ValueSet.language)),
+                joinedload(Value.domainelement),
+                joinedload(Value.valueset).joinedload(ValueSet.language)),
             'union').all()

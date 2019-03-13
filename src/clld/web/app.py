@@ -7,7 +7,7 @@ from uuid import uuid4
 import datetime
 
 from sqlalchemy import engine_from_config
-from sqlalchemy.orm import joinedload_all, joinedload, undefer
+from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from webob.request import Request as WebobRequest
@@ -250,18 +250,26 @@ class CtxFactoryQuery(object):
             else:
                 if model == common.Contribution:
                     query = query.options(
-                        joinedload_all(
-                            common.Contribution.valuesets,
-                            common.ValueSet.parameter,
+                        joinedload(
+                            common.Contribution.valuesets
+                        ).joinedload(
+                            common.ValueSet.parameter
                         ),
-                        joinedload_all(
-                            common.Contribution.valuesets,
-                            common.ValueSet.values,
-                            common.Value.domainelement),
-                        joinedload_all(
-                            common.Contribution.references,
-                            common.ContributionReference.source),
-                        joinedload(common.Contribution.data),
+                        joinedload(
+                            common.Contribution.valuesets
+                        ).joinedload(
+                            common.ValueSet.values
+                        ).joinedload(
+                            common.Value.domainelement
+                        ),
+                        joinedload(
+                            common.Contribution.references
+                        ).joinedload(
+                            common.ContributionReference.source
+                        ),
+                        joinedload(
+                            common.Contribution.data
+                        )
                     )
         else:
             query = custom_query  # pragma: no cover
