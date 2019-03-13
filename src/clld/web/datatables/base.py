@@ -23,7 +23,7 @@ from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 
 
-OPERATOR_PATTERN = re.compile('\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
+OPERATOR_PATTERN = re.compile(r'\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
 
 DISPLAY_LENGTH, DISPLAY_LIMIT = 100, 1000
 

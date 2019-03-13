@@ -116,7 +116,7 @@ def get_url_template(req, route, relative=True, variable_map=None):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
     if route:
         res = '' if relative else req.application_url
-        param_pattern = re.compile('\{(?P<name>[a-z]+)(:[^\}]+)?\}')
+        param_pattern = re.compile(r'\{(?P<name>[a-z]+)(:[^\}]+)?\}')
         return res + param_pattern.sub(
             lambda m: '{%s}' % variable_map.get(m.group('name'), m.group('name')),
             route.pattern)
@@ -151,7 +151,7 @@ class JS(object):
     """
 
     delimiter = '|'
-    pattern = re.compile('\"\{0}(?P<name>[^\{0}]+)\{0}\"'.format(delimiter))
+    pattern = re.compile(r'\"\{0}(?P<name>[^\{0}]+)\{0}\"'.format(delimiter))
 
     def __init__(self, name):
         self.name = name
@@ -390,7 +390,7 @@ def cite_button(req, ctx):
 # We look for sequences of uppercase letters which are not followed by a lowercase letter.
 GLOSS_ABBR_PATTERN = re.compile(
     '(?P<personprefix>1|2|3)?(?P<abbr>[A-Z]+)(?P<personsuffix>1|2|3)?(?=([^a-z]|$))')
-ALT_TRANSLATION_LANGUAGE_PATTERN = re.compile('((?P<language>[a-zA-Z\s]+):)')
+ALT_TRANSLATION_LANGUAGE_PATTERN = re.compile(r'((?P<language>[a-zA-Z\s]+):)')
 
 
 #

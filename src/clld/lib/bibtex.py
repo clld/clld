@@ -101,9 +101,9 @@ SYMBOLS = {
 }
 
 RE_XML_ILLEGAL = re.compile(
-    '([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' +
-    '|' +
-    '([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' %
+    r'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])'
+    + r'|'
+    + r'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' %
     (
         unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
         unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
@@ -119,7 +119,7 @@ def stripctrlchars(string):
 
 
 def unescape(string):
-    """Transform latex escape sequences of type \`\ae  into unicode.
+    r"""Transform latex escape sequences of type \`\ae  into unicode.
 
     :param string: six.text_type or six.binary_type \
     (which will be decoded using latex+latin1)
@@ -413,7 +413,7 @@ class Database(_Convertable):
             content = ''
 
         return cls((Record.from_string('@' + m, lowercase=lowercase)
-                    for m in re.split('^\s*@', content, 0, re.MULTILINE)))
+                    for m in re.split(r'^\s*@', content, 0, re.MULTILINE)))
 
     def __len__(self):
         return len(self.records)

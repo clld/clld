@@ -212,8 +212,8 @@ class _unlatex(Iterator):  # pragma: no cover
 latex_equivalents = {
     0x0009: ' ',
     0x000a: '\n',
-    0x0023: '{\#}',
-    0x0026: '{\&}',
+    0x0023: r'{\#}',
+    0x0026: r'{\&}',
     0x00a0: '{~}',
     0x00a1: '{!`}',
     0x00a2: '{\\not{c}}',
@@ -501,7 +501,7 @@ _blacklist.add(None)    # shortcut candidate generation at end of data
 
 # Construction of inverse translation table
 _l2u = {
-    '\ ': ord(' ')  # unexpanding space makes no sense in non-TeX contexts
+    r'\ ': ord(' ')  # unexpanding space makes no sense in non-TeX contexts
 }
 
 for _tex in latex_equivalents:

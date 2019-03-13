@@ -228,9 +228,9 @@ class ContextObject(list, UnicodeMixin):
 
         for i, author in enumerate(rec.getall('author')):
             if i == 0:
-                parts = re.split('\s*,\s*', author, 1)
+                parts = re.split(r'\s*,\s*', author, 1)
                 if len(parts) == 1:
-                    parts = re.split('\s+', author)
+                    parts = re.split(r'\s+', author)
                     last = parts[-1]
                     first = ' '.join(parts[:-1])
                 else:
