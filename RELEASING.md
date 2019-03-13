@@ -17,7 +17,7 @@ tox -r
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
 ```shell
-./venvs/clld/clld/build.sh "<rel-no>.dev0"
+sh build.sh $PATH_VENV_DIRECTORY $PATH_CLLD_REPOSITORY
 ```
 
 - Make sure javascript and css can be minified:
@@ -26,7 +26,9 @@ webassets -m clld.web.assets build
 rm -i src/clld/web/static/*/packed.*
 ```
 
-- Make sure javascript tests pass with coverage of clld.js at > 82%:
+- Make sure javascript tests pass with coverage of clld.js at > 82% and take
+  care of specifying the name of the Chromium binary (e.g. chromium-browser or
+  chromium):
 ```shell
 java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 ```
