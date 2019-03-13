@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: clld 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-09 17:14+0100\n"
+"POT-Creation-Date: 2019-03-12 11:59+0100\n"
 "PO-Revision-Date: 2013-01-15 13:57+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.2\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: src/clld/web/datatables/sentence.py:20
 #: src/clld/web/templates/sentence/detail_html.mako:33
@@ -33,6 +33,14 @@ msgstr ""
 #: src/clld/web/templates/parameter/detail_html.mako:6
 #: src/clld/web/templates/valueset/detail_html.mako:46
 msgid "Parameter"
+msgstr ""
+
+#: src/clld/web/templates/app.mako:159
+msgid "Privacy Policy"
+msgstr ""
+
+#: src/clld/web/templates/app.mako:161
+msgid "Disclaimer"
 msgstr ""
 
 #: src/clld/web/templates/sentence/detail_html.mako:19
