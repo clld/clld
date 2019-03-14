@@ -2,6 +2,12 @@
 Changes
 -------
 
+4.5.0
+~~~~~
+
+- Updated Leaflet to 1.4.0
+- Refactorings for SQLAlchemy 1.3.x compatibility
+
 4.4.2
 ~~~~~
 
