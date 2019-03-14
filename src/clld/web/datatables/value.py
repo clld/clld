@@ -1,5 +1,5 @@
 """Default DataTable for Value objects."""
-from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm import joinedload
 
 from clld.db.models.common import (
     Value, ValueSet, Parameter, DomainElement, Language, Contribution, ValueSetReference,

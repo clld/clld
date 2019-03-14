@@ -121,11 +121,8 @@ class OlacConfig(object):
             .filter_by(language_pk=Language.pk)
         return req.db.query(Language).filter(subquery.exists())\
             .options(undefer('updated'),
-                     joinedload(
-                Language.languageidentifier
-                     ).joinedload(
-                         LanguageIdentifier.identifier
-                     ))
+                     joinedload(Language.languageidentifier).
+                     joinedload(LanguageIdentifier.identifier))
 
     def get_earliest_record(self, req):
         return self._query(req).order_by(Language.updated, Language.pk).first()

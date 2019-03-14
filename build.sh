@@ -15,5 +15,5 @@ pip install -e .[test]
 python testapp/scripts/initializedb.py development.ini
 pytest
 cd $VENVS
-rm -rfi testapp
+rm -rfI testapp
 
