@@ -1,7 +1,7 @@
 <table id="${obj.eid}" cellpadding="0" cellspacing="0" border="0" class="table table-bordered order-column compact stripe">
     <thead>
         <tr>
-            % for col in ctx.cols:
+            % for col in obj.cols:
                 % if col.js_args.get('sTooltip', False):
                     <th title="${col.js_args['sTooltip']}">${col.js_args['sTitle']}</th>
                 % else:
