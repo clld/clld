@@ -31,7 +31,9 @@ class Table(DataTable):
             IntegerIdCol(self, 'id'),
             IdCol(self, 'nid',
                   get_object=lambda i: i, model_col=common.Contributor.id),
-            ExternalLinkCol(self, 'url')]
+            ExternalLinkCol(self, 'url'),
+            Col(self, 'id', choices=['x', 'y'], select='multiple', sTooltip='xytt'),
+        ]
 
 
 def test_DataTable(env, request_factory):
@@ -40,6 +42,9 @@ def test_DataTable(env, request_factory):
     assert text_type(dt) == 'Contributors'
     assert repr(dt) == 'Contributors'
     dt.get_query(undefer_cols=['updated']).all()
+    html = dt.render()
+    assert 'xytt' in html
+    assert ' multiple ' in html
 
 
 @pytest.mark.parametrize('params', [

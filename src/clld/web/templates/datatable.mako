@@ -2,7 +2,11 @@
     <thead>
         <tr>
             % for col in obj.cols:
-            <th>${col.js_args['sTitle']}</th>
+                % if col.js_args.get('sTooltip', False):
+                    <th title="${col.js_args['sTooltip']}">${col.js_args['sTitle']}</th>
+                % else:
+                    <th>${col.js_args['sTitle']}</th>
+                % endif
             % endfor
         </tr>
     </thead>
@@ -12,7 +16,7 @@
                 <th style="text-align: left;">
                     % if col.js_args.get('bSearchable', True):
                         % if hasattr(col, 'choices'):
-                            <select class="control input-${getattr(col, 'input_size', 'small')}" name="${col.name}" id="dt-filter-${col.name}">
+                            <select ${getattr(col, 'select', '')} class="select control input-${getattr(col, 'input_size', 'small')}" name="${col.name}" id="dt-filter-${col.name}">
                                 <option value="">--any--</option>
                                 % for val in getattr(col, 'choices'):
                                     % if isinstance(val, tuple) and len(val) == 2:
