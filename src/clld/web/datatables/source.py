@@ -2,6 +2,7 @@
 from clld.db.models.common import Language, LanguageSource, Source
 from clld.web.datatables.base import DataTable, Col, LinkCol, DetailsRowLinkCol
 from clld.lib.bibtex import EntryType
+from clld.web.util.htmllib import HTML
 
 
 class TypeCol(Col):
@@ -39,7 +40,7 @@ class Sources(DataTable):
         return [
             DetailsRowLinkCol(self, 'd'),
             LinkCol(self, 'name'),
-            Col(self, 'description', sTitle='Title'),
+            Col(self, 'description', sTitle='Title', format=lambda i: HTML.span(i.description)),
             Col(self, 'year'),
             Col(self, 'author'),
             TypeCol(self, 'bibtex_type'),
