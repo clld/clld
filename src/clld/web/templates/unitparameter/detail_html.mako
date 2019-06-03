@@ -5,6 +5,6 @@
 <h2>${_('Unit Parameter')} ${ctx.name}</h2>
 
 <div>
-    <% dt = request.registry.getUtility(h.interfaces.IDataTable, 'unitvalues'); dt = dt(request, h.models.UnitValue, parameter=ctx) %>
+    <% dt = request.registry.getUtility(h.interfaces.IDataTable, 'unitvalues'); dt = dt(request, h.models.UnitValue, unitparameter=ctx) %>
     ${dt.render()}
 </div>
