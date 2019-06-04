@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 install_requires = [
     'Babel',
     'csvw~=1.0',
-    'clldutils~=2.4',
+    'clldutils~=2.8',
     'pycldf>=1.5.1',
     'setuptools>=25',
     'pyramid>=1.10',
