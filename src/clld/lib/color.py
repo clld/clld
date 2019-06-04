@@ -1,6 +1,6 @@
 import warnings
 
-from clldutils.color import *
+from clldutils.color import *  # noqa: F401, F403
 
 warnings.simplefilter('always', DeprecationWarning)
 warnings.warn(
