@@ -68,7 +68,7 @@
 <%def name="accordion_group(eid, parent, title=None, open=False)">
     <div class="accordion-group">
         <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#${parent}" href="#${eid}">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#${parent}" href="#${eid}" title="${'click to hide or show {0}'.format(title or '')}">
                 ${title or caller.title()}
             </a>
         </div>
