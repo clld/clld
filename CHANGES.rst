@@ -2,6 +2,19 @@
 Changes
 -------
 
+4.7.1
+~~~~~
+
+- better accessibility of accordeon controls.
+
+
+4.7.0
+~~~~~
+
+- Updated Leaflet to 1.5.1
+- Moved modules `color` and `svg` to clldutils package
+
+
 4.6.1
 ~~~~~
 
