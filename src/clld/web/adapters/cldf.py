@@ -159,7 +159,7 @@ class CldfDownload(Download):
         with TemporaryDirectory() as tmpd:
             cls = getattr(dataset, cldf_cfg.module)
             ds = cls.in_dir(tmpd)
-            ds.properties['dc:bibliographicCitation '] = text_citation(req, req.dataset)
+            ds.properties['dc:bibliographicCitation'] = text_citation(req, req.dataset)
             ds.properties['dc:publisher'] = '%s, %s' % (
                 req.dataset.publisher_name, req.dataset.publisher_place)
             ds.properties['dc:license'] = req.dataset.license
