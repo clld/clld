@@ -348,12 +348,12 @@ class Data(defaultdict):
         super(Data, self).__init__(dict)
         self.defaults = kw
 
-    def add(self, model, key, **kw):
+    def add(self, model_, key_, **kw):
         """
         Create an instance of a model class to be persisted in the database.
 
-        :param model: The model class we want to create an instance of.
-        :param key: A key which can be used to retrieve the instance later.
+        :param model_: The model class we want to create an instance of.
+        :param key_: A key which can be used to retrieve the instance later.
         :param kw: Keyword parameters passed to model class for initialisation.
         :return: The newly created instance of model class.
         """
@@ -366,7 +366,7 @@ class Data(defaultdict):
         else:
             for k, v in self.defaults.items():
                 kw.setdefault(k, v)
-            new = model(**kw)
-        self[model.__name__][key] = new
+            new = model_(**kw)
+        self[model_.__name__][key_] = new
         DBSession.add(new)
         return new
