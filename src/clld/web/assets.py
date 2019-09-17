@@ -1,7 +1,6 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
+from pathlib import Path
 
 from webassets import Environment, Bundle
-from clldutils.path import Path
 
 import clld
 

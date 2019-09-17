@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import pytest
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HTTPFound

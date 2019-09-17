@@ -386,7 +386,7 @@ class DataTable(Component):
     def attr_from_constraint(model):
         return model.__name__.lower()
 
-    def __unicode__(self):
+    def __str__(self):
         return '%ss' % self.model.__name__
 
     def __repr__(self):

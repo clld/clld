@@ -1,6 +1,5 @@
-from __future__ import unicode_literals, division, print_function, absolute_import
+import io
 
-from six import BytesIO
 import xlwt
 import xlrd
 
@@ -17,7 +16,7 @@ def test_rows():
     d = {'a': 1}
     ws.write(0, 0, list(d.keys())[0])
     ws.write(1, 0, list(d.values())[0])
-    fp = BytesIO()
+    fp = io.BytesIO()
     wb.save(fp)
     fp.seek(0)
     wb = xlrd.open_workbook(file_contents=fp.read())

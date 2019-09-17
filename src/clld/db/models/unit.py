@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 

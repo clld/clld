@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
 from json import loads
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import joinedload
 
 import clld
 from clld.lib.bibtex import Record

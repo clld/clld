@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 
 from zope.interface import implementer
-from six import iteritems
 
 from clld.db.meta import Base, PolymorphicBaseMixin
 from clld.db.versioned import Versioned
@@ -98,7 +95,7 @@ class Source(Base,
         return {}
 
     def bibtex(self, exclude={'gbs', 'glottolog_ref_id'}):
-        kw = {k: v for k, v in iteritems(self.jsondata) if k not in exclude}
+        kw = {k: v for k, v in self.jsondata.items() if k not in exclude}
         kw.update(self.__bibtex__())
         return bibtex.Record.from_object(self, **kw)
 

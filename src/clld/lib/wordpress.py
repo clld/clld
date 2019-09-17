@@ -9,8 +9,8 @@ Client for the xmlrpc API of a wordpress blog.
     thus, rely on identifying the appropriate blog by xmlrpc endpoint.
 """
 import re
+import xmlrpc.client as xmlrpc_client
 
-from six.moves import xmlrpc_client
 import requests
 
 __all__ = ['XMLRPC_PATH', 'sluggify', 'Client']

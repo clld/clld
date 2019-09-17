@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
-from six import string_types
 from sqlalchemy import Column, Unicode
 
 from clld.db.meta import Base, DBSession
@@ -30,7 +27,7 @@ class Config(Base):
         :param id_: Identifier of a class instance.
         :return: ``str`` representation identifying a database object.
         """
-        if isinstance(model, string_types):
+        if isinstance(model, str):
             name = model
         elif isinstance(model, type):
             name = model.__name__

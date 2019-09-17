@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from sqlalchemy import Column, Float, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, validates, backref
 from sqlalchemy.ext.declarative import declared_attr
@@ -70,7 +68,7 @@ class UnitValue(Base,
             assert self.unitdomainelement.unitparameter_pk == unitparameter_pk
         return unitparameter_pk
 
-    def __unicode__(self):
+    def __str__(self):
         return self.unitdomainelement.name \
             if self.unitdomainelement else self.name or self.id
 

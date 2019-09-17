@@ -1,10 +1,6 @@
-# coding: utf8
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 import pytest
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.types import Integer
-from six import text_type
 from zope.interface import Interface, classImplements
 
 from clld.db.models import common
@@ -39,7 +35,7 @@ class Table(DataTable):
 def test_DataTable(env, request_factory):
     dt = Table(env['request'], common.Contributor)
     assert 'exclude' in dt._toolbar.options
-    assert text_type(dt) == 'Contributors'
+    assert str(dt) == 'Contributors'
     assert repr(dt) == 'Contributors'
     dt.get_query(undefer_cols=['updated']).all()
     html = dt.render()

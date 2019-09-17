@@ -1,6 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals, print_function, division
-
 
 def test_Pager():
     from clld.web.util.pager import Pager

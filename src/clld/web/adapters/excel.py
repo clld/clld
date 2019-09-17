@@ -1,5 +1,6 @@
 """Represent clld objects as excel spreadsheets."""
-from six import BytesIO
+import io
+
 import xlwt
 
 from clld.web.adapters.base import Index
@@ -21,13 +22,13 @@ class ExcelAdapter(Index):
         return ['ID', 'Name']
 
     def row(self, ctx, req, item):
-        return [item.id, hyperlink(req.resource_url(item), item.__unicode__())]
+        return [item.id, hyperlink(req.resource_url(item), str(item))]
 
     def render(self, ctx, req):
         if not xlwt:
             return ''  # pragma: no cover
         wb = xlwt.Workbook()
-        ws = wb.add_sheet(ctx.__unicode__())
+        ws = wb.add_sheet(str(ctx))
 
         for i, col in enumerate(self.header(ctx, req)):
             ws.write(0, i, col)
@@ -36,7 +37,7 @@ class ExcelAdapter(Index):
             for i, col in enumerate(self.row(ctx, req, item)):
                 ws.write(j + 1, i, col)
 
-        out = BytesIO()
+        out = io.BytesIO()
         wb.save(out)
         out.seek(0)
         return out.read()
@@ -75,7 +76,7 @@ class Values(ExcelAdapter):
     def row(self, ctx, req, item):
         res = super(Values, self).row(ctx, req, item)
         for obj in [item.valueset.parameter, item.valueset.language]:
-            res.append(hyperlink(req.resource_url(obj), obj.__unicode__()))
+            res.append(hyperlink(req.resource_url(obj), str(obj)))
         res.extend([item.frequency or '', item.confidence or ''])
         res.append(';'.join(filter(
             None, [r.source.name for r in item.valueset.references if r.source])))

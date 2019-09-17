@@ -1,8 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
-
-from six import text_type
-
 from clld.db.models import common
 from clld.interfaces import ILinkAttrs, IFrequencyMarker, IDownload
 from clld.web.adapters.download import N3Dump
@@ -182,7 +177,7 @@ def test_text2html(env):
     from clld.web.util.helpers import text2html
 
     assert '<br' in text2html('abc\ndef')
-    assert 'div' in text_type(text2html('chunk', mode='p'))
+    assert 'div' in str(text2html('chunk', mode='p'))
 
 
 def test_partitioned(env):
@@ -210,8 +205,7 @@ def test_format_frequency(env, mocker, utility_factory):
 def test_format_coordinates(env, mocker):
     from clld.web.util.helpers import format_coordinates
 
-    r = text_type(
-        format_coordinates(mocker.Mock(latitude=5.333333333333, longitude=-9.999)))
+    r = str(format_coordinates(mocker.Mock(latitude=5.333333333333, longitude=-9.999)))
     assert "5°20" in r
     assert "10°W" in r
     format_coordinates(mocker.Mock(latitude=5.333, longitude=-9.99), no_seconds=False)

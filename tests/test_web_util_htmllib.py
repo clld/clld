@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 
 def test_HTML():
     from clld.web.util.htmllib import HTML

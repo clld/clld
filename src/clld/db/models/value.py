@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from sqlalchemy import (
     Column,
     Float,
@@ -79,7 +77,7 @@ class Value(Base,
         res['valueset'] = self.valueset.__json__(req)
         return res
 
-    def __unicode__(self):
+    def __str__(self):
         return self.domainelement.name if self.domainelement else self.name or self.id
 
 

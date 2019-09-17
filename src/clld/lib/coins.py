@@ -3,13 +3,10 @@
 
 .. seealso:: http://ocoins.info/
 """
-from __future__ import unicode_literals
 import re
+from urllib.parse import urlencode
 
-from six import string_types, binary_type
-from six.moves.urllib.parse import urlencode
-
-from clldutils.misc import UnicodeMixin, encoded, to_binary
+from clldutils.misc import encoded, to_binary
 
 
 FIELDS = {
@@ -151,12 +148,12 @@ FIELDS = {
 
 
 def _encoded(value):
-    if not isinstance(value, binary_type) and not isinstance(value, string_types):
+    if not isinstance(value, bytes) and not isinstance(value, str):
         value = '%s' % value
     return encoded(value)
 
 
-class ContextObject(list, UnicodeMixin):
+class ContextObject(list):
 
     """A Context Object which knows how to render it's metadata as HTML span tags."""
 
@@ -242,7 +239,7 @@ class ContextObject(list, UnicodeMixin):
 
         return cls(sid, mtx, *data)
 
-    def __unicode__(self):
+    def __str__(self):
         pairs = [
             (to_binary('ctx_ver'), to_binary('Z39.88-2004')),
             (to_binary('rft_val_fmt'),
@@ -256,4 +253,4 @@ class ContextObject(list, UnicodeMixin):
             return to_binary('')
 
     def span_attrs(self):
-        return {'class': 'Z3988', 'title': self.__unicode__()}
+        return {'class': 'Z3988', 'title': str(self)}

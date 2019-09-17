@@ -11,7 +11,6 @@ from collections import namedtuple
 from pyramid.renderers import render
 from pyramid.response import Response
 from sqlalchemy.orm import joinedload, undefer
-from clldutils.misc import UnicodeMixin
 
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
 from clld.interfaces import IOlacConfig
@@ -65,7 +64,7 @@ def date(dt=None):
     return str(dt or datetime.utcnow()).split(' ')[0]
 
 
-class ResumptionToken(UnicodeMixin):
+class ResumptionToken(object):
 
     """Represents an OAI-PMH resumption token.
 
@@ -97,7 +96,7 @@ class ResumptionToken(UnicodeMixin):
             if m.group('until'):
                 self.until = datetime_from_iso(m.group('until')[1:]) + timedelta(1)
 
-    def __unicode__(self):
+    def __str__(self):
         res = "%s" % self.offset
         if self.from_:
             res += "f%s" % date(self.from_)

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-from six import text_type
 from markupsafe import Markup
 
 from clld.interfaces import IDataTable
@@ -74,7 +71,7 @@ class DownloadWidget(Component):
             HTML.button(
                 HTML.i(class_='icon-info-sign icon-white'),
                 class_='btn btn-info %s' % self._opener_class,
-                **{'data-content': text_type(doc), 'type': 'button'}),
+                **{'data-content': str(doc), 'type': 'button'}),
             HTML.a(
                 HTML.i(class_='icon-download-alt'),
                 HTML.span(class_="caret"),

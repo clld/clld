@@ -8,7 +8,6 @@ We also provide metadata following the guidelines of
 - http://www.w3.org/TR/tabular-metadata/ version
   http://www.w3.org/TR/2015/CR-tabular-metadata-20150716/
 """
-from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import chain
 
 from sqlalchemy import types, Column

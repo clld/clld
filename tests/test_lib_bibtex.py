@@ -1,9 +1,5 @@
-# coding: utf8
-from __future__ import unicode_literals, division, print_function, absolute_import
-
 import pytest
 
-from six import text_type, binary_type
 from mock import Mock
 
 from clld.lib.bibtex import *
@@ -12,7 +8,7 @@ from clld.lib.bibtex import *
 @pytest.mark.parametrize(
     "arg,res",
     [
-        (binary_type("\\ss \xef".encode('latin1')), 'ß\xef'),
+        (bytes("\\ss \xef".encode('latin1')), 'ß\xef'),
         ("\\ss ", 'ß'),
         ('\u2013', '\u2013'),
         ('?[\\u65533]', '\ufffd'),
@@ -50,14 +46,13 @@ def test_Record():
         pages='1-4',
         publisher='M',
         note="Revised edition")
-    assert '@book' in rec.__unicode__()
-    assert '@book' in rec.__str__()
+    assert '@book' in str(rec)
     assert 'bt' in rec.text()
 
     for fmt in ['txt', 'en', 'ris', 'mods']:
         rec.format(fmt)
 
-    Record.from_string(rec.__unicode__(), lowercase=True)
+    Record.from_string(str(rec), lowercase=True)
     Record.from_object(Mock())
 
     rec = Record(
@@ -81,7 +76,7 @@ def test_Database(testsdir):
     assert not len(db)
     db = Database([Record('book', 'id')])
     assert db[0] == db['id']
-    assert text_type(db)
+    assert str(db)
     db = Database.from_file('notexisting.bib')
     assert not len(db)
     db = Database.from_file(testsdir / 'test.bib')

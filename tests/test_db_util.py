@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 
 def test_alembic_version(db):
     from clld.db.util import set_alembic_version, get_alembic_version

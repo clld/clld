@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, print_function
 import json
 
 import requests
 from sqlalchemy.orm import joinedload
-from six.moves.urllib.parse import quote_plus
-from six import text_type
+from urllib.parse import quote_plus
 from clldutils.misc import slug
 
 from clld.scripts.util import confirm
@@ -53,7 +51,7 @@ def ia_func(command, args, sources=None):  # pragma: no cover
         if command == 'verify':
             stitle = source.description or source.title or source.booktitle
             needs_check = False
-            year = text_type(item.get('year', ''))
+            year = str(item.get('year', ''))
             if not year or year != slug(source.year or ''):
                 needs_check = True
             twords = words(stitle)

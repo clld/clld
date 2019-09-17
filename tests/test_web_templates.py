@@ -1,10 +1,7 @@
-# coding: utf8
-from __future__ import unicode_literals, division, print_function, absolute_import
 import re
 import json
+import io
 
-from six import PY2
-from six.moves import cStringIO as StringIO
 from pyramid.renderers import render
 from rdflib import Graph, URIRef
 import html5lib
@@ -60,7 +57,7 @@ def test_rdf(env):
             '%s/rdf.mako' % rsc.name, dict(ctx=ctx), request=env['request'])
         assert not qname_as_resource.search(res)
         g = Graph()
-        g.load(StringIO(res.encode('utf8') if PY2 else res))
+        g.load(io.StringIO(res))
         for predicate in ['void:inDataset', 'skos:prefLabel']:
             if predicate == 'void:inDataset' and rsc.name == 'dataset':
                 continue

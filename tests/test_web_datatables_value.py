@@ -1,6 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 import pytest
 from clld.db.models import common
 from clld.web.datatables import Values

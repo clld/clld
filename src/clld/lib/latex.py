@@ -15,11 +15,8 @@ mapping ord(unicode char) to LaTeX code.
 
 D. Eppstein, October 2003.
 """
-from __future__ import generators
 import codecs
 import re
-
-from six import text_type, Iterator, unichr
 
 
 def register():
@@ -64,14 +61,14 @@ def _registry(encoding):
         def decode(self, input, errors='strict'):
             """Convert latex source string to unicode."""
             if encoding:
-                input = text_type(input, encoding, errors)
+                input = str(input, encoding, errors)
 
             # Note: we may get buffer objects here.
             # It is not permussable to call join on buffer objects
             # but we can make them joinable by calling unicode.
             # This should always be safe since we are supposed
             # to be producing unicode output anyway.
-            x = map(text_type, _unlatex(input))
+            x = map(str, _unlatex(input))
             return u''.join(x), len(input)
 
     class StreamWriter(Codec, codecs.StreamWriter):
@@ -129,7 +126,7 @@ def _tokenize(tex):  # pragma: no cover
                     pos += 1
 
 
-class _unlatex(Iterator):  # pragma: no cover
+class _unlatex(object):  # pragma: no cover
 
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
 
@@ -169,13 +166,13 @@ class _unlatex(Iterator):  # pragma: no cover
         for delta, c in self.candidates(0):  # pragma: no cover
             if c in _l2u:
                 self.pos += delta
-                return unichr(_l2u[c])
+                return chr(_l2u[c])
             elif len(c) == 2 and c[1] == 'i' and (c[0], '\\i') in _l2u:
                 self.pos += delta       # correct failure to undot i
-                return unichr(_l2u[(c[0], '\\i')])
+                return chr(_l2u[(c[0], '\\i')])
             elif len(c) == 1 and c[0].startswith('\\char') and c[0][5:].isdigit():
                 self.pos += delta
-                return unichr(int(c[0][5:]))
+                return chr(int(c[0][5:]))
 
         # nothing matches, just pass through token as-is
         self.pos += 1

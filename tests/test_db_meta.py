@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
 import json
 
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
-from six import PY3
 
 from clld.db.models.common import Language
 from clld.db.meta import DBSession, VersionedDBSession, is_base
@@ -97,12 +95,8 @@ def test_Base(db):
     assert l.name == 'Name'
     assert not list(l.history())
 
-    # a bit of a hack to test the human readable representations.
-    # we exploit the fact, that on py2, string and unicode comparison does type
-    # coercion, while on py3, the two methods should actually return the same string.
-    assert l.__str__() == l.__unicode__()
     Language().__str__()
-    assert repr(l) == "<Language 'abc'>" if PY3 else "<Language u'abc'>"
+    assert repr(l) == "<Language 'abc'>"
 
 
 def test_Base_jsondata(db):

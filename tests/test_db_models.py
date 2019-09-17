@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from pathlib import Path
 
-from clldutils.path import Path
 from clld.db.meta import DBSession
 
 

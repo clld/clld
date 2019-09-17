@@ -1,5 +1,4 @@
 """Functionality to manage icons for map markers."""
-from __future__ import unicode_literals, print_function, division, absolute_import
 from itertools import product, chain
 
 from zope.interface import implementer

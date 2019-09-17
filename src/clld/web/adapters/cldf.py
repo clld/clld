@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 import shutil
 
@@ -217,5 +216,4 @@ class CldfDownload(Download):
             ds.write(**cldf_cfg.custom_tabledata(req, tabledata))
             ds.validate()
 
-            shutil.make_archive(
-                fname.parent.joinpath(fname.stem).as_posix(), 'zip', tmpd.as_posix())
+            shutil.make_archive(str(fname.parent / fname.stem), 'zip', str(tmpd))

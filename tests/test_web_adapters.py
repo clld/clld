@@ -1,5 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
 from clld.interfaces import IIndex, IRepresentation
 from clld.db.models.common import Contribution, Language, Dataset
 

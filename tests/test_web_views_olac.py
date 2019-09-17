@@ -1,5 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
 from datetime import date
 
 import pytest
@@ -20,7 +18,7 @@ class OaiPmhResponse(XmlResponse):
 def test_ResumptionToken():
     from clld.web.views.olac import ResumptionToken
 
-    assert ResumptionToken(from_=date.today(), until=date.today()).__unicode__()
+    assert str(ResumptionToken(from_=date.today(), until=date.today()))
 
 
 def with_params(request_factory, **kw):

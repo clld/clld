@@ -1,16 +1,14 @@
-# coding: utf8
 """Functionality to create downloads for the data of a clld app."""
-from __future__ import unicode_literals, division, absolute_import, print_function
 from zipfile import ZipFile, ZIP_DEFLATED
 from gzip import GzipFile
 from contextlib import closing
+import io
+from pathlib import Path
 
-from six import string_types, BytesIO, text_type, StringIO, PY3
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, class_mapper
 from csvw.dsv import UnicodeWriter
-from clldutils.path import Path
 from clldutils.misc import format_size, to_binary
 
 from clld.util import safe_overwrite
@@ -47,7 +45,7 @@ def format_readme(req, dataset):
 
 
 def pkg_name(pkg):
-    return pkg if isinstance(pkg, string_types) else pkg.__name__
+    return pkg if isinstance(pkg, str) else pkg.__name__
 
 
 def abspath(asset_spec):
@@ -134,7 +132,7 @@ class Download(object):
                         format_readme(req, req.db.query(Dataset).first()).encode('utf8'))
 
     def get_stream(self):
-        return BytesIO()
+        return io.BytesIO()
 
     def read_stream(self, fp):
         fp.seek(0)
@@ -162,7 +160,7 @@ class Download(object):
         self.dump_rendered(req, fp, item, index, adapter.render(item, req))
 
     def dump_rendered(self, req, fp, item, index, rendered):
-        if isinstance(rendered, text_type):
+        if isinstance(rendered, str):
             rendered = rendered.encode('utf8')
         fp.write(rendered)
 
@@ -187,13 +185,10 @@ class CsvDump(Download):
         self.writer = None
 
     def get_stream(self):
-        return StringIO(newline='') if PY3 else BytesIO()
+        return io.StringIO(newline='')
 
     def read_stream(self, fp):
-        res = Download.read_stream(self, fp)
-        if PY3:  # pragma: no cover
-            res = res.encode('utf8')
-        return res
+        return Download.read_stream(self, fp).encode('utf8')
 
     def get_fields(self, req):
         if not self.fields:
@@ -204,10 +199,10 @@ class CsvDump(Download):
         self.writer = UnicodeWriter(fp)
         self.writer.__enter__()
         self.writer.writerow(
-            [f if isinstance(f, string_types) else f[1] for f in self.get_fields(req)])
+            [f if isinstance(f, str) else f[1] for f in self.get_fields(req)])
 
     def row(self, req, fp, item, index):
-        return [getattr(item, f if isinstance(f, string_types) else f[0])
+        return [getattr(item, f if isinstance(f, str) else f[0])
                 for f in self.get_fields(req)]
 
     def dump(self, req, fp, item, index):

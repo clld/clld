@@ -1,6 +1,4 @@
 """Functionality to configure leaflet maps from python."""
-from __future__ import unicode_literals, division, print_function, absolute_import
-from six import string_types
 from clldutils.misc import lazyproperty
 
 from clld.interfaces import IDataTable, IMapMarker, IIcon
@@ -262,7 +260,7 @@ class Map(Component):
             return HTML.a(
                 layer.name,
                 onclick='return %s;' % helpers.JS_CLLD.mapShowGeojson(self.eid, layer.id),
-                href=layer.data if isinstance(layer.data, string_types) else '#')
+                href=layer.data if isinstance(layer.data, str) else '#')
         yield Legend(
             self, 'geojson', map(item, self.layers), label='GeoJSON', pull_right=True)
 

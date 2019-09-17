@@ -41,7 +41,7 @@ class MetadataFromRec(Metadata):
         return bibtex.Record(
             genre,
             id_,
-            title=getattr(ctx, 'citation_name', ctx.__unicode__()),
+            title=getattr(ctx, 'citation_name', str(ctx)),
             url=req.resource_url(ctx),
             address=req.dataset.publisher_place,
             publisher=req.dataset.publisher_name,
@@ -61,7 +61,7 @@ class BibTex(MetadataFromRec):
     mimetype = 'text/x-bibtex'
 
     def render(self, ctx, req):
-        return self.rec(ctx, req).__unicode__()
+        return str(self.rec(ctx, req))
 
 
 @implementer(interfaces.IRepresentation, interfaces.IMetadata)

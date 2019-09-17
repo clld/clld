@@ -1,11 +1,7 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-import os
 from tempfile import mktemp
 import gzip
 from contextlib import closing
 from xml.etree import cElementTree as et
-
-from clldutils.path import Path
 
 from clld.db.models.common import Language, Source
 from clld.web.adapters.download import *
@@ -32,11 +28,11 @@ def test_Download(mocker, env):
     dl.size(env['request'])
     dl.label(env['request'])
     assert abspath.exists()
-    os.remove(abspath.as_posix())
+    abspath.unlink()
 
     dl = TestDownload(Source, 'clld', ext='rdf')
     dl.create(env['request'], verbose=False)
-    os.remove(dl.abspath(env['request']).as_posix())
+    dl.abspath(env['request']).unlink()
 
 
 def test_Download_url(mocker, env):

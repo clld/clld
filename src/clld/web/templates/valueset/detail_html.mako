@@ -17,7 +17,7 @@ ${h.text2html(h.Markup(ctx.markup_description) if ctx.markup_description else ct
     </ul>
     <h4>
         ${h.map_marker_img(request, value)}
-        ${value.__unicode__()}
+        ${value}
         ${h.format_frequency(request, value)}
     </h4>
     <div id="s${i}" class="collapse in">

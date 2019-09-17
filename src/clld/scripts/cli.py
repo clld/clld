@@ -9,7 +9,6 @@ Functionality to be called from command line scripts is provided in this module.
 .. seealso: http://www.scotttorborg.com/python-packaging/command-line-scripts.html\
 #the-console-scripts-entry-point
 """
-from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 import argparse
 

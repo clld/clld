@@ -1,8 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
-
-from clldutils.path import Path
-
 
 def test_safe_overwrite(tmppath):
     from clld.util import safe_overwrite
@@ -53,4 +48,4 @@ def test_DeclEnum():
         db_type.process_bind_param(A.val1, None), None)
     assert db_type.process_result_value(
         db_type.process_bind_param(None, None), None) is None
-    assert A.val1.__json__() == A.val1.__unicode__()
+    assert A.val1.__json__() == str(A.val1)

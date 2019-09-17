@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from sqlalchemy import Column, Integer, Unicode, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr

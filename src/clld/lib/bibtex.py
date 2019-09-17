@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
 """
 Functionality to handle bibligraphical data in the BibTeX format.
 
 .. seealso:: http://en.wikipedia.org/wiki/BibTeX
 """
-from __future__ import unicode_literals, division, print_function, absolute_import
 from collections import OrderedDict
 import re
+from pathlib import Path
 
 from zope.interface import Interface, implementer
 from six import unichr, text_type, string_types, iteritems
 from six.moves import filter
-from clldutils.path import Path
-from clldutils.misc import UnicodeMixin, to_binary
+from clldutils.misc import to_binary
 from clldutils.source import Source
 
 from clld.util import DeclEnum
@@ -270,7 +268,7 @@ FIELDS = [
 FIELDS_SET = set(FIELDS)
 
 
-class _Convertable(UnicodeMixin):
+class _Convertable(object):
 
     """Mixin adding a shortcut to clld.lib.bibutils.convert as method."""
 
@@ -280,12 +278,12 @@ class _Convertable(UnicodeMixin):
                 return self.text()
             raise NotImplementedError('no text method found!')
         if fmt == 'en':
-            return convert(self.__unicode__(), 'bib', 'end')
+            return convert(str(self), 'bib', 'end')
         if fmt == 'ris':
-            return convert(self.__unicode__(), 'bib', 'ris')
+            return convert(str(self), 'bib', 'ris')
         if fmt == 'mods':
-            return convert(self.__unicode__(), 'bib')
-        return self.__unicode__()
+            return convert(str(self), 'bib')
+        return str(self)
 
 
 class IRecord(Interface):
@@ -360,7 +358,7 @@ class Record(Source, _Convertable):
             value = [value]
         return Record.sep(key).join(filter(None, value))
 
-    def __unicode__(self):
+    def __str__(self):
         """Represent the record in BibTeX format.
 
         :return: string encoding the record in BibTeX syntax.
@@ -388,8 +386,8 @@ class Database(_Convertable):
         self.records = [r for r in records if r and r.genre and r.id]
         self._keymap = None
 
-    def __unicode__(self):
-        return '\n'.join(r.__unicode__() for r in self.records)
+    def __str__(self):
+        return '\n'.join(str(r) for r in self.records)
 
     @property
     def keymap(self):

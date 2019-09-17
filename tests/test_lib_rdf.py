@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-
 
 def test_expand_prefix():
     from clld.lib.rdf import expand_prefix

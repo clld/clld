@@ -1,8 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
-
-from six import binary_type
-
 from clld.lib.bibtex import Record
 
 
@@ -11,7 +6,7 @@ def test_ContextObject():
 
     c = ContextObject('sid', 'journal', ('jtitle', '\xe2'))
     assert '%C3%A2' in c.span_attrs()['title']
-    c = ContextObject('sid', 'journal', ('jtitle', binary_type('ä'.encode('utf8'))))
+    c = ContextObject('sid', 'journal', ('jtitle', bytes('ä'.encode('utf8'))))
     assert '%C3%A4' in c.span_attrs()['title']
 
     bib = Record('book', '1', title='The Title', author='L, F')

@@ -1,8 +1,7 @@
 """This module provides functionality for handling our data as rdf."""
-from __future__ import unicode_literals, division, absolute_import, print_function
 from collections import namedtuple
+import io
 
-from six import string_types, BytesIO
 from clldutils.misc import encoded
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import (
@@ -48,7 +47,7 @@ def expand_prefix(p):
     :param p: a qualified name in prefix:localname notation or a URL.
     :return: a string URL or a URIRef
     """
-    if isinstance(p, string_types) and ':' in p:
+    if isinstance(p, str) and ':' in p:
         prefix, name = p.split(':', 1)
         if prefix in NAMESPACES:
             try:
@@ -79,13 +78,13 @@ class ClldGraph(Graph):
 
 def properties_as_xml_snippet(subject, props):
     """Serialize props of subject as RDF-XML snippet."""
-    if isinstance(subject, string_types):
+    if isinstance(subject, str):
         subject = URIRef(subject)
     g = ClldGraph()
     if props:
         for p, o in props:
             p = expand_prefix(p)
-            if isinstance(o, string_types):
+            if isinstance(o, str):
                 if o.startswith('http://') or o.startswith('https://'):
                     o = URIRef(o)
                 else:
@@ -108,10 +107,10 @@ def convert(string, from_, to_):
         return encoded(string)
     assert from_ in FORMATS and (to_ is None or to_ in FORMATS)
     g = Graph()
-    g.parse(BytesIO(encoded(string)), format=from_)
+    g.parse(io.BytesIO(encoded(string)), format=from_)
     if to_ is None:
         return g
-    out = BytesIO()
+    out = io.BytesIO()
     g.serialize(out, format=to_)
     out.seek(0)
     return out.read()

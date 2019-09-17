@@ -1,18 +1,14 @@
-# coding: utf8
 """Various helper functions to be used mainly in templates.
 
 .. note:: This module is available within Mako templates as ``h``.
 """
-from __future__ import unicode_literals
 import os
 import re
 from itertools import groupby  # we just import this to have it available in templates!
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
 from math import floor
-
-from six import text_type, string_types
-from six.moves.urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode
 
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -50,7 +46,7 @@ MARKER_IMG_DIM = '20'
 
 def cc_link(req, license_url, button='regular'):
     if license_url == 'https://en.wikipedia.org/wiki/Public_domain':
-        license_url = 'https://creativecommons.org/publicdomain/zero/1.0/'
+        license_url = 'https://creativecommons.org/publicdomain/zero/1.0/'  # pragma: no cover
     license_url = URL(license_url)
     if license_url.host() != 'creativecommons.org':
         return
@@ -112,7 +108,7 @@ def get_valueset(req, ctx):
 
 def get_url_template(req, route, relative=True, variable_map=None):
     variable_map = variable_map or {}
-    if isinstance(route, string_types):
+    if isinstance(route, str):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
     if route:
         res = '' if relative else req.application_url
@@ -251,7 +247,7 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
         if not no_seconds and seconds:
             fmt += '{2:0>2f}"'
         fmt += hemispheres[0] if dec > 0 else hemispheres[1]
-        return text_type(fmt).format(degrees, minutes, seconds)
+        return str(fmt).format(degrees, minutes, seconds)
 
     if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
         return ''
@@ -324,7 +320,7 @@ def link(req, obj, **kw):
     href = kw.pop('href', req.resource_url(obj, rsc=rsc, **kw.pop('url_kw', {})))
     kw['class'] = ' '.join(
         filter(None, kw.get('class', '').split() + [rsc.interface.__name__[1:]]))
-    label = kw.pop('label', text_type(obj))
+    label = kw.pop('label', str(obj))
     kw.setdefault('title', label)
     return HTML.a(label, href=href, **kw)
 

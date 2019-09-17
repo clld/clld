@@ -21,7 +21,7 @@ class ValueNameCol(LinkCol):
         return item.valueset
 
     def get_attrs(self, item):
-        label = item.__unicode__()
+        label = str(item)
         title = label
         if self.dt.parameter:
             label = HTML.span(map_marker_img(self.dt.req, item), literal('&nbsp;'), label)

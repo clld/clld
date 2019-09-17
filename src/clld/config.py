@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
 from functools import partial
-
-from six import PY2
-from six.moves.configparser import ConfigParser
-from clldutils.path import Path
+from configparser import ConfigParser
+from pathlib import Path
 
 
 def get_config(p):
@@ -13,12 +10,7 @@ def get_config(p):
     """
     cfg = {}
     parser = ConfigParser()
-    if hasattr(parser, 'read_file'):
-        parser.read_file(Path(p).open(encoding='utf8'))
-    else:  # pragma: no cover
-        assert PY2
-        # The `read_file` method is not available on ConfigParser in py2.7!
-        parser.readfp(Path(p).open(encoding='utf8'))
+    parser.read_file(Path(p).open(encoding='utf8'))
 
     for section in parser.sections():
         getters = {

@@ -1,7 +1,4 @@
-# coding: utf8
 """Functionality to format HTML pagination controls."""
-from __future__ import unicode_literals
-
 from paginate import Page
 
 from clld.web.util.component import Component

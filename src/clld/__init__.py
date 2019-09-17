@@ -1,9 +1,7 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
 from collections import namedtuple
 
 from clld.db.models import common
 from clld import interfaces
-
 
 __version__ = "4.7.3.dev0"
 

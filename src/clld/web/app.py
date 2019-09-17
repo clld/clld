@@ -5,6 +5,7 @@ import re
 import importlib
 from uuid import uuid4
 import datetime
+from pathlib import Path
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload, undefer
@@ -20,8 +21,7 @@ from pyramid.asset import abspath_from_asset_spec
 from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
 from purl import URL
-from six import string_types
-from clldutils.path import Path, md5, git_describe
+from clldutils.path import md5, git_describe
 
 import clld
 from clld.config import get_config
@@ -372,7 +372,7 @@ def register_menu(config, *items):
     """
     menuitems = OrderedDict()
     for item in items:
-        if isinstance(item, string_types):
+        if isinstance(item, str):
             item = (item, {})
         name, factory = item
         if isinstance(factory, dict):

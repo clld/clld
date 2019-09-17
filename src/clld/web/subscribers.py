@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
-
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 from clld.web.util import helpers

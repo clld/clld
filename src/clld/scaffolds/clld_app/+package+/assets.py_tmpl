@@ -1,4 +1,5 @@
-from clldutils.path import Path
+from pathlib import Path
+
 from clld.web.assets import environment
 
 import {{package}}

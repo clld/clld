@@ -1,20 +1,13 @@
-# coding: utf8
-from __future__ import unicode_literals, print_function, division
 import sys
 import os
+import pathlib
 
 import pytest
-from clldutils.path import Path
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
 from clld.db.meta import CustomModelMixin, DBSession, VersionedDBSession
 from clld.db.models import common
 from clld.db.util import set_alembic_version
 from clld.scripts.util import Data
-
-if sys.version_info < (3, 5):  # pragma: no cover
-    import pathlib2 as pathlib
-else:
-    import pathlib
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
@@ -31,7 +24,7 @@ def custom_language():
 
 @pytest.fixture
 def testsdir():
-    return Path(__file__).parent
+    return pathlib.Path(__file__).parent
 
 
 class TestData(Data):

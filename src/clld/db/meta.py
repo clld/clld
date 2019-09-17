@@ -2,8 +2,6 @@
 import sqlite3
 import json
 
-from six import string_types, PY2
-
 from sqlalchemy import (
     Column, Integer, Float, String, Boolean, DateTime, func, event)
 from sqlalchemy.exc import DisconnectionError
@@ -17,7 +15,7 @@ from sqlalchemy.inspection import inspect
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from zope.sqlalchemy import ZopeTransactionExtension
-from clldutils.misc import NO_DEFAULT, UnicodeMixin
+from clldutils.misc import NO_DEFAULT
 from clldutils import jsonlib
 
 from clld.db.versioned import versioned_session
@@ -144,8 +142,6 @@ class CsvMixin(object):
         prop = getattr(self, attr, '')
         if attr == 'jsondata':
             prop = json.dumps(prop)
-            if PY2:
-                prop = prop.decode('utf8')
         if rel == 'id' and hasattr(prop, 'id'):
             return prop.id
         elif rel == 'ids':
@@ -165,7 +161,7 @@ class CsvMixin(object):
             if isinstance(col.property.columns[0].type, Integer):
                 return int(value)
             if isinstance(col.property.columns[0].type, Float):
-                if isinstance(value, string_types):
+                if isinstance(value, str):
                     value = value.replace(',', '.')
                 return float(value)
         return value
@@ -185,7 +181,7 @@ class CsvMixin(object):
         return query.order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
 
 
-class Base(UnicodeMixin, CsvMixin, declarative_base()):
+class Base(CsvMixin, declarative_base()):
 
     """The declarative base for all our models."""
 
@@ -310,7 +306,7 @@ class Base(UnicodeMixin, CsvMixin, declarative_base()):
             if col.key not in exclude and not exclude.add(col.key)]
         return {col: jsonlib.format(getattr(self, col)) for col in cols}
 
-    def __unicode__(self):
+    def __str__(self):
         """A human readable label for the object."""
         r = getattr(self, 'name', None)
         if not r:

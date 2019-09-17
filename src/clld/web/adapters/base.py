@@ -1,11 +1,9 @@
 """Base classes for adapters."""
-from __future__ import unicode_literals
 from uuid import uuid4
 
 from zope.interface import implementer
 from pyramid.response import Response
 from pyramid.renderers import render as pyramid_render
-from six import text_type
 from clldutils.misc import slug
 
 from clld import interfaces
@@ -106,4 +104,4 @@ def adapter_factory(*args, **kw):
     kw.setdefault('mimetype', 'text/html')
     kw.setdefault('extension', 'html')
     base = kw.pop('base', Representation)
-    return type(str('AdapterFromFactory%s' % slug(text_type(uuid4()))), (base,), kw)
+    return type(str('AdapterFromFactory%s' % slug(str(uuid4()))), (base,), kw)

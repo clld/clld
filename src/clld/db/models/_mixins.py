@@ -1,12 +1,8 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
+from pathlib import Path
 
-import os
-
-from six import text_type
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
-from clldutils.path import Path
 
 __all__ = (
     'IdNameDescriptionMixin',
@@ -75,7 +71,7 @@ class FilesMixin(IdNameDescriptionMixin):
     @property
     def relpath(self):
         """OS file path of the file relative to the application's file-system dir."""
-        return os.path.join(self.owner_class().lower(), str(self.object.id), str(self.id))
+        return Path(self.owner_class().lower()) / str(self.object.id) / str(self.id)
 
     def create(self, dir_, content):
         """Write ``content`` to a file using ``dir_`` as file-system directory.
@@ -86,7 +82,7 @@ class FilesMixin(IdNameDescriptionMixin):
         if not p.parent.exists():
             p.parent.mkdir(parents=True)
         with open(p.as_posix(), 'wb') as fp:
-            if isinstance(content, text_type):
+            if isinstance(content, str):
                 content = content.encode('utf8')
             fp.write(content)
         return p.as_posix()

@@ -1,21 +1,20 @@
 """Shared functionality for clld console scripts."""
-from __future__ import unicode_literals, division, absolute_import, print_function
 import sys
 from distutils.util import strtobool
 from collections import defaultdict
 import argparse
 import logging
 from functools import partial
+from pathlib import Path
 
-from six.moves.urllib.parse import quote_plus
-from six.moves import input
+from urllib.parse import quote_plus
 import transaction
 from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy.orm import joinedload
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
 from nameparser import HumanName
-from clldutils.path import Path, as_posix, remove
+from clldutils.path import as_posix
 from clldutils import jsonlib
 from clldutils.misc import slug
 
@@ -234,11 +233,12 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
     if command == 'cleanup':
         for fname in args.data_file('gbs').glob('*.json'):
             try:
+                fname = Path(fname)
                 data = jsonlib.load(fname)
                 if data.get('totalItems') == 0:
-                    remove(fname)
+                    fname.unlink()
             except ValueError:
-                remove(fname)
+                fname.unlink()
         return
 
     if not sources:

@@ -1,12 +1,12 @@
 """Generic utility functions."""
-from __future__ import unicode_literals, print_function, division, absolute_import
 import re
 import random
 from string import ascii_lowercase
 from contextlib import contextmanager
+from pathlib import Path
 
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
-from clldutils.path import remove, move, Path
+from clldutils.path import move
 from clldutils.declenum import DeclEnum as BaseEnum
 from clldutils.lgr import ABBRS as LGR_ABBRS
 assert LGR_ABBRS
@@ -27,7 +27,7 @@ def safe_overwrite(fname):
         tmp = fname.parent.joinpath('%s.%s' % (fname.name, random_string(6)))
     yield tmp
     if fname.exists():
-        remove(fname)
+        fname.unlink()
     move(tmp, fname)
 
 

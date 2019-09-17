@@ -1,5 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals, print_function, division, absolute_import
 from zipfile import ZipFile
 
 from pycldf.dataset import Dataset as CldfDataset
