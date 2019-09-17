@@ -1,7 +1,6 @@
 import pytest
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotAcceptable, HTTPNotFound, HTTPGone, HTTPFound
-from requests.exceptions import ReadTimeout
 
 from clld.db.models import common
 from clld.interfaces import IDataTable
@@ -129,65 +128,3 @@ def test_unapi(env, request_factory, params, assertion):
 
     with request_factory(params=params) as req:
         assert assertion(unapi(req))
-
-
-def test_atom_feed(env, mocker):
-    from clld.web.views import atom_feed
-
-    class FeedResponseWithTitle(object):
-        status_code = 200
-        content = b"""\
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
-      xmlns:dc="http://purl.org/dc/elements/1.1/"
-      xmlns:atom="http://www.w3.org/2005/Atom"
-      xmlns:sy="http://purl.org/rss/1.0/modules/syndication/">
-<channel>
-    <title>Comments for The World Atlas of Language Structures Online</title>
-    <link>http://blog.wals.info</link>
-    <description>WALS Online Blog</description>
-        <item>
-        <title>Comment on Datapoint</title>
-        <link>http://blog.wals.info/datapoint</link>
-        <pubDate>Wed, 04 Nov 2015 22:11:03 +0000</pubDate>
-        <guid>http://blog.wals.info/datapoint-26a-wals_code_juk/</guid>
-        <description>Some description</description>
-        <content:encoded><![CDATA[<p>some description</p>
-]]></content:encoded>
-    </item>
-</channel>
-"""
-
-    class FeedResponseWithoutTitle(object):
-        status_code = 200
-        content = b"""\
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
-      xmlns:dc="http://purl.org/dc/elements/1.1/"
-      xmlns:atom="http://www.w3.org/2005/Atom"
-      xmlns:sy="http://purl.org/rss/1.0/modules/syndication/">
-<channel>
-    <link>http://blog.wals.info</link>
-    <description>WALS Online Blog</description>
-</channel>
-"""
-
-    class MockRequests1(object):
-        get = mocker.Mock(return_value=FeedResponseWithTitle)
-
-    class MockRequests2(object):
-        get = mocker.Mock(return_value=FeedResponseWithoutTitle)
-
-    class MockRequestsTimeout(object):
-        def get(self, *args, **kw):
-            raise ReadTimeout()
-
-    mocker.patch('clld.web.views.requests', MockRequests1())
-    res = atom_feed(env['request'], None)
-    assert '<entry>' in res.body.decode('utf8')
-
-    mocker.patch('clld.web.views.requests', MockRequests2())
-    res = atom_feed(env['request'], None)
-    assert '<entry>' not in res.body.decode('utf8')
-
-    mocker.patch('clld.web.views.requests', MockRequestsTimeout())
-    res = atom_feed(env['request'], None)
-    assert '<entry>' not in res.body.decode('utf8')
