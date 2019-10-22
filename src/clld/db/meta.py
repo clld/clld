@@ -14,7 +14,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.inspection import inspect
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
-from zope.sqlalchemy import ZopeTransactionExtension
+import zope.sqlalchemy
 from clldutils.misc import NO_DEFAULT
 from clldutils import jsonlib
 
@@ -82,11 +82,12 @@ class ActiveOnlyQuery(Query):  # pragma: no cover
             return self
 
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-ActiveOnlyDBSession = scoped_session(sessionmaker(
-    extension=ZopeTransactionExtension(), query_cls=ActiveOnlyQuery))
-VersionedDBSession = scoped_session(versioned_session(
-    sessionmaker(autoflush=False, extension=ZopeTransactionExtension())))
+DBSession = scoped_session(sessionmaker())
+zope.sqlalchemy.register(DBSession)
+ActiveOnlyDBSession = scoped_session(sessionmaker(query_cls=ActiveOnlyQuery))
+zope.sqlalchemy.register(ActiveOnlyDBSession)
+VersionedDBSession = scoped_session(versioned_session(sessionmaker(autoflush=False)))
+zope.sqlalchemy.register(VersionedDBSession)
 
 
 class JSONEncodedDict(TypeDecorator):
