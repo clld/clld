@@ -2,6 +2,12 @@
 Changes
 -------
 
+5.1.0
+~~~~~
+
+More support for cli scripts
+
+
 5.0.0
 ~~~~~
 
