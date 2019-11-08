@@ -16,10 +16,16 @@ def test_data_file():
 def test_setup_session(testsdir):
     from clld.scripts.util import setup_session
 
-    res = setup_session(
-        '%s#main' % (testsdir / 'test.ini').as_posix(),
-        create_engine('sqlite://'))
+    res = setup_session('{0}#main'.format(testsdir / 'test.ini'), create_engine('sqlite://'))
     assert res == 'tests'
+
+
+def test_SessionContext(testsdir):
+    from clld.scripts.util import SessionContext, get_env_and_settings
+
+    _, settings = get_env_and_settings('{0}#main'.format(testsdir / 'test.ini'))
+    with SessionContext(settings):
+        pass
 
 
 def test_bibtex2source():

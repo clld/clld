@@ -24,6 +24,29 @@ from clld.db.util import page_query
 from clld.lib import bibtex
 
 
+class SessionContext:
+    """
+    To support accessing configured sessions in cli commands.
+    """
+    def __init__(self, settings):
+        self.settings = {'sqlalchemy.url': settings} if isinstance(settings, str) else settings
+        self.engine = None
+
+    def __enter__(self):
+        self.engine = engine_from_config(self.settings)
+        DBSession.configure(bind=self.engine)
+        Base.metadata.create_all(self.engine)
+        return DBSession
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.engine:
+            self.engine.dispose()
+
+
+def get_env_and_settings(config_uri):
+    return bootstrap(config_uri), get_appsettings(config_uri)
+
+
 def glottocodes_by_isocode(dburi, cols=['id']):
     """Query Glottolog.
 
