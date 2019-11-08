@@ -110,6 +110,9 @@ class Combination(object):
         self.multiple = []
         super(Combination, self).__init__()
 
+    def __json__(self, *args, **kw):
+        return {k: getattr(self, k) for k in ['id', 'name']}
+
     @classmethod
     def get(cls, id_, **kw):
         params = []

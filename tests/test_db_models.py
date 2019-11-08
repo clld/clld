@@ -158,3 +158,4 @@ def test_Combination(data):
     c = Combination.get(Combination.delimiter.join(2 * [p.id]))
     assert c.values
     assert c.domain
+    assert c.__json__()
