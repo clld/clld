@@ -34,13 +34,16 @@ class SessionContext:
 
     def __enter__(self):
         self.engine = engine_from_config(self.settings)
+        DBSession.remove()
         DBSession.configure(bind=self.engine)
+        assert DBSession.bind == self.engine
         Base.metadata.create_all(self.engine)
         return DBSession
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.engine:
             self.engine.dispose()
+        DBSession.remove()
 
 
 def get_env_and_settings(config_uri):
