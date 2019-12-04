@@ -484,22 +484,24 @@ CLLD.Map = function(eid, layers, options) {
      * @private
      */
     var _onEachFeature = function(feature, layer) {
-        var size = 20,
-            map = CLLD.Maps[eid];
-        if (feature.properties.icon_size) {
-            size = feature.properties.icon_size;
-        } else if (map.options.sidebar) {
-            size = 20;
-        } else if (map.options.icon_size) {
-            size = map.options.icon_size;
-        }
-        layer.setIcon(map.icon(feature, size));
-        if (feature.properties.zindex) {
-            layer.setZIndexOffset(feature.properties.zindex);
-        }
-        map.oms.addMarker(layer);
-        map.marker_map[feature.properties.language.id] = layer;
-        layer.bindTooltip(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
+        if (layer.setIcon != undefined) {
+            var size = 20,
+                map = CLLD.Maps[eid];
+            if (feature.properties.icon_size) {
+                size = feature.properties.icon_size;
+            } else if (map.options.sidebar) {
+                size = 20;
+            } else if (map.options.icon_size) {
+                size = map.options.icon_size;
+            }
+            layer.setIcon(map.icon(feature, size));
+            if (feature.properties.zindex) {
+                layer.setZIndexOffset(feature.properties.zindex);
+            }
+            map.oms.addMarker(layer);
+            map.marker_map[feature.properties.language.id] = layer;
+            layer.bindTooltip(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
+        };
     };
 
     var _zoomToExtent = function() {
