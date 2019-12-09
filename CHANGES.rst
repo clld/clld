@@ -2,6 +2,12 @@
 Changes
 -------
 
+5.2.0
+~~~~~
+
+Bugfixes and upgrade of javascript
+
+
 5.1.0
 ~~~~~
 
