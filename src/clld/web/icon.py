@@ -1,6 +1,7 @@
 """Functionality to manage icons for map markers."""
-from itertools import product, chain
+import itertools
 
+from clldutils import svg
 from zope.interface import implementer
 from clld.interfaces import IIcon, IMapMarker
 
@@ -47,6 +48,7 @@ COLORS = [
     'ffffcc',
     'ffffff',
 ]
+DEFAULT_ICON = 'cff6600'
 
 # the following colors show enough mutual contrast to be easily distinguised:
 PREFERED_COLORS = [
@@ -72,12 +74,8 @@ class Icon(object):
     def __init__(self, name):
         self.name = name
 
-    @property
-    def asset_spec(self):
-        return 'clld:web/static/icons/%s.png' % self.name
-
     def url(self, req):
-        return req.static_url(self.asset_spec)
+        return svg.data_url(svg.icon(self.name))
 
 
 #: a list of all available icons:
@@ -87,9 +85,9 @@ ICONS = [Icon('%s%s' % (s, c)) for s in SHAPES for c in COLORS]
 ICON_MAP = {icon.name: icon for icon in ICONS}
 
 #: a list of icons ordered by preference:
-ORDERED_ICONS = [ICON_MAP[s + c] for s, c in chain(
-                 product(SHAPES, PREFERED_COLORS),
-                 product(SHAPES, SECONDARY_COLORS))]
+ORDERED_ICONS = [ICON_MAP[s + c] for s, c in itertools.chain(
+                 itertools.product(SHAPES, PREFERED_COLORS),
+                 itertools.product(SHAPES, SECONDARY_COLORS))]
 
 
 @implementer(IMapMarker)
@@ -98,8 +96,8 @@ class MapMarker(object):
     """The default map marker is an orange circle."""
 
     def get_icon(self, ctx, req):
-        return 'cff6600'
+        return DEFAULT_ICON
 
     def __call__(self, ctx, req):
-        icon = self.get_icon(ctx, req) or 'cff6600'
+        icon = self.get_icon(ctx, req) or DEFAULT_ICON
         return req.registry.getUtility(IIcon, icon).url(req)
