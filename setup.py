@@ -25,7 +25,7 @@ install_requires = [
     'xlwt',
     'webhelpers2>=2.0',
     'nameparser',
-    'waitress',
+    'waitress>=1.4.2',
 ]
 
 
