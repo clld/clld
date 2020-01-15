@@ -96,18 +96,6 @@ and publications:
     :members:
 
 
-Versioning
-~~~~~~~~~~
-
-Versioned model objects are supported via the :py:class:`clld.db.versioned.Versioned` mixin,
-implemented following the corresponding
-`SQLAlchemy ORM Example <http://docs.sqlalchemy.org/en/rel_0_9/orm/examples.html#module-examples.versioned_history>`_.
-
-.. automodule:: clld.db.versioned
-    :members:
-    :exclude-members: relationship, desc, mapper
-
-
 Migrations
 ~~~~~~~~~~
 
