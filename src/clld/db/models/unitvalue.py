@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -17,18 +16,17 @@ assert _unitparameter
 __all__ = ('UnitValue',)
 
 
-class UnitValue_data(Base, Versioned, DataMixin):
+class UnitValue_data(Base, DataMixin):
     pass
 
 
-class UnitValue_files(Base, Versioned, FilesMixin):
+class UnitValue_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IUnitValue)
 class UnitValue(Base,
                 PolymorphicBaseMixin,
-                Versioned,
                 IdNameDescriptionMixin,
                 HasDataMixin,
                 HasFilesMixin):

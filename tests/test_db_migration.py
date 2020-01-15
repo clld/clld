@@ -20,7 +20,6 @@ def test_crud(db):
     identifier = DBSession.query(common.Identifier)\
         .options(undefer('*')).get(pk)
     assert identifier.active
-    assert identifier.version == 1
     assert identifier.created
     assert identifier.updated
 

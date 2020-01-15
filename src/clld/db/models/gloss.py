@@ -2,14 +2,13 @@ from sqlalchemy import Column, Integer, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
 from clld.db.meta import Base
-from clld.db.versioned import Versioned
 
 from . import IdNameDescriptionMixin, Language
 
 __all__ = ('GlossAbbreviation',)
 
 
-class GlossAbbreviation(Base, Versioned, IdNameDescriptionMixin):
+class GlossAbbreviation(Base, IdNameDescriptionMixin):
 
     """Possibly language-specific abbreviation used in IGTs."""
 

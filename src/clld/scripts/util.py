@@ -18,7 +18,7 @@ from clldutils.path import as_posix
 from clldutils import jsonlib
 from clldutils.misc import slug
 
-from clld.db.meta import VersionedDBSession, DBSession, Base
+from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld.db.util import page_query
 from clld.lib import bibtex
@@ -163,7 +163,6 @@ def setup_session(config_uri, engine=None):
     settings = get_appsettings(config_uri)
     engine = engine or engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
-    VersionedDBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     return Path(config_uri.split('#')[0]).resolve().parent.name
 

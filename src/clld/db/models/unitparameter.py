@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import IdNameDescriptionMixin, DataMixin, HasDataMixin, FilesMixin, HasFilesMixin
@@ -12,18 +11,17 @@ from . import IdNameDescriptionMixin, DataMixin, HasDataMixin, FilesMixin, HasFi
 __all__ = ('UnitDomainElement', 'UnitParameter')
 
 
-class UnitDomainElement_data(Base, Versioned, DataMixin):
+class UnitDomainElement_data(Base, DataMixin):
     pass
 
 
-class UnitDomainElement_files(Base, Versioned, FilesMixin):
+class UnitDomainElement_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IUnitDomainElement)
 class UnitDomainElement(Base,
                         PolymorphicBaseMixin,
-                        Versioned,
                         IdNameDescriptionMixin,
                         HasDataMixin,
                         HasFilesMixin):
@@ -42,18 +40,17 @@ class UnitDomainElement(Base,
         return request.resource_url(self.parameter, _anchor='DE-%s' % self.id)
 
 
-class UnitParameter_data(Base, Versioned, DataMixin):
+class UnitParameter_data(Base, DataMixin):
     pass
 
 
-class UnitParameter_files(Base, Versioned, FilesMixin):
+class UnitParameter_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IUnitParameter)
 class UnitParameter(Base,
                     PolymorphicBaseMixin,
-                    Versioned,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):

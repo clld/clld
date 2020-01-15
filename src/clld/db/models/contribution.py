@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -15,18 +14,17 @@ from . import (
 __all__ = ('Contribution', 'ContributionReference', 'ContributionContributor')
 
 
-class Contribution_data(Base, Versioned, DataMixin):
+class Contribution_data(Base, DataMixin):
     pass
 
 
-class Contribution_files(Base, Versioned, FilesMixin):
+class Contribution_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IContribution)
 class Contribution(Base,
                    PolymorphicBaseMixin,
-                   Versioned,
                    IdNameDescriptionMixin,
                    HasDataMixin,
                    HasFilesMixin):
@@ -56,7 +54,7 @@ class Contribution(Base,
         return ' with '.join(contribs)
 
 
-class ContributionReference(Base, Versioned, HasSourceNotNullMixin):
+class ContributionReference(Base, HasSourceNotNullMixin):
 
     """Association table."""
 
@@ -68,7 +66,7 @@ class ContributionReference(Base, Versioned, HasSourceNotNullMixin):
     contribution = relationship(Contribution, innerjoin=True, backref="references")
 
 
-class ContributionContributor(Base, PolymorphicBaseMixin, Versioned):
+class ContributionContributor(Base, PolymorphicBaseMixin):
 
     """Many-to-many association between contributors and contributions."""
 

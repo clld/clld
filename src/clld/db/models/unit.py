@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -13,18 +12,17 @@ from . import (
 __all__ = ('Unit',)
 
 
-class Unit_data(Base, Versioned, DataMixin):
+class Unit_data(Base, DataMixin):
     pass
 
 
-class Unit_files(Base, Versioned, FilesMixin):
+class Unit_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IUnit)
 class Unit(Base,
            PolymorphicBaseMixin,
-           Versioned,
            IdNameDescriptionMixin,
            HasDataMixin,
            HasFilesMixin):

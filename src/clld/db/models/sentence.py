@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -15,18 +14,17 @@ from . import (
 __all__ = ('Sentence', 'SentenceReference')
 
 
-class Sentence_data(Base, Versioned, DataMixin):
+class Sentence_data(Base, DataMixin):
     pass
 
 
-class Sentence_files(Base, Versioned, FilesMixin):
+class Sentence_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.ISentence)
 class Sentence(Base,
                PolymorphicBaseMixin,
-               Versioned,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
@@ -72,7 +70,7 @@ class Sentence(Base,
                 return f
 
 
-class SentenceReference(Base, Versioned, HasSourceNotNullMixin):
+class SentenceReference(Base, HasSourceNotNullMixin):
 
     """Association table."""
 

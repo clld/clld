@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
-from clld.db.meta import CustomModelMixin, DBSession, VersionedDBSession
+from clld.db.meta import CustomModelMixin, DBSession
 from clld.db.models import common
 from clld.db.util import set_alembic_version
 from clld.scripts.util import Data
@@ -180,7 +180,6 @@ def db(db):
         yield db
     finally:
         DBSession.rollback()
-        VersionedDBSession.rollback()
 
 
 @pytest.fixture

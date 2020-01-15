@@ -1,7 +1,5 @@
 # update_unique_null.py - adapt composite unique constraints and nullables
 
-from __future__ import unicode_literals
-
 from alembic import op
 import sqlalchemy as sa
 

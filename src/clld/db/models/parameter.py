@@ -8,7 +8,6 @@ from zope.interface import implementer
 from clldutils.misc import lazyproperty
 
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
-from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.web.icon import ORDERED_ICONS
 
@@ -20,18 +19,17 @@ from . import (
 __all__ = ('DomainElement', 'Parameter', 'Combination')
 
 
-class DomainElement_data(Base, Versioned, DataMixin):
+class DomainElement_data(Base, DataMixin):
     pass
 
 
-class DomainElement_files(Base, Versioned, FilesMixin):
+class DomainElement_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IDomainElement)
 class DomainElement(Base,
                     PolymorphicBaseMixin,
-                    Versioned,
                     IdNameDescriptionMixin,
                     HasDataMixin,
                     HasFilesMixin):
@@ -55,18 +53,17 @@ class DomainElement(Base,
         return request.resource_url(self.parameter, _anchor='DE-' + self.id)
 
 
-class Parameter_data(Base, Versioned, DataMixin):
+class Parameter_data(Base, DataMixin):
     pass
 
 
-class Parameter_files(Base, Versioned, FilesMixin):
+class Parameter_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IParameter)
 class Parameter(Base,
                 PolymorphicBaseMixin,
-                Versioned,
                 IdNameDescriptionMixin,
                 HasDataMixin,
                 HasFilesMixin):

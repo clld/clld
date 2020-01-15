@@ -10,7 +10,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
-from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.web.util.htmllib import HTML
 
@@ -22,12 +21,12 @@ from . import (
 __all__ = ('Dataset', 'Editor')
 
 
-class Dataset_data(Base, Versioned, DataMixin):
+class Dataset_data(Base, DataMixin):
 
     """Associated data mapper."""
 
 
-class Dataset_files(Base, Versioned, FilesMixin):
+class Dataset_files(Base, FilesMixin):
 
     """Associated files mapper."""
 
@@ -35,7 +34,6 @@ class Dataset_files(Base, Versioned, FilesMixin):
 @implementer(interfaces.IDataset)
 class Dataset(Base,
               PolymorphicBaseMixin,
-              Versioned,
               IdNameDescriptionMixin,
               HasDataMixin,
               HasFilesMixin):
@@ -86,7 +84,7 @@ class Dataset(Base,
         )
 
 
-class Editor(Base, PolymorphicBaseMixin, Versioned):
+class Editor(Base, PolymorphicBaseMixin):
 
     """Many-to-many association between contributors and dataset."""
 

@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -18,18 +17,17 @@ assert _parameter
 __all__ = ('ValueSet', 'ValueSetReference')
 
 
-class ValueSet_data(Base, Versioned, DataMixin):
+class ValueSet_data(Base, DataMixin):
     pass
 
 
-class ValueSet_files(Base, Versioned, FilesMixin):
+class ValueSet_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IValueSet)
 class ValueSet(Base,
                PolymorphicBaseMixin,
-               Versioned,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
@@ -70,7 +68,7 @@ class ValueSet(Base,
         return self.language.name + ' / ' + self.parameter.name
 
 
-class ValueSetReference(Base, Versioned, HasSourceNotNullMixin):
+class ValueSetReference(Base, HasSourceNotNullMixin):
 
     """References for a set of values (related to one parameter and one language).
 

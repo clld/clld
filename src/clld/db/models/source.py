@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.lib import bibtex
 from clld.lib import coins
@@ -19,18 +18,17 @@ from . import (
 __all__ = ('Source', 'HasSourceMixin', 'HasSourceNotNullMixin')
 
 
-class Source_data(Base, Versioned, DataMixin):
+class Source_data(Base, DataMixin):
     pass
 
 
-class Source_files(Base, Versioned, FilesMixin):
+class Source_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.ISource)
 class Source(Base,
              PolymorphicBaseMixin,
-             Versioned,
              IdNameDescriptionMixin,
              HasDataMixin,
              HasFilesMixin):

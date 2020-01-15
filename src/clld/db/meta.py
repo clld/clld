@@ -10,15 +10,12 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import scoped_session, sessionmaker, deferred, undefer
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from sqlalchemy.orm.query import Query
 from sqlalchemy.inspection import inspect
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 import zope.sqlalchemy
 from clldutils.misc import NO_DEFAULT
 from clldutils import jsonlib
-
-from clld.db.versioned import versioned_session
 
 
 @event.listens_for(Pool, "checkout")
@@ -50,44 +47,8 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-class ActiveOnlyQuery(Query):  # pragma: no cover
-
-    """A pre-filtering query.
-
-    Implements a
-    `pre-filtering query <http://www.sqlalchemy.org/trac/wiki/UsageRecipes/\
-    PreFilteredQuery>`_ that filters on the :py:attr:`clld.db.meta._Base.active` flag.
-    """
-
-    def get(self, ident):
-        # override get() so that the flag is always checked in the
-        # DB as opposed to pulling from the identity map.
-        return Query.get(self.populate_existing(), ident)
-
-    def __iter__(self):
-        return Query.__iter__(self.private())
-
-    def from_self(self, *ent):
-        # override from_self() to automatically apply
-        # the criterion too.   this works with count() and
-        # others.
-        return Query.from_self(self.private(), *ent)
-
-    def private(self):
-        mzero = self._mapper_zero()
-        if mzero is not None:
-            crit = mzero.class_.active == True
-            return self.enable_assertions(False).filter(crit)
-        else:
-            return self
-
-
 DBSession = scoped_session(sessionmaker())
 zope.sqlalchemy.register(DBSession)
-ActiveOnlyDBSession = scoped_session(sessionmaker(query_cls=ActiveOnlyQuery))
-zope.sqlalchemy.register(ActiveOnlyDBSession)
-VersionedDBSession = scoped_session(versioned_session(sessionmaker(autoflush=False)))
-zope.sqlalchemy.register(VersionedDBSession)
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -283,16 +244,6 @@ class Base(CsvMixin, declarative_base()):
     def first(cls):
         """More convenience."""
         return DBSession.query(cls).order_by(cls.pk).first()
-
-    def history(self):
-        """return result proxy to iterate over previous versions of a record."""
-        model = self.__class__
-        if not hasattr(model, '__history_mapper__'):
-            return []  # pragma: no cover
-
-        history_class = model.__history_mapper__.class_
-        return DBSession.query(history_class).filter(history_class.pk == self.pk)\
-            .order_by(history_class.version.desc())
 
     def __json__(self, req):
         """Custom JSON serialization of an object.

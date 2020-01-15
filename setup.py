@@ -73,7 +73,7 @@ setup(
             'xlrd',
             'mock',
             'pytest>=3.6',
-            'pytest-clld',
+            'pytest-clld>=1.0.0',
             'pytest-mock',
             'pytest-cov',
             'coverage>=4.2',

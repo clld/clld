@@ -4,7 +4,6 @@ from zope.interface import implementer
 from nameparser import HumanName
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from .import (
@@ -14,18 +13,17 @@ from .import (
 __all__ = ('Contributor',)
 
 
-class Contributor_data(Base, Versioned, DataMixin):
+class Contributor_data(Base, DataMixin):
     pass
 
 
-class Contributor_files(Base, Versioned, FilesMixin):
+class Contributor_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IContributor)
 class Contributor(Base,
                   PolymorphicBaseMixin,
-                  Versioned,
                   IdNameDescriptionMixin,
                   HasDataMixin,
                   HasFilesMixin):

@@ -14,7 +14,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 from clld.util import DeclEnum
 
@@ -28,12 +27,12 @@ __all__ = (
 )
 
 
-class Language_data(Base, Versioned, DataMixin):
+class Language_data(Base, DataMixin):
 
     """Associated data mapper."""
 
 
-class Language_files(Base, Versioned, FilesMixin):
+class Language_files(Base, FilesMixin):
 
     """Associated files mapper."""
 
@@ -41,7 +40,6 @@ class Language_files(Base, Versioned, FilesMixin):
 @implementer(interfaces.ILanguage)
 class Language(Base,
                PolymorphicBaseMixin,
-               Versioned,
                IdNameDescriptionMixin,
                HasDataMixin,
                HasFilesMixin):
@@ -78,7 +76,7 @@ class Language(Base,
         return self.get_identifier(IdentifierType.glottolog)
 
 
-class LanguageSource(Base, Versioned):
+class LanguageSource(Base):
 
     """Association table."""
 
@@ -99,7 +97,7 @@ class IdentifierType(DeclEnum):
     ethnologue = 'ethnologue', 'Ethnologue', 'http://www.ethnologue.com/language/{0.name}'
 
 
-class Identifier(Base, Versioned, IdNameDescriptionMixin):
+class Identifier(Base, IdNameDescriptionMixin):
 
     """A language identifier.
 
@@ -121,7 +119,7 @@ class Identifier(Base, Versioned, IdNameDescriptionMixin):
             return
 
 
-class LanguageIdentifier(Base, Versioned):
+class LanguageIdentifier(Base):
 
     """Association table.
 

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 from clld.db.models.common import Language
-from clld.db.meta import DBSession, VersionedDBSession, is_base
+from clld.db.meta import DBSession, is_base
 
 
 def test_JSONEncodedDict(db):
@@ -88,12 +88,11 @@ def test_CsvMixin2(db):
 
 def test_Base(db):
     l = Language(id='abc', name='Name')
-    VersionedDBSession.add(l)
-    VersionedDBSession.flush()
-    VersionedDBSession.expunge(l)
-    l = Language.get('abc', session=VersionedDBSession)
+    DBSession.add(l)
+    DBSession.flush()
+    DBSession.expunge(l)
+    l = Language.get('abc', session=DBSession)
     assert l.name == 'Name'
-    assert not list(l.history())
 
     Language().__str__()
     assert repr(l) == "<Language 'abc'>"
@@ -101,8 +100,8 @@ def test_Base(db):
 
 def test_Base_jsondata(db):
     l = Language(id='abc', name='Name')
-    VersionedDBSession.add(l)
-    VersionedDBSession.flush()
+    DBSession.add(l)
+    DBSession.flush()
     l.update_jsondata(a=1)
     assert 'a' in l.jsondata
     l.update_jsondata(b=1)

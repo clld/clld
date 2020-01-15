@@ -12,7 +12,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 
 from clld.db.meta import Base, PolymorphicBaseMixin
-from clld.db.versioned import Versioned
 from clld import interfaces
 
 from . import (
@@ -25,18 +24,17 @@ assert _parameter
 __all__ = ('Value', 'ValueSentence')
 
 
-class Value_data(Base, Versioned, DataMixin):
+class Value_data(Base, DataMixin):
     pass
 
 
-class Value_files(Base, Versioned, FilesMixin):
+class Value_files(Base, FilesMixin):
     pass
 
 
 @implementer(interfaces.IValue)
 class Value(Base,
             PolymorphicBaseMixin,
-            Versioned,
             IdNameDescriptionMixin,
             HasDataMixin,
             HasFilesMixin):
@@ -81,7 +79,7 @@ class Value(Base,
         return self.domainelement.name if self.domainelement else self.name or self.id
 
 
-class ValueSentence(Base, PolymorphicBaseMixin, Versioned):
+class ValueSentence(Base, PolymorphicBaseMixin):
 
     """Association between values and sentences given as explanation of a value."""
 
