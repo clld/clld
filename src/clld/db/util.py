@@ -1,6 +1,6 @@
 """Database utilities."""
-import time
 import re
+import time
 
 from sqlalchemy import Integer, event
 from sqlalchemy.orm import joinedload

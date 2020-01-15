@@ -1,12 +1,12 @@
 """Shared functionality for clld console scripts."""
 import sys
-from distutils.util import strtobool
-from collections import defaultdict
-import argparse
 import logging
-from functools import partial
-from pathlib import Path
+import pathlib
+import argparse
+import functools
+import collections
 
+from distutils.util import strtobool
 from urllib.parse import quote_plus
 import transaction
 from sqlalchemy import engine_from_config, create_engine
@@ -69,7 +69,7 @@ def glottocodes_by_isocode(dburi, cols=['id']):
             if row[0]:
                 glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
     else:
-        conv = defaultdict(lambda: lambda x: x, latitude=float, longitude=float)
+        conv = collections.defaultdict(lambda: lambda x: x, latitude=float, longitude=float)
         res = requests.get("http://glottolog.org/resourcemap.json?rsc=language")
         for rsc in res.json()['resources']:
             for id_ in rsc.get('identifiers', []):
@@ -155,7 +155,7 @@ def confirm(question, default=False):  # pragma: no cover
 
 def data_file(module, *comps):
     """Return Path object of file in the data directory of an app."""
-    return Path(module.__file__).parent.joinpath('..', 'data', *comps)
+    return pathlib.Path(module.__file__).parent.joinpath('..', 'data', *comps)
 
 
 def setup_session(config_uri, engine=None):
@@ -164,7 +164,7 @@ def setup_session(config_uri, engine=None):
     engine = engine or engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-    return Path(config_uri.split('#')[0]).resolve().parent.name
+    return pathlib.Path(config_uri.split('#')[0]).resolve().parent.name
 
 
 class ExistingDir(argparse.Action):  # pragma: no cover
@@ -172,7 +172,7 @@ class ExistingDir(argparse.Action):  # pragma: no cover
     """Action to select an existing directory."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        path_ = Path(values)
+        path_ = pathlib.Path(values)
         if not path_.exists():
             raise argparse.ArgumentError(self, 'path does not exist')
         if not path_.is_dir():
@@ -185,7 +185,7 @@ class ExistingConfig(argparse.Action):  # pragma: no cover
     """Action to select an existing config file."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        path_ = Path(values.split('#')[0])
+        path_ = pathlib.Path(values.split('#')[0])
         if not path_.exists():
             raise argparse.ArgumentError(self, 'file does not exist')
         setattr(namespace, self.dest, values)
@@ -227,9 +227,9 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     args.log = logging.getLogger(args.module.__name__)
     if engine:
         args.log.info('using bind %s' % engine)
-    args.data_file = partial(data_file, args.module)
-    args.module_dir = Path(args.module.__file__).parent
-    args.migrations_dir = Path(args.module.__file__).parent.joinpath('..', 'migrations')
+    args.data_file = functools.partial(data_file, args.module)
+    args.module_dir = pathlib.Path(args.module.__file__).parent
+    args.migrations_dir = pathlib.Path(args.module.__file__).parent.joinpath('..', 'migrations')
     return args
 
 
@@ -258,7 +258,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
     if command == 'cleanup':
         for fname in args.data_file('gbs').glob('*.json'):
             try:
-                fname = Path(fname)
+                fname = pathlib.Path(fname)
                 data = jsonlib.load(fname)
                 if data.get('totalItems') == 0:
                     fname.unlink()
@@ -357,7 +357,7 @@ def gbs_func(command, args, sources=None):  # pragma: no cover
         log.info('queried gbs for %s sources' % count)
 
 
-class Data(defaultdict):
+class Data(collections.defaultdict):
 
     """Dictionary, serving to store references to new db objects during data imports.
 

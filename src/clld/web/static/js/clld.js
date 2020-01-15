@@ -45,7 +45,7 @@ CLLD.reload = function (query) {
         query = $.extend({}, JSON.parse('{"' + decodeURI(current.search.replace('?', '').replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}'), query)
     }
     document.location.href = url + '?' + $.param(query);
-}
+};
 
 /**
  * Create a URL for a route within the app.

@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 from webassets import Environment, Bundle
 
@@ -10,7 +10,7 @@ def skip(_in, out, **kw):
     out.write('')  # pragma: no cover
 
 
-_static_path = Path(clld.__file__).parent.joinpath('web', 'static').as_posix()
+_static_path = pathlib.Path(clld.__file__).parent.joinpath('web', 'static').as_posix()
 environment = Environment(
     _static_path, '/clld:web/static/', manifest='json:', auto_build=False)
 environment.append_path(_static_path, url='/clld:web/static/')

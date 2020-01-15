@@ -1,5 +1,5 @@
-from collections import OrderedDict
-from itertools import product, groupby
+import itertools
+import collections
 
 from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship, joinedload
@@ -129,24 +129,24 @@ class Combination(object):
 
             This does only work well with parameters which have a discrete domain.
         """
-        d = OrderedDict()
-        for i, des in enumerate(product(*[p.domain for p in self.parameters])):
+        d = collections.OrderedDict()
+        for i, des in enumerate(itertools.product(*[p.domain for p in self.parameters])):
             cde = CombinationDomainElement(
                 self, des, icon=ORDERED_ICONS[i % len(ORDERED_ICONS)])
             d[cde.number] = cde
 
-        for language, values in groupby(
+        for language, values in itertools.groupby(
             sorted(self.values, key=lambda v: v.valueset.language_pk),
             lambda i: i.valueset.language,
         ):
             # values may contain multiple values for the same parameter, so we have to
             # group those, too.
-            values_by_parameter = OrderedDict()
+            values_by_parameter = collections.OrderedDict()
             for p in self.parameters:
                 values_by_parameter[p.pk] = []
             for v in values:
                 values_by_parameter[v.valueset.parameter_pk].append(v)
-            for i, cv in enumerate(product(*values_by_parameter.values())):
+            for i, cv in enumerate(itertools.product(*values_by_parameter.values())):
                 d[tuple(v.domainelement.number for v in cv)].languages.append(language)
                 if i > 0:
                     # a language with multiple values, store a reference.

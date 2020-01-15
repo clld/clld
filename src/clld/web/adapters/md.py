@@ -1,5 +1,5 @@
 """Adapters to serialize metadata of clld objects."""
-from itertools import chain
+import itertools
 
 from zope.interface import implementer
 
@@ -29,7 +29,7 @@ class MetadataFromRec(Metadata):
             genre = 'incollection'
             data['author'] = [
                 c.name for c in
-                chain(ctx.primary_contributors, ctx.secondary_contributors)]
+                itertools.chain(ctx.primary_contributors, ctx.secondary_contributors)]
             data['booktitle'] = req.dataset.description
             data['editor'] = [c.contributor.name for c in req.dataset.editors]
             id_ = '%s-%s' % (req.dataset.id, ctx.id)

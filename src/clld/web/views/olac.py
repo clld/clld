@@ -4,9 +4,9 @@ Support for the provider implementation of an OLAC OAI-PMH repository.
 .. seealso:: http://www.language-archives.org/OLAC/repositories.html
 """
 import re
-from datetime import datetime, timedelta
-from copy import copy
-from collections import namedtuple
+import copy
+import datetime
+import collections
 
 from pyramid.renderers import render
 from pyramid.response import Response
@@ -52,16 +52,16 @@ MD_PREFIX = 'olac'
 TIMESTAMP_REGEX = r'[0-9]{4}\-[0-9]{2}\-[0-9]{2}'
 TIMESTAMP_PATTERN = re.compile(TIMESTAMP_REGEX + '$')
 
-Participant = namedtuple('Participant', 'role name email')
-Institution = namedtuple('Institution', 'name url location')
+Participant = collections.namedtuple('Participant', 'role name email')
+Institution = collections.namedtuple('Institution', 'name url location')
 
 
 def timestamp(dt=None):
-    return str(dt or datetime.utcnow()).split('.')[0].replace(' ', 'T') + 'Z'
+    return str(dt or datetime.datetime.utcnow()).split('.')[0].replace(' ', 'T') + 'Z'
 
 
 def date(dt=None):
-    return str(dt or datetime.utcnow()).split(' ')[0]
+    return str(dt or datetime.datetime.utcnow()).split(' ')[0]
 
 
 class ResumptionToken(object):
@@ -80,7 +80,7 @@ class ResumptionToken(object):
 
     def __init__(self, url_arg=None, offset=None, from_=None, until=None):
         def datetime_from_iso(s):
-            return datetime(*map(int, s.split('-')))
+            return datetime.datetime(*map(int, s.split('-')))
 
         self.offset = offset or 0
         self.from_ = from_
@@ -94,7 +94,7 @@ class ResumptionToken(object):
             if m.group('from'):
                 self.from_ = datetime_from_iso(m.group('from')[1:])
             if m.group('until'):
-                self.until = datetime_from_iso(m.group('until')[1:]) + timedelta(1)
+                self.until = datetime_from_iso(m.group('until')[1:]) + datetime.timedelta(1)
 
     def __str__(self):
         res = "%s" % self.offset
@@ -208,7 +208,7 @@ def olac_with_cfg(req, cfg):
         return response(res)
 
     args = dict(req.params.items())
-    res['params'] = copy(args)
+    res['params'] = copy.copy(args)
     res['verb'] = args.pop('verb', None)
 
     if res['verb'] not in VERBS:

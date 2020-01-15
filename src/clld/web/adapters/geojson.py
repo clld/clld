@@ -3,8 +3,8 @@ Functionality to serialize clld objects as GeoJSON.
 
 .. seealso:: http://geojson.org/
 """
-from json import loads
-from itertools import groupby
+import json
+import itertools
 
 from zope.interface import implementer
 from pyramid.renderers import render as pyramid_render
@@ -201,7 +201,7 @@ class GeoJsonParameterMultipleValueSets(GeoJsonParameter):
 
     def feature_iterator(self, ctx, req):
         q = self.get_query(ctx, req)
-        return groupby(q.order_by(ValueSet.language_pk), lambda vs: vs.language)
+        return itertools.groupby(q.order_by(ValueSet.language_pk), lambda vs: vs.language)
 
     def get_language(self, ctx, req, pair):
         return pair[0]
@@ -232,7 +232,7 @@ class GeoJsonParameterFlatProperties(GeoJsonParameter):
     mimetype = 'application/flat+geojson'
 
     def render(self, ctx, req, dump=True):
-        res = loads(GeoJson.render(self, ctx, req, dump=True))
+        res = json.loads(GeoJson.render(self, ctx, req, dump=True))
         for f in res['features']:
             f['properties'] = flatten(f['properties'])
         return pyramid_render('json', res, request=req) if dump else res

@@ -1,7 +1,7 @@
 """View logic for clld default views."""
-from json import dumps
 import re
-from functools import partial
+import json
+import functools
 
 from pyramid.response import Response
 import pyramid.httpexceptions
@@ -22,7 +22,7 @@ def xpartial(func, *args, **kw):
     >>> f = xpartial(lambda x, y: x + y, 1)
     >>> assert f(1) == 2
     """
-    res = partial(func, *args, **kw)
+    res = functools.partial(func, *args, **kw)
     res.__module__ = func.__module__
     return res
 
@@ -152,12 +152,12 @@ def js(req):
     param_pattern = re.compile(r'\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
 
     res = [
-        "CLLD.base_url = %s;" % dumps(req.application_url),
-        "CLLD.query_params = %s;" % dumps(req.query_params),
+        "CLLD.base_url = %s;" % json.dumps(req.application_url),
+        "CLLD.query_params = %s;" % json.dumps(req.query_params),
     ]
     for route in req.registry.getUtility(IRoutesMapper).get_routes():
         pattern = param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
-        res.append('CLLD.routes[%s] = %s;' % tuple(map(dumps, [route.name, pattern])))
+        res.append('CLLD.routes[%s] = %s;' % tuple(map(json.dumps, [route.name, pattern])))
     return Response('\n'.join(res), content_type="text/javascript")
 
 

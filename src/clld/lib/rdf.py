@@ -1,6 +1,6 @@
 """This module provides functionality for handling our data as rdf."""
-from collections import namedtuple
 import io
+import collections
 
 from clldutils.misc import encoded
 from rdflib import Graph, URIRef, Literal
@@ -12,7 +12,7 @@ assert DOAP
 assert XMLNS
 
 
-Notation = namedtuple('Notation', 'name extension mimetype uri')
+Notation = collections.namedtuple('Notation', 'name extension mimetype uri')
 
 FORMATS = dict((n.name, n) for n in [
     Notation('xml', 'rdf', 'application/rdf+xml', 'http://www.w3.org/ns/formats/RDF_XML'),

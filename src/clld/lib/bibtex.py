@@ -3,9 +3,9 @@ Functionality to handle bibligraphical data in the BibTeX format.
 
 .. seealso:: http://en.wikipedia.org/wiki/BibTeX
 """
-from collections import OrderedDict
 import re
-from pathlib import Path
+import pathlib
+import collections
 
 from zope.interface import Interface, implementer
 from six import unichr, text_type, string_types, iteritems
@@ -353,7 +353,7 @@ class Record(Source, _Convertable):
 
         :return: string representing the concatenation of the values for field 'key'.
         """
-        value = OrderedDict.__getitem__(self, key)
+        value = collections.OrderedDict.__getitem__(self, key)
         if not isinstance(value, (tuple, list)):
             value = [value]
         return Record.sep(key).join(filter(None, value))
@@ -402,13 +402,8 @@ class Database(_Convertable):
 
         @param bibFile: path of the bibtex-database-file to be read.
         """
-        if not isinstance(bibFile, Path):
-            bibFile = Path(bibFile)
-        if bibFile.exists():
-            with bibFile.open(encoding=encoding) as fp:
-                content = fp.read()
-        else:
-            content = ''
+        bibFile = pathlib.Path(bibFile)
+        content = bibFile.read_text(encoding=encoding) if bibFile.exists() else ''
 
         return cls((Record.from_string('@' + m, lowercase=lowercase)
                     for m in re.split(r'^\s*@', content, 0, re.MULTILINE)))

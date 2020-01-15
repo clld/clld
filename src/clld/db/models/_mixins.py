@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relationship
@@ -71,14 +71,14 @@ class FilesMixin(IdNameDescriptionMixin):
     @property
     def relpath(self):
         """OS file path of the file relative to the application's file-system dir."""
-        return Path(self.owner_class().lower()) / str(self.object.id) / str(self.id)
+        return pathlib.Path(self.owner_class().lower()) / str(self.object.id) / str(self.id)
 
     def create(self, dir_, content):
         """Write ``content`` to a file using ``dir_`` as file-system directory.
 
         :return: File-system path of the file that was created.
         """
-        p = Path(dir_).joinpath(self.relpath)
+        p = pathlib.Path(dir_).joinpath(self.relpath)
         if not p.parent.exists():
             p.parent.mkdir(parents=True)
         with open(p.as_posix(), 'wb') as fp:

@@ -1,5 +1,5 @@
 """Base classes for adapters."""
-from uuid import uuid4
+import uuid
 
 from zope.interface import implementer
 from pyramid.response import Response
@@ -104,4 +104,4 @@ def adapter_factory(*args, **kw):
     kw.setdefault('mimetype', 'text/html')
     kw.setdefault('extension', 'html')
     base = kw.pop('base', Representation)
-    return type(str('AdapterFromFactory%s' % slug(str(uuid4()))), (base,), kw)
+    return type(str('AdapterFromFactory%s' % slug(str(uuid.uuid4()))), (base,), kw)

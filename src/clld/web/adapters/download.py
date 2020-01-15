@@ -1,9 +1,9 @@
 """Functionality to create downloads for the data of a clld app."""
-from zipfile import ZipFile, ZIP_DEFLATED
-from gzip import GzipFile
-from contextlib import closing
 import io
-from pathlib import Path
+import gzip
+import pathlib
+import zipfile
+import contextlib
 
 from zope.interface import implementer
 from pyramid.path import AssetResolver
@@ -49,7 +49,7 @@ def pkg_name(pkg):
 
 
 def abspath(asset_spec):
-    return Path(AssetResolver().resolve(asset_spec).abspath())
+    return pathlib.Path(AssetResolver().resolve(asset_spec).abspath())
 
 
 def download_asset_spec(pkg, *comps):
@@ -108,26 +108,25 @@ class Download(object):
                 #
                 # TODO: write test for the file name things!?
                 #
-                with closing(GzipFile(
-                    filename=Path(tmp.stem).stem, fileobj=tmp.open('wb')
+                with contextlib.closing(gzip.GzipFile(
+                    filename=pathlib.Path(tmp.stem).stem, fileobj=tmp.open('wb')
                 )) as fp:
                     self.before(req, fp)
                     for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                         self.dump(req, fp, item, i)
                     self.after(req, fp)
             else:
-                with ZipFile(tmp.as_posix(), 'w', ZIP_DEFLATED) as zipfile:
+                with zipfile.ZipFile(tmp.as_posix(), 'w', zipfile.ZIP_DEFLATED) as zipf:
                     if not filename:
                         fp = self.get_stream()
                         self.before(req, fp)
-                        for i, item in enumerate(
-                                page_query(self.query(req), verbose=verbose)):
+                        for i, item in enumerate(page_query(self.query(req), verbose=verbose)):
                             self.dump(req, fp, item, i)
                         self.after(req, fp)
-                        zipfile.writestr(self.name, self.read_stream(fp))
+                        zipf.writestr(self.name, self.read_stream(fp))
                     else:  # pragma: no cover
-                        zipfile.write(Path(filename).as_posix(), self.name)
-                    zipfile.writestr(
+                        zipf.write(str(pathlib.Path(filename)), self.name)
+                    zipf.writestr(
                         'README.txt',
                         format_readme(req, req.db.query(Dataset).first()).encode('utf8'))
 

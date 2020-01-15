@@ -1,11 +1,11 @@
 """Common functionality of clld Apps is cobbled together here."""
-from functools import partial
-from collections import OrderedDict, namedtuple
 import re
-import importlib
-from uuid import uuid4
+import uuid
+import pathlib
 import datetime
-from pathlib import Path
+import functools
+import importlib
+import collections
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload, undefer
@@ -370,13 +370,13 @@ def register_menu(config, *items):
     menu link; or a route name, or a pair (route name, dict), where dict is used as\
     keyword arguments for menu_item.
     """
-    menuitems = OrderedDict()
+    menuitems = collections.OrderedDict()
     for item in items:
         if isinstance(item, str):
             item = (item, {})
         name, factory = item
         if isinstance(factory, dict):
-            factory = partial(menu_item, name, **factory)
+            factory = functools.partial(menu_item, name, **factory)
         menuitems[name] = factory
     config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
@@ -401,7 +401,7 @@ def add_route_and_view(config, route_name, route_pattern, view, **kw):
 
 
 def register_resource_routes_and_views(config, rsc):
-    kw = dict(factory=partial(ctx_factory, rsc.model, 'rsc'))
+    kw = dict(factory=functools.partial(ctx_factory, rsc.model, 'rsc'))
     if rsc.model == common.Dataset:
         pattern = '/'
         kw['alt_route_pattern'] = '/void.{ext}'
@@ -414,7 +414,7 @@ def register_resource_routes_and_views(config, rsc):
             rsc.plural,
             '/%s' % rsc.plural,
             index_view,
-            factory=partial(ctx_factory, rsc.model, 'index'))
+            factory=functools.partial(ctx_factory, rsc.model, 'index'))
 
 
 def register_resource(config, name, model, interface, with_index=False, **kw):
@@ -442,7 +442,7 @@ def register_download(config, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
-StaticResource = namedtuple('StaticResource', 'type asset_spec')
+StaticResource = collections.namedtuple('StaticResource', 'type asset_spec')
 
 
 def register_staticresource(config, type, asset_spec):
@@ -459,7 +459,7 @@ def add_settings_from_file(config, file_):
 
 
 def _route_and_view(config, pattern, view, name=None):
-    name = name or str(uuid4())
+    name = name or str(uuid.uuid4())
     config.add_route(name, pattern)
     config.add_view(view, route_name=name)
 
@@ -497,7 +497,7 @@ def includeme(config):
     # note: the following exploits the import time side effect of modifying the webassets
     # environment!
     root_package = config.root_package.__name__
-    pkg_dir = Path(config.root_package.__file__).parent.resolve()
+    pkg_dir = pathlib.Path(config.root_package.__file__).parent.resolve()
     maybe_import('%s.assets' % root_package, pkg_dir=pkg_dir)
 
     json_renderer = JSON()
@@ -521,7 +521,7 @@ def includeme(config):
     Base.metadata.bind = engine
 
     try:
-        git_tag = git_describe(Path(pkg_dir).parent)
+        git_tag = git_describe(pathlib.Path(pkg_dir).parent)
     except ValueError:  # pragma: no cover
         git_tag = None
 
@@ -532,7 +532,7 @@ def includeme(config):
         'clld.parameters': {}})
     if 'clld.files' in config.registry.settings:
         # deployment-specific location of static data files
-        abspath = Path(config.registry.settings['clld.files']).resolve()
+        abspath = pathlib.Path(config.registry.settings['clld.files']).resolve()
         config.add_settings({'clld.files': abspath})
         config.add_static_view('files', str(abspath))
 
@@ -540,7 +540,7 @@ def includeme(config):
     config.add_subscriber(add_localizer, events.NewRequest)
     config.add_subscriber(init_map, events.ContextFound)
     config.add_subscriber(
-        partial(
+        functools.partial(
             add_renderer_globals,
             maybe_import('%s.util' % root_package, pkg_dir=pkg_dir)),
         events.BeforeRender)
@@ -550,8 +550,8 @@ def includeme(config):
     #
     for name, func in {
         'register_utility': register_utility,
-        'register_datatable': partial(register_cls, interfaces.IDataTable),
-        'register_map': partial(register_cls, interfaces.IMap),
+        'register_datatable': functools.partial(register_cls, interfaces.IDataTable),
+        'register_map': functools.partial(register_cls, interfaces.IMap),
         'register_menu': register_menu,
         'register_resource': register_resource,
         'register_adapter': register_adapter,
@@ -617,7 +617,7 @@ def includeme(config):
     #
     # inspect default locations for views and templates:
     #
-    home_comp = OrderedDict()
+    home_comp = collections.OrderedDict()
     for name, template in [
         ('introduction', False),
         ('about', False),

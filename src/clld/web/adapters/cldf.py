@@ -1,5 +1,5 @@
-from collections import OrderedDict, defaultdict
 import shutil
+import collections
 
 import transaction
 from zope.interface import implementer
@@ -27,7 +27,7 @@ def url_template(req, route, id_name):
 def source2source(req, source):
     """Harmonize the different Source implementations in clld and pycldf."""
     bibrecord = source.bibtex()
-    fields = OrderedDict({'%s_url' % req.dataset.id: req.resource_url(source)})
+    fields = collections.OrderedDict({'%s_url' % req.dataset.id: req.resource_url(source)})
     for key, value in bibrecord.items():
         fields[key] = '; '.join(value) if isinstance(value, list) else value
     return sources.Source(
@@ -53,7 +53,7 @@ def iterrefs(obj):
 @implementer(ICldfConfig)
 class CldfConfig(object):
     module = 'Wordlist'
-    pk2id = defaultdict(dict)
+    pk2id = collections.defaultdict(dict)
 
     def custom_schema(self, req, ds):
         return
@@ -194,7 +194,7 @@ class CldfDownload(Download):
 
             transaction.abort()
 
-            tabledata = defaultdict(list)
+            tabledata = collections.defaultdict(list)
             for table, model in [
                 ('ParameterTable', Parameter),
                 ('CodeTable', DomainElement),

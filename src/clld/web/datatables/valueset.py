@@ -1,5 +1,5 @@
 """Default DataTable for ValueSet objects."""
-from functools import partial
+import functools
 
 from sqlalchemy.orm import joinedload
 
@@ -52,22 +52,22 @@ class Valuesets(DataTable):
         if self.parameter:
             return res + [
                 LinkCol(self, 'language',
-                        model_col=Language.name, get_obj=partial(get, 'l')),
+                        model_col=Language.name, get_obj=functools.partial(get, 'l')),
                 refs_col,
-                LinkToMapCol(self, 'm', get_obj=partial(get, 'l')),
+                LinkToMapCol(self, 'm', get_obj=functools.partial(get, 'l')),
             ]
 
         if self.language:
             return res + [
                 LinkCol(self, 'parameter',
-                        model_col=Parameter.name, get_obj=partial(get, 'p')),
+                        model_col=Parameter.name, get_obj=functools.partial(get, 'p')),
                 refs_col,
             ]
 
         return res + [
-            LinkCol(self, 'language', model_col=Language.name, get_obj=partial(get, 'l')),
+            LinkCol(self, 'language', model_col=Language.name, get_obj=functools.partial(get, 'l')),
             LinkCol(
-                self, 'parameter', model_col=Parameter.name, get_obj=partial(get, 'p')),
+                self, 'parameter', model_col=Parameter.name, get_obj=functools.partial(get, 'p')),
             refs_col,
         ]
 

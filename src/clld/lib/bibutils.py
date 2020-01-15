@@ -3,7 +3,7 @@ python interface to bibutils.
 
 .. seealso:: http://sourceforge.net/p/bibutils/home/Bibutils/
 """
-from subprocess import Popen, PIPE
+import subprocess
 
 from clldutils.misc import encoded
 
@@ -12,7 +12,8 @@ FORMATS = ['bib', 'end', 'ris']
 
 
 def pipe(cmd, input_):
-    proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+    proc = subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return proc.communicate(encoded(input_))[0]
 
 

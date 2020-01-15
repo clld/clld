@@ -1,6 +1,6 @@
 """We provide some infrastructure to build extensible database models."""
-import sqlite3
 import json
+import sqlite3
 
 from sqlalchemy import (
     Column, Integer, Float, String, Boolean, DateTime, func, event)

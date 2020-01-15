@@ -8,7 +8,7 @@ We also provide metadata following the guidelines of
 - http://www.w3.org/TR/tabular-metadata/ version
   http://www.w3.org/TR/2015/CR-tabular-metadata-20150716/
 """
-from itertools import chain
+import itertools
 
 from sqlalchemy import types, Column
 from sqlalchemy.inspection import inspect
@@ -37,7 +37,7 @@ class CsvAdapter(Index):
             if first is not None:
                 cols = first.csv_head()
                 writer.writerow(cols)
-                for item in chain([first], rows):
+                for item in itertools.chain([first], rows):
                     writer.writerow(item.to_csv(ctx=ctx, req=req, cols=cols))
             return writer.read()
 

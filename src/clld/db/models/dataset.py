@@ -1,5 +1,5 @@
-from collections import OrderedDict
-from datetime import date
+import datetime
+import collections
 
 from sqlalchemy import (
     Column, String, Unicode, Date, Integer, ForeignKey, Boolean,
@@ -44,7 +44,7 @@ class Dataset(Base,
     have exactly one Dataset object.
     """
 
-    published = Column(Date, default=date.today, doc='date of publication')
+    published = Column(Date, default=datetime.date.today, doc='date of publication')
     publisher_name = Column(Unicode, doc='publisher')
     publisher_place = Column(Unicode, doc='place of publication')
     publisher_url = Column(String)
@@ -53,7 +53,7 @@ class Dataset(Base,
     contact = Column(String)
 
     def get_stats(self, resources, **filters):
-        res = OrderedDict()
+        res = collections.OrderedDict()
         for rsc in resources:
             if rsc.name != 'combination':
                 query = DBSession.query(rsc.model)

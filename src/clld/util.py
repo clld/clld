@@ -1,9 +1,9 @@
 """Generic utility functions."""
 import re
 import random
-from string import ascii_lowercase
-from contextlib import contextmanager
-from pathlib import Path
+import string
+import pathlib
+import contextlib
 
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 from clldutils.path import move
@@ -13,12 +13,12 @@ assert LGR_ABBRS
 
 
 def random_string(length):
-    return ''.join(random.choice(ascii_lowercase) for _ in range(length))
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
-@contextmanager
+@contextlib.contextmanager
 def safe_overwrite(fname):
-    fname = Path(fname)
+    fname = pathlib.Path(fname)
     if not fname.parent.exists():
         fname.parent.mkdir()
     assert fname.parent.exists()

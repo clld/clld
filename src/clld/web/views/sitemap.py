@@ -3,8 +3,8 @@ view callables implementing the sitemap protocol.
 
 .. seealso:: http://www.sitemaps.org/
 """
-from itertools import groupby
-from operator import itemgetter
+import operator
+import itertools
 
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound
@@ -113,7 +113,7 @@ def resourcemap(req):
         )).filter(common.Language.active == true()).order_by(common.Language.id)
 
         def resources():
-            for (id, name, lat, lon), rows in groupby(q, itemgetter(0, 1, 2, 3)):
+            for (id, name, lat, lon), rows in itertools.groupby(q, operator.itemgetter(0, 1, 2, 3)):
                 identifiers = [
                     {'type': r.itype, 'identifier': r.iname.lower()
                      if r.itype.startswith('WALS') else r.iname}

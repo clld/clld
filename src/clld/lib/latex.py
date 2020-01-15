@@ -15,8 +15,8 @@ mapping ord(unicode char) to LaTeX code.
 
 D. Eppstein, October 2003.
 """
-import codecs
 import re
+import codecs
 
 
 def register():
