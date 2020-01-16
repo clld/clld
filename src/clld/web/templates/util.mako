@@ -196,29 +196,6 @@ $(document).ready(function() {
 </%def>
 
 ##
-## format history of an object
-##
-<%def name="history(obj_)">
-    <% versions = obj_.history().all() %>
-    <%self:well title="History">
-        <table>
-            <tbody>
-                <tr>
-                    <td>${str(obj_.updated).split(' ')[0]}</td>
-                    <td>${caller.body(item=obj_)}</td>
-                </tr>
-                % for v in versions:
-                <tr>
-                    <td>${str(v.updated).split(' ')[0]}</td>
-                    <td>${caller.body(item=v)}</td>
-                </tr>
-                % endfor
-            </tbody>
-        </table>
-    </%self:well>
-</%def>
-
-##
 ## format the sentences associated with a Value instance
 ##
 <%def name="sentences(obj=None, fmt='long')">
