@@ -41,7 +41,6 @@ class _CollKey(object):
     """Lazily check and cache collkey support in the database on first usage."""
 
     _query = "SELECT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'collkey')"
-    _pg_version = "SELECT current_setting('server_version_num')"
 
     @property
     def has_collkey(self):  # pragma: no cover
@@ -50,20 +49,13 @@ class _CollKey(object):
         self.__dict__['has_collkey'] = result  # cached overrides property
         return result
 
-    @property
-    def get_version_number(self):  # pragma: no cover
-        version = DBSession.bind.dialect.name == 'postgresql'\
-            and DBSession.scalar(self._pg_version)
-        self.__dict__['version_number'] = int(version)
-        return int(version)
-
     def __call__(self, col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
         """If supported by the database, we use pg_collkey for collation.
 
         The optional arguments are passed to the collkey function as described at
         http://pgxn.org/dist/pg_collkey/0.5.1/
         """
-        if self.has_collkey and (self.get_version_number < 100000):  # pragma: no cover
+        if self.has_collkey:  # pragma: no cover
             return func.collkey(col, locale, special_at_4, level, numeric_sorting)
 
         return col
