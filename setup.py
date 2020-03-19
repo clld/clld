@@ -31,7 +31,7 @@ install_requires = [
 
 setup(
     name='clld',
-    version='6.0.1.dev0',
+    version='6.0.1',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=open('README.md').read(),
@@ -52,7 +52,7 @@ setup(
     keywords='web pyramid LRL Linguistics',
     author="Robert Forkel, MPI SHH",
     author_email="forkel@shh.mpg.de",
-    url="http://clld.org",
+    url="https://clld.org",
     license="Apache Software License",
     packages=find_packages(where="src"),
     package_dir={"": "src"},

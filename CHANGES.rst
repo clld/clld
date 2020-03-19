@@ -2,6 +2,13 @@
 Changes
 -------
 
+
+6.0.0
+~~~~~
+
+Dropped py2 support
+
+
 5.2.0
 ~~~~~
 
