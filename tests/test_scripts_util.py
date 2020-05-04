@@ -1,5 +1,3 @@
-from json import loads
-
 import pytest
 from sqlalchemy import create_engine
 
@@ -40,58 +38,7 @@ def test_bibtex2source():
 def test_parsed_args(testsdir):
     from clld.scripts.util import parsed_args
 
-    parsed_args(args=[(testsdir / 'test.ini').as_posix()])
-
-
-def test_glottocodes_by_isocode(mocker, env):
-    from clld.scripts.util import glottocodes_by_isocode
-
-    ce = mocker.Mock(return_value=mocker.Mock(execute=lambda *args: [('iso', 'abcd1234')]))
-
-    mocker.patch('clld.scripts.util.create_engine', ce)
-    assert glottocodes_by_isocode('dburi')['iso'] == 'abcd1234'
-
-    json = """{
-        "properties": {
-            "dataset": "glottolog",
-            "uri_template": "http://glottolog.org/resource/languoid/id/{id}"
-        },
-        "resources": [
-            {
-                "id": "aant1238",
-                "identifiers": [
-                    {
-                        "identifier": "tbg-aan",
-                        "type": "multitree"
-                    }
-                ],
-                "latitude": null,
-                "longitude": null,
-                "name": "Aantantara"
-            },
-            {
-                "id": "aari1239",
-                "identifiers": [
-                    {
-                        "identifier": "aiw",
-                        "type": "iso639-3"
-                    },
-                    {
-                        "identifier": "aiw",
-                        "type": "multitree"
-                    }
-                ],
-                "latitude": 5.95034,
-                "longitude": 36.5721,
-                "name": "Aari"
-            }]}"""
-
-    class Req(mocker.Mock):
-        def get(self, *args):
-            return mocker.Mock(json=mocker.Mock(return_value=loads(json)))
-
-    mocker.patch('clld.scripts.util.requests', Req())
-    assert glottocodes_by_isocode(None, cols=['id', 'latitude'])['aiw'][0] == 'aari1239'
+    parsed_args((['-x'], dict(default=None)), args=[str(testsdir / 'test.ini')])
 
 
 def test_Data(mocker):

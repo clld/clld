@@ -93,6 +93,6 @@ setup(
         [pyramid.scaffold]
         clld_app=clld.scaffolds:ClldAppTemplate
         [console_scripts]
-        clld-create-downloads = clld.scripts.cli:create_downloads
+        clld = clld.__main__:main
     """
 )

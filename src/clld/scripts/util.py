@@ -8,11 +8,11 @@ import collections
 
 from distutils.util import strtobool
 import transaction
-from sqlalchemy import engine_from_config, create_engine
+from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
-import requests
 from nameparser import HumanName
 from clldutils.misc import slug
+from clldutils.clilib import PathType
 
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
@@ -43,38 +43,6 @@ class SessionContext:
 
 def get_env_and_settings(config_uri):
     return bootstrap(config_uri), get_appsettings(config_uri)
-
-
-def glottocodes_by_isocode(dburi, cols=['id']):
-    """Query Glottolog.
-
-    :dburi: If not None, sqlalchemy dburi for a glottolog database. If None, \
-    glottolog.org will be queried.
-    :cols: list of column/attribute names for which information should be gathered.
-    :return: dict mapping iso639-3 codes to glottolog data.
-    """
-    glottocodes = {}
-    if dburi:
-        select = ', '.join('l.%s' % name for name in cols)
-        glottolog = create_engine(dburi)
-        for row in glottolog.execute(
-            'select ll.hid, %s from language as l, languoid as ll where l.pk = ll.pk'
-            % select
-        ):
-            if row[0]:
-                glottocodes[row[0]] = row[1] if len(row) == 2 else row[1:]
-    else:
-        conv = collections.defaultdict(lambda: lambda x: x, latitude=float, longitude=float)
-        res = requests.get("http://glottolog.org/resourcemap.json?rsc=language")
-        for rsc in res.json()['resources']:
-            for id_ in rsc.get('identifiers', []):
-                if id_['type'] == 'iso639-3':
-                    row = [conv[col](rsc.get(col)) if rsc.get(col) is not None else None
-                           for col in cols]
-                    glottocodes[id_['identifier']] = row[0] if len(row) == 1 \
-                        else tuple(row)
-                    break
-    return glottocodes
 
 
 def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
@@ -162,53 +130,11 @@ def setup_session(config_uri, engine=None):
     return pathlib.Path(config_uri.split('#')[0]).resolve().parent.name
 
 
-class ExistingDir(argparse.Action):  # pragma: no cover
-
-    """Action to select an existing directory."""
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        path_ = pathlib.Path(values)
-        if not path_.exists():
-            raise argparse.ArgumentError(self, 'path does not exist')
-        if not path_.is_dir():
-            raise argparse.ArgumentError(self, 'path is no directory')
-        setattr(namespace, self.dest, path_)
-
-
-class ExistingConfig(argparse.Action):  # pragma: no cover
-
-    """Action to select an existing config file."""
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        path_ = pathlib.Path(values.split('#')[0])
-        if not path_.exists():
-            raise argparse.ArgumentError(self, 'file does not exist')
-        setattr(namespace, self.dest, values)
-
-
-class SqliteDb(argparse.Action):  # pragma: no cover
-
-    """Action to select an sqlite db to connect to."""
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, 'engine', create_engine('sqlite:///%s' % values[0]))
-
-
-def parsed_args(*arg_specs, **kw):  # pragma: no cover
+def augment_arguments(args, **kw):  # pragma: no cover
     """pass a truthy value as keyword parameter bootstrap to bootstrap the app."""
-    parser = argparse.ArgumentParser(description=kw.pop('description', None))
-    parser.add_argument(
-        "config_uri", action=ExistingConfig, help="ini file providing app config")
-    parser.add_argument("--glottolog-dburi", default=None)
-    parser.add_argument("--module", default=None)
-    parser.add_argument(
-        "--sqlite", nargs=1, action=SqliteDb, help="sqlite db file")
-    for args, _kw in arg_specs:
-        parser.add_argument(*args, **_kw)
-    args = parser.parse_args(args=kw.pop('args', None))
     engine = getattr(args, 'engine', kw.get('engine', None))
-    args.env = bootstrap(args.config_uri) if kw.get('bootstrap', False) else {}
-    module = setup_session(args.config_uri, engine=engine)
+    args.env = bootstrap(str(args.config_uri)) if kw.get('bootstrap', False) else {}
+    module = setup_session(str(args.config_uri), engine=engine)
 
     # make sure we create URLs in the correct domain
     if args.env:
@@ -226,6 +152,17 @@ def parsed_args(*arg_specs, **kw):  # pragma: no cover
     args.module_dir = pathlib.Path(args.module.__file__).parent
     args.migrations_dir = pathlib.Path(args.module.__file__).parent.joinpath('..', 'migrations')
     return args
+
+
+def parsed_args(*arg_specs, **kw):
+    parser = argparse.ArgumentParser(description=kw.pop('description', None))
+    parser.add_argument(
+        "config_uri", type=PathType(type='file'), help="ini file providing app config")
+    parser.add_argument("--module", default=None)
+    for args, _kw in arg_specs:
+        parser.add_argument(*args, **_kw)
+    args = parser.parse_args(args=kw.pop('args', None))
+    return augment_arguments(args)
 
 
 def initializedb(*args, **kw):  # pragma: no cover
