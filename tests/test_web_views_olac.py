@@ -21,13 +21,6 @@ def test_ResumptionToken():
     assert str(ResumptionToken(from_=date.today(), until=date.today()))
 
 
-def with_params(request_factory, **kw):
-    from clld.web.views.olac import olac
-
-    with request_factory(params=kw) as req:
-        return OaiPmhResponse(olac(req))
-
-
 @pytest.mark.parametrize(
     "params,test,expected",
     [

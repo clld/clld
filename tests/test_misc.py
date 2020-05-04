@@ -2,5 +2,4 @@
 def test_imports():
     from clld import scaffolds
     from clld.scripts import cli
-    from clld.scripts import internetarchive
-    assert scaffolds and cli and internetarchive
+    assert scaffolds and cli

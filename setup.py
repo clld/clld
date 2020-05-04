@@ -93,8 +93,6 @@ setup(
         [pyramid.scaffold]
         clld_app=clld.scaffolds:ClldAppTemplate
         [console_scripts]
-        clld-google-books = clld.scripts.cli:google_books
-        clld-internetarchive = clld.scripts.cli:internetarchive
         clld-create-downloads = clld.scripts.cli:create_downloads
     """
 )

@@ -7,20 +7,15 @@ import functools
 import collections
 
 from distutils.util import strtobool
-from urllib.parse import quote_plus
 import transaction
 from sqlalchemy import engine_from_config, create_engine
-from sqlalchemy.orm import joinedload
 from pyramid.paster import get_appsettings, setup_logging, bootstrap
 import requests
 from nameparser import HumanName
-from clldutils.path import as_posix
-from clldutils import jsonlib
 from clldutils.misc import slug
 
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
-from clld.db.util import page_query
 from clld.lib import bibtex
 
 
@@ -245,116 +240,6 @@ def initializedb(*args, **kw):  # pragma: no cover
     if prime_cache:
         with transaction.manager:
             prime_cache(args)
-
-
-def gbs_func(command, args, sources=None):  # pragma: no cover
-    def words(s):
-        return set(slug(s.strip(), remove_whitespace=False).split())
-
-    log = args.log
-    count = 0
-    api_url = "https://www.googleapis.com/books/v1/volumes?"
-
-    if command == 'cleanup':
-        for fname in args.data_file('gbs').glob('*.json'):
-            try:
-                fname = pathlib.Path(fname)
-                data = jsonlib.load(fname)
-                if data.get('totalItems') == 0:
-                    fname.unlink()
-            except ValueError:
-                fname.unlink()
-        return
-
-    if not sources:
-        sources = DBSession.query(common.Source)\
-            .order_by(common.Source.id)\
-            .options(joinedload(common.Source.data))
-    if callable(sources):
-        sources = sources()
-
-    for i, source in enumerate(page_query(sources, verbose=True, commit=True)):
-        filepath = args.data_file('gbs', 'source%s.json' % source.id)
-
-        if command == 'update':
-            source.google_book_search_id = None
-            source.update_jsondata(gbs={})
-
-        if command in ['verify', 'update']:
-            if filepath.exists():
-                try:
-                    data = jsonlib.load(filepath)
-                except ValueError:
-                    log.warn('no JSON object found in: %s' % filepath)
-                    continue
-                if not data['totalItems']:
-                    continue
-                item = data['items'][0]
-            else:
-                continue
-
-        if command == 'verify':
-            stitle = source.description or source.title or source.booktitle
-            needs_check = False
-            year = item['volumeInfo'].get('publishedDate', '').split('-')[0]
-            if not year or year != slug(source.year or ''):
-                needs_check = True
-            twords = words(stitle)
-            iwords = words(
-                item['volumeInfo']['title'] + ' '
-                + item['volumeInfo'].get('subtitle', ''))
-            if twords == iwords \
-                    or (len(iwords) > 2 and iwords.issubset(twords))\
-                    or (len(twords) > 2 and twords.issubset(iwords)):
-                needs_check = False
-            if int(source.id) == 241:
-                log.info('%s' % sorted(words(stitle)))
-                log.info('%s' % sorted(iwords))
-            if needs_check:
-                log.info('------- %s -> %s' % (
-                    source.id, item['volumeInfo'].get('industryIdentifiers')))
-                log.info('%s %s' % (
-                    item['volumeInfo']['title'], item['volumeInfo'].get('subtitle', '')))
-                log.info(stitle)
-                log.info(item['volumeInfo'].get('publishedDate'))
-                log.info(source.year)
-                log.info(item['volumeInfo'].get('authors'))
-                log.info(source.author)
-                log.info(item['volumeInfo'].get('publisher'))
-                log.info(source.publisher)
-                if not confirm('Are the records the same?'):
-                    log.warn('---- removing ----')
-                    jsonlib.dump({"totalItems": 0}, filepath)
-        elif command == 'update':
-            source.google_book_search_id = item['id']
-            source.update_jsondata(gbs=item)
-            count += 1
-        elif command == 'download':
-            if source.author and (source.title or source.booktitle):
-                title = source.title or source.booktitle
-                if filepath.exists():
-                    continue
-                q = [
-                    'inauthor:' + quote_plus(source.author.encode('utf8')),
-                    'intitle:' + quote_plus(title.encode('utf8')),
-                ]
-                if source.publisher:
-                    q.append('inpublisher:' + quote_plus(
-                        source.publisher.encode('utf8')))
-                url = api_url + 'q=%s&key=%s' % ('+'.join(q), args.api_key)
-                count += 1
-                r = requests.get(url, headers={'accept': 'application/json'})
-                log.info('%s - %s' % (r.status_code, url))
-                if r.status_code == 200:
-                    with open(as_posix(filepath), 'w') as fp:
-                        fp.write(r.text.encode('utf8'))
-                elif r.status_code == 403:
-                    log.warn("limit reached")
-                    break
-    if command == 'update':
-        log.info('assigned gbs ids for %s out of %s sources' % (count, i))
-    elif command == 'download':
-        log.info('queried gbs for %s sources' % count)
 
 
 class Data(collections.defaultdict):
