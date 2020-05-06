@@ -1,43 +1,47 @@
 #!/usr/bin/env bash
 VENVS=$1 # first argument, path to virtual environment folder
+GLOTTOLOG=$3 # 3rd argument, path to glottolog/glottolog
 
 cd $VENVS
 
 virtualenv testapp
-./testapp/bin/pip install -U setuptools
-./testapp/bin/pip install -U pip
-./testapp/bin/pip install -e $2 # second argument, path to local clld repository
-./testapp/bin/pip install cookiecutter
-./testapp/bin/clld create --quiet --force testapp
 cd testapp
-./bin/pip install -e .[test]
-./bin/clld initdb development.ini
-./bin/pytest
+./bin/pip install -U setuptools
+./bin/pip install -U pip
+./bin/pip install -e $2 # second argument, path to local clld repository
+./bin/pip install cookiecutter
+./bin/clld create --quiet --force testapp_clld
+cd testapp_clld
+../bin/pip install -e .[test]
+../bin/clld initdb development.ini
+../bin/pytest || exit 1
 cd $VENVS
-rm -rfI testapp
+rm -rf testapp
 
 virtualenv testapp
-./testapp/bin/pip install -U setuptools
-./testapp/bin/pip install -U pip
-./testapp/bin/pip install -e $2 # second argument, path to local clld repository
-./testapp/bin/pip install cookiecutter
-./testapp/bin/clld create --quiet testapp mpg=y
 cd testapp
-./bin/pip install -e .[test]
-./bin/clld initdb development.ini
-./bin/pytest
+./bin/pip install -U setuptools
+./bin/pip install -U pip
+./bin/pip install -e $2 # second argument, path to local clld repository
+./bin/pip install cookiecutter
+./bin/clld create --quiet testapp_clld mpg=y
+cd testapp_clld
+../bin/pip install -e .[test]
+../bin/clld initdb development.ini
+../bin/pytest || exit 1
 cd $VENVS
-rm -rfI testapp
+rm -rf testapp
 
-#virtualenv testapp
-#testapp/bin/pip install -U setuptools
-#testapp/bin/pip install -U pip
-#testapp/bin/pip install $2 # second argument, path to local clld repository
-#testapp/bin/pip install cookiecutter
-#testapp/bin/clld create --quiet testapp cldf_module=structuredataset
-#testapp/bin/pip install -e testapp/.[test]
-#testapp/bin/clld initdb development.ini --cldf --glottolog ...
-#cd testapp/testapp
-#pytest
-#cd $VENVS
-#rm -rfI testapp
+virtualenv testapp
+cd testapp
+./bin/pip install -U setuptools
+./bin/pip install -U pip
+./bin/pip install $2 # second argument, path to local clld repository
+./bin/pip install cookiecutter
+./bin/clld create --quiet testapp_clld cldf_module=structuredataset
+cd testapp_clld
+../bin/pip install -e .[test]
+../bin/clld initdb development.ini --cldf $2/tests/cldf_datasets/structuredataset/StructureDataset-metadata.json --glottolog $GLOTTOLOG
+../bin/pytest || exit 1
+cd $VENVS
+rm -rf testapp

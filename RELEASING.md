@@ -17,7 +17,7 @@ tox -r
 
 - Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
 ```shell
-sh build.sh $PATH_VENV_DIRECTORY $PATH_CLLD_REPOSITORY
+sh build.sh $PATH_VENV_DIRECTORY $PATH_CLLD_REPOSITORY $PATH_TO_GLOTTOLOG_CLONE
 ```
 
 - Make sure javascript and css can be minified:

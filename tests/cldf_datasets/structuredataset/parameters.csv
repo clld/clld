@@ -1,0 +1,29 @@
+ID,Name,Description
+B,Gender/Noun classes,Gender
+C,Enclitic PL,Enclitic plural marker or free-standing word
+D,Oblique Nouns,Oblique stems of common nouns
+E,Ergative morphology,Presence of ergative morphology
+F,3 Numbers in Pronoun,Three numbers with free-standingpronouns
+G,Inclusive/Exclusive distinction,"Inclusive /exclusive distinction in non-singular first persons (or at least in dual or plural, if not in both)"
+H,Classifier,Classifiers
+I,'from' = 'to',Similarity between morphemes denoting ‘from’ and ‘to’
+J,'place' = LOC,Lexeme for ‘place’ can be used productively as a locative case marker or as part of a nominal compound
+K,'side' = ALLATIVE,"Lexeme for ‘side’ can be used productively as an allative marker (juxtaposition or compound, not when ‘side’ is a relational noun, cf. Hindi *kī taraf*)"
+L,Alienable/Inalienable,Alienable /inalienable distinction in attributive possession
+M,Genitive = FOC,Marker of focus which derives from genitive
+N,GEN as PTCP or INF marker,"Genitive used as a nominalizer/adjectivizer (e.g., as (part of the) infinitive or participle marker"
+O,GEN = PERS marker,"Genitive used as a person marker (typically 3rd person, singular)"
+P,GEN in COP,Genitive marker found in copular form(s)
+Q,Suppletive ID/LOC COP,Suppletive forms for the positive identity and locative copulas (including obligatory “zero verb” as a separate stem)
+R,Suppletive POS/NEG COP,Suppletive forms (for at least one form) of the positive and negative copulas
+S,Finite marker,“Finite” or “narrative” predicate marker
+T,Object marking on Predicate,Object marking on predicate
+U,Anticipatory category,Anticipatory predicate category
+V,QPRO = REL,Interrogative pronoun is also used in relative clauses
+W,'start' = 'continue',"Lexeme is found which can mean both ‘start’ and ‘continue’, irrespective of *Aktionsart* of the predicate"
+X,'want' = 'search',‘want’ is formally identical with ‘search’
+Y,Q = CMPL,Interrogative marker is also used as a complementizer
+Z,Noun incorporation,"Nominal incorporation, where the nominal element becomes part of the same morphological word as the predicate"
+AA,Active/Passive opposiion,Active /passive opposition
+AB,Number neutralization,"Number neutralization, i.e.,singular (/dual) /plural distinction is neutralized in some environment (e.g., in verbal morphology)"
+AC,i-Reduplication,Melodic overwriting (“echo-wordformation”) with -*i*-Substitution

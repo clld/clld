@@ -109,13 +109,13 @@ def main(args):
             common.Value,
             val['id'],
             id=val['id'],
-            name=val['form'],
+            name=val['value'],
             valueset=vs,
         )
 {% endif %}
-load_families(
-    Data(),
-    [(l.glottocode, l) for l in data['Variety'].values()],
+    load_families(
+        Data(),
+        [(l.glottocode, l) for l in data['Variety'].values()],
         glottolog_repos=args.glottolog,
         isolates_icon='tcccccc',
         strict=False,

@@ -1,0 +1,76 @@
+ID,Parameter_ID,Name,Description
+B-1,B,1,"one noun class (i.e., no gender system with common nouns)"
+B-2,B,2,"two classes (M/F, F/NF, M/NM)"
+B-3,B,3,three classes (M/F/N)
+C-0,C,0,affixal plural
+C-1,C,1,enclitic plural marker (with a largely constant form) or free-standing phonological word
+C-2,C,2,basically enclitic but with considerable morphophonological variation which is not entirely due to phonotactic constraints
+D-0,D,0,one invariable stem
+D-1,D,1,"two stems, “oblique” stem not a productive case"
+D-2,D,2,"two stems, “oblique”stem is at least generally identical with genitive"
+E-0,E,0,none
+E-1,E,1,"found either in certain verbal categories only (typically non-imperfective past tense, e.g., Hindi), with only certain persons (e.g., Darai, 3rd person,singular), or potentially in all verbal categories with all persons with transitive predicates, dependent on other factors (e.g., Nepali)."
+F-0,F,0,no
+F-1,F,1,yes
+G-0,G,0,no
+G-1,G,1,yes
+G-2,G,2,"yes, but found only on predicative marking, not on the pronouns themselves (e.g., Oriya)"
+H-0,H,0,none found
+H-1,H,1,found only with numerals and possibly a few other quantifiers
+H-2,H,2,"found with numerals etc., but also postposed to nouns to denote definiteness /referentiality"
+I-0,I,0,none found
+I-1,I,1,identical forms
+I-2,I,2,"no formal identity, but signs of at least some previous similarity, e.g., Kharia *tay* ‘from’ and *khoʔtay* ‘to’ (`<*`*khoʔ tay* ‘from the place’) or Konkani *ajun* ‘up to today’ (*<aji-un* ‘today-ABL’, cf. Master 1964: 153; 156; 170, (under the entry “*ājhuiṃ*”))"
+J-0,J,0,no
+J-1,J,1,yes
+K-0,K,0,no
+K-1,K,1,yes
+L-0,L,0,none
+L-1,L,1,"yes, but only in some persons (e.g., Sadri, only found in the 3rd person)"
+L-2,L,2,"yes, in all persons. Here we include cases such as Remo, for which we have only one example but which clearly seems to fit the overall pattern, i.e., the usual means in Munda languages in which the noun is followed by an enclitic/suffixal person marker, in this case the 2nd person, singular, so that it is clearly different from the Sadri case above(cf. Anderson and Harrison 2008a: 576)."
+L-3,L,3,so-called “appellative nouns” in Kuvi /Kui – status not entirely clear
+M-0,M,0,no
+M-1,M,1,yes
+N-0,N,0,no
+N-1,N,1,yes
+O-0,O,0,no
+O-1,O,1,"yes, formal identity at least in some forms, where it is productive"
+O-2,O,2,"found in some forms, but not /no longer productive"
+P-0,P,0,nowhere
+P-1,P,1,"yes, equal to the genitive in the respective language or in the donor language, if borrowed"
+Q-0,Q,0,no
+Q-1,Q,1,yes
+R-0,R,0,no
+R-1,R,1,yes
+S-0,S,0,none
+S-1,S,1,"yes, but only in some verbal categories and “optional”"
+S-2,S,2,"yes, obligatory"
+T-0,T,0,none
+T-1,T,1,yes – regular and productive
+T-2,T,2,object marking is found but generally not subject marking
+T-3,T,3,"special marker denoting that object is a 1st or 2nd person, but not a person marker, strictly speaking (e.g., Kuvi, Kui)"
+T-4,T,4,"yes, but only in combination with ergativity (e.g., Hindi)"
+U-0,U,0,no
+U-1,U,1,"yes, on finite predicates (and perhaps also non-finite)."
+U-2,U,2,"yes, but only non-finite forms"
+U-3,U,3,"form contains a finite and a non-finite element, e.g., the form “Verb-*an* Verb-*le*” found in Sora (Anderson and Harrison 2008b: 346), where the second form (in *-le*) is a finite form but the first form is not."
+V-0,V,0,no
+V-1,V,1,yes
+W-0,W,0,no
+W-1,W,1,yes
+W-2,W,2,"no, but clear historical traces are still found (e.g., Santali)"
+X-0,X,0,no
+X-1,X,1,yes
+Y-0,Y,0,no
+Y-1,Y,1,yes
+Z-0,Z,0,no
+Z-1,Z,1,"yes, largely productive"
+Z-2,Z,2,"yes, but not productive - only with a very limited number of nouns"
+AA-0,AA,0,"none found (e.g., achieved instead through other means such as an active /middle distinction, where the middle fulfils this function, in addition to other functions such as ‘intransitive’, etc.)"
+AA-1,AA,1,yes (morphological or periphrastic)
+AB-0,AB,0,none found
+AB-1,AB,1,"some form of obligatory number neutralization is found, e.g., Bengali, where the singular /plural distinction found with nouns is not found with verbs, which show no number distinctions. This group also includes languages where the neutralization affects only part of the verb system, e.g. Remo, which has a singular /dual /plural distinction with pronouns and verbs in the 1st and 2nd persons, but not on verbs for 3rd persons, Gtaʔ, where the dual /plural opposition is neutralized in the first person only, or Gorum, where there is number neutralization in 3rd person object marking."
+AB-2,AB,2,"found, but typically “optional”, e.g., Kharia, where the dual marker *=kiyaror* the plural marker *=ki* are optional with nouns and where the predicate in 3rd persons may optionally mark for non-singular number. This also includes Bhojpuri, where e.g. Verma (2003: 531) writes that number is basically not marked on verb forms – only person and honorific status – although it is optionally marked periphrastically."
+AC-0,AC,0,no
+AC-1,AC,1,yes
+AC-2,AC,2,"yes, but the first consonant is also replaced by another consonant, e.g., by /g/ in Kuvi, or by /b/, e.g., in Marathi."
