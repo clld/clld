@@ -1,22 +1,61 @@
 """Shared functionality for clld console scripts."""
 import sys
-import logging
 import pathlib
 import argparse
+import warnings
 import functools
+import importlib
 import collections
 
 from distutils.util import strtobool
-import transaction
 from sqlalchemy import engine_from_config
-from pyramid.paster import get_appsettings, setup_logging, bootstrap
+from pyramid.paster import get_appsettings, bootstrap
 from nameparser import HumanName
 from clldutils.misc import slug
-from clldutils.clilib import PathType
 
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
 from clld.lib import bibtex
+
+__all__ = [
+    'AppConfig',
+    'BootstrappedAppConfig',
+    'SessionContext',
+    'data_file',
+    'add_language_codes',
+    'bibtex2source',
+    'confirm',
+    'Data']
+
+
+class AppConfig(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        p = pathlib.Path(values.split('#')[0])
+        if not (p.exists() and p.is_file()):
+            raise ValueError()
+        setattr(namespace, self.dest, p)
+        namespace.module = p.resolve().parent.name
+        namespace.settings = get_appsettings(values)
+
+        if namespace.module == 'tests':
+            namespace.module = 'clld'
+
+        namespace.module = importlib.import_module(namespace.module)
+        namespace.data_file = functools.partial(data_file, namespace.module)
+        namespace.module_dir = pathlib.Path(namespace.module.__file__).parent
+        namespace.migrations_dir = namespace.module_dir.joinpath('..', 'migrations')
+
+
+class BootstrappedAppConfig(AppConfig):
+    def __call__(self, parser, namespace, values, option_string=None):
+        AppConfig.__call__(self, parser, namespace, values, option_string=option_string)
+        namespace.env = bootstrap(values)
+        try:
+            namespace.initializedb = importlib.import_module(
+                '.'.join([namespace.module.__name__, 'scripts', 'initializedb']))
+        except ImportError as e:
+            warnings.warn(str(e))
+            namespace.initializedb = None
 
 
 class SessionContext:
@@ -39,10 +78,6 @@ class SessionContext:
         if self.engine:
             self.engine.dispose()
         DBSession.remove()
-
-
-def get_env_and_settings(config_uri):
-    return bootstrap(config_uri), get_appsettings(config_uri)
 
 
 def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
@@ -119,64 +154,6 @@ def confirm(question, default=False):  # pragma: no cover
 def data_file(module, *comps):
     """Return Path object of file in the data directory of an app."""
     return pathlib.Path(module.__file__).parent.joinpath('..', 'data', *comps)
-
-
-def setup_session(config_uri, engine=None):
-    setup_logging(config_uri)
-    settings = get_appsettings(config_uri)
-    engine = engine or engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    Base.metadata.create_all(engine)
-    return pathlib.Path(config_uri.split('#')[0]).resolve().parent.name
-
-
-def augment_arguments(args, **kw):  # pragma: no cover
-    """pass a truthy value as keyword parameter bootstrap to bootstrap the app."""
-    engine = getattr(args, 'engine', kw.get('engine', None))
-    args.env = bootstrap(str(args.config_uri)) if kw.get('bootstrap', False) else {}
-    module = setup_session(str(args.config_uri), engine=engine)
-
-    # make sure we create URLs in the correct domain
-    if args.env:
-        dataset = DBSession.query(common.Dataset).first()
-        if dataset:
-            args.env['request'].environ['HTTP_HOST'] = dataset.domain
-
-    if module == 'tests':
-        module = 'clld'
-    args.module = __import__(args.module or module)
-    args.log = logging.getLogger(args.module.__name__)
-    if engine:
-        args.log.info('using bind %s' % engine)
-    args.data_file = functools.partial(data_file, args.module)
-    args.module_dir = pathlib.Path(args.module.__file__).parent
-    args.migrations_dir = pathlib.Path(args.module.__file__).parent.joinpath('..', 'migrations')
-    return args
-
-
-def parsed_args(*arg_specs, **kw):
-    parser = argparse.ArgumentParser(description=kw.pop('description', None))
-    parser.add_argument(
-        "config_uri", type=PathType(type='file'), help="ini file providing app config")
-    parser.add_argument("--module", default=None)
-    for args, _kw in arg_specs:
-        parser.add_argument(*args, **_kw)
-    args = parser.parse_args(args=kw.pop('args', None))
-    return augment_arguments(args)
-
-
-def initializedb(*args, **kw):  # pragma: no cover
-    create = kw.pop('create', None)
-    prime_cache = kw.pop('prime_cache', None)
-    args = list(args) + [(("--prime-cache-only",), dict(action="store_true"))]
-    args = parsed_args(*args, **kw)
-    if not args.prime_cache_only:
-        if create:
-            with transaction.manager:
-                create(args)
-    if prime_cache:
-        with transaction.manager:
-            prime_cache(args)
 
 
 class Data(collections.defaultdict):

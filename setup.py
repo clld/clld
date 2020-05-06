@@ -62,6 +62,8 @@ setup(
     install_requires=install_requires,
     extras_require={
         'dev': [
+            'cookiecutter',
+            'cldfcatalog',
             'waitress',
             'pyramid_debugtoolbar',
             'tox',
@@ -70,6 +72,7 @@ setup(
             'twine',
         ],
         'test': [
+            'cookiecutter',
             'xlrd',
             'mock',
             'pytest>=3.6',
@@ -90,8 +93,6 @@ setup(
         ('**.mako', 'mako', {'encoding': 'utf8'}),
         ('web/static/**', 'ignore', None)]},
     entry_points="""\
-        [pyramid.scaffold]
-        clld_app=clld.scaffolds:ClldAppTemplate
         [console_scripts]
         clld = clld.__main__:main
     """

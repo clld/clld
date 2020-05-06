@@ -7,7 +7,7 @@ from sqlalchemy import Column, Unicode, Integer, ForeignKey
 from clld.db.meta import CustomModelMixin, DBSession
 from clld.db.models import common
 from clld.db.util import set_alembic_version
-from clld.scripts.util import Data
+from clld.cliutil import Data
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 

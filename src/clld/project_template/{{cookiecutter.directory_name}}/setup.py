@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='{{project}}',
+    name='{{cookiecutter.directory_name}}',
     version='0.0',
-    description='{{project}}',
+    description='{{cookiecutter.directory_name}}',
     classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
@@ -19,13 +19,20 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'clld',
-    ],
-    extras_require={
+        'clld',  # >=7.0
+{% if cookiecutter.cldf_module %}
+        'pyglottolog',
+        'clld-glottologfamily-plugin',
+{% endif %}
+{% if cookiecutter.mpg %}
+        'clldmpg',
+{% endif %}
+],
+extras_require={
         'dev': ['flake8', 'waitress'],
         'test': [
             'mock',
-            'pytest>=3.1',
+            'pytest>=5.4',
             'pytest-clld',
             'pytest-mock',
             'pytest-cov',
@@ -34,8 +41,8 @@ setup(
             'zope.component>=3.11.0',
         ],
     },
-    test_suite="{{package}}",
+    test_suite="{{cookiecutter.directory_name}}",
     entry_points="""\
     [paste.app_factory]
-    main = {{package}}:main
+    main = {{cookiecutter.directory_name}}:main
 """)

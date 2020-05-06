@@ -9,7 +9,7 @@
     </div>
 </%def>
 
-<h2>Welcome to {{package}}</h2>
+<h2>Welcome to {{cookiecutter.directory_name}}</h2>
 
 <p class="lead">
     Abstract.
