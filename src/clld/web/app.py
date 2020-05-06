@@ -188,6 +188,7 @@ class ClldRequest(Request):
         return self.route_url(route, **kw)
 
     def route_url(self, route, *args, **kw):
+        """Facade for Request.route_url, hacking in support for admin routes."""
         if self.admin:
             if '_query' not in kw:
                 kw['_query'] = {}
@@ -195,6 +196,7 @@ class ClldRequest(Request):
         return Request.route_url(self, route, *args, **kw)
 
     def resource_path(self, obj, rsc=None, **kw):
+        """Determine the path component of a Resource's URL."""
         route, kw = self._route(obj, rsc, **kw)
         return self.route_path(route, **kw)
 

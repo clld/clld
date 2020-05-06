@@ -5,10 +5,10 @@ Getting started
 Requirements
 ~~~~~~~~~~~~
 
-``clld`` works with python 2.7 and >=3.4. It has been installed and run successfully on
-Ubuntu (12.04, 14.04, 16.04), Mac OSX (see :ref:`install_mac`) and Windows (see :ref:`install_win`).
+``clld`` works with python >=3.5. It has been installed and run successfully on
+Ubuntu (14.04, 16.04, 18.04), Mac OSX/scripts and Windows.
 While it might be possible to use sqlite as database backend, all production installations
-of ``clld`` and most development is done with postgresql (9.1 or 9.3).
+of ``clld`` and most development is done with postgresql (9.x or 10.x).
 To retrieve the ``clld`` software from GitHub, ``git`` must be installed on the system.
 
 .. _install:
@@ -41,18 +41,14 @@ A ``clld`` app is a python package implementing a
 `pyramid <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
 web application.
 
-The ``clld`` package provides a pyramid application scaffold to create the initial package directory
-layout for a ``clld`` app:
+Installing the ``clld`` package will also install a command `clld`,
+which offers functionality to kickstart a `clld` app project:
 
 .. code:: bash
 
-    $ pcreate -t clld_app myapp
+    $ clld create myapp
 
-.. note::
-
-    The ``pcreate`` command has been installed with pyramid as a dependency of ``clld``.
-
-This will create a python package ``myapp`` with the following layout::
+This will create a ``myapp`` project directroy, containing a python package ``myapp`` with the following layout::
 
     (clld)robert@astroman:~/venvs/clld$ tree myapp/
     myapp/                           # project directory
@@ -70,7 +66,7 @@ This will create a python package ``myapp`` with the following layout::
     │   ├── maps.py                  # custom map objects
     │   ├── models.py                # custom database objects
     │   ├── scripts
-    │   │   ├── initializedb.py      # database initialization script
+    │   │   ├── initializedb.py      # database initialization code
     │   │   └── __init__.py
     │   ├── static                   # custom static assets
     │   │   ├── project.css
@@ -108,16 +104,10 @@ Running
 
 .. code:: bash
 
-    $ python myapp/scripts/initializedb.py development.ini
+    $ clld initdb development.ini
 
 will then create the database for your app. Whenever you edit the database initialization
 script, you have to re-run the above command.
-
-.. note::
-
-    If you are using PostgreSQL as rdbms the above command will not automatically drop
-    an existing database, so before running it, you have to drop and re-create and empty
-    database "by hand".
 
 You are now ready to run
 
@@ -134,12 +124,12 @@ Populating the database
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``clld`` framework does not provide any GUI or web interface for populating the database.
-Instead, this is assumed to be done with a script.
-You can edit ``clld/scripts/initializedb.py`` to fill the database with your data and run
+Instead, this is assumed to be done with code in
+``myapp/scripts/initializedb.py`` which is run via
 
 .. code:: bash
 
-    $ python myapp/scripts/initializedb.py development.ini
+    $ clld initdb development.ini
 
 Adding objects to the database is done by instantiating model objects and
 `adding them <http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html#adding-new-objects>`_
@@ -177,7 +167,7 @@ A more involved example, creating instances of all core model classes, is availa
 
 The ``data`` object present in the ``main`` function in ``initializedb.py`` is an instance of
 
-.. autoclass:: clld.scripts.util.Data
+.. autoclass:: clld.cliutil.Data
     :members:
 
 Thus, you can create objects which you can reference later like

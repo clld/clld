@@ -28,7 +28,7 @@ Metadata
 
 .. note::
 
-    We use a :py:class:`clld.scripts.util.Data` instance and its ``add`` method to create
+    We use a :py:class:`clld.cliutil.Data` instance and its ``add`` method to create
     objects we want to reference lateron.
 
 

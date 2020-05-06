@@ -48,7 +48,7 @@ def test_json(env):
 def test_rdf(env):
     global RESOURCES
     RESOURCES = _RESOURCES
-    qname_as_resource = re.compile('rdf:[a-z]+=\"\w+:\w+\"')
+    qname_as_resource = re.compile(r'rdf:[a-z]+=\"\w+:\w+\"')
     for rsc in _RESOURCES:
         if not hasattr(rsc.model, 'first'):
             continue

@@ -119,9 +119,9 @@ def stripctrlchars(string):
 def unescape(string):
     r"""Transform latex escape sequences of type \`\ae  into unicode.
 
-    :param string: six.text_type or six.binary_type \
-    (which will be decoded using latex+latin1)
-    :return: six.text_type
+    :param string: str or binary
+
+    :return: str
     """
     def _delatex(s):
         try:

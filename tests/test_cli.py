@@ -5,6 +5,7 @@ import pytest
 from clld.__main__ import main
 
 
+@pytest.mark.filterwarnings("ignore:No module named")
 def test_create_downloads(testsdir):
     main(['create_downloads', '-l', str(testsdir / 'test.ini'), 'abc'],
          log=logging.getLogger(__name__))
@@ -21,6 +22,7 @@ def test_create(tmppath):
         'app', 'scripts', 'initializedb.py').read_text(encoding='utf8')
 
 
+@pytest.mark.filterwarnings("ignore:No module named")
 def test_initdb(tmppath):
     tmppath.joinpath('tests').mkdir()
     cfg = tmppath / 'tests' / 'test.ini'
