@@ -17,6 +17,7 @@ cd testapp_clld
 ../bin/pytest || exit 1
 cd $VENVS
 rm -rf testapp
+echo "testing bare template done"
 
 virtualenv testapp
 cd testapp
@@ -31,6 +32,7 @@ cd testapp_clld
 ../bin/pytest || exit 1
 cd $VENVS
 rm -rf testapp
+echo "testing mpg template done"
 
 virtualenv testapp
 cd testapp
@@ -45,3 +47,4 @@ cd testapp_clld
 ../bin/pytest || exit 1
 cd $VENVS
 rm -rf testapp
+echo "testing cldf template done"
