@@ -1,7 +1,9 @@
+import itertools
 import collections
 
 from pycldf import Sources
 from clldutils.misc import nfilter
+from clldutils.color import qualitative_colors
 from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
 from clld.db.models import common
@@ -106,8 +108,30 @@ def main(args):
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
     )
-    for val in iteritems(args.cldf, 'ValueTable', 'id', 'value', 'languageReference', 'parameterReference', 'source'):
-        # FIXME: also get codeReference!
+    for pid, codes in itertools.groupby(
+        sorted(
+            iteritems(args.cldf, 'CodeTable', 'id', 'name', 'description', 'parameterReference'),
+            key=lambda v: (v['parameterReference'], v['id'])),
+        lambda v: v['parameterReference'],
+    ):
+        codes = list(codes)
+        colors = qualitative_colors(len(codes))
+        for code, color in zip(codes, colors):
+            data.add(
+                common.DomainElement,
+                code['id'],
+                id=code['id'],
+                name=code['name'],
+                description=code['description'],
+                parameter=data['Feature'][code['parameterReference']],
+                jsondata=dict(color=color),
+            )
+    for val in iteritems(
+            args.cldf,
+            'ValueTable',
+            'id', 'value', 'languageReference', 'parameterReference', 'codeReference', 'source'):
+        if val['value'] is None:  # Missing values are ignored.
+            continue
         vsid = (val['languageReference'], val['parameterReference'])
         vs = data['ValueSet'].get(vsid)
         if not vs:
@@ -128,6 +152,7 @@ def main(args):
             id=val['id'],
             name=val['value'],
             valueset=vs,
+            domainelement=data['DomainElement'][val['codeReference']],
         )
 {% endif %}
     for (vsid, sid), pages in refs.items():

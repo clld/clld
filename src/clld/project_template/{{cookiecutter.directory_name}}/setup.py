@@ -21,8 +21,8 @@ setup(
     install_requires=[
         'clld',  # >=7.0
 {% if cookiecutter.cldf_module %}
+        'clld-glottologfamily-plugin>=4.0',
         'pyglottolog',
-        'clld-glottologfamily-plugin',
 {% endif %}
 {% if cookiecutter.mpg %}
         'clldmpg',
