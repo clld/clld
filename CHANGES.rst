@@ -2,6 +2,11 @@
 Changes
 -------
 
+7.0.0
+~~~~~
+
+Refactored clld cli
+
 
 6.0.0
 ~~~~~
