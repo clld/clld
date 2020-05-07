@@ -1,5 +1,11 @@
-from clld.cliutil import Data
+import collections
+
+from pycldf import Sources
+from clldutils.misc import nfilter
+from clld.cliutil import Data, bibtex2source
+from clld.db.meta import DBSession
 from clld.db.models import common
+from clld.lib import bibtex
 {% if cookiecutter.cldf_module %}
 from clld_glottologfamily_plugin.util import load_families
 {% endif %}
@@ -57,6 +63,11 @@ def main(args):
             glottocode=lang['glottocode'],
         )
 
+    for rec in bibtex.Database.from_file(args.cldf.bibpath):
+        data.add(common.Source, rec.id, _obj=bibtex2source(rec))
+
+    refs = collections.defaultdict(list)
+
 {% if cookiecutter.cldf_module.lower() == 'wordlist' %}
     for param in iteritems(args.cldf, 'ParameterTable', 'id', 'concepticonReference', 'name'):
         data.add(
@@ -65,7 +76,7 @@ def main(args):
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
         )
-    for form in iteritems(args.cldf, 'FormTable', 'id', 'form', 'languageReference', 'parameterReference'):
+    for form in iteritems(args.cldf, 'FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
         vsid = (form['languageReference'], form['parameterReference'])
         vs = data['ValueSet'].get(vsid)
         if not vs:
@@ -77,6 +88,9 @@ def main(args):
                 parameter=data['Concept'][form['parameterReference']],
                 contribution=contrib,
             )
+        for ref in form.get('source', []):
+            sid, pages = Sources.parse(ref)
+            refs[(vsid, sid)].append(pages)
         data.add(
             common.Value,
             form['id'],
@@ -92,7 +106,7 @@ def main(args):
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
     )
-    for val in iteritems(args.cldf, 'ValueTable', 'id', 'value', 'languageReference', 'parameterReference'):
+    for val in iteritems(args.cldf, 'ValueTable', 'id', 'value', 'languageReference', 'parameterReference', 'source'):
         # FIXME: also get codeReference!
         vsid = (val['languageReference'], val['parameterReference'])
         vs = data['ValueSet'].get(vsid)
@@ -105,6 +119,9 @@ def main(args):
                 parameter=data['Feature'][val['parameterReference']],
                 contribution=contrib,
             )
+        for ref in val.get('source', []):
+            sid, pages = Sources.parse(ref)
+            refs[(vsid, sid)].append(pages)
         data.add(
             common.Value,
             val['id'],
@@ -113,6 +130,12 @@ def main(args):
             valueset=vs,
         )
 {% endif %}
+    for (vsid, sid), pages in refs.items():
+        DBSession.add(common.ValueSetReference(
+            valueset=data['ValueSet'][vsid],
+            source=data['Source'][sid],
+            description='; '.join(nfilter(pages))
+        ))
     load_families(
         Data(),
         [(l.glottocode, l) for l in data['Variety'].values()],
