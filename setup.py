@@ -31,7 +31,7 @@ install_requires = [
 
 setup(
     name='clld',
-    version='7.1.0',
+    version='7.1.1.dev0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=open('README.md').read(),
