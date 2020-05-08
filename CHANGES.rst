@@ -2,6 +2,12 @@
 Changes
 -------
 
+7.1.0
+~~~~~
+
+Better project template for apps from CLDF StructureDatasets
+
+
 7.0.0
 ~~~~~
 
