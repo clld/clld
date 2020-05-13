@@ -52,7 +52,8 @@ def run(args):
         args.cldf = Dataset.from_metadata(args.cldf)
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(db.FreshDB.from_settings(args.settings, log=args.log))
+        if not args.prime_cache_only:
+            stack.enter_context(db.FreshDB.from_settings(args.settings, log=args.log))
         stack.enter_context(SessionContext(args.settings))
 
         for name in ['concepticon', 'glottolog']:
