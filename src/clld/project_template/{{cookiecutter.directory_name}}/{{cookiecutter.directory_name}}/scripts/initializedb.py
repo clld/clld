@@ -65,7 +65,7 @@ def main(args):
             glottocode=lang['glottocode'],
         )
 
-    for rec in bibtex.Database.from_file(args.cldf.bibpath):
+    for rec in bibtex.Database.from_file(args.cldf.bibpath, lowercase=True):
         data.add(common.Source, rec.id, _obj=bibtex2source(rec))
 
     refs = collections.defaultdict(list)

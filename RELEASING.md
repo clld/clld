@@ -15,7 +15,7 @@ python setup.py compile_catalog
 tox -r
 ```
 
-- Make sure all scaffold tests pass (Py 2.7, 3.4): After pushing the develop branch run
+- Make sure all scaffold tests pass (on Py 3.5)
 ```shell
 sh build.sh $PATH_VENV_DIRECTORY $PATH_CLLD_REPOSITORY $PATH_TO_GLOTTOLOG_CLONE
 ```
