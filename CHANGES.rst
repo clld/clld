@@ -2,6 +2,12 @@
 Changes
 -------
 
+7.1.1
+~~~~~
+
+Fixed problems with new project templating / data loading machinery.
+
+
 7.1.0
 ~~~~~
 
