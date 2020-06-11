@@ -1,6 +1,7 @@
 """
 
 """
+import pathlib
 import contextlib
 
 import transaction
@@ -58,8 +59,11 @@ def run(args):
 
         for name in ['concepticon', 'glottolog']:
             if getattr(args, name):  # pragma: no cover
-                stack.enter_context(
-                    Catalog(getattr(args, name), tag=getattr(args, name + '_version')))
+                if getattr(args, name + '_version'):
+                    stack.enter_context(
+                        Catalog(getattr(args, name), tag=getattr(args, name + '_version')))
+                else:
+                    setattr(args, name, pathlib.Path(getattr(args, name)))
 
         if not args.prime_cache_only:
             with transaction.manager:
