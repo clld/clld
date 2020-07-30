@@ -382,6 +382,8 @@ CLLD.Map = function(eid, layers, options) {
     this.options = options == undefined ? {} : options;
     this.options.info_query = this.options.info_query == undefined ? {} : this.options.info_query;
     this.options.info_route = this.options.info_route == undefined ? 'language_alt' : this.options.info_route;
+    this.options.overlays = this.options.overlays == undefined ? [] : this.options.overlays;
+    this.options.exclude_from_zoom = this.options.exclude_from_zoom == undefined ? [] : this.options.exclude_from_zoom;
     this.map = L.map(
         eid,
         {
@@ -396,6 +398,7 @@ CLLD.Map = function(eid, layers, options) {
     var i, hash, opts, name,
         local_data = false,
         baseLayersMap = {},
+        overlays = {},
         baseLayers = [
             "OpenStreetMap.Mapnik",
             "OpenTopoMap",
@@ -501,7 +504,7 @@ CLLD.Map = function(eid, layers, options) {
             map.oms.addMarker(layer);
             map.marker_map[feature.properties.language.id] = layer;
             layer.bindTooltip(feature.properties.label == undefined ? feature.properties.language.name : feature.properties.label);
-        };
+        }
     };
 
     var _zoomToExtent = function() {
@@ -511,7 +514,7 @@ CLLD.Map = function(eid, layers, options) {
         }
         var i, pbounds, bounds;
         for (name in map.layer_map) {
-            if (map.layer_map.hasOwnProperty(name)) {
+            if (map.layer_map.hasOwnProperty(name) && !map.options.exclude_from_zoom.includes(name)) {
                 pbounds = map.layer_map[name].getBounds();
                 if (pbounds.isValid()) {
                     if (bounds) {
@@ -540,17 +543,24 @@ CLLD.Map = function(eid, layers, options) {
         hash = new L.Hash(this.map);
     }
 
-    if (this.options.tile_layer != undefined) {
-        L.tileLayer(this.options.tile_layer.url_pattern, this.options.tile_layer.options).addTo(this.map);
+    if (this.options.tile_layer !== undefined) {
+        baseLayersMap['base'] = L.tileLayer(this.options.tile_layer.url_pattern, this.options.tile_layer.options);
+        baseLayersMap['base'].addTo(this.map);
     } else {
         for (i = 0; i < baseLayers.length; ++i) {
             baseLayersMap[baseLayers[i]] = L.tileLayer.provider(baseLayers[i]);
-            if (i == 0) {
+            if (i === 0) {
                 baseLayersMap[baseLayers[i]].addTo(this.map)
             }
         }
-        L.control.layers(baseLayersMap).addTo(this.map);
     }
+
+    for (i = 0; i < this.options.overlays.length; i++) {
+        overlays[this.options.overlays[i].name] = L.tileLayer(this.options.overlays[i].url, this.options.overlays[i].options);
+        overlays[this.options.overlays[i].name].addTo(this.map);
+    }
+    this.control = L.control.layers(baseLayersMap, overlays);
+    this.control.addTo(this.map);
 
     this.marker_map = {};
     this.layer_map = {};
@@ -573,6 +583,9 @@ CLLD.Map = function(eid, layers, options) {
                 opts = $.extend(opts, CLLD.LayerOptions[name]);
             }
             this.layer_map[name] = L.geoJson(undefined, opts).addTo(this.map);
+            if (this.options.addLayersToControl) {
+                this.control.addOverlay(this.layer_map[name], name);
+            }
             this.layer_geojson[name] = layers[name];
 
             if ($.type(layers[name]) === 'string') {
@@ -580,7 +593,7 @@ CLLD.Map = function(eid, layers, options) {
                     var map = CLLD.Maps[eid];
                     map.layer_map[data.properties.layer].addData(data);
                     _zoomToExtent();
-                    if (map.options.show_labels) {
+                    if (map.options.show_labels && !map.options.exclude_from_zoom.includes(data.properties.layer)) {
                         map.eachMarker(function(marker){marker.openTooltip()})
                     }
                 });

@@ -32,6 +32,7 @@ class Layer(object):
         self.id = id_
         self.name = name
         self.data = data
+        self.addToLayersControl = False
         for k, v in kw.items():
             setattr(self, k, v)
 
