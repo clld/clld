@@ -148,6 +148,7 @@ class Map(Component):
     Represents the configuration for a leaflet map.
 
     Map options to be specified as items returned in `get_options`:
+
     - info_route: Name of the route to request info window content ['language_alt']
     - info_query: Query parameters to pass when requesting info window content [{}]
     - overlays: list of dicts(name=, url=, options=), specifying tileOverlays [[]]
@@ -163,10 +164,11 @@ class Map(Component):
     - center: (latitutde, longitude) pair specifying the center of the map [None]
     - hash: Flag indicating whether map center coords should be added to the URL [False]
     - tile_layer: dict(url_pattern=, options=), specifying an alternative base layer [None]
-    - add_layers_to_control: Flag indicating whether map layers should be added to the
+    - add_layers_to_control: Flag indicating whether map layers should be added to the \
       layers control as overlays [False]
     - show_labels: Flag indicating whether labels/tooltips should be initially open [False]
     - on_init: function to run at the end of map initialization [None]
+
     """
 
     __template__ = 'clld:web/templates/map.mako'
