@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
+    'arrow<1.0',  # Guard against losing py3.5 compat announced for v1.0.
     'Babel',
     'csvw>=1.0',
     'clldutils>=3.5',
