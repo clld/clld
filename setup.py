@@ -75,7 +75,7 @@ setup(
             'cookiecutter',
             'xlrd',
             'mock',
-            'pytest>=3.6',
+            'pytest>=6',
             'pytest-clld>=1.0.2',
             'pytest-mock',
             'pytest-cov',

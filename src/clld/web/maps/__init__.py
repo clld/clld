@@ -144,8 +144,30 @@ class FilterLegend(Legend):
 
 
 class Map(Component):
+    """
+    Represents the configuration for a leaflet map.
 
-    """Represents the configuration for a leaflet map."""
+    Map options to be specified as items returned in `get_options`:
+    - info_route: Name of the route to request info window content ['language_alt']
+    - info_query: Query parameters to pass when requesting info window content [{}]
+    - overlays: list of dicts(name=, url=, options=), specifying tileOverlays [[]]
+    - exclude_from_zoom: list of layer names to exclude when zooming to extent [[]]
+    - base_layer: Name of base layer to use.
+    - no_popup: Flag to opt out of info window popups [False]
+    - no_link: Flag to opt out of turning markers into links [False]
+    - icons: Name of icons style as defined in `CLLD.MapIcons` ['base']
+    - icon_size: initial size of map markers in pixels [20]
+    - sidebar: Flag indicating whether the map is rendered in the sidebar [False]
+    - zoom: Integer specifying the initial zoom factor of the map [None]
+    - max_zoom: Integer specfying the maximal zoom factor allowed for a map [6]
+    - center: (latitutde, longitude) pair specifying the center of the map [None]
+    - hash: Flag indicating whether map center coords should be added to the URL [False]
+    - tile_layer: dict(url_pattern=, options=), specifying an alternative base layer [None]
+    - add_layers_to_control: Flag indicating whether map layers should be added to the
+      layers control as overlays [False]
+    - show_labels: Flag indicating whether labels/tooltips should be initially open [False]
+    - on_init: function to run at the end of map initialization [None]
+    """
 
     __template__ = 'clld:web/templates/map.mako'
 

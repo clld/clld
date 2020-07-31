@@ -118,8 +118,8 @@ CLLD.Feed = (function(){
                     eid = $('#'+spec.eid),
                     date = new Date(item.find("updated").text());
 
-                if (i == 0) {
-                    title = spec.title == undefined ? result.feed.title : spec.title;
+                if (i === 0) {
+                    title = spec.title === undefined ? result.feed.title : spec.title;
                     if (spec.linkTitle) {
                         title = '<a href="'+spec.url+'">'+title+'</a>';
                     }
@@ -129,7 +129,7 @@ CLLD.Feed = (function(){
                 eid.append('<h4><a href="'+item.find("link").attr("href")+'">'+item.find("title").text()+'</a></h4>');
                 eid.append('<p class="muted"><small>'+date.toDateString()+'</small></p>');
                 eid.append('<p>'+item.find("summary").text()+'</p>');
-                return i < (spec.numEntries == undefined ? 4 : spec.numEntries) - 1;
+                return i < (spec.numEntries === undefined ? 4 : spec.numEntries) - 1;
             });
         }, 'xml');
     };
@@ -378,23 +378,6 @@ CLLD.MapIcons = {
  * https://groups.google.com/d/msg/leaflet-js/fA6M7fbchOs/JTNVhqdc7JcJ
  */
 CLLD.Map = function(eid, layers, options) {
-    CLLD.Maps[eid] = this;
-    this.options = options == undefined ? {} : options;
-    this.options.info_query = this.options.info_query == undefined ? {} : this.options.info_query;
-    this.options.info_route = this.options.info_route == undefined ? 'language_alt' : this.options.info_route;
-    this.options.overlays = this.options.overlays == undefined ? [] : this.options.overlays;
-    this.options.exclude_from_zoom = this.options.exclude_from_zoom == undefined ? [] : this.options.exclude_from_zoom;
-    this.map = L.map(
-        eid,
-        {
-            center: [5.5, 152.58],
-            scrollWheelZoom: false,
-            maxZoom: this.options.max_zoom == undefined ? 6 : this.options.max_zoom,
-            fullscreenControl: true,
-            attributionControl: true
-        }
-    );
-
     var i, hash, opts, name,
         local_data = false,
         baseLayersMap = {},
@@ -414,6 +397,40 @@ CLLD.Map = function(eid, layers, options) {
             "Esri.WorldShadedRelief",
             "Esri.WorldPhysical"
         ];
+    CLLD.Maps[eid] = this;
+    options = options === undefined ? {} : options;
+
+    this.options = {};
+    this.options.info_route = options.info_route === undefined ? 'language_alt' : options.info_route;
+    this.options.info_query = options.info_query === undefined ? {} : options.info_query;
+    this.options.overlays = options.overlays === undefined ? [] : options.overlays;
+    this.options.exclude_from_zoom = options.exclude_from_zoom === undefined ? {} : options.exclude_from_zoom;
+    this.options.base_layer = options.base_layer === undefined ? undefined : options.base_layer;
+    this.options.no_popup = options.no_popup === undefined ? false : options.no_popup;
+    this.options.no_link = options.no_link === undefined ? false : options.no_link;
+    this.options.icons = options.icons === undefined ? 'base' : options.icons;
+    this.options.icon_size = options.icon_size === undefined ? 20 : options.icon_size;
+    this.options.sidebar = options.sidebar === undefined ? false : options.sidebar;
+    this.options.zoom = options.zoom === undefined ? undefined : options.zoom;
+    this.options.max_zoom = options.max_zoom === undefined ? 6 : options.max_zoom;
+    this.options.center = options.center === undefined ? undefined : options.center;
+    this.options.exclude_from_zoom = options.exclude_from_zoom === undefined ? [] : options.exclude_from_zoom;
+    this.options.hash = options.hash === undefined ? false : options.hash;
+    this.options.tile_layer = options.tile_layer === undefined ? undefined : options.tile_layer;
+    this.options.add_layers_to_control = options.add_layers_to_control === undefined ? false : options.add_layers_to_control;
+    this.options.show_labels = options.show_labels === undefined ? false : options.show_labels;
+    this.options.on_init = options.on_init === undefined ? function(a){} : options.on_init;
+
+    this.map = L.map(
+        eid,
+        {
+            center: [5.5, 152.58],
+            scrollWheelZoom: false,
+            maxZoom: this.options.max_zoom,
+            fullscreenControl: true,
+            attributionControl: true
+        }
+    );
 
     if (this.options.base_layer) {
         baseLayers = [this.options.base_layer].concat(baseLayers);
@@ -432,7 +449,7 @@ CLLD.Map = function(eid, layers, options) {
         if (!map.popup) {
             map.popup = L.popup();
         }
-        latlng = latlng == undefined ? layer.getLatLng() : latlng
+        latlng = latlng === undefined ? layer.getLatLng() : latlng
         map.popup.setLatLng(latlng);
         map.popup.setContent(html);
         map.map.openPopup(map.popup);
@@ -466,7 +483,7 @@ CLLD.Map = function(eid, layers, options) {
                         {},
                         CLLD.query_params,
                         map.options.info_query,
-                        layer.feature.properties.info_query == undefined ? {} : layer.feature.properties.info_query)),
+                        layer.feature.properties.info_query === undefined ? {} : layer.feature.properties.info_query)),
                 map.options.info_query,
                 function(data, textStatus, jqXHR) {
                     _openPopup(layer, data, latlng);
@@ -476,7 +493,7 @@ CLLD.Map = function(eid, layers, options) {
         }
     };
 
-    this.icon = CLLD.MapIcons[this.options.icons == undefined ? 'base' : this.options.icons];
+    this.icon = CLLD.MapIcons[this.options.icons];
 
     /**
      * Default function to call upon instantiation of each feature in a GeoJSON layer.
@@ -487,15 +504,13 @@ CLLD.Map = function(eid, layers, options) {
      * @private
      */
     var _onEachFeature = function(feature, layer) {
-        if (layer.setIcon != undefined) {
-            var size = 20,
-                map = CLLD.Maps[eid];
+        if (layer.setIcon !== undefined) {
+            var map = CLLD.Maps[eid],
+                size = map.options.icon_size;
             if (feature.properties.icon_size) {
                 size = feature.properties.icon_size;
             } else if (map.options.sidebar) {
                 size = 20;
-            } else if (map.options.icon_size) {
-                size = map.options.icon_size;
             }
             layer.setIcon(map.icon(feature, size));
             if (feature.properties.zindex) {
@@ -583,7 +598,7 @@ CLLD.Map = function(eid, layers, options) {
                 opts = $.extend(opts, CLLD.LayerOptions[name]);
             }
             this.layer_map[name] = L.geoJson(undefined, opts).addTo(this.map);
-            if (this.options.addLayersToControl) {
+            if (this.options.add_layers_to_control) {
                 this.control.addOverlay(this.layer_map[name], name);
             }
             this.layer_geojson[name] = layers[name];
@@ -614,7 +629,7 @@ CLLD.Map = function(eid, layers, options) {
     if (this.options.center) {
         this.map.setView(
             this.options.center,
-            this.options.zoom == undefined ? 5 : this.options.zoom);
+            this.options.zoom === undefined ? 5 : this.options.zoom);
     }
 
     if (this.options.on_init) {
@@ -640,13 +655,9 @@ CLLD.mapToggleLabels = function(eid, ctrl){
 
 CLLD.mapGetMap = function(eid) {
     if (!eid) {
-        for (eid in CLLD.Maps) {
-            return CLLD.Maps[eid];
-        }
-    } else {
-        return CLLD.Maps[eid];
+        return CLLD.Maps[Object.keys(CLLD.Maps)[0]];
     }
-    return undefined;
+    return CLLD.Maps[eid];
 };
 
 CLLD.mapShowInfoWindow = function(eid, layer, latlng) {
@@ -724,7 +735,7 @@ CLLD.mapLegendFilter = function(eid, colname, ctrlname, value_getter, dtname) {
 
     for (i in checkboxes) {
         if (checkboxes.hasOwnProperty(i) && checkboxes[i]) {
-            if (i == '--any--') {
+            if (i === '--any--') {
                 i = '';
             }
             ctrl.val(i);
@@ -745,7 +756,7 @@ CLLD.process_gbs_info = function(booksInfo) {
             target = $('#' + id_.replace(':', '-'));
             info = booksInfo[id_];
 
-            if (info.preview == "full" || info.preview == "partial") {
+            if (info.preview === "full" || info.preview === "partial") {
                 target.after('<div><a title="preview at Google Books" href="' + info.preview_url + '"><img src="https://www.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/></a></div>');
             } else {
                 target.after('<div><a title="info at Google Books" href="' + info.info_url + '"><i class="icon-share"> </i> info at Google Books</a></div>');
