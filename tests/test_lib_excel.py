@@ -8,6 +8,7 @@ from clld.lib.excel import *
 
 def test_hyperlink():
     assert hyperlink('http://example.org', label='"example"')
+    assert 'label' in hyperlink('http://example.org/' + 300 * 'x', label='"label"')
 
 
 def test_rows():

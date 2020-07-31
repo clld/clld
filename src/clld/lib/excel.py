@@ -11,7 +11,10 @@ def hyperlink(url, label=None):
     style = xlwt.XFStyle()
     style.font = f
     label = label.replace('"', "'") if label else url
-    return xlwt.Formula('HYPERLINK("%s";"%s")' % (url, label[:255]))
+    try:
+        return xlwt.Formula('HYPERLINK("%s";"%s")' % (url, label[:255]))
+    except Exception:
+        return label or url
 
 
 def rows(sheet, as_dict=False):
