@@ -385,7 +385,6 @@ CLLD.Map = function(eid, layers, options) {
         baseLayers = [
             "OpenStreetMap.Mapnik",
             "OpenTopoMap",
-            "OpenMapSurfer.Roads",
             "Stamen.Watercolor",
             "Stamen.Terrain",
             "Stamen.TerrainBackground",
