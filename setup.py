@@ -23,7 +23,6 @@ install_requires = [
     'colander',
     'python-dateutil',
     'paginate',
-    'xlwt',
     'webhelpers2>=2.0',
     'nameparser',
     'waitress>=1.4.2',

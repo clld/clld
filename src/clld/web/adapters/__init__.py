@@ -8,7 +8,6 @@ from clld.web.adapters.base import Index, Representation, Json, JsonIndex
 from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
-from clld.web.adapters import excel
 from clld.web.adapters import csv
 from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
 from clld.web.adapters.rdf import Rdf, RdfIndex
@@ -28,8 +27,6 @@ def template_exists(config, relpath):
 def register_resource_adapters(config, rsc):
     name, interface = rsc.name, rsc.interface
 
-    config.register_adapter(
-        getattr(excel, rsc.plural.capitalize(), excel.ExcelAdapter), interface)
     cls = type('Json%s' % rsc.model.__name__, (Json,), {})
     config.register_adapter(
         cls, interface, to_=interfaces.IRepresentation, name=Json.mimetype)
