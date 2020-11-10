@@ -101,7 +101,10 @@ Test.prototype.test_MapWithLocalData = function() {
             }
         ]
         },
-        on_init = function() {fcalled = true;};
+        on_init = function(themap) {
+            CLLD.AudioPlayer.addToMap(themap);
+            fcalled = true;
+        };
 
     CLLD.routes['test_info_route'] = '/test/tests/xhr/language{id}.{ext}';
 
@@ -110,6 +113,9 @@ Test.prototype.test_MapWithLocalData = function() {
         {l1: fc},
         {hash: true, show_labels: true, on_init: on_init, info_route: 'test_info_route'});
     assertTrue(fcalled);
+    $('.leaflet-control-audioplayer-play').delay(100).trigger('click');
+    $('.leaflet-control-audioplayer-play').delay(100).trigger('click');
+    $('.leaflet-control-audioplayer-stop').delay(100).trigger('click');
     fcalled = false;
     CLLD.mapShowInfoWindow('map', '1');
     CLLD.mapFilterMarkers('map', function(m){return true;});

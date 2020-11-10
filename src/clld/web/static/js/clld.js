@@ -767,3 +767,131 @@ CLLD.process_gbs_info = function(booksInfo) {
         }
     }
 };
+
+/**
+ * An AudioPlayer as leaflet map control.
+ *
+ * Usage:
+ * - add the player controls to a map by setting the on_init option, e.g.
+ *   `'on_init': JSNamespace('CLLD.AudioPlayer').addToMap`.
+ * - deliver the audio content as audio elements in the map info windows, i.e. via
+ *   `language/snippet_html.mako`.
+ * - optionally register a custom playlist order by overriding CLLD.AudioPlayerOptions.marker_order.
+ */
+CLLD.AudioPlayerOptions = {
+    marker_order: function (m1, m2) {
+        // sort by latitude, North to South:
+        return m2.getLatLng().lat - m1.getLatLng().lat
+    }
+}
+
+/**
+ * @type {{
+ * play: CLLD.AudioPlayer.play,
+ * stop: CLLD.AudioPlayer.stop,
+ * addToMap: CLLD.AudioPlayer.addToMap, a function suitable for passing as
+ * CLLD.Map.on_init option}}
+ */
+CLLD.AudioPlayer = (function(){
+    var paused = true,
+        playlist_index = -1,  // index of the active marker in our "playlist".
+        playlist = [],  // map markers - our "playlist".
+        map;
+
+    var _play = function() {
+        var layer, audio;
+
+        if (paused) return;
+        playlist_index++;
+        if (playlist_index === playlist.length) {
+            playlist_index = 0;
+        }
+        layer = playlist[playlist_index];
+        if (layer.feature.properties.popup === undefined) {
+            $.ajax({
+                url: CLLD.route_url(
+                    map.options.info_route,
+                    {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
+                    $.extend(
+                        {},
+                        CLLD.query_params,
+                        map.options.info_query,
+                        layer.feature.properties.info_query === undefined ? {} : layer.feature.properties.info_query)),
+                data: map.options.info_query,
+                success: function(data, textStatus, jqXHR) {
+                    layer.feature.properties.popup = data;
+                },
+                dataType: 'html',
+                async: false // we want to access the popup content after the ajax call returned.
+            });
+        }
+        map.showInfoWindow(layer);  // since properties.popup was set, this won't result in another ajax call.
+        audio = $('.leaflet-popup-content').find('audio');
+        if (audio.length) {
+            audio[0].addEventListener('ended', _play);
+            audio[0].play();
+        } else {
+            _play();  // we only incremented the playlist index.
+        }
+    };
+
+    var _control_button = function (type, container, title, linktext, callable, ctx) {
+        var button = L.DomUtil.create('a', 'leaflet-control-audioplayer-' + type, container);
+        button.href = '#';
+        button.title = title;
+        button.style.cssText = 'font-size: 22px;';
+        button.innerText = linktext;
+        L.DomEvent.on(
+            button,
+            'click',
+            function (e) {
+                L.DomEvent.stopPropagation(e);
+                L.DomEvent.preventDefault(e);
+                callable();
+            },
+            ctx);
+        return button;
+    };
+
+    var _init = function() {
+        map.eachMarker(function(marker) {
+            playlist.push(marker);
+        });
+        playlist.sort(CLLD.AudioPlayerOptions.marker_order);
+    }
+
+    return {
+        play: function(){
+            if (!playlist.length) {
+                _init();
+            }
+            if (paused) {
+                paused = false;
+                $('.leaflet-control-audioplayer-play')[0].innerText = '⏸';
+            } else {
+                paused = true;
+                $('.leaflet-control-audioplayer-play')[0].innerText = '▶';
+            }
+            _play();
+        },
+        stop: function(){
+            $('.leaflet-control-audioplayer-play')[0].innerText = '▶';
+            playlist_index = -1;
+            paused = true;
+        },
+        addToMap: function (themap){
+            L.Control.AudioPlayer = L.Control.extend({
+                options: {position: 'topleft'},
+                onAdd: function (map) {
+                    var container = L.DomUtil.create('div', 'leaflet-control-audioplayer leaflet-bar leaflet-control');
+                    this.link = _control_button('play', container, 'Play audio', '▶', CLLD.AudioPlayer.play, this);
+                    this.stop = _control_button('stop', container, 'Stop audio', '⏹', CLLD.AudioPlayer.stop, this);
+                    return container;
+                }
+            });
+            L.control.audioplayer = function(opts) {return new L.Control.AudioPlayer(opts);}
+            L.control.audioplayer().addTo(themap.map);
+            map = themap;
+        }
+    }
+})();
