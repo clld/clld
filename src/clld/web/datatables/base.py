@@ -428,6 +428,23 @@ class DataTable(Component):
             data_url = self.req.route_url(
                 '%ss' % interface.__name__.lower()[1:], _query=query_params)
         return {
+            "language": {
+            "paginate": {
+            "next": self.req.translate("Next"),
+            "previous": self.req.translate("Previous"),
+            "first": self.req.translate("First"),
+            "last": self.req.translate("Last"),
+            },
+            "emptyTable": self.req.translate("No data available in table"),
+            "info": self.req.translate("Showing _START_ to _END_ of _TOTAL_ entries"),
+            "infoEmpty": self.req.translate("Showing 0 to 0 of 0 entries"),
+            "infoFiltered": self.req.translate("(filtered from _MAX_ total entries)"),
+            "lengthMenu": self.req.translate("Show _MENU_ entries"),
+            "loadingRecords": self.req.translate("Loading..."),
+            "processing": self.req.translate("Processing..."),
+            "search": self.req.translate("Search:"),
+            "zeroRecords": self.req.translate("No matching records found"),
+            },
             'bServerSide': True,
             'bProcessing': True,
             "sDom": "<'dt-before-table row-fluid'<'span4'i><'span6'p><'span2'f<'"

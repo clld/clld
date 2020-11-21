@@ -40,7 +40,7 @@ def _add_localizer(request):
     if hasattr(request, 'translate'):
         return
 
-    request._LOCALE_ = 'en'
+    request._LOCALE_ = request.params.get('__locale__', 'en')
     localizer = get_localizer(request)
 
     def auto_translate(*args, **kwargs):

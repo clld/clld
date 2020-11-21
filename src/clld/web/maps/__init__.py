@@ -279,7 +279,7 @@ class Map(Component):
             self,
             'iconsize',
             items,
-            label='Icon size')
+            label=self.req.translate('Icon size'))
 
         def item(layer):
             return HTML.a(

@@ -796,9 +796,13 @@ CLLD.AudioPlayer = (function(){
     var paused = true,
         playlist_index = -1,  // index of the active marker in our "playlist".
         playlist = [],  // map markers - our "playlist".
+        play_initial_bounds,
         map;
+    var play_btn_img = '<img class="btn-ctrl-img" title="Play all audio within the current map section from north to south" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDggOCI+PHBhdGggZD0iTTAgMHY2bDYtMy02LTN6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxIDEpIi8+PC9zdmc+" />';
+    var stop_btn_img = '<img class="btn-ctrl-img" title="Stop audio" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDggOCI+PHBhdGggZD0iTTAgMHY2aDZ2LTZoLTZ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxIDEpIi8+PC9zdmc+" />';
+    var pause_btn_img = '<img class="btn-ctrl-img" title="Pause audio" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDggOCI+PHBhdGggZD0iTTAgMHY2aDJ2LTZoLTJ6bTQgMHY2aDJ2LTZoLTJ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxIDEpIi8+PC9zdmc+" />';
 
-    var _play = function() {
+  var _play = function() {
         var layer, audio;
 
         if (paused) return;
@@ -807,40 +811,44 @@ CLLD.AudioPlayer = (function(){
             playlist_index = 0;
         }
         layer = playlist[playlist_index];
-        if (layer.feature.properties.popup === undefined) {
-            $.ajax({
-                url: CLLD.route_url(
-                    map.options.info_route,
-                    {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
-                    $.extend(
-                        {},
-                        CLLD.query_params,
-                        map.options.info_query,
-                        layer.feature.properties.info_query === undefined ? {} : layer.feature.properties.info_query)),
-                data: map.options.info_query,
-                success: function(data, textStatus, jqXHR) {
-                    layer.feature.properties.popup = data;
-                },
-                dataType: 'html',
-                async: false // we want to access the popup content after the ajax call returned.
-            });
-        }
-        map.showInfoWindow(layer);  // since properties.popup was set, this won't result in another ajax call.
-        audio = $('.leaflet-popup-content').find('audio');
-        if (audio.length) {
-            audio[0].addEventListener('ended', _play);
-            audio[0].play();
+
+        // play only those audio which is currently shown at map bounds
+        if (play_initial_bounds.contains(layer.getLatLng())) {
+            if (layer.feature.properties.popup === undefined) {
+                $.ajax({
+                    url: CLLD.route_url(
+                        map.options.info_route,
+                        {'id': layer.feature.properties.language.id, 'ext': 'snippet.html'},
+                        $.extend(
+                            {},
+                            CLLD.query_params,
+                            map.options.info_query,
+                            layer.feature.properties.info_query === undefined ? {} : layer.feature.properties.info_query)),
+                    data: map.options.info_query,
+                    success: function(data, textStatus, jqXHR) {
+                        layer.feature.properties.popup = data;
+                    },
+                    dataType: 'html',
+                    async: false // we want to access the popup content after the ajax call returned.
+                });
+            }
+            map.showInfoWindow(layer);  // since properties.popup was set, this won't result in another ajax call.
+            audio = $('.leaflet-popup-content').find('audio');
+            if (audio.length) {
+                audio[0].addEventListener('ended', _play);
+                audio[0].play();
+            } else {
+                _play();  // we only incremented the playlist index.
+            }
         } else {
-            _play();  // we only incremented the playlist index.
+            _play();
         }
     };
 
-    var _control_button = function (type, container, title, linktext, callable, ctx) {
+    var _control_button = function (type, container, linktext, callable, ctx) {
         var button = L.DomUtil.create('a', 'leaflet-control-audioplayer-' + type, container);
         button.href = '#';
-        button.title = title;
-        button.style.cssText = 'font-size: 22px;';
-        button.innerText = linktext;
+        button.innerHTML = linktext;
         L.DomEvent.on(
             button,
             'click',
@@ -867,15 +875,18 @@ CLLD.AudioPlayer = (function(){
             }
             if (paused) {
                 paused = false;
-                $('.leaflet-control-audioplayer-play')[0].innerText = '⏸';
+                $('.leaflet-control-audioplayer-play')[0].innerHTML = pause_btn_img;
             } else {
                 paused = true;
-                $('.leaflet-control-audioplayer-play')[0].innerText = '▶';
+                $('.leaflet-control-audioplayer-play')[0].innerHTML = play_btn_img;
             }
+            // remember globally the inital bounds
+            // due to possible shifting the map while open a popup
+            play_initial_bounds = map.map.getBounds();
             _play();
         },
         stop: function(){
-            $('.leaflet-control-audioplayer-play')[0].innerText = '▶';
+            $('.leaflet-control-audioplayer-play')[0].innerHTML = play_btn_img;
             playlist_index = -1;
             paused = true;
         },
@@ -884,8 +895,8 @@ CLLD.AudioPlayer = (function(){
                 options: {position: 'topleft'},
                 onAdd: function (map) {
                     var container = L.DomUtil.create('div', 'leaflet-control-audioplayer leaflet-bar leaflet-control');
-                    this.link = _control_button('play', container, 'Play audio', '▶', CLLD.AudioPlayer.play, this);
-                    this.stop = _control_button('stop', container, 'Stop audio', '⏹', CLLD.AudioPlayer.stop, this);
+                    this.link = _control_button('play', container, play_btn_img, CLLD.AudioPlayer.play, this);
+                    this.stop = _control_button('stop', container, stop_btn_img, CLLD.AudioPlayer.stop, this);
                     return container;
                 }
             });

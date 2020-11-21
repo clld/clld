@@ -193,6 +193,10 @@ class ClldRequest(Request):
             if '_query' not in kw:
                 kw['_query'] = {}
             kw['_query']['__admin__'] = '1'
+        if '__locale__' in self.params:
+            if '_query' not in kw:
+                kw['_query'] = {}
+            kw['_query']['__locale__'] = self.params['__locale__']
         return Request.route_url(self, route, *args, **kw)
 
     def resource_path(self, obj, rsc=None, **kw):
@@ -677,7 +681,7 @@ def includeme(config):
     menuitems = config.registry.settings.get(
         'clld.menuitems_list',
         ['contributions', 'parameters', 'languages', 'contributors'])
-    config.register_menu(('dataset', dict(label='Home')), *menuitems)
+    config.register_menu(('dataset', lambda ctx, req: (req.resource_url(req.dataset), req.translate('Home'))), *menuitems)
 
     config.include('pyramid_mako')
 

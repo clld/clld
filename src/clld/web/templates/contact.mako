@@ -1,8 +1,8 @@
 <%inherit file="home_comp.mako"/>
 
-<h3>Contact ${h.contactmail(req)}</h3>
+<h3>${_('Contact')} ${h.contactmail(req)}</h3>
 <div class="well">
-    <p>You can contact us via email at <a href="mailto:${request.dataset.contact}">${request.dataset.contact}</a>.</p>
+    <p>${_('You can contact us via email at')} <a href="mailto:${request.dataset.contact}">${request.dataset.contact}</a>.</p>
     % if request.registry.settings.get('clld.github_repos') and request.registry.settings.get('clld.github_repos_data'):
     <% srepo = request.registry.settings['clld.github_repos'] %>
     <% drepo = request.registry.settings['clld.github_repos_data'] %>
