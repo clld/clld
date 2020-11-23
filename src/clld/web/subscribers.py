@@ -46,7 +46,7 @@ def _add_localizer(request):
     def auto_translate(*args, **kwargs):
         return localizer.translate(tsf(*args, **kwargs))
 
-    request.translate = auto_translate
+    request._ = request.translate = auto_translate
 
 
 def init_map(event):
