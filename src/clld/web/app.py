@@ -681,7 +681,9 @@ def includeme(config):
     menuitems = config.registry.settings.get(
         'clld.menuitems_list',
         ['contributions', 'parameters', 'languages', 'contributors'])
-    config.register_menu(('dataset', lambda ctx, req: (req.resource_url(req.dataset), req.translate('Home'))), *menuitems)
+    config.register_menu(
+        ('dataset', lambda ctx, req: (req.resource_url(req.dataset), req.translate('Home'))),
+        *menuitems)
 
     config.include('pyramid_mako')
 
