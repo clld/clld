@@ -8,7 +8,7 @@
         <ul>
         % for va in ctx.value_assocs:
             % if va.value:
-            <li>${h.link(request, va.value.valueset, label='%s: %s' % (va.value.valueset.parameter.name, va.value.domainelement.name))}</li>
+            <li>${h.link(request, va.value.valueset, label='%s: %s' % (va.value.valueset.parameter.name, va.value.domainelement.name if va.value.domainelement else va.value.name))}</li>
             % endif
         % endfor
         </ul>
@@ -26,7 +26,7 @@ ${h.rendered_sentence(ctx)|n}
 
 <dl>
 % if ctx.comment:
-<dt>Comment:</dt>
+<dt>${_('Comment')}:</dt>
 <dd>${ctx.markup_comment or ctx.comment|n}</dd>
 % endif
 % if ctx.source:
