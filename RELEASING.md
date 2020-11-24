@@ -17,7 +17,7 @@ tox -r
 
 - Make sure all scaffold tests pass (on Py 3.5)
 ```shell
-sh build.sh $PATH_VENV_DIRECTORY $PATH_CLLD_REPOSITORY $PATH_TO_GLOTTOLOG_CLONE
+sh build.sh $ABSOLUTE_PATH_VENV_DIRECTORY $ABSOLUTE_PATH_CLLD_REPOSITORY $ABSOLUTE_PATH_TO_GLOTTOLOG_CLONE
 ```
 
 - Make sure javascript and css can be minified:

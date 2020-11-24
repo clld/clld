@@ -16,14 +16,6 @@ import {{cookiecutter.directory_name}}
 from {{cookiecutter.directory_name}} import models
 
 
-def iteritems(cldf, t, *cols):
-    cmap = {cldf[t, col].name: col for col in cols}
-    for item in cldf[t]:
-        for k, v in cmap.items():
-            item[v] = item[k]
-        yield item
-
-
 def main(args):
 {% if cookiecutter.cldf_module %}
     assert args.glottolog, 'The --glottolog option is required!'
@@ -54,7 +46,7 @@ def main(args):
         description=args.cldf.properties.get('dc:bibliographicCitation'),
     )
 
-    for lang in iteritems(args.cldf, 'LanguageTable', 'id', 'glottocode', 'name', 'latitude', 'longitude'):
+    for lang in args.cldf.iter_rows('LanguageTable', 'id', 'glottocode', 'name', 'latitude', 'longitude'):
         data.add(
             models.Variety,
             lang['id'],
@@ -71,14 +63,14 @@ def main(args):
     refs = collections.defaultdict(list)
 
 {% if cookiecutter.cldf_module.lower() == 'wordlist' %}
-    for param in iteritems(args.cldf, 'ParameterTable', 'id', 'concepticonReference', 'name'):
+    for param in args.cldf.iter_rows('ParameterTable', 'id', 'concepticonReference', 'name'):
         data.add(
             models.Concept,
             param['id'],
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
         )
-    for form in iteritems(args.cldf, 'FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
+    for form in args.cldf.iter_rows('FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
         vsid = (form['languageReference'], form['parameterReference'])
         vs = data['ValueSet'].get(vsid)
         if not vs:
@@ -101,7 +93,7 @@ def main(args):
             valueset=vs,
         )
 {% elif cookiecutter.cldf_module.lower() == 'structuredataset' %}
-    for param in iteritems(args.cldf, 'ParameterTable', 'id', 'name'):
+    for param in args.cldf.iter_rows('ParameterTable', 'id', 'name'):
         data.add(
             models.Feature,
             param['id'],
@@ -110,7 +102,7 @@ def main(args):
     )
     for pid, codes in itertools.groupby(
         sorted(
-            iteritems(args.cldf, 'CodeTable', 'id', 'name', 'description', 'parameterReference'),
+            args.cldf.iter_rows('CodeTable', 'id', 'name', 'description', 'parameterReference'),
             key=lambda v: (v['parameterReference'], v['id'])),
         lambda v: v['parameterReference'],
     ):
@@ -126,8 +118,7 @@ def main(args):
                 parameter=data['Feature'][code['parameterReference']],
                 jsondata=dict(color=color),
             )
-    for val in iteritems(
-            args.cldf,
+    for val in args.cldf.iter_rows(
             'ValueTable',
             'id', 'value', 'languageReference', 'parameterReference', 'codeReference', 'source'):
         if val['value'] is None:  # Missing values are ignored.
