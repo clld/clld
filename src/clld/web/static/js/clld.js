@@ -390,6 +390,7 @@ CLLD.Map = function(eid, layers, options) {
             "Stamen.TerrainBackground",
             "Esri.WorldStreetMap",
             "Esri.DeLorme",
+            "Esri.NatGeoWorldMap",
             "Esri.WorldTopoMap",
             "Esri.WorldImagery",
             "Esri.WorldTerrain",
