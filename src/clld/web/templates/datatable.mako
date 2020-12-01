@@ -13,7 +13,11 @@
     <thead>
         <tr>
             % for col in obj.cols:
+              % if col.js_args.get('bVisible', True):
                 <th style="text-align: left;">
+              % else:
+                <th class="hide">
+              % endif
                     % if col.js_args.get('bSearchable', True):
                         % if hasattr(col, 'choices'):
                             <select ${getattr(col, 'select', '')} class="select control input-${getattr(col, 'input_size', 'small')}" name="${col.name}" id="dt-filter-${col.name}">

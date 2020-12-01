@@ -32,7 +32,7 @@ bundles = {
             'js/leaflet-hash.js',
             'js/clld.js',
             'project.js',
-            filters='yui_js'),
+            filters='rjsmin'),
     ],
     'css': [
         Bundle(
@@ -44,12 +44,12 @@ bundles = {
             'css/jqtree.css',
             'css/hint.css',
             'css/jquery.dataTables.css',
-            filters='yui_css'),
+            filters=(skip,)),
         'css/bootstrap.min.css',
         'css/bootstrap-responsive.min.css',
         Bundle(
             'project.css',
-            filters='yui_css'),
+            filters=(skip,)),
     ],
 }
 
