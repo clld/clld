@@ -16,7 +16,6 @@ install_requires = [
     'zope.sqlalchemy',
     'alembic>=0.7.1',
     'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
-    'yuicompressor',
     'markupsafe',
     'requests>=2.4.3',  # we use the support for connect timeouts introduced in 2.4.0
     'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
