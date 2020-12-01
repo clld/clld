@@ -2,6 +2,13 @@
 Changes
 -------
 
+7.4.0
+~~~~~
+
+- Better support for internationalization
+- Support for map resizing
+
+
 7.1.1
 ~~~~~
 
