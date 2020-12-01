@@ -157,7 +157,7 @@ class OlacConfig(object):
         :param req: The current request.
         :return: A suitable `Participant` instance or None.
         """
-        return Participant("Admin", "Archive Admin", req.dataset.contact)
+        return Participant("Admin", "Archive Admin", req.contact_email_address)
 
     def description(self, req):
         # Note: According to http://www.language-archives.org/OLAC/repositories.html the
@@ -169,7 +169,7 @@ class OlacConfig(object):
             participants.append(Participant(
                 "Editor",
                 ed.contributor.name,
-                ed.contributor.email or req.dataset.contact))
+                ed.contributor.email or req.contact_email_address))
         return {
             'archiveURL': 'http://%s/' % req.dataset.domain,
             'participants': participants,

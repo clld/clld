@@ -497,7 +497,7 @@ def contactmail(req, ctx=None, title='contact maintainer'):
             .strip()\
             .encode('utf8')
         query = urlencode(params).replace('+', '%20')
-    href = 'mailto:{0}?{1}'.format(req.dataset.contact, query)
+    href = 'mailto:{0}?{1}'.format(req.contact_email_address, query)
     return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 

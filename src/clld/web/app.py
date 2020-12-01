@@ -98,6 +98,12 @@ class ClldRequest(Request):
         """
         return self.db.query(common.Dataset).options(undefer('updated')).first()
 
+    @property
+    def contact_email_address(self):
+        if 'clld.contact' in self.registry.settings:
+            return self.registry.settings['clld.contact']
+        return self.dataset.contact  # pragma: no cover
+
     def get_datatable(self, name, model, **kw):
         """Convenient lookup and retrieval of initialized DataTable object.
 

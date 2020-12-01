@@ -55,8 +55,8 @@ ${TxtCitation.render(request.dataset, request)}
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
         <skos:prefLabel xml:lang="en">${request.dataset.publisher_name}</skos:prefLabel>
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>
-        % if request.dataset.contact:
-            <foaf:mbox>${request.dataset.contact}</foaf:mbox>
+        % if request.contact_email_address:
+            <foaf:mbox>${request.contact_email_address}</foaf:mbox>
         % endif
     </foaf:Organization>
     <dctype:Software rdf:about="https://github.com/clld/clld">

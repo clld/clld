@@ -31,6 +31,7 @@ def test_CLLDRequest(env):
     env['request'].file_url(Language_files(id='1', object=Language.first()))
     assert env['request'].get_datatable('valuesets', ValueSet)
     assert env['request'].blog is None
+    assert env['request'].contact_email_address.startswith('from.settings')
 
 
 def test_menu_item(env):
