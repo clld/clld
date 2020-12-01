@@ -420,6 +420,8 @@ CLLD.Map = function(eid, layers, options) {
     this.options.add_layers_to_control = options.add_layers_to_control === undefined ? false : options.add_layers_to_control;
     this.options.show_labels = options.show_labels === undefined ? false : options.show_labels;
     this.options.on_init = options.on_init === undefined ? function(a){} : options.on_init;
+    this.options.resize_direction = options.resize_direction;
+    this.options.with_audioplayer = options.with_audioplayer === undefined ? false : options.with_audioplayer;
 
     this.map = L.map(
         eid,
@@ -630,6 +632,14 @@ CLLD.Map = function(eid, layers, options) {
         this.map.setView(
             this.options.center,
             this.options.zoom === undefined ? 5 : this.options.zoom);
+    }
+
+    if (this.options.with_audioplayer) {
+        CLLD.AudioPlayer.addToMap(this);
+    }
+
+    if (this.options.resize_direction !== undefined) {
+        L.control.resizer({ direction: this.options.resize_direction }).addTo(this.map);
     }
 
     if (this.options.on_init) {

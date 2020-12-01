@@ -168,6 +168,9 @@ class Map(Component):
       layers control as overlays [False]
     - show_labels: Flag indicating whether labels/tooltips should be initially open [False]
     - on_init: function to run at the end of map initialization [None]
+    - resize_direction: 'e', 's' or 'se', make map resizeable.
+      see https://github.com/jjimenezshaw/Leaflet.Control.Resizer#api
+    - with_audioplayer: Flag indicating whether to add an AudioPlayer control on the map.
 
     """
 

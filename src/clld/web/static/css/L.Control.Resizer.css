@@ -1,0 +1,108 @@
+.leaflet-control-resizer-corner-e,
+.leaflet-control-resizer-corner-s,
+.leaflet-control-resizer-corner-se {
+    z-index: 1000;
+    position: absolute;
+}
+
+.leaflet-control-resizer-corner-e {
+    right: 0;
+    height: 100%;
+}
+
+.leaflet-control-resizer-corner-s {
+    bottom: 0;
+    width: 100%;
+}
+
+.leaflet-control-resizer-corner-se {
+    right: 0;
+    bottom: 0;
+}
+
+
+.leaflet-control-resizer-transparent {
+    background-color: transparent;
+    user-select: none;
+    transition: 0.5s;
+}
+.leaflet-control-resizer-transparent::after {
+    border-color: transparent;
+    transition: 0.5s;
+}
+
+.leaflet-control-resizer-opaque,
+.leaflet-control-resizer-transparent:hover,
+.leaflet-control-resizer-transparent-fakedhover {
+    background-color: rgba(255, 250, 170, 0.8);
+}
+
+.leaflet-control-resizer-opaque::after,
+.leaflet-control-resizer-transparent:hover::after,
+.leaflet-control-resizer-transparent-fakedhover::after {
+    border-color: rgba(85, 85, 85, 0.9);
+}
+
+.leaflet-control-resizer-e {
+    width: 25px;
+    height: 50px;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    cursor: e-resize;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.leaflet-control-resizer-s {
+    width: 50px;
+    height: 25px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    cursor: s-resize;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+.leaflet-control-resizer-se {
+    width: 35px;
+    height: 35px;
+    border-top-left-radius: 35px;
+    cursor: se-resize;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+.leaflet-control-resizer-e::after,
+.leaflet-control-resizer-s::after,
+.leaflet-control-resizer-se::after {
+    content: '';
+    position: absolute;
+    z-index: 999;
+    border-width: 1px;
+    bottom: 20%;
+    right: 20%;
+}
+
+.leaflet-control-resizer-e::after,
+.leaflet-control-resizer-s::after {
+    width: 60%;
+    height: 60%;
+
+}
+
+.leaflet-control-resizer-se::after {
+    width: 40%;
+    height: 40%;
+}
+
+.leaflet-control-resizer-e::after,
+.leaflet-control-resizer-se::after {
+    border-right-style: solid;
+}
+.leaflet-control-resizer-s:after,
+.leaflet-control-resizer-se::after {
+    border-bottom-style: solid;
+}

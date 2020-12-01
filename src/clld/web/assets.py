@@ -30,6 +30,7 @@ bundles = {
             'js/tree.jquery.js',
             'js/leaflet-providers.js',
             'js/leaflet-hash.js',
+            'js/L.Control.Resizer.js',
             'js/clld.js',
             'project.js',
             filters='rjsmin'),
@@ -38,6 +39,7 @@ bundles = {
         Bundle(
             'css/leaflet.css',
             'css/leaflet.fullscreen.css',
+            'css/L.Control.Resizer.css',
             filters=(skip,)),
         Bundle(
             'css/clld.css',
