@@ -46,6 +46,8 @@ def filter_number(col, qs, type_=None, qs_weight=1):
     """
     if '..' in qs:
         min_, max_ = qs.split('..', 1)
+        # We only support a single range!
+        max_ = max_.split('..')[0]
         return (
             filter_number(col, '>=' + min_, type_=type_, qs_weight=qs_weight),
             filter_number(col, '<=' + max_, type_=type_, qs_weight=qs_weight))
@@ -321,8 +323,8 @@ class Toolbar(DownloadWidget):
                 items.extend([HTML.dt(col.js_args['sTitle']), HTML.dd(dsc)])
         return HTML.dl(
             HTML.p(
-                'Columns containing numeric data may be filtered giving upper or lower '
-                'bounds in the form "<5" or ranges in the form "-2..20".'),
+                'Columns containing numeric data may be filtered giving an upper and/or lower '
+                'bound in the form "<5" or a range in the form "-2..20".'),
             self.ctx.options.get('sDescription', ''),
             *items)
 

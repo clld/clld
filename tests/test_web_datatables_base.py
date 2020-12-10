@@ -74,6 +74,9 @@ def test_DataTable2(request_factory):
         def col_defs(self):
             return [Col(self, 'latitude'), TestCol(self, 'pk')]
 
+    with request_factory(params={'sSearch_0': '1..2,3..4'}) as req:
+        handle_dt(req, TestTable, common.Language)
+
     with request_factory(params={'sSearch_0': '> 1', 'sSearch_1': '> 1'}) as req:
         handle_dt(req, TestTable, common.Language)
 
