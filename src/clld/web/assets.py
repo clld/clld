@@ -36,22 +36,16 @@ bundles = {
             filters='rjsmin'),
     ],
     'css': [
-        Bundle(
-            'css/leaflet.css',
-            'css/leaflet.fullscreen.css',
-            'css/L.Control.Resizer.css',
-            filters=(skip,)),
-        Bundle(
-            'css/clld.css',
-            'css/jqtree.css',
-            'css/hint.css',
-            'css/jquery.dataTables.css',
-            filters=(skip,)),
+        'css/leaflet.css',
+        'css/leaflet.fullscreen.css',
+        'css/L.Control.Resizer.css',
+        'css/clld.css',
+        'css/jqtree.css',
+        'css/hint.css',
+        'css/jquery.dataTables.css',
         'css/bootstrap.min.css',
         'css/bootstrap-responsive.min.css',
-        Bundle(
-            'project.css',
-            filters=(skip,)),
+        'project.css',
     ],
 }
 
