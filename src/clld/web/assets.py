@@ -36,8 +36,10 @@ bundles = {
             filters='rjsmin'),
     ],
     'css': [
-        'css/leaflet.css',
-        'css/leaflet.fullscreen.css',
+        Bundle(
+            'css/leaflet.css',
+            'css/leaflet.fullscreen.css',
+            filters=(skip,)),
         'css/L.Control.Resizer.css',
         'css/clld.css',
         'css/jqtree.css',
