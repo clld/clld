@@ -2,6 +2,12 @@
 Changes
 -------
 
+7.4.1
+~~~~~
+
+Fixed bug whereby L.Control.Resizer.css wouldn't work due to packing.
+
+
 7.4.0
 ~~~~~
 
