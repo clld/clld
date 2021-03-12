@@ -176,7 +176,8 @@ CLLD.DataTable = (function(){
      * @function
      */    
     var _init = function(eid, toolbar, options) {
-        var col, i;
+        var col, i, index, params,
+            cols_by_index = {};
 
         options = options === undefined ? {} : options;
 
@@ -318,9 +319,22 @@ CLLD.DataTable = (function(){
 
         for (i=0; i < options.aoColumns.length; i++) {
             col = options.aoColumns[i];
+            cols_by_index[i] = col.sName;
             if (col.sFilter) {
                 CLLD.DataTables[eid].fnFilter(col.sFilter, i);
             }
+        }
+        // Since search params will be picked up by the xhr response with the data, we should also populate the
+        // search filters accordingly, such as to give the user a visual cue of what's going on in addition to
+        // browser location bar and the "filtered from ..." text.
+        if (URLSearchParams !== undefined) {
+            params = new URLSearchParams(window.location.search);
+            params.forEach(function (value, key) {
+                index = key.split('sSearch_')[1];
+                if (index !== undefined && cols_by_index.hasOwnProperty(index)) {
+                    $('#dt-filter-' + cols_by_index[index]).val(value);
+                }
+            })
         }
     };
 
