@@ -16,6 +16,7 @@ mapping ord(unicode char) to LaTeX code.
 D. Eppstein, October 2003.
 """
 import re
+import sys
 import codecs
 
 
@@ -37,6 +38,8 @@ def _registry(encoding):
     if encoding == 'latex':
         encoding = None  # pragma: no cover
     elif encoding.startswith('latex+'):
+        encoding = encoding[6:]
+    elif sys.version_info >= (3, 9, 0) and encoding.startswith('latex_'):
         encoding = encoding[6:]
     else:
         return None  # pragma: no cover
@@ -69,7 +72,7 @@ def _registry(encoding):
             # This should always be safe since we are supposed
             # to be producing unicode output anyway.
             x = map(str, _unlatex(input))
-            return u''.join(x), len(input)
+            return ''.join(x), len(input)
 
     class StreamWriter(Codec, codecs.StreamWriter):
         pass

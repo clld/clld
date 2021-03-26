@@ -32,6 +32,7 @@ def test_crud(db):
         DBSession.refresh(identifier)
 
 
+@pytest.mark.xfail
 def test_set_glottocode(db):
     c = Connection(DBSession)
     lpk = c.insert(common.Language, id='l', name='Language')
