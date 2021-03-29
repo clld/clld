@@ -8,8 +8,6 @@ import pathlib
 import collections
 
 from zope.interface import Interface, implementer
-from six import unichr, text_type, string_types, iteritems
-from six.moves import filter
 from clldutils.misc import to_binary
 from clldutils.source import Source
 
@@ -23,7 +21,7 @@ __all__ = [
 
 latex.register()
 
-UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,5})\]')
+UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,5})]')
 
 
 def u_unescape(s):
@@ -38,7 +36,7 @@ def u_unescape(s):
         end = 0
         for m in UU_PATTERN.finditer(s):
             yield s[end:m.start()]
-            yield unichr(int(m.group('number')))
+            yield chr(int(m.group('number')))
             end = m.end()
         yield s[end:]
 
@@ -103,9 +101,9 @@ RE_XML_ILLEGAL = re.compile(
     + r'|'
     + r'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' %
     (
-        unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
-        unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
-        unichr(0xd800), unichr(0xdbff), unichr(0xdc00), unichr(0xdfff),
+        chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff),
+        chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff),
+        chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff),
     ))
 
 
@@ -129,7 +127,7 @@ def unescape(string):
             result = t.decode('latex+latin1')
         except UnicodeEncodeError:
             result = string
-        u_result = text_type(result)
+        u_result = str(result)
         return u_result
 
     res = u_unescape(stripctrlchars(_delatex(string.strip())))
@@ -312,7 +310,7 @@ class Record(Source, _Convertable):
     def __init__(self, genre, id_, *args, **kw):
         super(Record, self).__init__(genre, 'a', args, **kw)
         self.id = id_
-        if isinstance(self.genre, string_types):
+        if isinstance(self.genre, str):
             try:
                 self.genre = EntryType.from_string(genre.lower())
             except ValueError:
@@ -327,7 +325,7 @@ class Record(Source, _Convertable):
                 data[field] = value
         data.update(kw)
         data.setdefault('title', obj.description)
-        data = sorted(iteritems(data))
+        data = sorted(data.items())
         return cls(obj.bibtex_type, obj.id, *data)
 
     @classmethod
@@ -344,7 +342,7 @@ class Record(Source, _Convertable):
         :return: list of strings representing the values of the record for field 'key'.
         """
         res = self.get(key, [])
-        if isinstance(res, string_types):
+        if isinstance(res, str):
             res = res.split(Record.sep(key))
         return [_f for _f in res if _f]
 
