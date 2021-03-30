@@ -109,7 +109,7 @@ class Download(object):
                 # TODO: write test for the file name things!?
                 #
                 with contextlib.closing(gzip.GzipFile(
-                    filename=pathlib.Path(tmp.stem).stem, fileobj=tmp.open('wb')
+                    filename=pathlib.Path(tmp.stem).stem, fileobj=tmp.open('wb'), mode='w',
                 )) as fp:
                     self.before(req, fp)
                     for i, item in enumerate(page_query(self.query(req), verbose=verbose)):

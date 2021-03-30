@@ -97,7 +97,7 @@ class Connection(object):
             ('version', 1),
             ('created', func.now()),
             ('updated', func.now()),
-            ('active', True)
+            ('active', True),
         ]:
             if hasattr(model.__table__.c, k):
                 values.setdefault(k, v)

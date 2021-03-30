@@ -1,7 +1,7 @@
 # coding: utf8
 """Functionality to create Coins, i.e. context objects in spans.
 
-.. seealso:: http://ocoins.info/
+.. seealso:: https://en.wikipedia.org/wiki/COinS
 """
 import re
 from urllib.parse import urlencode

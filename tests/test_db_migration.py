@@ -32,13 +32,13 @@ def test_crud(db):
         DBSession.refresh(identifier)
 
 
-@pytest.mark.xfail
-def test_set_glottocode(db):
+def test_set_glottocode(db, custom_language):
     c = Connection(DBSession)
-    lpk = c.insert(common.Language, id='l', name='Language')
+    lpk = c.insert(common.Language, id='l', name='Language', polymorphic_type='custom')
+    c.insert(custom_language, pk=lpk, custom='x')
     c.set_glottocode('l', 'abcd1234')
     c.set_glottocode('l', 'abcd1234')
-    l = DBSession.query(common.Language).get(lpk)
+    l = DBSession.query(custom_language).get(lpk)
     assert l.glottocode == 'abcd1234'
 
     c.set_glottocode('l', 'dcba1234')
