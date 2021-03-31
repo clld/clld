@@ -15,7 +15,7 @@ python setup.py compile_catalog
 tox -r
 ```
 
-- Make sure all scaffold tests pass (on Py 3.5)
+- Make sure all scaffold tests pass (on at least one supported Python version):
 ```shell
 sh build.sh $ABSOLUTE_PATH_VENV_DIRECTORY $ABSOLUTE_PATH_CLLD_REPOSITORY $ABSOLUTE_PATH_TO_GLOTTOLOG_CLONE
 ```
@@ -26,9 +26,8 @@ webassets -m clld.web.assets build
 rm -i src/clld/web/static/*/packed.*
 ```
 
-- Make sure javascript tests pass with coverage of clld.js at > 82% and take
-  care of specifying the name of the Chromium binary (e.g. chromium-browser or
-  chromium):
+- Make sure javascript tests pass (take care of specifying the name of the Chromium binary - e.g. 
+  chromium-browser or chromium):
 ```shell
 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
 ```
