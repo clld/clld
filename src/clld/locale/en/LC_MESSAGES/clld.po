@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: clld 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-12 11:59+0100\n"
+"POT-Creation-Date: 2021-03-31 08:55+0200\n"
 "PO-Revision-Date: 2013-01-15 13:57+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,73 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.9.0\n"
+
+#: src/clld/project_template/{{cookiecutter.directory_name}}/{{cookiecutter.directory_name}}/templates/parameter/detail_html.mako:4
+#: src/clld/project_template/{{cookiecutter.directory_name}}/{{cookiecutter.directory_name}}/templates/parameter/detail_html.mako:23
+#: src/clld/web/datatables/value.py:119
+#: src/clld/web/templates/combination/detail_html.mako:20
+#: src/clld/web/templates/parameter/detail_html.mako:4
+#: src/clld/web/templates/parameter/detail_html.mako:6
+#: src/clld/web/templates/valueset/detail_html.mako:46
+msgid "Parameter"
+msgstr ""
+
+#: src/clld/web/app.py:691
+msgid "Home"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:435
+msgid "Next"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:436
+msgid "Previous"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:437
+msgid "First"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:438
+msgid "Last"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:440
+msgid "No data available in table"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:441
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:442
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:443
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:444
+msgid "Show _MENU_ entries"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:445
+msgid "Loading..."
+msgstr ""
+
+#: src/clld/web/datatables/base.py:446
+msgid "Processing..."
+msgstr ""
+
+#: src/clld/web/datatables/base.py:447
+msgid "Search:"
+msgstr ""
+
+#: src/clld/web/datatables/base.py:448
+msgid "No matching records found"
+msgstr ""
 
 #: src/clld/web/datatables/sentence.py:20
 #: src/clld/web/templates/sentence/detail_html.mako:33
@@ -27,12 +93,8 @@ msgstr ""
 msgid "Translation"
 msgstr ""
 
-#: src/clld/web/datatables/value.py:113
-#: src/clld/web/templates/combination/detail_html.mako:20
-#: src/clld/web/templates/parameter/detail_html.mako:4
-#: src/clld/web/templates/parameter/detail_html.mako:6
-#: src/clld/web/templates/valueset/detail_html.mako:46
-msgid "Parameter"
+#: src/clld/web/maps/__init__.py:285
+msgid "Icon size"
 msgstr ""
 
 #: src/clld/web/templates/app.mako:159
@@ -43,17 +105,29 @@ msgstr ""
 msgid "Disclaimer"
 msgstr ""
 
+#: src/clld/web/templates/contact.mako:3
+msgid "Contact"
+msgstr ""
+
+#: src/clld/web/templates/contact.mako:5
+msgid "You can contact us via email at"
+msgstr ""
+
+#: src/clld/web/templates/map.mako:19
+msgid "Show/hide Labels"
+msgstr ""
+
 #: src/clld/web/templates/sentence/detail_html.mako:19
-#: src/clld/web/templates/util.mako:228
+#: src/clld/web/templates/util.mako:205
 msgid "Sentence"
 msgstr ""
 
-#: src/clld/web/templates/util.mako:272
+#: src/clld/web/templates/util.mako:249
 msgid "Alternative names"
 msgstr ""
 
 #: src/clld/web/templates/unit/detail_html.mako:21
-#: src/clld/web/templates/util.mako:338
+#: src/clld/web/templates/util.mako:315
 #: src/clld/web/templates/value/index_html.mako:6
 #: src/clld/web/templates/valueset/detail_html.mako:12
 #: src/clld/web/templates/valueset/snippet_html.mako:8
@@ -61,7 +135,7 @@ msgid "Values"
 msgstr ""
 
 #: src/clld/web/templates/source/detail_html.mako:61
-#: src/clld/web/templates/util.mako:339
+#: src/clld/web/templates/util.mako:316
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
 msgid "Sentences"
@@ -134,6 +208,10 @@ msgstr ""
 
 #: src/clld/web/templates/sentence/detail_html.mako:7
 msgid "Datapoints"
+msgstr ""
+
+#: src/clld/web/templates/sentence/detail_html.mako:29
+msgid "Comment"
 msgstr ""
 
 #: src/clld/web/templates/sentence/index_html.mako:6
