@@ -64,6 +64,12 @@ apps.
   [TuLaR (Tupían Language Resources)](https://tular.clld.org)). The TuLaR
   app aggregates data which is curated in several datasets, bundled under
   a [Zenodo community](https://zenodo.org/communities/tular), see https://github.com/tupian-language-resources/tular/blob/main/tular/scripts/initializedb.py
+- **Using Charis SIL fonts**: using [SIL's Charis fonts](https://software.sil.org/charis/) on a `clld` page is simple. Here's an example
+  https://ids.clld.org/valuesets/1-100-316
+  - Include the relevant style sheet (which will pull in the font resources):
+    https://github.com/clld/ids/blob/b2884e06a53a0a3c7a0dc27955c314869d0a31aa/ids/templates/ids.mako#L10-L12
+  - Then assign the appropriate css class:
+    https://github.com/clld/ids/blob/b2884e06a53a0a3c7a0dc27955c314869d0a31aa/ids/templates/unit/detail_html.mako#L6
 
 
 ## See
