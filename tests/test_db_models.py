@@ -10,12 +10,12 @@ def test_Config_replacement_key():
     assert Config.replacement_key(None, 'Y') == '__NoneType_Y__'
 
 
-def test_Files(db, tmppath):
+def test_Files(db, tmp_path):
     from clld.db.models.common import Sentence, Sentence_files
 
     l = Sentence(id='abc', name='Name')
     f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
-    p = f.create(Path(tmppath), 'content')
+    p = f.create(tmp_path, 'content')
     assert Path(p).exists()
 
     l._files.append(f)

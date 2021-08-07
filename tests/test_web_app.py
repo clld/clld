@@ -100,13 +100,13 @@ def test_no_overwrite_registration(config):
     assert config.registry.queryUtility(IDataTable, name='route') == 1
 
 
-def test_includeme_error(tmpdir, capsys):
+def test_includeme_error(tmp_path, capsys):
     import sys
-    sys.path.append(str(tmpdir))
-    pkg = tmpdir.join('failingapp')
+    sys.path.append(str(tmp_path))
+    pkg = tmp_path.joinpath('failingapp')
     pkg.mkdir()
-    pkg.join('__init__.py').write_text('#\n', 'ascii')
-    pkg.join('util.py').write_text('import xyzxyz', 'ascii')
+    pkg.joinpath('__init__.py').write_text('#\n', 'ascii')
+    pkg.joinpath('util.py').write_text('import xyzxyz', 'ascii')
     config = Configurator(
         root_package=importlib.import_module('failingapp'),
         settings={'sqlalchemy.url': 'sqlite://'})

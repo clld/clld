@@ -11,8 +11,8 @@ def test_create_downloads(testsdir):
          log=logging.getLogger(__name__))
 
 
-def test_create(tmppath):
-    outdir = tmppath / 'app'
+def test_create(tmp_path):
+    outdir = tmp_path / 'app'
     main(['create', '--quiet', str(outdir)])
     assert outdir.joinpath('setup.py').exists()
     with pytest.raises(ValueError):
@@ -23,15 +23,15 @@ def test_create(tmppath):
 
 
 @pytest.mark.filterwarnings("ignore:No module named")
-def test_initdb(tmppath):
-    tmppath.joinpath('tests').mkdir()
-    cfg = tmppath / 'tests' / 'test.ini'
+def test_initdb(tmp_path):
+    tmp_path.joinpath('tests').mkdir()
+    cfg = tmp_path / 'tests' / 'test.ini'
     cfg.write_text("""\
 [app:main]
 use = call:testutils:main
 sqlalchemy.url = sqlite:///{}
-    """.format(tmppath / 'db.sqlite'), encoding='utf8')
+    """.format(tmp_path / 'db.sqlite'), encoding='utf8')
     main(['initdb', str(cfg)])
 
     with pytest.raises(ValueError):
-        main(['initdb', str(tmppath / 'xyz.ini')])
+        main(['initdb', str(tmp_path / 'xyz.ini')])

@@ -85,7 +85,7 @@ class FilesMixin(IdNameDescriptionMixin):
             if isinstance(content, str):
                 content = content.encode('utf8')
             fp.write(content)
-        return p.as_posix()
+        return str(p)
 
 
 class HasFilesMixin(object):

@@ -14,17 +14,17 @@ def test_source2source(env):
         assert len(res) >= 1
 
 
-def test_CldfDownload(env, tmppath, mocker, capsys):
+def test_CldfDownload(env, tmp_path, mocker, capsys):
     from clld.web.adapters.cldf import CldfDownload
 
     mocker.patch('clld.web.adapters.cldf.transaction')
-    tmp = tmppath / 'dl.zip'
+    tmp = tmp_path / 'dl.zip'
     dl = CldfDownload(Dataset, 'clld')
     dl.create(env['request'], outfile=tmp, verbose=True)
     out, err = capsys.readouterr()
     assert 'Value' in out
 
-    outdir = tmppath / 'cldf'
+    outdir = tmp_path / 'cldf'
     with ZipFile(tmp.as_posix()) as zip:
         assert 'Wordlist-metadata.json' in zip.namelist()
         zip.extractall(str(outdir))

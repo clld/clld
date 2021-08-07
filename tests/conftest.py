@@ -186,8 +186,3 @@ def db(db):
 def data(db):
     populate_test_db(db)
     yield db
-
-
-@pytest.fixture()
-def tmppath(tmpdir):
-    return pathlib.Path(str(tmpdir))

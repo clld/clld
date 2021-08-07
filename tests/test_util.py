@@ -1,18 +1,16 @@
 
-def test_safe_overwrite(tmppath):
+def test_safe_overwrite(tmp_path):
     from clld.util import safe_overwrite
 
-    target = tmppath / 'a' / 'b'
+    target = tmp_path / 'a' / 'b'
     with safe_overwrite(target) as tmp:
-        with tmp.open('w', encoding='utf8') as fp:
-            fp.write('stuff')
+        tmp.write_text('stuff', encoding='utf8')
 
     assert not tmp.exists()
     assert target.exists()
 
     with safe_overwrite(target) as tmp:
-        with tmp.open('w', encoding='utf8') as fp:
-            fp.write('other')
+        tmp.write_text('other', encoding='utf8')
 
     with target.open(encoding='utf8') as fp:
         assert fp.read() == 'other'

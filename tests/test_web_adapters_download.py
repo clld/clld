@@ -44,8 +44,8 @@ def test_Download_url(mocker, env):
     assert dl.url(env['request'])
 
 
-def test_Download2(env, tmppath):
-    out = tmppath / 'dl'
+def test_Download2(env, tmp_path):
+    out = tmp_path / 'dl'
     dl = CsvDump(Language, 'clld')
     dl.create(env['request'], verbose=False, outfile=out)
     assert out.exists()
