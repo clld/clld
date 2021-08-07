@@ -1,6 +1,8 @@
 import sys
 import os
+import time
 import pathlib
+
 
 import pytest
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
@@ -186,3 +188,4 @@ def db(db):
 def data(db):
     populate_test_db(db)
     yield db
+    time.sleep(0.1)
