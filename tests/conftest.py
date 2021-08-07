@@ -188,4 +188,4 @@ def db(db):
 def data(db):
     populate_test_db(db)
     yield db
-    time.sleep(0.1)
+    time.sleep(0.2)
