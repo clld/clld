@@ -6,7 +6,8 @@ def _xml_findall(app, name):
 
 
 def test_robots(app):
-    app.get('/robots.txt')
+    res = app.get('/robots.txt')
+    assert 'User-agent: robot1\nDisallow: /\n' in res.body.decode('utf8')
 
 
 def test_sitemapindex(app):

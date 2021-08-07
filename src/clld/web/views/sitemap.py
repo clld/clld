@@ -26,8 +26,12 @@ def robots(req):
 
     .. seealso:: http://www.sitemaps.org/protocol.html#submit_robots
     """
+    spec = ''
+    deny = (req.registry.settings.get('clld.robots_deny') or '').strip().split()
+    for robot in deny:
+        spec = spec + 'User-agent: {}\nDisallow: /\n'.format(robot)
     return Response(
-        "Sitemap: %s\n" % req.route_url('sitemapindex'), content_type="text/plain")
+        "Sitemap: {}\n{}".format(req.route_url('sitemapindex'), spec), content_type="text/plain")
 
 
 def _query(req, rsc):

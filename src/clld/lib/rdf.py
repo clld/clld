@@ -92,7 +92,10 @@ def properties_as_xml_snippet(subject, props):
             g.add((subject, p, o))
     res = []
     in_desc = False
-    for line in g.serialize(format='xml').decode('utf8').split('\n'):
+    xml = g.serialize(format='xml')
+    if not isinstance(xml, str):
+        xml = xml.decode('utf8')  # pragma: no cover
+    for line in xml.split('\n'):
         if line.strip().startswith('</rdf:Description'):
             break
         if in_desc:
