@@ -9,7 +9,7 @@ from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
 from clld.web.adapters import csv
-from clld.web.adapters.md import BibTex, TxtCitation, ReferenceManager
+from clld.web.adapters.md import BibTex, TxtCitation
 from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
 from clld.lib.rdf import FORMATS as RDF_NOTATIONS
@@ -114,7 +114,7 @@ def includeme(config):
 
     config.register_adapters(specs)
 
-    for cls in [BibTex, TxtCitation, ReferenceManager]:
+    for cls in [BibTex, TxtCitation]:
         for if_ in [interfaces.IRepresentation, interfaces.IMetadata]:
             for adapts in [interfaces.IContribution, interfaces.IDataset]:
                 config.register_adapter(cls, adapts, if_, name=cls.mimetype)

@@ -33,7 +33,6 @@ def test_dataset(app):
     assert app.parsed_body.find(
         './/{http://rdfs.org/ns/void#}Dataset').get(
         '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about')
-    app.get('/void.md.ris')
     assert 'skos:example' in app.get_xml('/void.rdf')
     # Test __locale__ param is propagated:
     res = app.get_html('/?__locale__=en')
@@ -61,9 +60,8 @@ def test_resources(app):
 
 
 def test_source(app):
-    for ext in 'bib en ris mods'.split():
-        app.get('/sources/source.' + ext)
-        app.get('/sources.' + ext)
+    app.get('/sources/source.bib')
+    app.get('/sources.bib')
     app.get_xml('/sources.rdf?sEcho=1')
     # resources with a name should be listed with rdfs:label in rdf index.
     # see https://github.com/clld/clld/issues/66

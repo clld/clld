@@ -12,7 +12,6 @@ from clldutils.misc import to_binary
 from clldutils.source import Source
 
 from clld.util import DeclEnum
-from clld.lib.bibutils import convert
 from clld.lib import latex
 
 __all__ = [
@@ -275,12 +274,6 @@ class _Convertable(object):
             if hasattr(self, 'text'):
                 return self.text()
             raise NotImplementedError('no text method found!')
-        if fmt == 'en':
-            return convert(str(self), 'bib', 'end')
-        if fmt == 'ris':
-            return convert(str(self), 'bib', 'ris')
-        if fmt == 'mods':
-            return convert(str(self), 'bib')
         return str(self)
 
 

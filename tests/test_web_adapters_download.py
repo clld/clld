@@ -1,4 +1,3 @@
-from tempfile import mktemp
 import gzip
 from contextlib import closing
 from xml.etree import cElementTree as et
@@ -11,15 +10,13 @@ def test_download_dir():
     assert download_dir('clld')
 
 
-def test_Download(mocker, env):
+def test_Download(mocker, env, tmp_path):
     dl = Download(Source, 'clld', ext='x')
     assert dl.asset_spec(mocker.Mock()).startswith('clld:')
 
     class TestDownload(Download):
-        _path = mktemp()
-
         def asset_spec(self, req):
-            return self._path
+            return str(tmp_path / 'x')
 
     dl = TestDownload(Source, 'clld', ext='bib')
     abspath = dl.abspath(env['request'])

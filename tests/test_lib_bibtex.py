@@ -1,7 +1,5 @@
 import pytest
 
-from mock import Mock
-
 from clld.lib.bibtex import *
 
 
@@ -34,7 +32,7 @@ def test_Record_author_editor():
     assert rec.getall('editor') == ['a', 'b']
 
 
-def test_Record():
+def test_Record(mocker):
     rec = Record(
         'book', '1',
         title='The Title',
@@ -49,11 +47,10 @@ def test_Record():
     assert '@book' in str(rec)
     assert 'bt' in rec.text()
 
-    for fmt in ['txt', 'en', 'ris', 'mods']:
-        rec.format(fmt)
+    rec.format('txt')
 
     Record.from_string(str(rec), lowercase=True)
-    Record.from_object(Mock())
+    Record.from_object(mocker.Mock())
 
     rec = Record(
         'incollection', '1',
