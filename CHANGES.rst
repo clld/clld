@@ -2,6 +2,14 @@
 Changes
 -------
 
+unreleased 8.0.0
+~~~~~~~~~~~~~~~~
+
+- Dropped support for legacy bib formats Endnote, RIS, MODS via bibutils.
+- Dropped support for schema migrations - these shouldn't rely on clld code
+  anyway.
+
+
 7.4.1
 ~~~~~
 
