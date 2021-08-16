@@ -30,5 +30,7 @@ def test_convert():
 
     g = ClldGraph()
     for from_ in FORMATS:
-        for to_ in list(FORMATS.keys()) + [None]:
-            convert(g.serialize(format=from_), from_, to_)
+        if from_ != 'nt':
+            for to_ in list(FORMATS.keys()) + [None]:
+                if to_ != 'nt':
+                    convert(g.serialize(format=from_), from_, to_)

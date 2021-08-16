@@ -53,11 +53,10 @@ def test_rdf(env):
         if not hasattr(rsc.model, 'first'):
             continue
         ctx = rsc.model.first()
-        res = render(
-            '%s/rdf.mako' % rsc.name, dict(ctx=ctx), request=env['request'])
+        res = render('%s/rdf.mako' % rsc.name, dict(ctx=ctx), request=env['request'])
         assert not qname_as_resource.search(res)
         g = Graph()
-        g.load(io.StringIO(res))
+        g.parse(io.StringIO(res), format='xml')
         for predicate in ['void:inDataset', 'skos:prefLabel']:
             if predicate == 'void:inDataset' and rsc.name == 'dataset':
                 continue
