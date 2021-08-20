@@ -84,10 +84,6 @@ class ClldRequest(Request):
         """
         return DBSession
 
-    @property
-    def blog(self):
-        return self.registry.queryUtility(interfaces.IBlog)
-
     @reify
     def dataset(self):
         """Convenient access to the Dataset object.
