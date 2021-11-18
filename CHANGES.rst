@@ -6,6 +6,13 @@ unreleased
 ~~~~~~~~~~
 
 
+8.0.1
+~~~~~
+
+- Resizeable maps as default
+- Include python 3.10 as supported platform
+
+
 8.0.0
 ~~~~~
 
