@@ -7,7 +7,6 @@ import functools
 import importlib
 import collections
 
-from distutils.util import strtobool
 from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings, bootstrap
 from nameparser import HumanName
@@ -26,6 +25,22 @@ __all__ = [
     'bibtex2source',
     'confirm',
     'Data']
+
+
+# Moved here from distutils.util, due to this package being deprecated.
+def strtobool (val):  # pragma: no cover
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    if val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    raise ValueError("invalid truth value %r" % (val,))
 
 
 class AppConfig(argparse.Action):
