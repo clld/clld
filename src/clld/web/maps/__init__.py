@@ -200,6 +200,9 @@ class Map(Component):
             pass
         return res
 
+    def get_default_options(self):
+        return {'resize_direction': 's'}
+
     @lazyproperty
     def layers(self):
         """The list of layers of the map.
@@ -315,7 +318,10 @@ class ParameterMap(Map):
                 self.req.resource_url(self.ctx, ext='geojson'))
 
     def get_default_options(self):
-        return {'info_query': {'parameter': self.ctx.pk}, 'hash': True}
+        return {
+            'resize_direction': 's',
+            'info_query': {'parameter': self.ctx.pk},
+            'hash': True}
 
 
 class GeoJsonMultiple(GeoJson):
