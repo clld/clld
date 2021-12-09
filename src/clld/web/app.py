@@ -6,6 +6,7 @@ import datetime
 import functools
 import importlib
 import collections
+import urllib.parse
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload, undefer
@@ -22,6 +23,7 @@ from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
 from purl import URL
 from clldutils.path import md5, git_describe
+from clldutils.misc import deprecated
 
 import clld
 from clld.config import get_config
@@ -58,9 +60,13 @@ class ClldRequest(Request):
     def purl(self):
         """Access the current request's URL.
 
+        This property is deprecated and will be removed in clld 8.2. Use functionality
+        from `urllib.parse` to parse `self.url` instead.
+
         For more convenient URL manipulations, we provide the current request's URL
         as `purl.URL <http://purl.readthedocs.org/en/latest/#purl.URL>`_ instance.
         """
+        deprecated('`ClldRequest.purl` will be removed in clld 8.2.')
         return URL(self.url)
 
     @reify
@@ -73,7 +79,8 @@ class ClldRequest(Request):
 
         :return: dict of the query parameters of the request URL.
         """
-        return {k: v[0] for k, v in self.purl.query_params().items()}
+        return {k: v[0] for k, v in
+                urllib.parse.parse_qs(urllib.parse.urlparse(self.url).query).items()}
 
     @property
     def db(self):
@@ -161,11 +168,11 @@ class ClldRequest(Request):
         :return: model instance or ``None``.
         """
         mapper = self.registry.getUtility(IRoutesMapper)
-        _path = URL(url).path()
+        _path = urllib.parse.urlparse(url).path
         info = mapper(WebobRequest({'PATH_INFO': _path}))
         if not info['route']:
             # FIXME: hack to cater to deployments under a path prefix
-            info = mapper(WebobRequest({'PATH_INFO': re.sub(r'^\/[a-z]+', '', _path)}))
+            info = mapper(WebobRequest({'PATH_INFO': re.sub(r'^/[a-z]+', '', _path)}))
         if info['route']:
             for rsc in RESOURCES:
                 if rsc.name == info['route'].name:

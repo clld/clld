@@ -8,7 +8,7 @@ from itertools import groupby  # we just import this to have it available in tem
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
 from math import floor
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlparse
 
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -16,7 +16,6 @@ from markupsafe import Markup
 from pyramid.renderers import render as pyramid_render
 from pyramid.threadlocal import get_current_request
 from pyramid.interfaces import IRoutesMapper
-from purl import URL
 from zope.interface import providedBy
 from clldutils.misc import xmlchars
 
@@ -45,13 +44,14 @@ MARKER_IMG_DIM = '20'
 
 
 def cc_link(req, license_url, button='regular'):
+    license_url = license_url.decode('utf8') if isinstance(license_url, bytes) else license_url
     if license_url == 'https://en.wikipedia.org/wiki/Public_domain':
         license_url = 'https://creativecommons.org/publicdomain/zero/1.0/'  # pragma: no cover
-    license_url = URL(license_url)
-    if license_url.host() != 'creativecommons.org':
+    license_url = urlparse(license_url)
+    if license_url.hostname != 'creativecommons.org':
         return
 
-    comps = license_url.path().split('/')
+    comps = license_url.path.split('/')
     if len(comps) < 3:
         return  # pragma: no cover
 
@@ -72,16 +72,16 @@ def cc_link(req, license_url, button='regular'):
         src=req.static_url('clld:web/static/images/' + icon))
     height, width = (15, 80) if button == 'small' else (30, 86)
     img_attrs.update(height=height, width=width)
-    return HTML.a(HTML.img(**img_attrs), href=license_url, rel='license')
+    return HTML.a(HTML.img(**img_attrs), href=license_url.geturl(), rel='license')
 
 
 def maybe_license_link(req, license, **kw):
     cc_link_ = cc_link(req, license, button=kw.pop('button', 'regular'))
     if cc_link_:
         return cc_link_
-    license_url = URL(license)
-    if license_url.host():
-        return external_link(license_url, **kw)
+    license_url = urlparse(license)
+    if license_url.hostname:
+        return external_link(license_url.geturl(), **kw)
     return license
 
 
@@ -332,8 +332,8 @@ def external_link(url, label=None, inverted=False, **kw):
 
 
 def maybe_external_link(text, **kw):
-    url = URL(text)
-    if url.host() and url.scheme() in ['http', 'https']:
+    url = urlparse(text)
+    if url.hostname and url.scheme in ['http', 'https']:
         return external_link(text, **kw)
     return text
 

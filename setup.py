@@ -9,11 +9,10 @@ install_requires = [
     'pyramid>=1.10',
     'pyramid_mako>=1.0',
     'pyramid_tm',
-    'SQLAlchemy>=1.0.6',
+    'SQLAlchemy>=1.4',
     'purl>=0.5',
     'pytz',
     'zope.sqlalchemy',
-    'alembic>=0.7.1',
     'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
     'markupsafe',
     'requests>=2.4.3',  # we use the support for connect timeouts introduced in 2.4.0

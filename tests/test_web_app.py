@@ -4,7 +4,6 @@ import pytest
 from zope.interface import Interface
 from pyramid.testing import Configurator
 from pyramid.httpexceptions import HTTPNotFound
-from purl import URL
 
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
 from clld.interfaces import IMapMarker, IDataTable
@@ -23,7 +22,9 @@ def config():
 
 
 def test_CLLDRequest(env):
-    assert isinstance(env['request'].purl, URL)
+    with pytest.deprecated_call():
+        _ = env['request'].purl
+
     c = env['request'].db.query(Contribution).first()
     env['request'].resource_url(c, ext='geojson')
     assert env['request'].ctx_for_url('/some/path/to/nowhere') is None

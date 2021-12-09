@@ -28,7 +28,7 @@ __all__ = [
 
 
 # Moved here from distutils.util, due to this package being deprecated.
-def strtobool (val):  # pragma: no cover
+def strtobool(val):  # pragma: no cover
     """Convert a string representation of truth to true (1) or false (0).
 
     True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values

@@ -1,7 +1,7 @@
 from xml.etree.ElementTree import fromstring
 
 from pyramid.config import Configurator
-from mock import Mock
+from unittest.mock import Mock
 
 
 def main(global_config, **settings):
