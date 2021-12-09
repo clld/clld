@@ -19,6 +19,10 @@ def test_properties_as_xml_snippet():
 
     properties_as_xml_snippet(
         'subject', [('foaf:name', 'a name'), ('foaf:homepage', 'http://example.org')])
+    properties_as_xml_snippet(
+        'subject', [('rdf:about', 'x'), ('foaf:homepage', 'http://example.org')])
+    properties_as_xml_snippet(
+        'subject', [('about', 'x'), ('foaf:homepage', 'http://example.org')])
 
     p = properties_as_xml_snippet(
         'http://example.org', [('dcterms:title', 'ttt')])

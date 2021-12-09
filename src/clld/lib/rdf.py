@@ -50,10 +50,7 @@ def expand_prefix(p):
     if isinstance(p, str) and ':' in p:
         prefix, name = p.split(':', 1)
         if prefix in NAMESPACES:
-            try:
-                return getattr(NAMESPACES[prefix], name)
-            except Exception:
-                pass
+            return getattr(NAMESPACES[prefix], name, p)
     return p
 
 
@@ -84,12 +81,16 @@ def properties_as_xml_snippet(subject, props):
     if props:
         for p, o in props:
             p = expand_prefix(p)
-            if isinstance(o, str):
-                if o.startswith('http://') or o.startswith('https://'):
-                    o = URIRef(o)
-                else:
-                    o = Literal(o)
-            g.add((subject, p, o))
+            if p:
+                if isinstance(o, str):
+                    if o.startswith('http://') or o.startswith('https://'):
+                        o = URIRef(o)
+                    else:
+                        o = Literal(o)
+                try:
+                    g.add((subject, p, o))
+                except AssertionError:
+                    pass
     res = []
     in_desc = False
     xml = g.serialize(format='xml')
