@@ -5,6 +5,10 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+
+8.1.0
+~~~~~
+
 - deprecate `ClldRequest.purl` in preparation of removing `purl` as dependency 
 - require `SQLAlchemy>=1.4`
 
