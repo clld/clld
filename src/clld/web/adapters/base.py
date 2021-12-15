@@ -68,7 +68,8 @@ class Representation(Renderable):
     """Base class for adapters implementing IRepresentation."""
 
 
-class _Json(Renderable):
+@implementer(interfaces.IRepresentation)
+class Json(Renderable):
 
     """JavaScript Object Notation."""
 
@@ -78,16 +79,6 @@ class _Json(Renderable):
 
     def render(self, ctx, req):
         return pyramid_render('json', ctx, request=req)
-
-
-@implementer(interfaces.IRepresentation)
-class Json(_Json):
-    pass
-
-
-@implementer(interfaces.IIndex)
-class JsonIndex(_Json):
-    pass
 
 
 @implementer(interfaces.IIndex)

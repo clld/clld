@@ -4,7 +4,7 @@ import os
 from pyramid.path import AssetResolver
 
 from clld import interfaces
-from clld.web.adapters.base import Index, Representation, Json, JsonIndex
+from clld.web.adapters.base import Index, Representation, Json
 from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
@@ -40,14 +40,6 @@ def register_resource_adapters(config, rsc):
             interface,
             interfaces.IIndex,
             name=csv.CsvAdapter.mimetype)
-        config.register_adapter(
-            csv.CsvmJsonAdapter,
-            interface,
-            interfaces.IIndex,
-            name=csv.CsvmJsonAdapter.mimetype)
-        cls = type('JsonIndex%s' % rsc.model.__name__, (JsonIndex,), {})
-        config.register_adapter(
-            cls, interface, to_=interfaces.IIndex, name=JsonIndex.mimetype)
         if template_exists(config, name + '/index_html.mako'):
             # ... as html index
             specs.append((Index, 'text/html', 'html', name + '/index_html.mako', {}))

@@ -51,8 +51,6 @@ def test_resources(app):
         assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}altLabel')) > 0
         app.get_html('/%ss' % rsc.name)
         app.get_xml('/%ss.rdf' % rsc.name)
-        app.get_json('/{0}s.json'.format(rsc.name))
-        assert 'columns' in app.parsed_body
         app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
     app.get_xml('/unitparameters/up2.rdf')
     app.get_html('/combinations/parameter')

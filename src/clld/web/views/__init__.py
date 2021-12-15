@@ -10,7 +10,6 @@ from pyramid.renderers import render, render_to_response
 
 from clld.interfaces import IRepresentation, IIndex, IMetadata
 from clld.web.adapters import get_adapter, get_adapters
-from clld.web.adapters.csv import CsvAdapter, CsvmJsonAdapter
 from clld.web.util.multiselect import MultiSelect
 from clld.db.models.common import Combination
 
@@ -82,16 +81,6 @@ def index_view(ctx, req):
         if req.matched_route.name.endswith('_alt'):
             # add the canonical link:
             _add_link_header(res, req.route_url(req.matched_route.name[:-4]))
-            if current.mimetype == CsvAdapter.mimetype:
-                # If serving csv add link header to make metadata discoverable. See
-                # http://www.w3.org/TR/2015/CR-tabular-data-model-20150716/#link-header
-                csvm = [a for a in adapters if a.extension == CsvmJsonAdapter.extension]
-                if csvm:
-                    a = csvm[0]
-                    _add_link_header(
-                        res,
-                        req.route_url(req.matched_route.name, ext=a.extension),
-                        adapter=a)
         else:
             for a in [_a for _a in adapters if _a.rel and _a.extension]:
                 _add_link_header(
