@@ -32,10 +32,3 @@ def test_icontains(data):
     for qs, count in [('Se', 1), ('^d$', 0), ('^d', 1), ('setä$', 1), ('\\\\b', 0)]:
         q = DBSession.query(Dataset).filter(icontains(Dataset.name, qs))
         assert q.count() == count
-
-
-def test_collkey(data):
-    from clld.db.util import collkey
-    from clld.db.models.common import Language
-
-    collkey(Language.name)

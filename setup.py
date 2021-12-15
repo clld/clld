@@ -1,26 +1,5 @@
 from setuptools import setup, find_packages
 
-install_requires = [
-    'Babel',
-    'csvw>=1.0',
-    'clldutils>=3.5',
-    'pycldf>=1.5.1',
-    'setuptools>=25',
-    'pyramid>=1.10',
-    'pyramid_mako>=1.0',
-    'pyramid_tm',
-    'SQLAlchemy>=1.4',
-    'purl>=0.5',
-    'zope.sqlalchemy',
-    'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
-    'markupsafe',
-    'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
-    'paginate',
-    'webhelpers2>=2.0',
-    'nameparser',
-    'waitress>=1.4.2',
-]
-
 
 setup(
     name='clld',
@@ -53,7 +32,25 @@ setup(
     include_package_data=True,
     zip_safe=False,
     python_requires='>=3.6',
-    install_requires=install_requires,
+    install_requires=[
+        'Babel',
+        'csvw>=1.0',
+        'clldutils>=3.5',
+        'pycldf>=1.5.1',
+        'setuptools>=25',
+        'pyramid>=1.10',
+        'pyramid_mako>=1.0',
+        'pyramid_tm',
+        'SQLAlchemy>=1.4',
+        'purl>=0.5',
+        'zope.sqlalchemy',
+        'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
+        'markupsafe',
+        'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
+        'paginate',
+        'webhelpers2>=2.0',
+        'nameparser',
+    ],
     extras_require={
         'dev': [
             'cookiecutter',
@@ -67,7 +64,6 @@ setup(
         ],
         'test': [
             'cookiecutter',
-            'xlrd',
             'pytest>=6',
             'pytest-clld>=1.0.3',
             'pytest-mock',

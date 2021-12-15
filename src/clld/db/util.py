@@ -2,66 +2,17 @@
 import re
 import time
 
-from sqlalchemy import Integer, event
+from sqlalchemy import Integer
 from sqlalchemy.orm import joinedload
-from sqlalchemy.schema import DDL
-from sqlalchemy.sql.expression import cast, func
+from sqlalchemy.sql.expression import cast
 import transaction
 
-from clld.db.meta import DBSession, Base
+from clld.db.meta import DBSession
 from clld.db.models import common
 
 
 def as_int(col):
     return cast(col, Integer)
-
-
-def with_collkey_ddl():  # pragma: no cover
-    """Register creation of collkey function.
-
-    Can be called at module level in db initialization scripts to create the collkey
-    function. Once a session is bound to an engine collkey can be used to create indexes
-    or in order_by clauses, e.g.::
-
-        Index('ducet', collkey(common.Value.name)).create(DBSession.bind)
-    """
-    event.listen(
-        Base.metadata,
-        'before_create',
-        DDL("""
-CREATE OR REPLACE FUNCTION collkey (text, text, bool, int4, bool) RETURNS bytea
-    LANGUAGE 'c' IMMUTABLE STRICT AS
-    '$libdir/collkey_icu.so',
-    'pgsqlext_collkey';
-""").execute_if(dialect='postgresql'))
-
-
-class _CollKey(object):
-
-    """Lazily check and cache collkey support in the database on first usage."""
-
-    _query = "SELECT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'collkey')"
-
-    @property
-    def has_collkey(self):  # pragma: no cover
-        result = DBSession.bind.dialect.name == 'postgresql'\
-            and DBSession.scalar(self._query)
-        self.__dict__['has_collkey'] = result  # cached overrides property
-        return result
-
-    def __call__(self, col, locale='root', special_at_4=True, level=4, numeric_sorting=False):
-        """If supported by the database, we use pg_collkey for collation.
-
-        The optional arguments are passed to the collkey function as described at
-        http://pgxn.org/dist/pg_collkey/0.5.1/
-        """
-        if self.has_collkey:  # pragma: no cover
-            return func.collkey(col, locale, special_at_4, level, numeric_sorting)
-
-        return col
-
-
-collkey = _CollKey()
 
 
 def icontains(col, qs):
