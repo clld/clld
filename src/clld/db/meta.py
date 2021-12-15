@@ -2,8 +2,7 @@
 import json
 import sqlite3
 
-from sqlalchemy import (
-    Column, Integer, Float, String, Boolean, DateTime, func, event)
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
 from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.declarative import declarative_base, declared_attr

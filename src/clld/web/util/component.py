@@ -42,7 +42,7 @@ class Component(object):
 
         :return: JSON serializable dict
         """
-        return {}
+        return {}  # pragma: no cover
 
     def get_options_from_req(self):
         """Override this method to define options derived from request properties.

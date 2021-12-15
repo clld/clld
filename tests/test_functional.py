@@ -24,6 +24,7 @@ def test_sitemap(app):
 
 
 def test_dataset(app):
+    _ = app.get('/void.md.bib')
     res = app.get_html('/?__admin__=1')
     assert 'notexisting.css' in res
     assert 'notexisting.js' in res

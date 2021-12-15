@@ -39,7 +39,7 @@ def _registry(encoding):
         encoding = None  # pragma: no cover
     elif encoding.startswith('latex+'):
         encoding = encoding[6:]
-    elif sys.version_info >= (3, 9, 0) and encoding.startswith('latex_'):
+    elif sys.version_info >= (3, 9, 0) and encoding.startswith('latex_'):  # pragma: no cover
         encoding = encoding[6:]
     else:
         return None  # pragma: no cover

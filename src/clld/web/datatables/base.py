@@ -459,9 +459,6 @@ class DataTable(Component):
             'sAjaxSource': data_url,
         }
 
-    def __json__(self, req=None):
-        return dict(columns=[col.js_args for col in self.cols])
-
     def db_model(self):
         return self.model
 
