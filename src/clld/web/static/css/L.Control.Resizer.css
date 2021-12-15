@@ -48,7 +48,7 @@
     height: 50px;
     border-top-left-radius: 25px;
     border-bottom-left-radius: 25px;
-    cursor: e-resize !important;
+    cursor: e-resize;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
@@ -59,7 +59,7 @@
     height: 25px;
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
-    cursor: s-resize !important;
+    cursor: s-resize;
     left: 50%;
     bottom: 0;
     transform: translateX(-50%);
@@ -69,7 +69,7 @@
     width: 35px;
     height: 35px;
     border-top-left-radius: 35px;
-    cursor: se-resize !important;
+    cursor: se-resize;
     right: 0;
     bottom: 0;
     position: absolute;
