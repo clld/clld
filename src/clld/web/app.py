@@ -21,9 +21,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.renderers import JSON, JSONP
 from pyramid.settings import asbool
-from purl import URL
 from clldutils.path import md5, git_describe
-from clldutils.misc import deprecated
 
 import clld
 from clld.config import get_config
@@ -55,19 +53,6 @@ assert assets
 class ClldRequest(Request):
 
     """Custom Request class."""
-
-    @reify
-    def purl(self):
-        """Access the current request's URL.
-
-        This property is deprecated and will be removed in clld 8.2. Use functionality
-        from `urllib.parse` to parse `self.url` instead.
-
-        For more convenient URL manipulations, we provide the current request's URL
-        as `purl.URL <http://purl.readthedocs.org/en/latest/#purl.URL>`_ instance.
-        """
-        deprecated('`ClldRequest.purl` will be removed in clld 8.2.')
-        return URL(self.url)
 
     @reify
     def admin(self):

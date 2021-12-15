@@ -42,7 +42,6 @@ setup(
         'pyramid_mako>=1.0',
         'pyramid_tm',
         'SQLAlchemy>=1.4',
-        'purl>=0.5',
         'zope.sqlalchemy',
         'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
         'markupsafe',

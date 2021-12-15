@@ -22,9 +22,6 @@ def config():
 
 
 def test_CLLDRequest(env):
-    with pytest.deprecated_call():
-        _ = env['request'].purl
-
     c = env['request'].db.query(Contribution).first()
     env['request'].resource_url(c, ext='geojson')
     assert env['request'].ctx_for_url('/some/path/to/nowhere') is None
