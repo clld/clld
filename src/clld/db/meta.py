@@ -115,29 +115,6 @@ class CsvMixin(object):
         return [self.value_to_csv(attr, ctx, req) for attr in cols or self.csv_head()]
 
     @classmethod
-    def value_from_csv(cls, attr, value):
-        if not value:
-            return None
-        col = getattr(cls, attr)
-        if hasattr(col, 'property') and hasattr(col.property, 'columns'):
-            if isinstance(col.property.columns[0].type, Integer):
-                return int(value)
-            if isinstance(col.property.columns[0].type, Float):
-                if isinstance(value, str):
-                    value = value.replace(',', '.')
-                return float(value)
-        return value
-
-    @classmethod
-    def from_csv(cls, row, data=None, cols=None):
-        obj = cls()
-        cols = cols or obj.csv_head()
-        for i, k in enumerate(cols):
-            if not (k.endswith('__id') or k.endswith('__ids')) and hasattr(obj, k):
-                setattr(obj, k, cls.value_from_csv(k, row[i]) or None)
-        return obj
-
-    @classmethod
     def csv_query(cls, session):
         query = session.query(cls).filter_by(active=True)
         return query.order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))

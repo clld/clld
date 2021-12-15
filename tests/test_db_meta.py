@@ -54,11 +54,6 @@ def test_CsvMixin(db):
     for k, v in zip(cols, row):
         if k == 'jsondata':
             assert 'a' in json.loads(v)
-    l2 = Language.from_csv(row)
-    assert pytest.approx(l1.latitude) == l2.latitude
-    row[cols.index('latitude')] = '3,5'
-    l2 = Language.from_csv(row)
-    assert l2.latitude < l1.latitude
 
 
 def test_CsvMixin2(db):
@@ -81,9 +76,6 @@ def test_CsvMixin2(db):
 
     a = A(B())
     assert a.to_csv() == [5, "5,5"]
-    a = A.from_csv(['5', "5,5"])
-    assert a.b is None
-    assert a.bs is None
 
 
 def test_Base(db):
