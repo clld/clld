@@ -13,7 +13,6 @@ from clld.web.adapters import get_adapter, get_adapters
 from clld.web.adapters.csv import CsvAdapter, CsvmJsonAdapter
 from clld.web.util.multiselect import MultiSelect
 from clld.db.models.common import Combination
-from clld.web.maps import CombinedMap
 
 
 def xpartial(func, *args, **kw):
@@ -256,11 +255,3 @@ class ParameterMultiSelect(MultiSelect):  # pragma: no cover
             'class': 'span6',
             'multiple': True,
             'data': self.data}
-
-
-def combined(ctx, req):  # pragma: no cover
-    res = {'map': None, 'select': ParameterMultiSelect(req, 'parameters', 'parameters')}
-    urls = list(res['select'].get_urls())
-    if urls:
-        res['map'] = CombinedMap(urls, req)
-    return res
