@@ -5,6 +5,18 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+9.0.0
+~~~~~
+
+Fixed bug where resize cursor would not show for map resizer with Leaflet 1.7.
+
+Backwards incompatible removals:
+
+- remove mostly useless adapters
+- removed functionality to initialize db objects from csv
+- removed deprecated purl property
+- drop support for pg_collkey
+- removed unneeded deps and unused functionality for combining geojson from other clld apps
 
 
 
