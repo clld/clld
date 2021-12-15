@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: clld 7.4.2.dev0\n"
+"Project-Id-Version: clld 8.1.1.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-03-31 08:55+0200\n"
+"POT-Creation-Date: 2021-12-15 10:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Parameter"
 msgstr ""
 
-#: src/clld/web/app.py:691
+#: src/clld/web/app.py:679
 msgid "Home"
 msgstr ""
 
@@ -92,7 +92,7 @@ msgstr ""
 msgid "Translation"
 msgstr ""
 
-#: src/clld/web/maps/__init__.py:285
+#: src/clld/web/maps/__init__.py:288
 msgid "Icon size"
 msgstr ""
 
@@ -133,7 +133,7 @@ msgstr ""
 msgid "Values"
 msgstr ""
 
-#: src/clld/web/templates/source/detail_html.mako:61
+#: src/clld/web/templates/source/detail_html.mako:57
 #: src/clld/web/templates/util.mako:316
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
@@ -158,7 +158,7 @@ msgstr ""
 #: src/clld/web/templates/contribution/index_html.mako:4
 #: src/clld/web/templates/contribution/index_html.mako:6
 #: src/clld/web/templates/contributor/detail_html.mako:32
-#: src/clld/web/templates/source/detail_html.mako:49
+#: src/clld/web/templates/source/detail_html.mako:45
 msgid "Contributions"
 msgstr ""
 
@@ -190,7 +190,7 @@ msgstr ""
 #: src/clld/web/templates/language/kml.mako:5
 #: src/clld/web/templates/language/map_html.mako:4
 #: src/clld/web/templates/language/map_html.mako:6
-#: src/clld/web/templates/source/detail_html.mako:43
+#: src/clld/web/templates/source/detail_html.mako:39
 msgid "Languages"
 msgstr ""
 
@@ -217,7 +217,7 @@ msgstr ""
 msgid "Examples"
 msgstr ""
 
-#: src/clld/web/templates/source/detail_html.mako:55
+#: src/clld/web/templates/source/detail_html.mako:51
 msgid "ValueSets"
 msgstr ""
 

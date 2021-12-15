@@ -6,6 +6,16 @@ unreleased
 ~~~~~~~~~~
 
 
+9.0.0
+~~~~~
+
+Backwards incompatible removals:
+
+- remove mostly useless adapters
+- removed functionality to initialize db objects from csv
+- removed deprecated purl property
+- drop support for pg_collkey
+- removed unneeded deps and unused functionality for combining geojson from other clld apps
 
 
 8.1.0
