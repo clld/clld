@@ -5,6 +5,13 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+9.0.1
+~~~~~
+
+Fixed bug where person pre/suffixes for unknown gloss abbreviations would be
+dropped when rendering IGTs.
+
+
 9.0.0
 ~~~~~
 
