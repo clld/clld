@@ -433,7 +433,10 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
                     HTML.span(gloss[match.start():match.end()].lower(), class_='sc'),
                     **{'data-hint': explanation, 'class': 'hint--bottom'}))
             else:
-                res.append(abbr)
+                res.append(
+                    (match.group('personprefix') or '') +  # noqa: W504
+                    abbr +  # noqa: W504
+                    (match.group('personsuffix') or ''))
 
             end = match.end()
 

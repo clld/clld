@@ -227,6 +227,7 @@ def test_rendered_sentence(env, mocker):
     rendered_sentence(mocker.MagicMock())
     rendered_sentence(common.Sentence.first())
     rendered_sentence(common.Sentence.first(), abbrs=dict(SG='singular'))
+    assert '1SG' in str(rendered_sentence(common.Sentence.first(), abbrs=dict()))
 
 
 def test_language_identifier(env):
