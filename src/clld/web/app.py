@@ -55,10 +55,6 @@ class ClldRequest(Request):
     """Custom Request class."""
 
     @reify
-    def admin(self):
-        return '__admin__' in self.params
-
-    @reify
     def query_params(self):
         """Convenient access to the query parameters of the current request.
 
@@ -182,11 +178,7 @@ class ClldRequest(Request):
         return self.route_url(route, **kw)
 
     def route_url(self, route, *args, **kw):
-        """Facade for Request.route_url, hacking in support for admin routes."""
-        if self.admin:
-            if '_query' not in kw:
-                kw['_query'] = {}
-            kw['_query']['__admin__'] = '1'
+        """Facade for Request.route_url."""
         if '__locale__' in self.params:
             if '_query' not in kw:
                 kw['_query'] = {}
