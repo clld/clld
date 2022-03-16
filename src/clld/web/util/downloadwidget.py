@@ -61,11 +61,11 @@ class DownloadWidget(Component):
                 adoc.append(HTML.dt(adapter.name or adapter.extension))
                 adoc.append(HTML.dd(adapter.__doc__))
         doc = HTML.div(
+            self.doc(),
             HTML.p(
                 """You may download alternative representations of the data on
 "%s" by clicking the button """ % self.ctx,
                 HTML.i(class_='icon-download-alt')),
-            self.doc(),
             HTML.dl(*adoc))
         res = HTML.div(
             HTML.button(

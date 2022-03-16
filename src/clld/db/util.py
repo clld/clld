@@ -1,6 +1,7 @@
 """Database utilities."""
 import re
 import time
+import functools
 
 from sqlalchemy import Integer
 from sqlalchemy.orm import joinedload
@@ -10,12 +11,16 @@ import transaction
 from clld.db.meta import DBSession
 from clld.db.models import common
 
+__all__ = [
+    'as_int', 'contains', 'icontains', 'compute_language_sources', 'compute_number_of_values',
+    'get_distinct_values', 'get_alembic_version', 'set_alembic_version', 'page_query']
+
 
 def as_int(col):
     return cast(col, Integer)
 
 
-def icontains(col, qs):
+def _contains(method, col, qs):
     """Infix search condition.
 
     Basic support is provided for specifying matches at beginning or end of the text.
@@ -40,7 +45,11 @@ def icontains(col, qs):
     # Prevent invalid LIKE patterns:
     if qs.endswith('\\') and not qs.endswith('\\\\'):
         qs += '\\'
-    return col.ilike(prefix + qs + suffix)
+    return getattr(col, method)(prefix + qs + suffix)
+
+
+icontains = functools.partial(_contains, 'ilike')
+contains = functools.partial(_contains, 'like')
 
 
 def compute_language_sources(*references):

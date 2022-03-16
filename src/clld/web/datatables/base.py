@@ -14,7 +14,7 @@ from clldutils.misc import lazyproperty, nfilter
 
 from clld.db.meta import DBSession
 from clld.db.util import icontains, as_int
-from clld.web.util.htmllib import HTML
+from clld.web.util.htmllib import HTML, literal
 from clld.web.util.helpers import (
     link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
@@ -320,7 +320,7 @@ class Toolbar(DownloadWidget):
         for col in self.ctx.cols:
             dsc = col.js_args.get('sDescription')
             if dsc:
-                items.extend([HTML.dt(col.js_args['sTitle']), HTML.dd(dsc)])
+                items.extend([HTML.dt(col.js_args['sTitle']), HTML.dd(literal(dsc))])
         return HTML.dl(
             HTML.p(
                 'Columns containing numeric data may be filtered giving an upper and/or lower '
