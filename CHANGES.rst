@@ -5,6 +5,14 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+
+9.0.2
+~~~~~
+
+- Fixed confusing table info.
+- Added case-sensitive column search function.
+
+
 9.0.1
 ~~~~~
 

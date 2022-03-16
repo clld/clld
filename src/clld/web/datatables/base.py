@@ -92,6 +92,14 @@ class Col(object):
     __kw__ = {}
 
     def __init__(self, dt, name, get_object=None, model_col=None, format=None, **kw):
+        """
+        :param kw: Camel-cased keywords with type prefix are made available to JS. Recognized \
+        keywords are \
+        - `sDescription`: Description of the column, possibly using HTML,\
+        - `bSearchable`\
+        - `bSortable`
+        -
+        """
         self.dt = dt
         self.name = name
         self._get_object = get_object
