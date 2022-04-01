@@ -20,7 +20,7 @@ To install the python package from pypi run
 
 .. code:: bash
 
-    $ pip install clld
+    $ pip install clld[dev]
 
 To install from a git repository (if you want to hack on ``clld``),
 you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_:
