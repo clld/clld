@@ -18,7 +18,7 @@ from clld.web.util.htmllib import HTML, literal
 from clld.web.util.helpers import (
     link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
-from clld.web.util.downloadwidget import DownloadWidget
+from clld.web.util.downloadwidget import BaseToolbarWidget
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 
@@ -319,7 +319,7 @@ class RefsCol(Col):
             nfilter([getattr(vs, 'source', None), linked_references(self.dt.req, vs)]))
 
 
-class Toolbar(DownloadWidget):
+class Toolbar(BaseToolbarWidget):
     def get_options(self):
         return {'doc_position': 'left'}
 
