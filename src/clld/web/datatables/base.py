@@ -7,6 +7,7 @@ object. Server side they know how to provide the data to the client-side table.
 """
 import re
 
+from markupsafe import Markup
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
@@ -18,7 +19,6 @@ from clld.web.util.htmllib import HTML, literal
 from clld.web.util.helpers import (
     link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
-from clld.web.util.downloadwidget import BaseToolbarWidget
 from clld.web.util.component import Component
 from clld.interfaces import IDataTable, IIndex
 
@@ -319,9 +319,35 @@ class RefsCol(Col):
             nfilter([getattr(vs, 'source', None), linked_references(self.dt.req, vs)]))
 
 
-class Toolbar(BaseToolbarWidget):
+class Toolbar(Component):
+    def __init__(self, req, ctx, obj, dl_url_tmpl, interface, **kw):
+        self.req = req
+        self.ctx = ctx
+        self.obj = obj
+        self.dl_url_tmpl = dl_url_tmpl
+        self.interface = interface
+        kw.setdefault('doc_position', 'right')
+        kw.setdefault('exclude', ['html', 'snippet.html'])
+        self._kw = kw
+        self._opener_class = 'dl-widget-%s' % self.interface.__name__
+        self._id_prefix = 'dt-dl-' if IDataTable.providedBy(ctx) else 'rsc-dl-'
+
     def get_options(self):
         return {'doc_position': 'left'}
+
+    def get_default_options(self):
+        return self._kw
+
+    def js(self):
+        return Markup(HTML.script(literal("""\
+    $(document).ready(function() {
+        $('.%s').clickover({
+            html: true,
+            title: 'Column information',
+            placement: '%s',
+            trigger: 'click'
+        });
+    });""" % (self._opener_class, self.options['doc_position']))))
 
     def doc(self):
         items = []
@@ -335,6 +361,17 @@ class Toolbar(BaseToolbarWidget):
                 'bound in the form "<5" or a range in the form "-2..20".'),
             self.ctx.options.get('sDescription', ''),
             *items)
+
+    def render(self, no_js=False):
+        doc = HTML.div(self.doc())
+        res = HTML.div(
+            HTML.button(
+                HTML.i(class_='icon-info-sign icon-white'),
+                class_='btn btn-info %s' % self._opener_class,
+                **{'data-content': str(doc), 'type': 'button'}))
+        if no_js:
+            return res
+        return HTML.div(res, self.js())  # pragma: no cover
 
 
 @implementer(IDataTable)

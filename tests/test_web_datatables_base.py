@@ -22,7 +22,7 @@ class Table(DataTable):
             LinkToMapCol(self, 'm'),
             LinkCol(self, 'link'),
             Col(self, 'active'),
-            Col(self, 'name', model_col=None),
+            Col(self, 'name', model_col=None, sDescription='MyName'),
             Col(self, 'description', format=lambda i: 'x'),
             IntegerIdCol(self, 'id'),
             IdCol(self, 'nid',
@@ -41,6 +41,7 @@ def test_DataTable(env, request_factory):
     html = dt.render()
     assert 'xytt' in html
     assert ' multiple ' in html
+    assert 'MyName' in html
 
 
 @pytest.mark.parametrize('params', [

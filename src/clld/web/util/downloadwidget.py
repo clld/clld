@@ -5,9 +5,9 @@ from clld.web.util.component import Component
 from clld.web.util.htmllib import HTML, literal
 
 
-class BaseToolbarWidget(Component):
+class DownloadWidget(Component):
 
-    """Button group, grouping an info popover."""
+    """Button group, grouping an info popover and a download selection."""
 
     def __init__(self, req, ctx, obj, dl_url_tmpl, interface, **kw):
         self.req = req
@@ -36,19 +36,54 @@ class BaseToolbarWidget(Component):
     $(document).ready(function() {
         $('.%s').clickover({
             html: true,
-            title: 'Column information',
+            title: 'Download information',
             placement: '%s',
             trigger: 'click'
         });
     });""" % (self._opener_class, self.options['doc_position']))))
 
+    def dl_link(self, adapter):
+        return HTML.a(
+            adapter.name or adapter.extension,
+            href="#",
+            id=self._id_prefix + adapter.extension,
+            onclick="document.location.href = %s; return false;"
+                    % (self.dl_url_tmpl % adapter.extension))
+
     def render(self, no_js=False):
-        doc = HTML.div(self.doc())
+        adapters = [a for n, a in
+                    self.req.registry.getAdapters([self.obj], self.interface)
+                    if a.extension not in set(self.options['exclude'])]
+        adapters = sorted(adapters, key=lambda x: x.extension)
+        adoc = []
+        for adapter in adapters:
+            if adapter.__doc__:
+                adoc.append(HTML.dt(adapter.name or adapter.extension))
+                adoc.append(HTML.dd(adapter.__doc__))
+        doc = HTML.div(
+            self.doc(),
+            HTML.p(
+                """You may download alternative representations of the data on
+"%s" by clicking the button """ % self.ctx,
+                HTML.i(class_='icon-download-alt')),
+            HTML.dl(*adoc))
         res = HTML.div(
             HTML.button(
                 HTML.i(class_='icon-info-sign icon-white'),
                 class_='btn btn-info %s' % self._opener_class,
-                **{'data-content': str(doc), 'type': 'button'}))
-        if no_js:
+                **{'data-content': str(doc), 'type': 'button'}),
+            HTML.a(
+                HTML.i(class_='icon-download-alt'),
+                HTML.span(class_="caret"),
+                **{
+                    'class_': "btn dropdown-toggle",
+                    'data-toggle': "dropdown",
+                    'href': "#",
+                    'id': self._id_prefix + "opener"}),
+            HTML.ul(
+                *[HTML.li(self.dl_link(adapter)) for adapter in adapters],
+                **dict(class_="dropdown-menu")),
+            class_='btn-group right')
+        if no_js:  # pragma: no cover
             return res
         return HTML.div(res, self.js())

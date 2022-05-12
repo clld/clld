@@ -23,7 +23,7 @@ import clld
 from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
-from clld.web.util.downloadwidget import BaseToolbarWidget
+from clld.web.util.downloadwidget import DownloadWidget
 from clld.db.meta import DBSession
 from clld.db.models import common as models
 from clld.web.adapters import get_adapter, get_adapters
@@ -604,7 +604,7 @@ def alt_representations(req, rsc, doc_position='right', exclude=None):
     if exclude:
         kw['exclude'] = exclude
     route, route_kw = req._route(rsc, None, ext='%s')
-    dlw = BaseToolbarWidget(
+    dlw = DownloadWidget(
         req,
         rsc,
         rsc,
