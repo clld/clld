@@ -84,6 +84,6 @@ class DownloadWidget(Component):
                 *[HTML.li(self.dl_link(adapter)) for adapter in adapters],
                 **dict(class_="dropdown-menu")),
             class_='btn-group right')
-        if no_js:
+        if no_js:  # pragma: no cover
             return res
         return HTML.div(res, self.js())
