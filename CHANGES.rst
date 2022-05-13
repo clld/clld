@@ -5,6 +5,9 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+- Dropped support for py3.6.
+- Removed per-table download buttons.
+
 
 9.0.2
 ~~~~~
