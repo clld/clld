@@ -42,10 +42,12 @@ A ``clld`` app is a python package implementing a
 web application.
 
 Installing the ``clld`` package will also install a command `clld`,
-which offers functionality to kickstart a `clld` app project:
+which offers functionality to kickstart a `clld` app project. Note that
+this functionality requires the `cookiecutter` package to be installed:
 
 .. code:: bash
 
+    $ pip install cookiecutter
     $ clld create myapp
 
 This will create a ``myapp`` project directroy, containing a python package ``myapp`` with the following layout::
