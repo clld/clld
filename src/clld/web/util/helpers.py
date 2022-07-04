@@ -725,10 +725,8 @@ def localize_url(req, locale, default_locale='en'):
     assert locale, 'Missing locale'
     k_str = '__locale__'
     p_url = urlsplit(req.url)
-    params = req.query_params
-    if k_str in params and locale.lower() == default_locale:
-        del params[k_str]
-    elif locale.lower() != default_locale:
+    params = {k: v for k, v in req.query_params.items() if not (k == k_str and locale.lower() == default_locale.lower())}
+    if locale.lower() != default_locale.lower():
         params[k_str] = locale.lower()
     return urlunsplit(
         SplitResult(p_url.scheme, p_url.netloc, p_url.path,
