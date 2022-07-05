@@ -8,7 +8,7 @@ from itertools import groupby  # we just import this to have it available in tem
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
 from math import floor
-from urllib.parse import quote, urlencode, urlparse
+from urllib.parse import quote, urlencode, urlparse, urlsplit, urlunsplit, SplitResult
 
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -711,3 +711,24 @@ def get_resource_type(obj):
     """
     for interface in providedBy(obj):
         return interface.__name__[1:].lower()
+
+
+def localize_url(req, locale, default_locale='en'):
+    """Add localization query parameter to current url.
+    If locale = default_locale it removes the query parameter.
+
+    :param req: current request
+    :param locale: language code (ISO 639-1:2002)
+    :param default_locale: default language code (ISO 639-1:2002)
+    :return: URL as string
+    """
+    assert locale, 'Missing locale'
+    k_str = '__locale__'
+    p_url = urlsplit(req.url)
+    params = {k: v for k, v in req.query_params.items() if not (k == k_str and locale.lower() == default_locale.lower())}
+    if locale.lower() != default_locale.lower():
+        params[k_str] = locale.lower()
+    return urlunsplit(
+        SplitResult(p_url.scheme, p_url.netloc, p_url.path,
+                    urlencode(params, doseq=True),
+                    p_url.fragment))

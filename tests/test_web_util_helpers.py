@@ -238,3 +238,11 @@ def test_language_identifier(env):
     lang = common.Language.get('language')
     for identifier in lang.identifiers:
         language_identifier(env['request'], identifier)
+
+
+def test_localize_url(env):
+    from clld.web.util.helpers import localize_url
+
+    assert '__locale__' not in localize_url(env['request'], 'en')
+    assert '__locale__=eo' in localize_url(env['request'], 'eo')
+    assert '__locale__' not in localize_url(env['request'], 'eo', 'eo')
