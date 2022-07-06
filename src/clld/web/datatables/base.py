@@ -20,7 +20,7 @@ from clld.web.util.helpers import (
     link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
 from clld.web.util.component import Component
-from clld.interfaces import IDataTable, IIndex
+from clld.interfaces import IDataTable, IIndex, ISource
 
 
 OPERATOR_PATTERN = re.compile(r'\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
@@ -364,11 +364,20 @@ class Toolbar(Component):
 
     def render(self, no_js=False):
         doc = HTML.div(self.doc())
-        res = HTML.div(
-            HTML.button(
-                HTML.i(class_='icon-info-sign icon-white'),
-                class_='btn btn-info %s' % self._opener_class,
-                **{'data-content': str(doc), 'type': 'button'}))
+        buttons = [HTML.button(
+            HTML.i(class_='icon-info-sign icon-white'),
+            class_='btn btn-info %s' % self._opener_class,
+            **{'data-content': str(doc), 'type': 'button'})]
+        if ISource in set(implementedBy(self.ctx.model)):
+            buttons.append(HTML.button(
+                'BibTeX',
+                class_='btn',
+                id='sources-bibtex-download',
+                href='#',
+                onclick="document.location.href = CLLD.DataTable.current_url('{}', 'bib'); "
+                "return false;".format(self.ctx.eid)
+            ))
+        res = HTML.div(*buttons, **{'class': 'btn-group' if len(buttons) > 1 else ''})
         if no_js:
             return res
         return HTML.div(res, self.js())  # pragma: no cover
