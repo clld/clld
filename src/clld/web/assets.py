@@ -17,11 +17,9 @@ environment.append_path(_static_path, url='/clld:web/static/')
 
 bundles = {
     'js': [
-        Bundle(
-            'js/jquery.js',
-            'js/leaflet-src.js',
-            'js/Leaflet.fullscreen.js',
-            filters=(skip,)),
+        'js/jquery.js',
+        'js/leaflet.js',
+        'js/Leaflet.fullscreen.js',
         'js/bootstrap.min.js',
         'js/jquery.dataTables.min.js',
         'js/oms.min.js',
@@ -36,10 +34,8 @@ bundles = {
             filters='rjsmin'),
     ],
     'css': [
-        Bundle(
-            'css/leaflet.css',
-            'css/leaflet.fullscreen.css',
-            filters=(skip,)),
+        'css/leaflet.css',
+        'css/leaflet.fullscreen.css',
         'css/L.Control.Resizer.css',
         'css/clld.css',
         'css/jqtree.css',

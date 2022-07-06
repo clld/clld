@@ -19,15 +19,6 @@
         <link href="${request.static_url(asset[1:])}" rel="stylesheet">
         % endfor
 
-        % if request.registry.settings.get('clld.environment') == 'production':
-        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-        <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
-        <link href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" rel="stylesheet" />
-        % endif
-
         % for asset in assets['js'].urls():
         <script src="${request.static_url(asset[1:])}"></script>
         % endfor
