@@ -6,6 +6,12 @@ unreleased
 ~~~~~~~~~~
 
 
+9.2.1
+~~~~~
+
+- Don't advertise sourceMappingURL in javascript if this URL doesn't exist.
+
+
 9.2.0
 ~~~~~
 
