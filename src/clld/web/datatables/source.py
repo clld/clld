@@ -29,6 +29,7 @@ class Sources(DataTable):
     """Default DataTable for Source objects."""
 
     __constraints__ = [Language]
+    __toolbar_kw__ = {'dl_formats': {'bib': 'BibTeX'}}
 
     def base_query(self, query):
         if self.language:

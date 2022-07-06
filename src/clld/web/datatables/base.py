@@ -6,24 +6,26 @@ nature: On the client they provide the information to instantiate a jquery DataT
 object. Server side they know how to provide the data to the client-side table.
 """
 import re
+import typing
 
 from markupsafe import Markup
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
 from clldutils.misc import lazyproperty, nfilter
+from pyramid.request import Request
 
-from clld.db.meta import DBSession
+from clld.db.meta import DBSession, Base
 from clld.db.util import icontains, as_int
 from clld.web.util.htmllib import HTML, literal
 from clld.web.util.helpers import (
     link, button, icon, JS_CLLD, external_link, linked_references, JSDataTable,
 )
 from clld.web.util.component import Component
-from clld.interfaces import IDataTable, IIndex, ISource
+from clld.interfaces import IDataTable, IIndex
 
 
-OPERATOR_PATTERN = re.compile(r'\s*(?P<op>\>\=?|\<\=?|\=\=?)\s*')
+OPERATOR_PATTERN = re.compile(r'\s*(?P<op>>=?|<=?|==?)\s*')
 
 DISPLAY_LENGTH, DISPLAY_LIMIT = 100, 1000
 
@@ -326,6 +328,7 @@ class Toolbar(Component):
         self.obj = obj
         self.dl_url_tmpl = dl_url_tmpl
         self.interface = interface
+        self.dl_formats = kw.pop('dl_formats', {})
         kw.setdefault('doc_position', 'right')
         kw.setdefault('exclude', ['html', 'snippet.html'])
         self._kw = kw
@@ -368,14 +371,15 @@ class Toolbar(Component):
             HTML.i(class_='icon-info-sign icon-white'),
             class_='btn btn-info %s' % self._opener_class,
             **{'data-content': str(doc), 'type': 'button'})]
-        if ISource in set(implementedBy(self.ctx.model)):
+        for ext, label in self.dl_formats.items():
             buttons.append(HTML.button(
-                'BibTeX',
+                label,
                 class_='btn',
-                id='sources-bibtex-download',
+                id='{}-{}-download'.format(self.ctx.eid, ext),
                 href='#',
-                onclick="document.location.href = CLLD.DataTable.current_url('{}', 'bib'); "
-                "return false;".format(self.ctx.eid)
+                tite="Download items in the table formatted as {}.".format(label),
+                onclick="document.location.href = {}; "
+                "return false;".format(self.dl_url_tmpl % ext)
             ))
         res = HTML.div(*buttons, **{'class': 'btn-group' if len(buttons) > 1 else ''})
         if no_js:
@@ -402,15 +406,22 @@ class DataTable(Component):
 
         The actual filtering has to be done in a custom implementation
         of :py:meth:`clld.web.datatables.base.DataTable.base_query`.
+
+    Items in a table may have standard representations other than tabular data - e.g. sources
+    may be more useful as BibTeX records. If so, and the custom serialization is registered as
+    adapter for the model class, DataTables can provide access to the currently filtered items
+    in this custom format through a download button. This can be configured by adding a key
+    `dl_formats` to :attr:`clld.web.datatables.base.DataTable.__toolbar_kw__` specifying a `dict`
+    mapping registered `extension` strings to labels for the download button.
     """
 
     __template__ = 'clld:web/templates/datatable.mako'
     __constraints__ = []
     __toolbar_kw__ = {}
 
-    def __init__(self, req, model, eid=None, **kw):
-        """Initialize.
-
+    def __init__(
+            self, req: Request, model: typing.Type[Base], eid: typing.Optional[str] = None, **kw):
+        """
         :param req: request object.
         :param model: mapper class, instances of this class will be the rows in the table.
         :param eid: HTML element id that will be assigned to this data table.
