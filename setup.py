@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='clld',
-    version='9.1.1.dev0',
+    version='9.2.0',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=open('README.md').read(),

@@ -6,6 +6,14 @@ unreleased
 ~~~~~~~~~~
 
 
+9.2.0
+~~~~~
+
+- Don't load resources from CDN anymore.
+- Re-instate per-DataTable configurable download links.
+- Support for creating localized URLs.
+
+
 9.1.0
 ~~~~~
 
