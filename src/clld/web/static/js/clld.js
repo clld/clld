@@ -402,14 +402,9 @@ CLLD.Map = function(eid, layers, options) {
             "Stamen.Watercolor",
             "Stamen.Terrain",
             "Stamen.TerrainBackground",
-            "Esri.WorldStreetMap",
-            "Esri.DeLorme",
-            "Esri.NatGeoWorldMap",
-            "Esri.WorldTopoMap",
-            "Esri.WorldImagery",
-            "Esri.WorldTerrain",
-            "Esri.WorldShadedRelief",
-            "Esri.WorldPhysical"
+            "USGS.USTopo",
+            "USGS.USImagery",
+            "USGS.USImageryTopo",
         ];
     CLLD.Maps[eid] = this;
     options = options === undefined ? {} : options;
