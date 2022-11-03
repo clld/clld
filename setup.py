@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='clld',
-    version='9.2.2.dev0',
+    version='9.2.2',
     description=(
         'Python library supporting the development of cross-linguistic databases'),
     long_description=open('README.md').read(),
@@ -60,6 +60,7 @@ setup(
             'flake8',
             'wheel',
             'twine',
+            'build',
         ],
         'test': [
             'cookiecutter',

@@ -65,7 +65,7 @@ git tag -a v<VERSION> -m "<VERSION> release"
 ```shell
 rm -rf build
 rm dist/*
-python setup.py sdist bdist_wheel
+python -m build -n
 twine upload dist/*
 ```
 
