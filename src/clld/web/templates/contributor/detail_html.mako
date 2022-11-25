@@ -4,8 +4,8 @@
 
 
 <h2>${ctx.name}
-% if ctx.orcid:
-<a href="https://orcid.org/${ctx.orcid}"><img style="height:.8em" src="${request.static_url('clld:web/static/images/orcid.svg')}" /></a>
+% if ctx.jsondatadict.get("orcid", None):
+<a href="https://orcid.org/${ctx.jsondatadict["orcid"]}"><img style="height:.8em" src="${request.static_url('clld:web/static/images/orcid.svg')}" /></a>
 
 
 % endif</h2>

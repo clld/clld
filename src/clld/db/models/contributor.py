@@ -34,7 +34,6 @@ class Contributor(Base,
 
     url = Column(Unicode())
     email = Column(String)
-    orcid = Column(String)
     address = Column(Unicode)
 
     def last_first(self):
