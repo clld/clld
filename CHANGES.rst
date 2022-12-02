@@ -6,6 +6,13 @@ unreleased
 ~~~~~~~~~~
 
 
+9.2.2
+~~~~~
+
+- Limit base layer providers to ones that don't require API tokens.
+- Update default publisher in project template.
+
+
 9.2.1
 ~~~~~
 
