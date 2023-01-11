@@ -9,7 +9,7 @@ from clldutils.misc import slug
 from clld import interfaces
 
 
-class Renderable(object):
+class Renderable:
 
     """Virtual base class for adapters.
 

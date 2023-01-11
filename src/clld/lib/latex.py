@@ -145,9 +145,7 @@ class _unlatex(object):  # pragma: no cover
 
     def __getitem__(self, n):
         """Return token at offset n from current pos."""
-        p = self.pos + n
-        t = self.tex
-        return p < len(t) and t[p] or None
+        return self.pos + n < len(self.tex) and self.tex[self.pos + n] or None
 
     def __next__(self):
         """Find and return another piece of converted output."""

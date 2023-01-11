@@ -23,7 +23,7 @@ def run(args):
     """
     if args.domain:
         args.env['request'].environ['HTTP_HOST'] = args.domain
-    for name, download in args.env['registry'].getUtilitiesFor(IDownload):
-        args.log.info('creating download %s' % name)  # pragma: no cover
+    for name, download in args.env['registry'].getUtilitiesFor(IDownload):  # pragma: no cover
+        args.log.info('creating download %s' % name)
         if not args.list:
-            download.create(args.env['request'])  # pragma: no cover
+            download.create(args.env['request'])

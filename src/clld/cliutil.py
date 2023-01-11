@@ -1,5 +1,4 @@
 """Shared functionality for clld console scripts."""
-import sys
 import pathlib
 import argparse
 import warnings
@@ -11,6 +10,7 @@ from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings, bootstrap
 from nameparser import HumanName
 from clldutils.misc import slug
+from clldutils import clilib
 
 from clld.db.meta import DBSession, Base
 from clld.db.models import common
@@ -25,6 +25,8 @@ __all__ = [
     'bibtex2source',
     'confirm',
     'Data']
+
+confirm = functools.partial(clilib.confirm, default=False)
 
 
 # Moved here from distutils.util, due to this package being deprecated.
@@ -114,17 +116,14 @@ def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
 
 
 def bibtex2source(rec, cls=common.Source, lowercase_id=False):
-    year = bibtex.unescape(rec.get('year', 'nd'))
-    fields = {}
-    jsondata = {}
+    year, fields, jsondata = bibtex.unescape(rec.get('year', 'nd')), {}, {}
     for field in bibtex.FIELDS:
         if field in rec:
             value = bibtex.unescape(rec[field])
             container = fields if hasattr(cls, field) else jsondata
             container[field] = value
 
-    etal = ''
-    eds = ''
+    etal, eds = '', ''
     authors = rec.get('author')
     if not authors:
         authors = rec.get('editor', '')
@@ -136,8 +135,7 @@ def bibtex2source(rec, cls=common.Source, lowercase_id=False):
             authors = authors[:1]
             etal = ' et al.'
 
-        authors = [HumanName(a) for a in authors]
-        authors = [n.last or n.first for n in authors]
+        authors = [n.last or n.first for n in [HumanName(a) for a in authors]]
         authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(
@@ -147,23 +145,6 @@ def bibtex2source(rec, cls=common.Source, lowercase_id=False):
         jsondata=jsondata,
         bibtex_type=rec.genre,
         **fields)
-
-
-def confirm(question, default=False):  # pragma: no cover
-    """Ask a yes/no question via input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    """
-    while True:
-        sys.stdout.write(question + (" [Y|n] " if default else " [y|N] "))
-        choice = input().lower()
-        if not choice:
-            return default
-        try:
-            return strtobool(choice)
-        except ValueError:
-            sys.stdout.write(
-                "Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
 def data_file(module, *comps):
