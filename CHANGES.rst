@@ -6,7 +6,10 @@ unreleased
 ~~~~~~~~~~
 
 - Drop support for CSV exports
-- Drop support for in-database versioning
+- Drop support for alembic versioning
+
+Note: This release introduces a backwards incompatible change in the database schema. Thus, it can
+only be used with apps that can recreate the database.
 
 
 9.2.2
