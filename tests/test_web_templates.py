@@ -2,6 +2,8 @@ import re
 import json
 import io
 
+import pytest
+
 from pyramid.renderers import render
 from rdflib import Graph, URIRef
 import html5lib
@@ -14,35 +16,38 @@ from clld.db.models.common import Parameter
 _RESOURCES = [_rsc for _rsc in RESOURCES if _rsc.name != 'testresource']
 
 
-def test_detail_html(request_factory):
+@pytest.mark.parametrize(
+    'rsc',
+    [r for r in _RESOURCES if hasattr(r.model, 'first')],
+)
+def test_detail_html(request_factory, rsc):
     with request_factory(matched_route='home', map=None) as req:
-        for rsc in _RESOURCES:
-            if not hasattr(rsc.model, 'first'):
-                continue
-            res = render(
-                '%s/detail_html.mako' % rsc.name, {'ctx': rsc.model.first()}, request=req)
-            html5lib.parse(res)
-            if rsc.name == 'dataset':
-                assert 'http://example.org/privacy' in res
-                assert 'Privacy Policy' in res
+        res = render(
+            '%s/detail_html.mako' % rsc.name, {'ctx': rsc.model.first()}, request=req)
+        html5lib.parse(res)
+        if rsc.name == 'dataset':
+            assert 'http://example.org/privacy' in res
+            assert 'Privacy Policy' in res
 
 
-def test_index_html(request_factory):
+@pytest.mark.parametrize(
+    'rsc',
+    [r for r in _RESOURCES if hasattr(r.model, 'first') and r.name != 'dataset'],
+)
+def test_index_html(request_factory, rsc):
     with request_factory(matched_route='home', map=None) as req:
-        for rsc in _RESOURCES:
-            if not hasattr(rsc.model, 'first') or not rsc.with_index:
-                continue
-            dt = req.get_datatable(rsc.name + 's', rsc.model)
-            res = render('%s/index_html.mako' % rsc.name, {'ctx': dt}, request=req)
-            html5lib.parse(res)
+        dt = req.get_datatable(rsc.name + 's', rsc.model)
+        res = render('%s/index_html.mako' % rsc.name, {'ctx': dt}, request=req)
+        html5lib.parse(res)
 
 
-def test_json(env):
-    for rsc in _RESOURCES:
-        if not hasattr(rsc.model, 'first'):
-            continue
-        res = render('json', dict(ctx=rsc.model.first()), request=env['request'])
-        json.loads(res)
+@pytest.mark.parametrize(
+    'rsc',
+    [r for r in _RESOURCES if hasattr(r.model, 'first')],
+)
+def test_json(env, rsc):
+    res = render('json', dict(ctx=rsc.model.first()), request=env['request'])
+    json.loads(res)
 
 
 def test_rdf(env):

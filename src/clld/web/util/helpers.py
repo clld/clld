@@ -296,9 +296,7 @@ def map_marker_url(req, obj, marker=None):
 
 def map_marker_img(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
     url = map_marker_url(req, obj, marker=marker)
-    if url:
-        return marker_img(url, height=height, width=width)
-    return ''
+    return marker_img(url, height=height, width=width) if url else ''
 
 
 def link(req, obj, **kw):
@@ -412,8 +410,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             '3': 'third person',
         }
 
-        res = []
-        end = 0
+        res, end = [], 0
         for match in GLOSS_ABBR_PATTERN.finditer(gloss):
             if match.start() > end:
                 res.append(gloss[end:match.start()])
@@ -504,16 +501,18 @@ def contactmail(req, ctx=None, title='contact maintainer'):
     return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 
+def iter_join(items, sep):
+    for i, item in enumerate(items):
+        if i > 0:
+            yield sep
+        yield item
+
+
 def newline2br(text):
     """Replace newlines in text with HTML br tags."""
     if not text:
         return ''
-    chunks = []
-    for i, line in enumerate(text.split('\n')):
-        if i > 0:
-            chunks.append(HTML.br())
-        chunks.append(literal(line))
-    return '\n'.join(chunks)
+    return '\n'.join(iter_join([literal(line) for line in text.split('\n')], HTML.br()))
 
 
 def text2html(text, mode='br', sep='\n\n'):
@@ -524,19 +523,11 @@ def text2html(text, mode='br', sep='\n\n'):
 
 
 def linked_contributors(req, contribution):
-    chunks = []
-    for i, c in enumerate(contribution.primary_contributors):
-        if i > 0:
-            chunks.append(' and ')
-        chunks.append(link(req, c))
-
-    for i, c in enumerate(contribution.secondary_contributors):
-        if i == 0 and contribution.primary_contributors:
-            chunks.append(' with ')
-        if i > 0:
-            chunks.append(' and ')
-        chunks.append(link(req, c))
-
+    chunks = list(iter_join([link(req, c) for c in contribution.primary_contributors], ' and '))
+    sec = list(iter_join([link(req, c) for c in contribution.secondary_contributors], ' and '))
+    if sec:
+        chunks.append(' with ')
+        chunks.extend(sec)
     return HTML.span(*chunks)
 
 

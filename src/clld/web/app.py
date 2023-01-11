@@ -322,7 +322,6 @@ def maybe_import(name, pkg_dir=None):
         if pkg_dir and exists:
             print('failed to import existing module {0}'.format(name))
             raise
-        return None
 
 
 #
