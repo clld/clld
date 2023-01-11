@@ -2,11 +2,11 @@
 import sqlite3
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event, JSON
-from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
-from sqlalchemy.orm import declarative_base, declared_attr
-from sqlalchemy.orm import scoped_session, sessionmaker, deferred, undefer
-from sqlalchemy.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.orm import (
+    declarative_base, declared_attr, scoped_session, sessionmaker, deferred, undefer,
+)
+from sqlalchemy.exc import NoResultFound, MultipleResultsFound, DisconnectionError
 from sqlalchemy.inspection import inspect
 
 import zope.sqlalchemy
@@ -70,9 +70,7 @@ class Base(declarative_base()):
     #: when it comes to database changes.
     pk = Column(Integer, primary_key=True, doc='primary key')
 
-    #: To allow for timestamp-based versioning - as opposed or in addition to the version
-    #: number approach implemented in :py:class:`clld.db.meta.Versioned` - we store
-    #: a timestamp for creation or an object.
+    #: To allow for timestamp-based versioning we store a timestamp for creation or an object.
     @declared_attr
     def created(cls):
         return deferred(Column(DateTime(timezone=True), default=func.now()))
@@ -83,8 +81,7 @@ class Base(declarative_base()):
         return deferred(Column(DateTime(timezone=True), default=func.now(), onupdate=func.now()))
 
     #: The active flag is meant as an easy way to mark records as obsolete or inactive,
-    #: without actually deleting them. A custom Query class could then be used which
-    #: filters out inactive records.
+    #: without actually deleting them.
     @declared_attr
     def active(cls):
         return deferred(Column(Boolean, default=True))

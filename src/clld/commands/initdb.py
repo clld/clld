@@ -10,7 +10,7 @@ from clldutils.clilib import PathType
 from clld.cliutil import SessionContext, BootstrappedAppConfig
 try:
     from pycldf import Dataset
-except:  # pragma: no cover
+except ImportError:  # pragma: no cover
     Dataset = None
 
 try:
