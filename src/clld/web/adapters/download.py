@@ -1,5 +1,6 @@
 """Functionality to create downloads for the data of a clld app."""
 import io
+import csv
 import gzip
 import pathlib
 import zipfile
@@ -8,7 +9,6 @@ import contextlib
 from zope.interface import implementer
 from pyramid.path import AssetResolver
 from sqlalchemy.orm import joinedload, class_mapper
-from csvw.dsv import UnicodeWriter
 from clldutils.misc import format_size, to_binary
 
 from clld.util import safe_overwrite
@@ -195,8 +195,7 @@ class CsvDump(Download):
         return self.fields
 
     def before(self, req, fp):
-        self.writer = UnicodeWriter(fp)
-        self.writer.__enter__()
+        self.writer = csv.writer(fp)
         self.writer.writerow(
             [f if isinstance(f, str) else f[1] for f in self.get_fields(req)])
 
