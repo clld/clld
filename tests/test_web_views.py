@@ -30,7 +30,7 @@ from testutils import XmlResponse
             {
                 'is_xhr': False,
                 'matched_route': 'contributors_alt',
-                'matchdict': {'ext': 'csv'}},
+                'matchdict': {'ext': 'atom'}},
             None),
     ])
 def test_index_view(env, request_factory, ctx_cls, model, req_props, content_type):

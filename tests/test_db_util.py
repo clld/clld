@@ -1,12 +1,4 @@
 
-def test_alembic_version(db):
-    from clld.db.util import set_alembic_version, get_alembic_version
-
-    assert get_alembic_version(db) != '1234'
-    set_alembic_version(db, '1234')
-    assert get_alembic_version(db) == '1234'
-
-
 def test_compute_language_sources(data):
     from clld.db.util import compute_language_sources
     from clld.db.models.common import Source, Sentence, Language, SentenceReference

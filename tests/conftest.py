@@ -8,7 +8,6 @@ import pytest
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
 from clld.db.meta import CustomModelMixin, DBSession
 from clld.db.models import common
-from clld.db.util import set_alembic_version
 from clld.cliutil import Data
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
@@ -43,8 +42,6 @@ class TestData(Data):
 
 
 def populate_test_db(engine):
-    set_alembic_version(engine, '58559d4eea0d')
-
     data = TestData()
     data.add_default(
         common.Dataset,

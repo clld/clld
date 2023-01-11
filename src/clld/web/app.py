@@ -10,7 +10,7 @@ import urllib.parse
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload, undefer
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy

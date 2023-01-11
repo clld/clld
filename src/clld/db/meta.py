@@ -1,16 +1,13 @@
 """We provide some infrastructure to build extensible database models."""
-import json
 import sqlite3
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event, JSON
 from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.pool import Pool
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.orm import declarative_base, declared_attr
 from sqlalchemy.orm import scoped_session, sessionmaker, deferred, undefer
-from sqlalchemy.types import TypeDecorator, VARCHAR
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.inspection import inspect
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 import zope.sqlalchemy
 from clldutils.misc import NO_DEFAULT
@@ -50,76 +47,7 @@ DBSession = scoped_session(sessionmaker())
 zope.sqlalchemy.register(DBSession)
 
 
-class JSONEncodedDict(TypeDecorator):
-
-    """Represents an immutable structure as a json-encoded string.
-
-    Loads/serializes an empty dict for any empty value.
-    """
-
-    impl = VARCHAR
-
-    def process_bind_param(self, value, dialect):
-        if not value:
-            value = {}
-        return json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        if not value:
-            return {}
-        return json.loads(value)
-
-
-class CsvMixin(object):
-
-    """Mixin providing methods to control (de-)serialization of an object as csv row."""
-
-    #: base name of the csv file
-    __csv_name__ = None
-
-    @classmethod
-    def csv_head(cls):
-        """return List of column names."""
-        exclude = {'active', 'version', 'created', 'updated', 'polymorphic_type'}
-        cols = sorted(
-            col.key for om in inspect(cls).iterate_to_root()
-            for col in om.local_table.c
-            if (col.key not in exclude
-                and col.type.__class__ not in [TSVECTOR]
-                and not exclude.add(col.key)))
-        return cols
-
-    def value_to_csv(self, attr, ctx=None, req=None):
-        """Convert one value to a representation suitable for csv writer.
-
-        :param attr: Name of the attribute from which to convert the value.
-        :return: Object suitable for serialization with csv writer.
-        """
-        rel = None
-        if attr.endswith('__ids') or attr.endswith('__id'):
-            attr = attr.split('__')
-            rel = attr[-1]
-            attr = '__'.join(attr[:-1])
-        prop = getattr(self, attr, '')
-        if attr == 'jsondata':
-            prop = json.dumps(prop)
-        if rel == 'id' and hasattr(prop, 'id'):
-            return prop.id
-        elif rel == 'ids':
-            return ','.join('%s' % o.id for o in prop)
-        return prop
-
-    def to_csv(self, ctx=None, req=None, cols=None):
-        """return list of values to be passed to csv.writer.writerow."""
-        return [self.value_to_csv(attr, ctx, req) for attr in cols or self.csv_head()]
-
-    @classmethod
-    def csv_query(cls, session):
-        query = session.query(cls).filter_by(active=True)
-        return query.order_by(getattr(cls, 'id', getattr(cls, 'pk', None)))
-
-
-class Base(CsvMixin, declarative_base()):
+class Base(declarative_base()):
 
     """The declarative base for all our models."""
 
@@ -163,7 +91,7 @@ class Base(CsvMixin, declarative_base()):
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
-    jsondata = Column(JSONEncodedDict)
+    jsondata = Column(JSON)
 
     def __init__(self, jsondata=None, **kwargs):
         kwargs['jsondata'] = jsondata or {}
@@ -177,7 +105,7 @@ class Base(CsvMixin, declarative_base()):
         #marshal-json-strings>`_
         without mutation tracking, we provide a convenience method to update
         """
-        d = self.jsondata.copy()
+        d = (self.jsondata or {}).copy()
         d.update(kw)
         self.jsondata = d
 

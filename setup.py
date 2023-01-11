@@ -41,7 +41,7 @@ setup(
         'pyramid>=1.10',
         'pyramid_mako>=1.0',
         'pyramid_tm',
-        'SQLAlchemy>=1.4',
+        'SQLAlchemy>=1.4,<2.0',
         'zope.sqlalchemy',
         'webassets>=0.12.1',  # last release: 2.0 from Dec 2019!
         'markupsafe',

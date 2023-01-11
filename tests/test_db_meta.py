@@ -1,7 +1,6 @@
-import json
-
 import pytest
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
+
 
 from clld.db.models.common import Language
 from clld.db.meta import DBSession, is_base
@@ -42,40 +41,6 @@ def test_CustomModelMixin_polymorphic(db, custom_language):
     assert clang.polymorphic_type == 'custom'
     assert type(lang) is Language
     assert type(clang) is custom_language
-
-
-def test_CsvMixin(db):
-    l1 = Language(id='abc', name='Name', latitude=12.4, jsondata=dict(a=None))
-    DBSession.add(l1)
-    DBSession.flush()
-    l1 = Language.csv_query(DBSession).first()
-    cols = l1.csv_head()
-    row = l1.to_csv()
-    for k, v in zip(cols, row):
-        if k == 'jsondata':
-            assert 'a' in json.loads(v)
-
-
-def test_CsvMixin2(db):
-    from clld.db.meta import CsvMixin
-
-    class B(object):
-        id = 5
-
-    class A(CsvMixin):
-        b = None
-        bs = None
-
-        def __init__(self, b=None):
-            if b:
-                self.b = b
-                self.bs = [b, b]
-
-        def csv_head(self):
-            return ['b__id', 'bs__ids']
-
-    a = A(B())
-    assert a.to_csv() == [5, "5,5"]
 
 
 def test_Base(db):
