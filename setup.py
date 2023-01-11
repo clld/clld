@@ -35,7 +35,7 @@ setup(
     install_requires=[
         'Babel',
         'csvw>=1.0',
-        'clldutils>=3.5',
+        'clldutils>=3.17',
         'pycldf>=1.5.1',
         'setuptools>=25',
         'pyramid>=1.10',
@@ -43,11 +43,9 @@ setup(
         'pyramid_tm',
         'SQLAlchemy>=1.4',
         'zope.sqlalchemy',
-        'webassets>=0.12.1',  # no longer supports py2, no longer requires six!
+        'webassets>=0.12.1',  # last release: 2.0 from Dec 2019!
         'markupsafe',
         'rdflib>=4.1.1',  # rdflib 4.1.0 requires html5lib==0.95
-        'paginate',
-        'webhelpers2>=2.0',
         'nameparser',
     ],
     extras_require={

@@ -1,5 +1,5 @@
 """Functionality to format HTML pagination controls."""
-from paginate import Page
+from clldutils.paginate import Page
 
 from clld.web.util.component import Component
 

@@ -5,6 +5,9 @@ Changes
 unreleased
 ~~~~~~~~~~
 
+- Drop support for CSV exports
+- Drop support for in-database versioning
+
 
 9.2.2
 ~~~~~
