@@ -24,8 +24,7 @@ except ImportError:  # pragma: no cover
 
 
 def kv(string):
-    k, v = string.split('=', maxsplit=1)
-    return k, v
+    return string.split('=', maxsplit=1)
 
 
 def register(parser):

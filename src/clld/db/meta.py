@@ -1,13 +1,15 @@
 """We provide some infrastructure to build extensible database models."""
+import json
 import sqlite3
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event, JSON
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
 from sqlalchemy.pool import Pool
 from sqlalchemy.orm import (
     declarative_base, declared_attr, scoped_session, sessionmaker, deferred, undefer,
 )
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, DisconnectionError
 from sqlalchemy.inspection import inspect
+from sqlalchemy.types import TypeDecorator, VARCHAR
 
 import zope.sqlalchemy
 from clldutils.misc import NO_DEFAULT
@@ -45,6 +47,21 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
 DBSession = scoped_session(sessionmaker())
 zope.sqlalchemy.register(DBSession)
+
+
+class JSONEncodedDict(TypeDecorator):
+
+    """Represents an immutable structure as a json-encoded string.
+    Loads/serializes an empty dict for any empty value.
+    """
+
+    impl = VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        return json.dumps(value or {})
+
+    def process_result_value(self, value, dialect):
+        return json.loads(value) if value else {}
 
 
 class Base(declarative_base()):
@@ -88,7 +105,7 @@ class Base(declarative_base()):
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
-    jsondata = Column(JSON)
+    jsondata = Column(JSONEncodedDict)
 
     def __init__(self, jsondata=None, **kwargs):
         kwargs['jsondata'] = jsondata or {}

@@ -7,7 +7,6 @@ import re
 from itertools import groupby  # we just import this to have it available in templates!
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
-from math import floor
 from urllib.parse import quote, urlencode, urlparse, urlsplit, urlunsplit, SplitResult
 
 from sqlalchemy import or_
@@ -18,6 +17,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.interfaces import IRoutesMapper
 from zope.interface import providedBy
 from clldutils.misc import xmlchars
+from clldutils.coordinates import degminsec
 
 import clld
 from clld import interfaces
@@ -227,28 +227,6 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
 
     .. seealso:: https://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
     """
-    def degminsec(dec, hemispheres):
-        _dec = abs(dec)
-        degrees = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec))) * 60
-        minutes = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec))) * 60
-        seconds = _dec
-        if no_seconds:
-            if seconds > 30:
-                if minutes < 59:
-                    minutes += 1
-                else:
-                    minutes = 0
-                    degrees += 1
-        fmt = "{0}\xb0"
-        if minutes:
-            fmt += "{1:0>2d}'"
-        if not no_seconds and seconds:
-            fmt += '{2:0>2f}"'
-        fmt += hemispheres[0] if dec > 0 else hemispheres[1]
-        return str(fmt).format(degrees, minutes, seconds)
-
     if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
         return ''
     return HTML.div(
@@ -261,7 +239,8 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
                         label="WGS84") if wgs_link else ''),
                 HTML.td(
                     HTML.span('%s, %s' % (
-                        degminsec(obj.latitude, 'NS'), degminsec(obj.longitude, 'EW'))),
+                        degminsec(obj.latitude, 'NS', no_seconds=no_seconds),
+                        degminsec(obj.longitude, 'EW', no_seconds=no_seconds))),
                     HTML.br(),
                     HTML.span(
                         '{0.latitude:.2f}, {0.longitude:.2f}'.format(obj),

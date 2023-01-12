@@ -35,12 +35,10 @@ def _contains(method, col, qs):
 
     prefix, suffix = '%', '%'
     if spattern.search(qs):
-        qs = spattern.sub('', qs)
-        prefix = ''
+        qs, prefix = spattern.sub('', qs), ''
 
     if epattern.search(qs):
-        qs = epattern.sub('', qs)
-        suffix = ''
+        qs, suffix = epattern.sub('', qs), ''
 
     # Prevent invalid LIKE patterns:
     if qs.endswith('\\') and not qs.endswith('\\\\'):
@@ -57,22 +55,18 @@ def compute_language_sources(*references):
 
     by going through the relevant models derived from the HasSource mixin.
     """
-    old_sl = {}
-    for pair in DBSession.query(common.LanguageSource):
-        old_sl[(pair.source_pk, pair.language_pk)] = True
+    old_sl = {(ls.source_pk, ls.language_pk) for ls in DBSession.query(common.LanguageSource)}
 
     references = list(references)
     references.extend([
         (common.ValueSetReference, 'valueset'),
         (common.SentenceReference, 'sentence')])
-    sl = {}
+
     for model, attr in references:
         for ref in DBSession.query(model):
-            sl[(ref.source_pk, getattr(ref, attr).language_pk)] = True
-
-    for s, l in sl:
-        if (s, l) not in old_sl:
-            DBSession.add(common.LanguageSource(language_pk=l, source_pk=s))
+            if (ref.source_pk, getattr(ref, attr).language_pk) not in old_sl:
+                DBSession.add(common.LanguageSource(
+                    language_pk=getattr(ref, attr).language_pk, source_pk=ref.source_pk))
 
 
 def compute_number_of_values():

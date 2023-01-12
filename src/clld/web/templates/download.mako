@@ -23,3 +23,25 @@
         file.
     </p>
 </div>
+
+
+## eWAVE serves the latest  released version of data curated at  cldf-datasets/ewave. All released versions are accessible via
+## DOI
+## on  Zenodo as well.
+
+## Need: dataset repos; concept DOI
+##<p>
+##    <a href="${req.resource_url(req.dataset)}">eWAVE</a>
+##    serves the latest
+    ##   ${h.external_link('https://github.com/cldf-datasets/ewave/releases', label='released version')}
+##    of data curated at
+##    ${h.external_link('https://github.com/cldf-datasets/ewave', label='cldf-datasets/ewave')}.
+##    All released versions are accessible via <br/>
+##    <a href="https://doi.org/10.5281/zenodo.3603136">
+##        <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3603136.svg" alt="DOI">
+##    </a>
+##    <br/>
+##    on
+##    ${h.external_link('https://zenodo.org', label='Zenodo')}
+##    as well.
+##</p>
