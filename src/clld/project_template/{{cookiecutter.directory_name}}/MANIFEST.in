@@ -1,2 +1,2 @@
-include *.txt *.ini *.cfg *.rst
-recursive-include {{cookiecutter.directory_name}} *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+graft {{cookiecutter.directory_name}}
+global-exclude *.py[co]

@@ -6,6 +6,7 @@ from zope.interface import implementer
 from clld import interfaces
 from clld.web.adapters.base import Representation
 from clld.lib import bibtex
+from clld.web.util import doi
 
 
 class Metadata(Representation):
@@ -24,7 +25,17 @@ class MetadataFromRec(Metadata):
     """Virtual base class deriving metadata from a bibtex record."""
 
     def rec(self, ctx, req):
+        zdoi = req.registry.settings.get('clld.zenodo_version_doi') or \
+            req.registry.settings.get('clld.zenodo_concept_doi')
         data = {}
+        if zdoi:
+            data.update(doi=zdoi, type='Data set', url=doi.url(zdoi), publisher='Zenodo')
+        else:
+            data.update(
+                url=req.resource_url(ctx),
+                address=req.dataset.publisher_place,
+                publisher=req.dataset.publisher_name)
+
         if interfaces.IContribution.providedBy(ctx):
             genre = 'incollection'
             data['author'] = [
@@ -41,10 +52,11 @@ class MetadataFromRec(Metadata):
         return bibtex.Record(
             genre,
             id_,
-            title=getattr(ctx, 'citation_name', str(ctx)),
-            url=req.resource_url(ctx),
-            address=req.dataset.publisher_place,
-            publisher=req.dataset.publisher_name,
+            title='{}{}'.format(
+                getattr(ctx, 'citation_name', str(ctx)),
+                (' ({})'.format(req.registry.settings['clld.zenodo_version_tag'])
+                 if req.registry.settings.get('clld.zenodo_version_doi') else ''),
+            ),
             year=str(req.dataset.published.year),
             **data)
 

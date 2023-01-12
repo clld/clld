@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from testutils import XmlResponse
+from clld.web.views.olac import ResumptionToken, olac, OlacConfig
 
 
 class OaiPmhResponse(XmlResponse):
@@ -16,8 +17,6 @@ class OaiPmhResponse(XmlResponse):
 
 
 def test_ResumptionToken():
-    from clld.web.views.olac import ResumptionToken
-
     assert str(ResumptionToken(from_=date.today(), until=date.today()))
 
 
@@ -100,13 +99,9 @@ def test_ResumptionToken():
             'noRecordsMatch'),
     ])
 def test_olac(request_factory, params, test, expected):
-    from clld.web.views.olac import olac
-
     with request_factory(params=params) as req:
         assert test(OaiPmhResponse(olac(req))) == expected
 
 
 def test_olac_config():
-    from clld.web.views.olac import OlacConfig
-
     OlacConfig()

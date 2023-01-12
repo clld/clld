@@ -96,7 +96,7 @@ this is the case for the HTML index and detail view.
 
 
 Providing custom data for a resources details template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since the view rendering a resources details representations is implemented in
 clld core code, clld applications may need a way to provide additional context

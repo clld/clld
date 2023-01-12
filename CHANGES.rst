@@ -8,6 +8,7 @@ unreleased
 - Drop support for CSV exports
 - Drop support for alembic versioning
 - Drop support for CLDF download
+- Better support for metadata of CLDF datasets
 
 
 9.2.2

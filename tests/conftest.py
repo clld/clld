@@ -2,9 +2,10 @@ import sys
 import os
 import time
 import pathlib
-
+import configparser
 
 import pytest
+from pyramid import paster
 from sqlalchemy import Column, Unicode, Integer, ForeignKey
 from clld.db.meta import CustomModelMixin, DBSession
 from clld.db.models import common
@@ -16,6 +17,15 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 class CustomLanguage(CustomModelMixin, common.Language):
     pk = Column(Integer, ForeignKey('language.pk'), primary_key=True)
     custom = Column(Unicode)
+
+
+@pytest.fixture
+def persist():
+    def wrapped_(*objects):
+        DBSession.add_all(objects)
+        DBSession.flush()
+        return objects[0] if len(objects) == 1 else objects
+    return wrapped_
 
 
 @pytest.fixture
@@ -186,3 +196,19 @@ def data(db):
     populate_test_db(db)
     yield db
     time.sleep(0.2)
+
+
+@pytest.fixture
+def env_factory(data, tmp_path):
+    def _env(**settings):
+        cfg = configparser.ConfigParser()
+        cfg.add_section('app:main')
+        cfg['app:main'].update({'use': 'call:testutils:main', 'sqlalchemy.url': 'sqlite://'})
+        cfg['app:main'].update({'clld.' + k: v for k, v in settings.items()})
+        cfgp = tmp_path / 'config.ini'
+        with cfgp.open('w') as fp:
+            cfg.write(fp)
+        env = paster.bootstrap(str(cfgp))
+        env['request'].translate = lambda s, **kw: s
+        return env
+    return _env

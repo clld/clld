@@ -5,11 +5,14 @@ import string
 import pathlib
 import contextlib
 
-from sqlalchemy.types import SchemaType, TypeDecorator, Enum
+from sqlalchemy.sql.sqltypes import SchemaType
+from sqlalchemy.types import TypeDecorator, Enum
 from clldutils.path import move
 from clldutils.declenum import DeclEnum as BaseEnum
 from clldutils.lgr import ABBRS as LGR_ABBRS
 assert LGR_ABBRS
+
+__all__ = ['random_string', 'safe_overwrite', 'summary', 'DeclEnum', 'DeclEnumType']
 
 
 def random_string(length):
@@ -32,18 +35,10 @@ def safe_overwrite(fname):
 
 
 def summary(text, max_length=70):
-    res = ''
-    words = list(reversed(text.split()))
-    while words:
-        nextword = words.pop()
-        if len(res) + len(nextword) + 1 > max_length:
-            # too long, add the word back onto the remainder
-            words.append(nextword)
-            break
-        res += ' ' + nextword
-    if words:
-        res += ' ...'
-    return res.strip()
+    from textwrap import shorten
+    if max_length < 4:
+        return '...'
+    return shorten(text, width=max_length, placeholder=' ...')
 
 
 # From "The Enum Recipe": http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/

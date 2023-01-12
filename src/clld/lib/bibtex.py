@@ -122,19 +122,16 @@ def unescape(string):
     """
     def _delatex(s):
         try:
-            t = to_binary(s, encoding='latin1')
-            result = t.decode('latex+latin1')
+            result = to_binary(s, encoding='latin1').decode('latex+latin1')
         except UnicodeEncodeError:
             result = string
-        u_result = str(result)
-        return u_result
+        return str(result)
 
     res = u_unescape(stripctrlchars(_delatex(string.strip())))
     for symbol in sorted(SYMBOLS.keys(), key=lambda s: len(s)):
         res = res.replace(symbol, SYMBOLS[symbol])
     if '\\' not in res:
-        res = res.replace('{', '')
-        res = res.replace('}', '')
+        res = res.replace('{', '').replace('}', '')
     return res
 
 
@@ -311,11 +308,7 @@ class Record(Source, _Convertable):
 
     @classmethod
     def from_object(cls, obj, **kw):
-        data = {}
-        for field in FIELDS:
-            value = getattr(obj, field, None)
-            if value:
-                data[field] = value
+        data = {field: getattr(obj, field, None) for field in FIELDS if getattr(obj, field, None)}
         data.update(kw)
         data.setdefault('title', obj.description)
         data = sorted(data.items())
@@ -338,6 +331,12 @@ class Record(Source, _Convertable):
         if isinstance(res, str):
             res = res.split(Record.sep(key))
         return [_f for _f in res if _f]
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def __getitem__(self, key):
         """Get concatenated string of all values for key.

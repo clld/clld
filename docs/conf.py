@@ -12,6 +12,11 @@
 # serve to show the default.
 
 import sys, os
+import warnings
+
+from sqlalchemy.exc import SAWarning
+
+warnings.simplefilter('ignore', SAWarning)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -27,7 +32,6 @@ import sys, os
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc', 
-    #'sphinx.ext.intersphinx', 
     'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -43,8 +47,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'clld'
-copyright = u'Max Planck Society'
+project = 'clld'
+copyright = 'Max Planck Society'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -231,8 +235,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'clld', u'clld Documentation',
-   u'Robert Forkel', 'clld', 'One line description of project.',
+  ('index', 'clld', 'clld Documentation',
+   'Robert Forkel', 'clld', 'One line description of project.',
    'Miscellaneous'),
 ]
 

@@ -1,5 +1,6 @@
 <%! from json import dumps %>
 <%! from clldutils.misc import slug %>
+<%! from clld.web.util import doi %>
 ##
 ##
 ##
@@ -454,19 +455,48 @@ $(document).ready(function() {
     % endif
 </%def>
 
+##
+## Download info for datasets archived with Zenodo.
+## It uses the following data specified in the clld section of appconf.ini:
+## - zenodo_concept_doi
+## - zenodo_version_doi (optional)
+## - zenodo_version_tag (optional)
+## - dataset_github_repos
+##
 <%def name="dataset_download(div_class='alert alert-info', label=None)">
     <div class="${div_class}">
         <p>
-        The ${label or req.dataset.name} web application serves the latest
-        ${h.external_link('https://github.com/{}/releases'.format(req.registry.settings['clld.dataset_github_repos']), label=_('released version'))}
-        of data curated at
-        ${h.external_link('https://github.com/{}'.format(req.registry.settings['clld.dataset_github_repos']), label=req.registry.settings['clld.dataset_github_repos'])}.
-        All released version are accessible via
-        <a href="https://doi.org/${req.registry.settings['clld.zenodo_doi']}">
-            <img src="https://zenodo.org/badge/DOI/${req.registry.settings['clld.zenodo_doi']}.svg" alt="DOI">
-        </a>
-        <br/>
-        on ${h.external_link('https://zenodo.org', label='Zenodo')} as well.
+            The ${label or req.dataset.name} web application serves
+            % if req.registry.settings.get('clld.zenodo_version_tag'):
+                version ${req.registry.settings['clld.zenodo_version_tag']}
+                % if req.registry.settings.get('clld.zenodo_version_doi'):
+                    ${doi.badge(req.registry.settings['clld.zenodo_version_doi'])}
+                % endif
+                ##
+                ## FIXME: link to version doi if available!
+                ##
+            % elif req.registry.settings.get('clld.dataset_github_repos'):
+                the latest
+                ${h.external_link('https://github.com/{}/releases'.format(req.registry.settings['clld.dataset_github_repos']), label=_('released version'))}
+            % else:
+                a version
+            % endif
+            % if req.registry.settings.get('clld.dataset_github_repos'):
+                of data curated at
+                ${h.external_link('https://github.com/{}'.format(req.registry.settings['clld.dataset_github_repos']), label=req.registry.settings['clld.dataset_github_repos'])}.
+            % else:
+                of the dataset ${req.dataset.name}.
+            % endif
+            All released versions are accessible via
+            ${doi.badge(req.registry.settings['clld.zenodo_concept_doi'])}
+            <br/>
+            on ${h.external_link('https://zenodo.org', label='Zenodo')} as well.
         </p>
     </div>
+</%def>
+
+<%def name="dataset_citation()">
+    <blockquote>
+        ${h.newline2br(h.get_adapter(h.interfaces.IRepresentation, req.dataset, req, ext='md.txt').render(ctx, request))|n}
+    </blockquote>
 </%def>

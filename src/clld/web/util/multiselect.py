@@ -8,6 +8,8 @@ from clld.db.models.common import Parameter
 from clld.web.util.helpers import JS
 from clld.web.util.component import Component
 
+__all__ = ['MultiSelect', 'CombinationMultiSelect']
+
 
 class MultiSelect(Component):
 

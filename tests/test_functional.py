@@ -1,3 +1,5 @@
+import pytest
+
 from clld import RESOURCES
 
 
@@ -40,19 +42,20 @@ def test_dataset(app):
     assert '?__locale__=en' in res
 
 
-def test_resources(app):
-    for rsc in RESOURCES:
-        if not rsc.with_index:  # exclude the special case dataset
-            continue
-        app.get_html('/{0}s/{0}'.format(rsc.name))
-        app.get_html('/{0}s/{0}.snippet.html'.format(rsc.name), docroot='div')
-        res = app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
-        assert res.headers['Vary'] == 'Accept'
-        assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}scopeNote')) == 1
-        assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}altLabel')) > 0
-        app.get_html('/%ss' % rsc.name)
-        app.get_xml('/%ss.rdf' % rsc.name)
-        app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
+@pytest.mark.parametrize('rsc', [rsc for rsc in RESOURCES if rsc.with_index])
+def test_resources(app, rsc):
+    app.get_html('/{0}s/{0}'.format(rsc.name))
+    app.get_html('/{0}s/{0}.snippet.html'.format(rsc.name), docroot='div')
+    res = app.get_xml('/{0}s/{0}.rdf'.format(rsc.name))
+    assert res.headers['Vary'] == 'Accept'
+    assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}scopeNote')) == 1
+    assert len(_xml_findall(app, '{http://www.w3.org/2004/02/skos/core#}altLabel')) > 0
+    app.get_html('/%ss' % rsc.name)
+    app.get_xml('/%ss.rdf' % rsc.name)
+    app.get_dt('/%ss?iDisplayLength=5' % rsc.name)
+
+
+def test_resources_special_cases(app):
     app.get_xml('/unitparameters/up2.rdf')
     app.get_html('/combinations/parameter')
     app.get_xml('/combinations/parameter.rdf')
@@ -68,7 +71,9 @@ def test_source(app):
         '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description')) > 0
 
 
-def test_replacement(app):
-    app.get('/languages/replaced', status=301)
-    app.get('/languages/gone', status=410)
-    app.get('/sources/replaced', status=301)
+@pytest.mark.parametrize(
+    'route,status',
+    [('/languages/replaced', 301), ('/languages/gone', 410), ('/sources/replaced', 301)]
+)
+def test_replacement(app, route, status):
+    app.get(route, status=status)

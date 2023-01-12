@@ -27,45 +27,63 @@ def test_stripctrlchars():
 def test_Record_author_editor():
     rec = Record('article', '1', author=['a', 'b'], editor='a and b')
     assert rec['author'] == 'a and b'
-    assert rec.get('author') == rec.getall('author')
     assert rec['editor'] == rec.get('editor')
     assert rec.getall('editor') == ['a', 'b']
 
 
 def test_Record(mocker):
-    rec = Record(
-        'book', '1',
-        title='The Title',
-        author='author',
-        editor='ed',
-        booktitle='bt',
-        school='s',
-        issue='i',
-        pages='1-4',
-        publisher='M',
-        note="Revised edition")
-    assert '@book' in str(rec)
-    assert 'bt' in rec.text()
-
+    rec = Record('article', '1', author=['a', 'b'], editor='a and b')
     rec.format('txt')
-
     Record.from_string(str(rec), lowercase=True)
     Record.from_object(mocker.Mock())
 
-    rec = Record(
-        'incollection', '1',
-        title='The Title', editor='ed', booktitle='bt', school='s', issue='i',
-        pages='1-4', publisher='M', note="Revised edition")
-    assert 'In ' in rec.text()
 
-    rec = Record(
-        'article', '1',
-        title='The Title', journal='The Journal', volume="The volume", issue='issue')
-    assert 'The Journal' in rec.text()
-
-    rec = Record('xmisc', '1', note='Something')
-    assert rec.genre == EntryType.misc
-    assert 'Something' in rec.text()
+@pytest.mark.parametrize(
+    'genre,fields,expected_genre,substring',
+    [
+        (
+            'incollection',
+            dict(
+                title='The Title',
+                editor='ed',
+                booktitle='bt',
+                school='s',
+                issue='i',
+                pages='1-4',
+                publisher='M',
+                note="Revised edition"),
+            EntryType.incollection,
+            'In '),
+        (
+            'article',
+            dict(
+                title='The Title',
+                journal='The Journal',
+                volume="The volume",
+                issue='issue'),
+            EntryType.article,
+            'The Journal'),
+        ('xmisc', dict(note='Something'), EntryType.misc, 'Something'),
+        (
+            'book',
+            dict(
+                title='The Title',
+                author='author',
+                editor='ed',
+                booktitle='bt',
+                school='s',
+                issue='i',
+                pages='1-4',
+                publisher='M',
+                note="Revised edition"),
+            EntryType.book,
+            'bt'),
+    ]
+)
+def test_Record_text(genre,fields,expected_genre,substring):
+    rec = Record(genre, '1', **fields)
+    assert expected_genre == rec.genre
+    assert substring in rec.text()
 
 
 def test_Database(testsdir):

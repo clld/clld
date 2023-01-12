@@ -37,3 +37,4 @@ def badge(obj):
             HTML.img(
                 src="https://zenodo.org/badge/DOI/{}.svg".format(doi), alt='DOI: {}'.format(doi)),
             href=url(doi))
+    return HTML.a(doi, href=url(doi))

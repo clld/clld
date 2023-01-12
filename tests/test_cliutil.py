@@ -4,6 +4,7 @@ from pyramid.paster import get_appsettings
 import clld
 from clld.lib.bibtex import Record
 from clld.cliutil import *
+from clld.db.models.common import Language
 
 
 def test_data_file():
@@ -24,8 +25,6 @@ def test_bibtex2source():
 
 
 def test_Data(mocker):
-    from clld.db.models.common import Language
-
     session = set()
     mocker.patch('clld.cliutil.DBSession', session)
     d = Data(jsondata={})
@@ -37,6 +36,4 @@ def test_Data(mocker):
 
 
 def test_add_language_codes(env):
-    from clld.db.models.common import Language
-
     add_language_codes(Data(), Language(), 'iso', glottocodes=dict(iso='glot1234'))
