@@ -398,7 +398,6 @@ $(document).ready(function() {
 </%def>
 
 
-
 <%def name="combination_valuetable(ctx, iconselect=False)">
     <%self:table items="${enumerate(ctx.domain)}" args="item" eid="refs" class_="table-condensed table-striped table-nonfluid" options="${dict(aaSorting=[[2, 'desc']])}">\
         <%def name="head()">
@@ -453,4 +452,21 @@ $(document).ready(function() {
     });
     </script>
     % endif
+</%def>
+
+<%def name="dataset_download(div_class='alert alert-info', label=None)">
+    <div class="${div_class}">
+        <p>
+        The ${label or req.dataset.name} web application serves the latest
+        ${h.external_link('https://github.com/{}/releases'.format(req.registry.settings['clld.dataset_github_repos']), label=_('released version'))}
+        of data curated at
+        ${h.external_link('https://github.com/{}'.format(req.registry.settings['clld.dataset_github_repos']), label=req.registry.settings['clld.dataset_github_repos'])}.
+        All released version are accessible via
+        <a href="https://doi.org/${req.registry.settings['clld.zenodo_doi']}">
+            <img src="https://zenodo.org/badge/DOI/${req.registry.settings['clld.zenodo_doi']}.svg" alt="DOI">
+        </a>
+        <br/>
+        on ${h.external_link('https://zenodo.org', label='Zenodo')} as well.
+        </p>
+    </div>
 </%def>
