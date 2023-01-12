@@ -13,14 +13,14 @@ The goal of the Cross-Linguistic Linked Data project (CLLD) is to help record th
 language diversity heritage. This is to be facilitated by developing, providing and
 maintaining interoperable data publication structures.
 
-For more information refer to the `project's website at clld.org <http://clld.org>`_.
+For more information refer to the `project's website at clld.org <https://clld.org>`_.
 
 
 The ``clld`` framework
 ----------------------
 
 Underlying all applications built within the project to publish datasets is the ``clld``
-framework - a `python package <https://pypi.python.org/pypi/clld/>`_ providing functionality
+framework - a `python package <https://pypi.org/project/clld/>`_ providing functionality
 to build and maintain CLLD apps.
 
 
@@ -35,7 +35,7 @@ Overview
 - scripts exploiting the core database model,
 - libraries for common problems when working with linguistic databases.
 
-Online documentation is at `readthedocs <http://clld.readthedocs.org/>`_,
+Online documentation is at `readthedocs <https://clld.readthedocs.io/>`_,
 source code and issue tracker at `GitHub <https://github.com/clld/clld>`_.
 
 
@@ -55,7 +55,6 @@ Contents:
     lib
     linkeddata
     protocols
-    tools
     trees
     advanced
     design

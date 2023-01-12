@@ -5,10 +5,10 @@ Getting started
 Requirements
 ~~~~~~~~~~~~
 
-``clld`` works with python >=3.5. It has been installed and run successfully on
-Ubuntu (14.04, 16.04, 18.04), Mac OSX/scripts and Windows.
+``clld`` works with python >=3.7. It has been installed and run successfully on
+Ubuntu (20.04, 22.04), Mac OSX/scripts and Windows.
 While it might be possible to use sqlite as database backend, all production installations
-of ``clld`` and most development is done with postgresql (9.x or 10.x).
+of ``clld`` and most development is done with postgresql (>=9.x).
 To retrieve the ``clld`` software from GitHub, ``git`` must be installed on the system.
 
 .. _install:

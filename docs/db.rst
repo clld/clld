@@ -94,16 +94,3 @@ and publications:
 
 .. autoclass:: clld.db.models.common.UnitValue
     :members:
-
-
-Migrations
-~~~~~~~~~~
-
-Migrations provide a mechanism to update the database model (or the data) in a controlled
-and repeatable way. ``clld`` apps use
-`Alembic <http://alembic.readthedocs.org/en/latest/>`_ to implement migrations.
-
-Since a migration may change the database schema, it is generally not possible to fully
-use ORM mechanisms in migration scripts. Instead, migration scripts typically construct
-SQL to be sent to the database "by hand", or using SQLAlchemy's
-`SQL expression language <http://docs.sqlalchemy.org/en/latest/core/tutorial.html>`_.
