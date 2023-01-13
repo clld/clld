@@ -3,7 +3,7 @@
 
 <h3>Downloads</h3>
 
-% if req.registry.settings.get('clld.zenodo_doi') and req.registry.settings.get('clld.dataset_github_repos'):
+% if req.registry.settings.get('clld.zenodo_concept_doi'):
 ${util.dataset_download()}
 % else:
 <div class="span5 well well-small">

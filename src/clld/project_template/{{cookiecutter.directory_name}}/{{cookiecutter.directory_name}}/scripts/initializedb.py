@@ -8,30 +8,32 @@ from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.lib import bibtex
-{% if cookiecutter.cldf_module %}
-from clld_glottologfamily_plugin.util import load_families
-{% endif %}
 
 import {{cookiecutter.directory_name}}
 from {{cookiecutter.directory_name}} import models
 
 
 def main(args):
-{% if cookiecutter.cldf_module %}
-    assert args.glottolog, 'The --glottolog option is required!'
-{% endif %}
     data = Data()
     data.add(
         common.Dataset,
         {{cookiecutter.directory_name}}.__name__,
         id={{cookiecutter.directory_name}}.__name__,
         domain='{{cookiecutter.domain}}',
-{% if cookiecutter.mpg %}
+{% if cookiecutter.mpg == true %}
         publisher_name="Max Planck Institute for Evolutionary Anthropology",
         publisher_place="Leipzig",
         publisher_url="http://www.eva.mpg.de",
         license="http://creativecommons.org/licenses/by/4.0/",
         jsondata={
+            'license_icon': 'cc-by.png',
+            'license_name': 'Creative Commons Attribution 4.0 International License'},
+{% else %}
+        publisher_name = "",
+        publisher_place = "",
+        publisher_url = "",
+        license = "http://creativecommons.org/licenses/by/4.0/",
+        jsondata = {
             'license_icon': 'cc-by.png',
             'license_name': 'Creative Commons Attribution 4.0 International License'},
 {% endif %}
@@ -152,13 +154,6 @@ def main(args):
             source=data['Source'][sid],
             description='; '.join(nfilter(pages))
         ))
-    load_families(
-        Data(),
-        [(l.glottocode, l) for l in data['Variety'].values()],
-        glottolog_repos=args.glottolog,
-        isolates_icon='tcccccc',
-        strict=False,
-    )
 {% endif %}
 
 

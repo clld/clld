@@ -8,9 +8,9 @@ This chapter describes somewhat more advanced techniques to configure a ``clld``
 Custom map icons
 ~~~~~~~~~~~~~~~~
 
-``clld`` uses `leaflet <http://leafletjs.com/>`_ to display maps. Thus, techniques to use
+``clld`` uses `leaflet <https://leafletjs.com/>`_ to display maps. Thus, techniques to use
 custom map markers are based on
-`corresponding <http://leafletjs.com/examples/custom-icons/>`_
+`corresponding <https://leafletjs.com/examples/custom-icons/>`_
 `mechanisms <https://gist.github.com/comp615/2288108>`_
 for leaflet.
 
