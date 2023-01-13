@@ -3,24 +3,18 @@
 The `clld` toolkit - a web framework for the publication of
 [Cross-Linguistic Linked Data](https://clld.org).
 
-Documentation for the code base and its use is available at http://clld.readthedocs.org/en/latest/. The source for this documentation is in the `docs` directory.
+Documentation for the code base and its use is available at https://clld.readthedocs.io/en/latest/.
+The source for this documentation is in the `docs` directory.
 
 [![Build Status](https://github.com/clld/clld/workflows/tests/badge.svg)](https://github.com/clld/clld/actions?query=workflow%3Atests)
-[![Requirements Status](https://requires.io/github/clld/clld/requirements.svg?branch=master)](https://requires.io/github/clld/clld/requirements/?branch=master)
 [![PyPI](https://img.shields.io/pypi/v/clld.svg)](https://pypi.python.org/pypi/clld)
 [![Documentation Status](http://readthedocs.org/projects/clld/badge/?version=latest)](http://clld.readthedocs.io/en/latest/?badge=latest)
-
-
-## Cite
-
-Most recent version:
-https://doi.org/10.5281/zenodo.592412
 
 
 ## Usage
 
 Once the initial steps (installation, bootstrapping a new project)
-have been done helped by [the online documentation](http://clld.readthedocs.org/en/latest/),
+have been done helped by [the online documentation](https://clld.readthedocs.io/en/latest/),
 the biggest resource to guide further development of a `clld` app
 is the [wealth of existing apps](https://github.com/clld/clld/network/dependents).
 (Note: GitHub's "Used by" links - created from the dependency graph data - are really
@@ -74,5 +68,5 @@ apps.
 ## See
 
 - The [CLLD project](https://clld.org)
-- [Online documentation](http://clld.readthedocs.org/en/latest/)
+- [Online documentation](https://clld.readthedocs.io/en/latest/)
 - [Presentation on clld from 2014](https://clld.org/docs/reflex/clld.pdf)
