@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: clld 9.2.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-11 17:07+0100\n"
+"POT-Creation-Date: 2023-01-16 09:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Parameter"
 msgstr ""
 
-#: src/clld/web/app.py:671
+#: src/clld/web/app.py:668
 msgid "Home"
 msgstr ""
 
@@ -117,16 +117,16 @@ msgid "Show/hide Labels"
 msgstr ""
 
 #: src/clld/web/templates/sentence/detail_html.mako:19
-#: src/clld/web/templates/util.mako:205
+#: src/clld/web/templates/util.mako:206
 msgid "Sentence"
 msgstr ""
 
-#: src/clld/web/templates/util.mako:249
+#: src/clld/web/templates/util.mako:250
 msgid "Alternative names"
 msgstr ""
 
 #: src/clld/web/templates/unit/detail_html.mako:21
-#: src/clld/web/templates/util.mako:315
+#: src/clld/web/templates/util.mako:316
 #: src/clld/web/templates/value/index_html.mako:6
 #: src/clld/web/templates/valueset/detail_html.mako:12
 #: src/clld/web/templates/valueset/snippet_html.mako:8
@@ -134,10 +134,14 @@ msgid "Values"
 msgstr ""
 
 #: src/clld/web/templates/source/detail_html.mako:57
-#: src/clld/web/templates/util.mako:316
+#: src/clld/web/templates/util.mako:317
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
 msgid "Sentences"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:480
+msgid "released version"
 msgstr ""
 
 #: src/clld/web/templates/combination/detail_html.mako:5

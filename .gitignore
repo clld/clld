@@ -43,3 +43,6 @@ yolk.txt
 
 /clld/tests/dbschema.sql
 .pytest_cache/
+jsTestDriver.conf-coverage.dat
+jstestcov/
+
