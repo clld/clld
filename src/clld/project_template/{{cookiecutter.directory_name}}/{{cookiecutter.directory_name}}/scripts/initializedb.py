@@ -1,13 +1,15 @@
 import itertools
 import collections
 
-from pycldf import Sources
 from clldutils.misc import nfilter
 from clldutils.color import qualitative_colors
 from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.lib import bibtex
+{% if cookiecutter.cldf_module %}
+from pycldf import Sources
+{% endif %}
 
 import {{cookiecutter.directory_name}}
 from {{cookiecutter.directory_name}} import models
