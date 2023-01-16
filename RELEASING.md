@@ -30,7 +30,7 @@ Releasing clld
 - Make sure javascript tests pass (take care of specifying the name of the Chromium binary - e.g. 
   chromium-browser or chromium):
   ```shell
-  /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877
+  /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877 --raiseOnFailure true
   ```
   Note that this requires Java 8 to be installed.
   To inspect JS test coverage run

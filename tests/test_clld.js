@@ -15,7 +15,8 @@ Test.prototype.test_route_url = function() {
 };
 
 Test.prototype.test_Feed = function() {
-    CLLD.Feed.init({url: 'http://blog.wals.info', linkTitle: 't'});
+    /*:DOC += <div id="feed"/> */
+    CLLD.Feed.init({url: 'http://localhost:9877/', linkTitle: 't', eid: 'feed'});
 };
 
 Test.prototype.test_TreeView = function() {
