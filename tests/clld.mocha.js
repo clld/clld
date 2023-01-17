@@ -85,13 +85,16 @@ describe('MultiSelect', function () {
 
 describe('DataTable', function () {
     before(function () {
-        document.body.innerHTML = '<table id="dt"><thead><tr><th>1</th><th>2</th></tr></thead><tbody></tbody><tfoot><tr><input type="text" class="control"/></tr></tfoot></table>';
+        document.body.innerHTML = '<table id="dt"><thead><tr><th>1</th><th>2</th></tr></thead>' +
+            '<tbody></tbody><tfoot><tr><input type="text" class="control"/></tr></tfoot></table>' +
+            '<table id="dt2"><thead><tr><th>1<select><option>3</option></select></th><th>2<input type="text" class="control"/></th></tr></thead>' +
+            '<tbody></tbody><tfoot><tr><input type="text" class="control"/></tr></tfoot></table>';
         sinon.stub($, 'get').callsFake(function (url, opts, callback) {
             callback(
                 {
                     "iTotalRecords": 2679,
                     "aaData": [
-                        ["Australia & Oceania", "<button id=\"bt\" class=\"details\" href=\"/test/clld/tests/xhr/language1.snippet.html\"/>"],
+                        ["Australia & Oceania", "<button id=\"bt\" class=\"details\" href=\"language1.snippet.html\"/>"],
                         ["Australia & Oceania", ""],
                         ["Australia & Oceania", ""],
                         ["Australia & Oceania", ""],
@@ -128,10 +131,17 @@ describe('DataTable', function () {
                     {sName: 'P2'}],
                 'aoPresearchCols': [{sSearch: 'Aus'}]
             });
+
         CLLD.DataTable.current_url('dt');
         $('tfoot input').delay(100).trigger('keyup');
         $('div.pagination li.next a').delay(100).trigger('click');
-        $('#bt').delay(100).trigger('click');
+        $('#dt tbody td button.details').delay(100).trigger('click');
+
+        CLLD.DataTable.init(
+            'dt2', '<p/>', {'sAjaxSource': 'dt.html?x=y', 'aoColumns': [{sName: 'P2'}]});
+        expect(CLLD.DataTable.current_url('dt2')).contain('=y');
+        $("#dt2 thead select").trigger('change');
+        $("#dt2 thead input").trigger('keyup');
     });
 });
 
@@ -186,7 +196,7 @@ describe('MapWithRemoteData', function () {
         assert.equal(CLLD.mapGetMap('map'), CLLD.mapGetMap());
         CLLD.mapShowInfoWindow('map', layer);
         CLLD.map('map2', {l: url}, {sidebar: true, zoom: 3});
-        CLLD.map('map3', {l: url}, {icon_size: 15});
+        CLLD.map('map3', {l: url}, {icon_size: 15, base_layer: 'OpenTopoMap'});
     });
 });
 

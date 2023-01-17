@@ -328,6 +328,7 @@ CLLD.DataTable = (function(){
         // Since search params will be picked up by the xhr response with the data, we should also populate the
         // search filters accordingly, such as to give the user a visual cue of what's going on in addition to
         // browser location bar and the "filtered from ..." text.
+        /* istanbul ignore if */
         if (URLSearchParams !== undefined) {
             params = new URLSearchParams(window.location.search);
             params.forEach(function (value, key) {
@@ -471,7 +472,7 @@ CLLD.Map = function(eid, layers, options) {
         var map = CLLD.Maps[eid];
 
         if (map.options.no_popup) {
-            if (!map.options.no_link) {
+            if (!map.options.no_link) { /* istanbul ignore next */
                 document.location.href = CLLD.route_url(
                     'language', {'id': layer.feature.properties.language.id});
             }
@@ -528,7 +529,7 @@ CLLD.Map = function(eid, layers, options) {
             if (feature.properties.zindex) {
                 layer.setZIndexOffset(feature.properties.zindex);
             }
-            if (map.oms !== undefined) {
+            if (map.oms !== undefined) { /* istanbul ignore next */
                 map.oms.addMarker(layer);
             }
             map.marker_map[feature.properties.language.id] = layer;
