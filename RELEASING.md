@@ -27,18 +27,10 @@ Releasing clld
   rm -i src/clld/web/static/*/packed.*
   ```
 
-- Make sure javascript tests pass (take care of specifying the name of the Chromium binary - e.g. 
-  chromium-browser or chromium):
+- Make sure javascript tests pass:
   ```shell
-  /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877 --raiseOnFailure true
+  npm test
   ```
-  Note that this requires Java 8 to be installed.
-  To inspect JS test coverage run
-  ```shell
-  /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar tools/jsTestDriver/JsTestDriver-1.3.5.jar --tests all --browser chromium-browser --port 9877 --testOutput .
-  genhtml -o jstestcov/ jsTestDriver.conf-coverage.dat
-  ```
-  and inspect `jstestcov/index.html`.
 
 - Make sure flake8 passes
   ```shell

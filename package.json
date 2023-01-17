@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "test": "nyc --reporter=text --include src/**/clld.js mocha"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "jsdom": "8.5.0",
+    "jsdom-global": "2.1.1",
+    "mocha": "10.2.0",
+    "sinon": "^15.0.1"
+  },
+  "dependencies": {
+    "nyc": "^15.1.0"
+  }
+}

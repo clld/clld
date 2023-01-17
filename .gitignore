@@ -43,6 +43,7 @@ yolk.txt
 
 /clld/tests/dbschema.sql
 .pytest_cache/
-jsTestDriver.conf-coverage.dat
-jstestcov/
+node_modules/
+.nyc_output/
+package-lock.json
 

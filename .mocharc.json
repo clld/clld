@@ -1,0 +1,12 @@
+{
+  "spec": "tests/clld.mocha.js",
+  "require": [
+    "tests/fixtures.cjs"
+  ],
+  "diff": true,
+  "extension": ["js"],
+  "reporter": "spec",
+  "slow": "75",
+  "timeout": "2000",
+  "ui": "bdd"
+}
