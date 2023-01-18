@@ -59,8 +59,7 @@ def test_get_valueset(request_factory):
 def test_alt_representations(env):
     from clld.web.util.helpers import alt_representations
 
-    alt_representations(
-        env['request'], common.Parameter.first(), exclude=['xslt'])
+    alt_representations(env['request'], common.Parameter.first(), exclude=['xslt'])
 
 
 def test_icon(env):

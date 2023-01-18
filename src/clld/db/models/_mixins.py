@@ -81,10 +81,7 @@ class FilesMixin(IdNameDescriptionMixin):
         p = pathlib.Path(dir_).joinpath(self.relpath)
         if not p.parent.exists():
             p.parent.mkdir(parents=True)
-        with open(p.as_posix(), 'wb') as fp:
-            if isinstance(content, str):
-                content = content.encode('utf8')
-            fp.write(content)
+        p.write_bytes(content.encode('utf8') if isinstance(content, str) else content)
         return str(p)
 
 

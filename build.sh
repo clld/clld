@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-VENVS=$1 # first argument, path to virtual environment folder
-GLOTTOLOG=$3 # 3rd argument, path to glottolog/glottolog
+VENVS=$(realpath ~/venvs/)
+path=$(realpath "${BASH_SOURCE:-$0}")
+CLLD_DIR_PATH=$(dirname $path)
 
 cd $VENVS
 
@@ -8,7 +9,7 @@ virtualenv testapp
 cd testapp
 ./bin/pip install -U setuptools
 ./bin/pip install -U pip
-./bin/pip install -e $2 # second argument, path to local clld repository
+./bin/pip install -e $CLLD_DIR_PATH
 ./bin/pip install cookiecutter
 ./bin/clld create --quiet --force testapp_clld
 cd testapp_clld
@@ -23,7 +24,7 @@ virtualenv testapp
 cd testapp
 ./bin/pip install -U setuptools
 ./bin/pip install -U pip
-./bin/pip install -e $2 # second argument, path to local clld repository
+./bin/pip install -e $CLLD_DIR_PATH
 ./bin/pip install cookiecutter
 ./bin/clld create --quiet testapp_clld mpg=y
 cd testapp_clld
@@ -38,12 +39,11 @@ virtualenv testapp
 cd testapp
 ./bin/pip install -U setuptools
 ./bin/pip install -U pip
-./bin/pip install $2 # second argument, path to local clld repository
-./bin/pip install cookiecutter
+./bin/pip install $CLLD_DIR_PATH[bootstrap]
 ./bin/clld create --quiet testapp_clld cldf_module=structuredataset
 cd testapp_clld
 ../bin/pip install -e .[test]
-../bin/clld initdb development.ini --cldf $2/tests/cldf_datasets/structuredataset/StructureDataset-metadata.json --glottolog $GLOTTOLOG
+../bin/clld initdb development.ini --cldf $CLLD_DIR_PATH/tests/cldf_datasets/structuredataset/StructureDataset-metadata.json
 ../bin/pytest || exit 1
 cd $VENVS
 rm -rf testapp

@@ -13,7 +13,7 @@ from clld.db.models import common
 
 __all__ = [
     'as_int', 'contains', 'icontains', 'compute_language_sources', 'compute_number_of_values',
-    'get_distinct_values', 'get_alembic_version', 'set_alembic_version', 'page_query']
+    'get_distinct_values', 'page_query']
 
 
 def as_int(col):
@@ -35,12 +35,10 @@ def _contains(method, col, qs):
 
     prefix, suffix = '%', '%'
     if spattern.search(qs):
-        qs = spattern.sub('', qs)
-        prefix = ''
+        qs, prefix = spattern.sub('', qs), ''
 
     if epattern.search(qs):
-        qs = epattern.sub('', qs)
-        suffix = ''
+        qs, suffix = epattern.sub('', qs), ''
 
     # Prevent invalid LIKE patterns:
     if qs.endswith('\\') and not qs.endswith('\\\\'):
@@ -57,22 +55,18 @@ def compute_language_sources(*references):
 
     by going through the relevant models derived from the HasSource mixin.
     """
-    old_sl = {}
-    for pair in DBSession.query(common.LanguageSource):
-        old_sl[(pair.source_pk, pair.language_pk)] = True
+    old_sl = {(ls.source_pk, ls.language_pk) for ls in DBSession.query(common.LanguageSource)}
 
     references = list(references)
     references.extend([
         (common.ValueSetReference, 'valueset'),
         (common.SentenceReference, 'sentence')])
-    sl = {}
+
     for model, attr in references:
         for ref in DBSession.query(model):
-            sl[(ref.source_pk, getattr(ref, attr).language_pk)] = True
-
-    for s, l in sl:
-        if (s, l) not in old_sl:
-            DBSession.add(common.LanguageSource(language_pk=l, source_pk=s))
+            if (ref.source_pk, getattr(ref, attr).language_pk) not in old_sl:
+                DBSession.add(common.LanguageSource(
+                    language_pk=getattr(ref, attr).language_pk, source_pk=ref.source_pk))
 
 
 def compute_number_of_values():
@@ -109,28 +103,3 @@ def page_query(q, n=1000, verbose=False, commit=False):
         s = e
         if not r:
             break
-
-
-def set_alembic_version(engine, db_version):
-    """Sets up the alembic_version table in an sqlite database.
-
-    .. notes::
-
-        This function is only to be used with sqlite databases, either when testing or
-        when restoring a frozen database.
-
-    :param engine: A connection to an sqlite database.
-    :param db_version: The new version_num.
-    """
-    engine.execute("CREATE TABLE IF NOT EXISTS alembic_version (version_num VARCHAR(32))")
-    if engine.execute("SELECT * FROM alembic_version").fetchall():  # pragma: no cover
-        engine.execute("UPDATE alembic_version SET version_num = '%s'" % db_version)
-    else:
-        engine.execute("INSERT INTO alembic_version VALUES ('%s')" % db_version)
-
-
-def get_alembic_version(engine):
-    try:
-        return engine.execute("SELECT version_num FROM alembic_version").fetchone()[0]
-    except:  # noqa: E722; # pragma: no cover
-        return None

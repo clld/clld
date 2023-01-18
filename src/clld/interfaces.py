@@ -196,11 +196,6 @@ class ICtxFactoryQuery(Interface):
         """modified query."""
 
 
-class ICldfConfig(Interface):
-
-    """marker."""
-
-
 class IOlacConfig(Interface):
 
     """configuration of an applications OLAC repository."""

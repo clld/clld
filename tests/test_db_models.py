@@ -1,83 +1,70 @@
 from pathlib import Path
 
 from clld.db.meta import DBSession
+from clld.db.models import common
 
 
 def test_Config_replacement_key():
-    from clld.db.models.common import Config
-
-    assert Config.replacement_key('X', 'Y') == '__X_Y__'
-    assert Config.replacement_key(None, 'Y') == '__NoneType_Y__'
+    assert common.Config.replacement_key('X', 'Y') == '__X_Y__'
+    assert common.Config.replacement_key(None, 'Y') == '__NoneType_Y__'
 
 
-def test_Files(db, tmp_path):
-    from clld.db.models.common import Sentence, Sentence_files
-
-    l = Sentence(id='abc', name='Name')
-    f = Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
+def test_Files(db, tmp_path, persist):
+    l = common.Sentence(id='abc', name='Name')
+    f = common.Sentence_files(object=l, id='abstract', mime_type='audio/mpeg')
     p = f.create(tmp_path, 'content')
     assert Path(p).exists()
 
     l._files.append(f)
-    DBSession.add(l)
-    DBSession.flush()
+    persist(l)
     DBSession.refresh(l)
     assert l.files
     assert l.audio
 
 
-def test_Dataset(db):
+def test_Dataset(db, persist):
     from clld import RESOURCES
-    from clld.db.models.common import Dataset, Source
 
-    d = Dataset(id='abc', domain='test')
-    DBSession.add(d)
-    DBSession.flush()
+    d = persist(common.Dataset(id='abc', domain='test'))
     assert d.jsondata == d.jsondatadict
-    d.get_stats(RESOURCES, source=Source.id == None)
+    d.get_stats(RESOURCES, source=common.Source.id == None)
 
 
 def test_Contributor():
-    from clld.db.models.common import Contributor
-
-    d = Contributor(id='abc')
+    d = common.Contributor(id='abc')
     d.last_first()
-    d = Contributor(id='abc', name='Robert Forkel')
+    d = common.Contributor(id='abc', name='Robert Forkel')
     assert d.last_first() == 'Forkel, Robert'
-    d = Contributor(id='abc', name='Hans Robert von Forkel')
+    d = common.Contributor(id='abc', name='Hans Robert von Forkel')
     assert d.last_first() == 'von Forkel, Hans Robert'
 
 
 def test_Language():
-    from clld.db.models.common import Language
-
-    d = Language(id='abc')
+    d = common.Language(id='abc')
     assert d.glottocode is None
     assert d.iso_code is None
 
 
 def test_Source():
-    from clld.db.models.common import Source
-
-    d = Source(id='abc')
+    d = common.Source(id='abc')
     assert d.gbs_identifier is None
-    d = Source(id='abc', jsondata={'gbs': {'volumeInfo': {}}})
+    d = common.Source(id='abc', jsondata={'gbs': {'volumeInfo': {}}})
     assert d.gbs_identifier is None
-    d = Source(
+    d = common.Source(
         id='abc',
         jsondata={
             'gbs': {
                 'volumeInfo': {
                     'industryIdentifiers': [{'type': 'x', 'identifier': 'y'}]}}})
     assert d.gbs_identifier == 'y'
-    d = Source(
+    d = common.Source(
         id='abc',
         jsondata={
             'gbs': {
                 'volumeInfo': {
                     'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': ''}]}}})
     assert d.gbs_identifier == 'ISBN:'
-    d = Source(
+    d = common.Source(
         id='abc',
         jsondata={
             'gbs': {
@@ -87,24 +74,19 @@ def test_Source():
     d.bibtex()
 
 
-def test_Data(db):
-    from clld.db.models.common import Language, Language_data
-
-    l = Language(id='abc', name='Name')
-    l.data.append(Language_data(key='abstract', value='c'))
-    DBSession.add(l)
-    DBSession.flush()
+def test_Data(db, persist):
+    l = common.Language(id='abc', name='Name')
+    l.data.append(common.Language_data(key='abstract', value='c'))
+    persist(l)
     DBSession.refresh(l)
     assert l.datadict()['abstract'] == 'c'
 
 
 def test_Unit():
-    from clld.db.models.common import Unit, Language
-
-    u = Unit(name='unit', language=Language(name='language'))
+    _ = common.Unit(name='unit', language=common.Language(name='language'))
 
 
-def test_UnitValue(db):
+def test_UnitValue(db, persist):
     from clld.db.models.common import Unit, Language, UnitParameter, UnitValue, UnitDomainElement
 
     u = Unit(name='unit', language=Language(name='language'))
@@ -116,9 +98,7 @@ def test_UnitValue(db):
         unit=u, unitparameter=p1,
         unitdomainelement=UnitDomainElement(parameter=p1, name='ude'))
     assert str(v) == 'ude'
-    DBSession.add(v)
-    DBSession.add(p2)
-    DBSession.flush()
+    persist(v, p2)
     try:
         v.unitparameter_pk = p2.pk
         raise ValueError  # pragma: no cover
@@ -130,32 +110,24 @@ def test_UnitValue(db):
 
 
 def test_Identifier():
-    from clld.db.models.common import Identifier, IdentifierType
-
-    i = Identifier(id='a', name='a', type=IdentifierType.iso.value)
+    i = common.Identifier(id='a', name='a', type=common.IdentifierType.iso.value)
     assert i.url()
-    i = Identifier(id='a', name='a', type='xxx')
+    i = common.Identifier(id='a', name='a', type='xxx')
     assert i.url() is None
 
 
 def test_Contribution(data):
-    from clld.db.models.common import Contribution
-
-    c = DBSession.query(Contribution).first()
+    c = DBSession.query(common.Contribution).first()
     assert c.formatted_contributors()
 
 
 def test_Value(data):
-    from clld.db.models.common import Value
-
-    assert 'valueset' in Value.first().__json__(None)
+    assert 'valueset' in common.Value.first().__json__(None)
 
 
 def test_Combination(data):
-    from clld.db.models.common import Combination, Parameter
-
-    p = Parameter.first()
-    c = Combination.get(Combination.delimiter.join(2 * [p.id]))
+    p = common.Parameter.first()
+    c = common.Combination.get(common.Combination.delimiter.join(2 * [p.id]))
     assert c.values
     assert c.domain
     assert c.__json__()

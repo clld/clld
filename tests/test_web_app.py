@@ -1,3 +1,4 @@
+import warnings
 import importlib
 
 import pytest
@@ -12,13 +13,17 @@ from clld.web.adapters.download import N3Dump
 
 @pytest.fixture
 def config():
-    config_ = Configurator(
-        root_package=importlib.import_module('clld.web'),
-        settings={
-            'sqlalchemy.url': 'sqlite://',
-            'clld.pacific_centered_maps': True})
-    config_.include('clld.web.app')
-    return config_
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            'ignore', category=DeprecationWarning, module='importlib._bootstrap')
+
+        config_ = Configurator(
+            root_package=importlib.import_module('clld.web'),
+            settings={
+                'sqlalchemy.url': 'sqlite://',
+                'clld.pacific_centered_maps': True})
+        config_.include('clld.web.app')
+        return config_
 
 
 def test_CLLDRequest(env):

@@ -8,7 +8,6 @@ from clld.web.adapters.base import Index, Representation, Json
 from clld.web.adapters.geojson import (
     GeoJson, GeoJsonLanguages, GeoJsonParameter, GeoJsonParameterFlatProperties,
 )
-from clld.web.adapters import csv
 from clld.web.adapters.md import BibTex, TxtCitation
 from clld.web.adapters.rdf import Rdf, RdfIndex
 from clld.web.adapters import biblio
@@ -35,11 +34,6 @@ def register_resource_adapters(config, rsc):
 
     if rsc.with_index:
         specs.append((Index, 'application/atom+xml', 'atom', 'index_atom.mako', {}))
-        config.register_adapter(
-            getattr(csv, rsc.name.capitalize() + 's', csv.CsvAdapter),
-            interface,
-            interfaces.IIndex,
-            name=csv.CsvAdapter.mimetype)
         if template_exists(config, name + '/index_html.mako'):
             # ... as html index
             specs.append((Index, 'text/html', 'html', name + '/index_html.mako', {}))

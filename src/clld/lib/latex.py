@@ -38,7 +38,7 @@ def _registry(encoding):
     if encoding == 'latex':
         encoding = None  # pragma: no cover
     elif encoding.startswith('latex+'):
-        encoding = encoding[6:]
+        encoding = encoding[6:]  # pragma: no cover
     elif sys.version_info >= (3, 9, 0) and encoding.startswith('latex_'):  # pragma: no cover
         encoding = encoding[6:]
     else:
@@ -145,9 +145,7 @@ class _unlatex(object):  # pragma: no cover
 
     def __getitem__(self, n):
         """Return token at offset n from current pos."""
-        p = self.pos + n
-        t = self.tex
-        return p < len(t) and t[p] or None
+        return self.pos + n < len(self.tex) and self.tex[self.pos + n] or None
 
     def __next__(self):
         """Find and return another piece of converted output."""

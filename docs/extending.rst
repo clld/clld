@@ -10,7 +10,7 @@ this means calling methods on the config object returned by the call to
 Since the config object is an instance of the pyramid
 `Configurator <http://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator>`_
 this includes all the standard ways to configure pyramid apps, in particular adding
-routes and views to provide additional pages and funtionality with an app.
+routes and views to provide additional pages and functionality with an app.
 
 
 Wording
@@ -92,7 +92,7 @@ If this file is located at ``myapp/static/publisher_logo.png`` it will be picked
 automatically by the default application footer template.
 
 Other static content can still be placed in the ``myapp/static`` directory but must be
-explicitely included on pages making use of it, e.g. with template code like:
+explicitly included on pages making use of it, e.g. with template code like:
 
 .. code-block:: html
 
@@ -360,12 +360,6 @@ like in the following example from WALS:
             'language': '/languoid/lect/wals_code_{id:[^/\.]+}',
         }
         config = get_configurator('wals3', **dict(settings=settings))
-
-
-Downloads
-~~~~~~~~~
-
-TODO
 
 
 Misc Utilities

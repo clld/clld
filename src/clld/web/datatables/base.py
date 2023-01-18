@@ -125,7 +125,7 @@ class Col(object):
 
         if not self.model_col:
             #
-            # model_col was not explicitely passed as keyword parameter
+            # model_col was not explicitly passed as keyword parameter
             #
             # TODO: fix mechanism to infer model_col for derived classes!)
             #

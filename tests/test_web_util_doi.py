@@ -16,5 +16,5 @@ def test_link(env):
 
 
 def test_badge():
-    assert badge('xyz') is None
+    assert badge('xyz')
     assert badge('10.5281/zenodo.xyz')

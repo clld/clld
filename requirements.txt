@@ -1,2 +1,2 @@
 # development environment: install in development mode
--e .[dev,test,docs]
+-e .[dev,test,docs,bootstrap]

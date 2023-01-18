@@ -8,7 +8,10 @@ import transaction
 from clldutils import db
 from clldutils.clilib import PathType
 from clld.cliutil import SessionContext, BootstrappedAppConfig
-from pycldf import Dataset
+try:
+    from pycldf import Dataset
+except ImportError:  # pragma: no cover
+    Dataset = None
 
 try:
     from cldfcatalog import Catalog
@@ -50,6 +53,9 @@ def run(args):
         return 10
 
     if args.cldf:  # pragma: no cover
+        if not Dataset:
+            print('To import CLDF data you must install the pycldf package!')
+            return 10
         args.cldf = Dataset.from_metadata(args.cldf)
 
     with contextlib.ExitStack() as stack:

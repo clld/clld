@@ -9,7 +9,7 @@ from clldutils.misc import slug
 from clld import interfaces
 
 
-class Renderable(object):
+class Renderable:
 
     """Virtual base class for adapters.
 
@@ -23,7 +23,6 @@ class Renderable(object):
     extension = None
     send_mimetype = None
     rel = 'alternate'
-    content_type_params = None
 
     def __init__(self, obj):
         self.obj = obj
@@ -46,11 +45,6 @@ class Renderable(object):
         res.content_type = str(self.send_mimetype or self.mimetype)
         if self.charset:
             res.content_type += str('; charset=') + str(self.charset)
-        if self.content_type_params:
-            d = res.content_type_params
-            for k, v in self.content_type_params.items():
-                d[str(k)] = str(v)
-            res.content_type_params = d
         return res
 
     def template_context(self, ctx, req):

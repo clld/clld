@@ -1,40 +1,48 @@
+import itertools
 
-def test_expand_prefix():
-    from clld.lib.rdf import expand_prefix
+import pytest
 
-    assert str(expand_prefix('dcterms:title')) == 'http://purl.org/dc/terms/title'
-    assert expand_prefix('noprefix:lname') == 'noprefix:lname'
-    assert expand_prefix('rdf:nolname') == 'rdf:nolname'
-    assert expand_prefix('nocolon') == 'nocolon'
+from clld.lib.rdf import *
+
+
+@pytest.mark.parametrize(
+    'name,url',
+    [
+        ('dcterms:title', 'http://purl.org/dc/terms/title'),
+        ('noprefix:lname', 'noprefix:lname'),
+        ('rdf:nolname', 'rdf:nolname'),
+        ('nocolon', 'nocolon'),
+    ]
+)
+def test_expand_prefix(name, url):
+    assert str(expand_prefix(name)) == url
 
 
 def test_url_for_qname():
-    from clld.lib.rdf import url_for_qname
-
     assert url_for_qname('dcterms:title') == 'http://purl.org/dc/terms/title'
 
 
-def test_properties_as_xml_snippet():
-    from clld.lib.rdf import properties_as_xml_snippet
+@pytest.mark.parametrize(
+    'subject,props,substring',
+    [
+        ('subject', [('foaf:name', 'a name'), ('foaf:homepage', 'http://example.org')], None),
+        ('subject', [('rdf:about', 'x'), ('foaf:homepage', 'http://example.org')], None),
+        ('subject', [('about', 'x'), ('foaf:homepage', 'http://example.org')], None),
+        ('http://example.org', [('dcterms:title', 'ttt')], 'ttt'),
+    ]
+)
+def test_properties_as_xml_snippet(subject,props,substring):
+    p = properties_as_xml_snippet(subject, props)
+    assert not substring or (substring in p)
 
-    properties_as_xml_snippet(
-        'subject', [('foaf:name', 'a name'), ('foaf:homepage', 'http://example.org')])
-    properties_as_xml_snippet(
-        'subject', [('rdf:about', 'x'), ('foaf:homepage', 'http://example.org')])
-    properties_as_xml_snippet(
-        'subject', [('about', 'x'), ('foaf:homepage', 'http://example.org')])
 
-    p = properties_as_xml_snippet(
-        'http://example.org', [('dcterms:title', 'ttt')])
-    assert 'ttt' in p
-
-
-def test_convert():
-    from clld.lib.rdf import ClldGraph, convert, FORMATS
-
-    g = ClldGraph()
-    for from_ in FORMATS:
-        if from_ != 'nt':
-            for to_ in list(FORMATS.keys()) + [None]:
-                if to_ != 'nt':
-                    convert(g.serialize(format=from_), from_, to_)
+@pytest.mark.parametrize(
+    'from_,to_',
+    [
+        (f1, f2) for f1, f2 in
+        itertools.product(list(FORMATS.keys()) + [None], repeat=2)
+        if f1 not in {None, 'nt'} and f2 != 'nt'
+    ]
+)
+def test_convert(from_, to_):
+    convert(ClldGraph().serialize(format=from_), from_, to_)

@@ -1,9 +1,8 @@
 from clld.db.models import common
+from clld.web.util.multiselect import *
 
 
 def test_MultiSelect(env):
-    from clld.web.util.multiselect import MultiSelect
-
     ms = MultiSelect(env['request'], common.Language, 'x', url='/')
     ms.render()
     ms.render(selected=[common.Language.first()])
@@ -11,8 +10,6 @@ def test_MultiSelect(env):
 
 
 def test_CombinationMultiSelect(env):
-    from clld.web.util.multiselect import CombinationMultiSelect
-
     ms = CombinationMultiSelect(
         env['request'], combination=common.Combination(common.Parameter.first()))
     ms.render()

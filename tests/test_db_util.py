@@ -1,21 +1,10 @@
 
-def test_alembic_version(db):
-    from clld.db.util import set_alembic_version, get_alembic_version
-
-    assert get_alembic_version(db) != '1234'
-    set_alembic_version(db, '1234')
-    assert get_alembic_version(db) == '1234'
-
-
-def test_compute_language_sources(data):
+def test_compute_language_sources(data, persist):
     from clld.db.util import compute_language_sources
     from clld.db.models.common import Source, Sentence, Language, SentenceReference
-    from clld.db.meta import DBSession
 
     s = Sentence(id='sentenced', language=Language(id='newlang'))
-    sr = SentenceReference(sentence=s, source=Source.first())
-    DBSession.add(sr)
-    DBSession.flush()
+    persist(SentenceReference(sentence=s, source=Source.first()))
     compute_language_sources()
 
 

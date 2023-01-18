@@ -1,4 +1,0 @@
-
-document = {
-    location: {href: null}
-};

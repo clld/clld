@@ -5,10 +5,10 @@ Getting started
 Requirements
 ~~~~~~~~~~~~
 
-``clld`` works with python >=3.5. It has been installed and run successfully on
-Ubuntu (14.04, 16.04, 18.04), Mac OSX/scripts and Windows.
+``clld`` works with python >=3.7. It has been installed and run successfully on
+Ubuntu (20.04, 22.04), Mac OSX/scripts and Windows.
 While it might be possible to use sqlite as database backend, all production installations
-of ``clld`` and most development is done with postgresql (9.x or 10.x).
+of ``clld`` and most development is done with postgresql (>=9.x).
 To retrieve the ``clld`` software from GitHub, ``git`` must be installed on the system.
 
 .. _install:
@@ -18,39 +18,34 @@ Installation
 
 To install the python package from pypi run
 
-.. code:: bash
+.. code-block:: bash
 
-    $ pip install clld[dev]
+    $ pip install clld[bootstrap]
 
-To install from a git repository (if you want to hack on ``clld``),
-you may run the following commands in an activated `virtualenv <http://www.virtualenv.org/en/latest/>`_:
-
-.. code:: bash
-
-    $ git clone https://github.com/clld/clld.git
-    $ cd clld
-    $ pip install -r requirements.txt
-
-Alternatively, you may want to fork ``clld`` first and then work with your fork.
+Note that the above command also installs the ``bootstrap`` extra requirements. These are needed to
+create an app skeleton and initialize a database for the app. Thus, when deploying an app to a
+production server, copying over a database, you can do without ``bootstrap`` and cut down on
+software on the server.
 
 
 Bootstrapping a ``clld`` app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A ``clld`` app is a python package implementing a
-`pyramid <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
+`pyramid <https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/introduction.html>`_
 web application.
 
-Installing the ``clld`` package will also install a command `clld`,
-which offers functionality to kickstart a `clld` app project. Note that
-this functionality requires the `cookiecutter` package to be installed:
+Installing the ``clld`` package will also install a command ``clld``,
+which offers functionality to kickstart a ``clld`` app project. Note that
+this functionality requires the ``cookiecutter`` package to be installed (which will already
+be the case if you installed ``clld`` with the ``bootstrap`` extra).
 
-.. code:: bash
+.. code-block:: bash
 
     $ pip install cookiecutter
     $ clld create myapp
 
-This will create a ``myapp`` project directroy, containing a python package ``myapp`` with the following layout::
+This will create a ``myapp`` project directory, containing a python package ``myapp`` with the following layout::
 
     (clld)robert@astroman:~/venvs/clld$ tree myapp/
     myapp/                           # project directory
@@ -87,39 +82,104 @@ This will create a ``myapp`` project directroy, containing a python package ``my
     └── setup.py
 
 
+.. note::
+
+    If you are creating a ``clld`` app to serve data from a CLDF dataset, don't forget to specify
+    the CLDF module name when prompted. This will provide you with a stub implementation of data
+    import code in ``myapp/scripts/initializedb.py`` which is tailored to CLDF data.
+
+    For example if you wanted your ``clld`` app to serve a CLDF StructureDataset such as
+    `John Peterson's data <https://doi.org/10.5281/zenodo.3603755>`_ for his paper
+    "Towards a linguistic prehistory of eastern-central South Asia", you'd run
+
+    .. code-block:: shell
+
+        $ clld create myapp domain=example.org cldf_module=StructureDataset
+
+    and download the data to be loaded running
+
+    .. code-block:: shell
+
+        $ curl -o petersonsouthasia-v1.1.zip "https://zenodo.org/record/3603755/files/cldf-datasets/petersonsouthasia-v1.1.zip?download=1"
+        $ unzip petersonsouthasia-v1.1.zip
+
+
 Running
 
-.. code:: bash
+.. code-block:: bash
 
     $ cd myapp
-    $ pip install -e .
+    $ pip install -e .[dev]
 
 will install your app as Python package in development mode, i.e. will create a link to
-your app's code in the ``site-packages`` directory.
+your app's code in the ``site-packages`` directory. (We also install the ``dev`` extra in order
+to have the `waitress <https://docs.pylonsproject.org/projects/waitress/en/stable/index.html>`_
+app server available for testing.)
 
 Now edit the `configuration file <http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html>`_,
 ``myapp/development.ini`` providing a setting ``sqlalchemy.url`` in the ``[app:main]`` section.
-The `SQLAlchemy engine URL <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_ given in this
+The `SQLAlchemy engine URL <https://docs.sqlalchemy.org/en/14/core/engines.html>`_ given in this
 setting must point to an existing (but empty) database if the ``postgresql`` dialect is chosen.
+If you are happy with using an SQLite database, you can leave the configuration as is.
 
 Running
 
-.. code:: bash
+.. code-block:: bash
 
     $ clld initdb development.ini
 
 will then create the database for your app. Whenever you edit the database initialization
 script, you have to re-run the above command.
 
+.. note::
+
+    If your app serves data from a CLDF dataset - and loads this data from the
+    `pycldf.Dataset <https://pycldf.readthedocs.io/en/latest/dataset.html>`_
+    instance passed into ``initializedb.main`` as ``args.cldf`` - you must run
+    ``clld initdb development.ini --cldf PATH/TO/CLDF/METADATA.json``.
+
+    So if you downloaded and unzipped
+    `petersonsouthasia-v1.1.zip <https://zenodo.org/record/3603755/files/cldf-datasets/petersonsouthasia-v1.1.zip?download=1>`_
+    you should run
+
+    .. code-block:: shell
+
+        $ clld initdb development.ini --cldf ../cldf-datasets-petersonsouthasia-e029fbf/cldf/StructureDataset-metadata.json
+
+
 You are now ready to run
 
-.. code:: bash
+.. code-block:: bash
 
     $ pserve --reload development.ini
 
 and navigate with your browser to http://127.0.0.1:6543 to visit your application.
 
-The next step is populating the database.
+The next step is populating the database (unless you are happy with the defaults provided for
+CLDF datasets).
+
+
+Testing
+~~~~~~~
+
+The ``clld`` app skeleton comes with a stub test suite consisting in ``myapp/tests/``. To run these
+tests, install the requirements
+
+.. code-block:: bash
+
+    $ pip install -e .[test]
+
+and run the tests with
+
+.. code-block:: bash
+
+    $ pytest
+
+.. note::
+
+    The `selenium tests <https://selenium-python.readthedocs.io/installation.html>`_ are run on
+    Firefox, so you'd need to have Firefox installed as well as the corresponding
+    `driver <https://selenium-python.readthedocs.io/installation.html#drivers>`_
 
 
 Populating the database
@@ -129,7 +189,7 @@ The ``clld`` framework does not provide any GUI or web interface for populating 
 Instead, this is assumed to be done with code in
 ``myapp/scripts/initializedb.py`` which is run via
 
-.. code:: bash
+.. code-block:: bash
 
     $ clld initdb development.ini
 
@@ -206,6 +266,23 @@ This dataset is assumed to have a publisher
 and a license. Information about the publisher and the license should be part of the data,
 as well as other metadata about the dataset.
 
+.. note::
+
+    If your app serves the data from a published CLDF dataset (as is recommended), you can specify
+    metadata of the published dataset in ``myapp/appconf.ini``. This metadata will be used on the
+    download page to guide users to the data. The relevant settings are in the ``[clld]`` section:
+
+    .. code-block:: ini
+
+        # Version-independent concept DOI on Zenodo (see https://help.zenodo.org/#versioning)
+        zenodo_concept_doi =
+        # DOI for the exact version of the dataset on Zenodo
+        zenodo_version_doi =
+        # Version tag
+        zenodo_version_tag =
+        # GitHub repository in which the dataset is curated, specified as "org/repos"
+        dataset_github_repos =
+
 
 A note on files
 +++++++++++++++
@@ -230,15 +307,16 @@ in a different directory than primary data files.
 Deployment
 ~~~~~~~~~~
 
-TODO:
-clld.environment == 'production',
-webassets need to be built.
-gunicorn + nginx
+The ``clld`` apps maintained by the MPI EVA in Leipzig are deployed and managed using the
+`clldappconfig package <https://github.com/dlce-eva/clldappconfig>`_
+Reading through the code of the
+`deploy task <https://github.com/dlce-eva/clldappconfig/blob/68bcef6c90f7973d92d8e6f9248523f751425aa7/src/clldappconfig/tasks/deployment.py#L202>`_
+should give you a good idea of the things to keep in mind when deploying ``clld`` apps productively.
 
 
 Examples
 ~~~~~~~~
 
 A good way explore how to customize a ``clld`` app is by looking at the code of existing apps.
-These apps are listed at `<http://clld.org/datasets.html>`_ and each app links to its source code
+These apps are listed at `<https://clld.org/datasets.html>`_ and each app links to its source code
 repository on `GitHub <https://github.com/clld>`_ (in the site footer).

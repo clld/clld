@@ -19,8 +19,3 @@ OAI-PMH for OLAC
 .. automodule:: clld.web.views.olac
     :members:
 
-
-OpenSearch
-~~~~~~~~~~
-
-TODO

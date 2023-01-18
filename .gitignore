@@ -43,3 +43,7 @@ yolk.txt
 
 /clld/tests/dbschema.sql
 .pytest_cache/
+node_modules/
+.nyc_output/
+package-lock.json
+

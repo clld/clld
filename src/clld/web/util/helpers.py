@@ -7,7 +7,6 @@ import re
 from itertools import groupby  # we just import this to have it available in templates!
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
-from math import floor
 from urllib.parse import quote, urlencode, urlparse, urlsplit, urlunsplit, SplitResult
 
 from sqlalchemy import or_
@@ -18,6 +17,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.interfaces import IRoutesMapper
 from zope.interface import providedBy
 from clldutils.misc import xmlchars
+from clldutils.coordinates import degminsec
 
 import clld
 from clld import interfaces
@@ -227,28 +227,6 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
 
     .. seealso:: https://en.wikipedia.org/wiki/ISO_6709#Order.2C_sign.2C_and_units
     """
-    def degminsec(dec, hemispheres):
-        _dec = abs(dec)
-        degrees = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec))) * 60
-        minutes = int(floor(_dec))
-        _dec = (_dec - int(floor(_dec))) * 60
-        seconds = _dec
-        if no_seconds:
-            if seconds > 30:
-                if minutes < 59:
-                    minutes += 1
-                else:
-                    minutes = 0
-                    degrees += 1
-        fmt = "{0}\xb0"
-        if minutes:
-            fmt += "{1:0>2d}'"
-        if not no_seconds and seconds:
-            fmt += '{2:0>2f}"'
-        fmt += hemispheres[0] if dec > 0 else hemispheres[1]
-        return str(fmt).format(degrees, minutes, seconds)
-
     if not isinstance(obj.latitude, float) or not isinstance(obj.longitude, float):
         return ''
     return HTML.div(
@@ -261,7 +239,8 @@ def format_coordinates(obj, no_seconds=True, wgs_link=True):
                         label="WGS84") if wgs_link else ''),
                 HTML.td(
                     HTML.span('%s, %s' % (
-                        degminsec(obj.latitude, 'NS'), degminsec(obj.longitude, 'EW'))),
+                        degminsec(obj.latitude, 'NS', no_seconds=no_seconds),
+                        degminsec(obj.longitude, 'EW', no_seconds=no_seconds))),
                     HTML.br(),
                     HTML.span(
                         '{0.latitude:.2f}, {0.longitude:.2f}'.format(obj),
@@ -296,9 +275,7 @@ def map_marker_url(req, obj, marker=None):
 
 def map_marker_img(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
     url = map_marker_url(req, obj, marker=marker)
-    if url:
-        return marker_img(url, height=height, width=width)
-    return ''
+    return marker_img(url, height=height, width=width) if url else ''
 
 
 def link(req, obj, **kw):
@@ -412,8 +389,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             '3': 'third person',
         }
 
-        res = []
-        end = 0
+        res, end = [], 0
         for match in GLOSS_ABBR_PATTERN.finditer(gloss):
             if match.start() > end:
                 res.append(gloss[end:match.start()])
@@ -504,16 +480,18 @@ def contactmail(req, ctx=None, title='contact maintainer'):
     return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 
+def iter_join(items, sep):
+    for i, item in enumerate(items):
+        if i > 0:
+            yield sep
+        yield item
+
+
 def newline2br(text):
     """Replace newlines in text with HTML br tags."""
     if not text:
         return ''
-    chunks = []
-    for i, line in enumerate(text.split('\n')):
-        if i > 0:
-            chunks.append(HTML.br())
-        chunks.append(literal(line))
-    return '\n'.join(chunks)
+    return '\n'.join(iter_join([literal(line) for line in text.split('\n')], HTML.br()))
 
 
 def text2html(text, mode='br', sep='\n\n'):
@@ -524,19 +502,11 @@ def text2html(text, mode='br', sep='\n\n'):
 
 
 def linked_contributors(req, contribution):
-    chunks = []
-    for i, c in enumerate(contribution.primary_contributors):
-        if i > 0:
-            chunks.append(' and ')
-        chunks.append(link(req, c))
-
-    for i, c in enumerate(contribution.secondary_contributors):
-        if i == 0 and contribution.primary_contributors:
-            chunks.append(' with ')
-        if i > 0:
-            chunks.append(' and ')
-        chunks.append(link(req, c))
-
+    chunks = list(iter_join([link(req, c) for c in contribution.primary_contributors], ' and '))
+    sec = list(iter_join([link(req, c) for c in contribution.secondary_contributors], ' and '))
+    if sec:
+        chunks.append(' with ')
+        chunks.extend(sec)
     return HTML.span(*chunks)
 
 

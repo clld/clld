@@ -1,7 +1,7 @@
+from clld.util import *
+
 
 def test_safe_overwrite(tmp_path):
-    from clld.util import safe_overwrite
-
     target = tmp_path / 'a' / 'b'
     with safe_overwrite(target) as tmp:
         tmp.write_text('stuff', encoding='utf8')
@@ -17,14 +17,10 @@ def test_safe_overwrite(tmp_path):
 
 
 def test_random_string():
-    from clld.util import random_string
-
     assert len(random_string(5)) == 5
 
 
 def test_summary():
-    from clld.util import summary
-
     # text consisting of unique words
     text = "This is a long text, which we want to summarize."
 
@@ -35,8 +31,6 @@ def test_summary():
 
 
 def test_DeclEnum():
-    from clld.util import DeclEnum
-
     class A(DeclEnum):
         val1 = '1', 'value 1'
         val2 = '2', 'value 2'

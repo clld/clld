@@ -1,17 +1,21 @@
 <%inherit file="home_comp.mako"/>
+<%namespace name="util" file="util.mako"/>
 
 <h3>Downloads</h3>
 
+% if req.registry.settings.get('clld.zenodo_concept_doi'):
+${util.dataset_download()}
+% else:
 <div class="span5 well well-small">
     <dl>
-    % for model, dls in h.get_downloads(request):
+        % for model, dls in h.get_downloads(request):
         <dt>${_(model)}</dt>
         % for dl in dls:
         <dd>
             <a href="${dl.url(request)}">${dl.label(req)}</a>
         </dd>
         % endfor
-    % endfor
+        % endfor
     </dl>
 </div>
 <div class="span6">
@@ -23,3 +27,4 @@
         file.
     </p>
 </div>
+% endif

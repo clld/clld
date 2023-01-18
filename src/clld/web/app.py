@@ -10,7 +10,7 @@ import urllib.parse
 
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import joinedload, undefer
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
@@ -32,7 +32,6 @@ from clld import interfaces
 from clld.web.adapters import get_adapters
 from clld.web.adapters import geojson, register_resource_adapters
 from clld.web.adapters.base import adapter_factory
-from clld.web.adapters.cldf import CldfDownload, CldfConfig
 from clld.web.views import (
     index_view, resource_view, _raise, _ping, js, unapi, xpartial, redirect, gone,
     select_combination,
@@ -323,7 +322,6 @@ def maybe_import(name, pkg_dir=None):
         if pkg_dir and exists:
             print('failed to import existing module {0}'.format(name))
             raise
-        return None
 
 
 #
@@ -505,7 +503,6 @@ def includeme(config):
     config.set_request_factory(ClldRequest)
     config.registry.registerUtility(CtxFactoryQuery(), interfaces.ICtxFactoryQuery)
     config.registry.registerUtility(OlacConfig(), interfaces.IOlacConfig)
-    config.registry.registerUtility(CldfConfig(), interfaces.ICldfConfig)
 
     # initialize the db connection
     engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
@@ -677,5 +674,3 @@ def includeme(config):
         mod = maybe_import('%s.%s' % (root_package, name), pkg_dir=pkg_dir)
         if mod and hasattr(mod, 'includeme'):
             config.include(mod)
-
-    config.register_download(CldfDownload(common.Dataset, root_package))

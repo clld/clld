@@ -11,6 +11,8 @@ from rdflib.namespace import (
 assert DOAP
 assert XMLNS
 
+__all__ = ['FORMATS', 'NAMESPACES', 'expand_prefix', 'url_for_qname',
+           'ClldGraph', 'properties_as_xml_snippet', 'convert']
 
 Notation = collections.namedtuple('Notation', 'name extension mimetype uri')
 
