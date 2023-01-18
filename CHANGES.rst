@@ -2,8 +2,8 @@
 Changes
 -------
 
-unreleased
-~~~~~~~~~~
+10.0.0
+~~~~~~
 
 - Drop support for CSV exports
 - Drop support for alembic versioning

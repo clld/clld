@@ -45,7 +45,7 @@ Releasing clld
   ```
 
 - Update the version number, by removing the trailing `.dev0` in:
-  - `setup.py`
+  - `setup.cfg`
   - `src/clld/__init__.py`
   - `docs/conf.py`
 
@@ -80,7 +80,7 @@ Releasing clld
 
 - Increment version number and append `.dev0` to the version number for the new development cycle:
   - `src/clld/__init__.py`
-  - `setup.py`
+  - `setup.cfg`
   - `docs/conf.py`
 
 - Commit/push the version change:
