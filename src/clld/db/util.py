@@ -64,9 +64,12 @@ def compute_language_sources(*references):
 
     for model, attr in references:
         for ref in DBSession.query(model):
-            if (ref.source_pk, getattr(ref, attr).language_pk) not in old_sl:
+            source_pk = ref.source_pk
+            language_pk = getattr(ref, attr).language_pk
+            if (source_pk, language_pk) not in old_sl:
+                old_sl.add((source_pk, language_pk))
                 DBSession.add(common.LanguageSource(
-                    language_pk=getattr(ref, attr).language_pk, source_pk=ref.source_pk))
+                    language_pk=language_pk, source_pk=source_pk))
 
 
 def compute_number_of_values():
