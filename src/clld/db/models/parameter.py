@@ -6,10 +6,11 @@ from sqlalchemy.orm import relationship, joinedload
 
 from zope.interface import implementer
 from clldutils.misc import lazyproperty
+from clldutils.color import qualitative_colors
 
 from clld.db.meta import Base, PolymorphicBaseMixin, DBSession
+from clld.web.icon import Icon
 from clld import interfaces
-from clld.web.icon import ORDERED_ICONS
 
 from . import (
     IdNameDescriptionMixin,
@@ -131,9 +132,11 @@ class Combination(object):
         """
         d = collections.OrderedDict()
         for i, des in enumerate(itertools.product(*[p.domain for p in self.parameters])):
-            cde = CombinationDomainElement(
-                self, des, icon=ORDERED_ICONS[i % len(ORDERED_ICONS)])
+            cde = CombinationDomainElement(self, des)
             d[cde.number] = cde
+
+        for cde, color in zip(d.values(), qualitative_colors(i + 1)):
+            cde.icon = Icon(color.replace('#', 'c'))
 
         for language, values in itertools.groupby(
             sorted(self.values, key=lambda v: v.valueset.language_pk),

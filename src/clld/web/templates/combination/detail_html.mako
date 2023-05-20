@@ -7,6 +7,7 @@
 <%block name="head">
     <link href="${request.static_url('clld:web/static/css/select2.css')}" rel="stylesheet">
     <script src="${request.static_url('clld:web/static/js/select2.js')}"></script>
+    ${util.head_coloris()}
 </%block>
 
 <h3>${_('Combination')} ${' / '.join(h.link(request, p) for p in ctx.parameters)|n}</h3>

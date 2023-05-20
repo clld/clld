@@ -196,6 +196,10 @@ class Map(Component):
                 res['center'] = list(map(float, [params['lat'], params['lng']]))
             if 'z' in params:
                 res['zoom'] = int(params['z'])
+            if 'iconsize' in params:
+                res['icon_size'] = int(params['iconsize'])
+            if 'labels' in params:
+                res['show_labels'] = params['labels'] == '1'
         except (ValueError, TypeError):
             pass
         return res
@@ -269,9 +273,10 @@ class Map(Component):
                 stay_open=True,
                 item_attrs=dict(style='clear: right'))
         items = []
+        iconsize = self.options.get('icon_size', 30)
         for size in [15, 20, 30, 40]:
             attrs = dict(name="iconsize", value=str(size), type="radio")
-            if size == self.options.get('icon_size', 30):
+            if size == iconsize:
                 attrs['checked'] = 'checked'
             items.append(HTML.label(
                 HTML.input(onclick=helpers.JS_CLLD.mapResizeIcons(self.eid), **attrs),

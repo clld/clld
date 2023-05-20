@@ -606,30 +606,6 @@ def marker_img(src, **kw):
     return HTML.img(src=src, **kw)
 
 
-def icons(req, param):
-    """Create an HTML snippet listing available icons.
-
-    :param req: current request
-    :param param: parameter name
-    :return: HTML element
-    """
-    iconlist = req.registry.queryUtility(interfaces.IIconList)
-
-    def td(icon):
-        return HTML.td(
-            marker_img(icon.url(req)),
-            onclick='CLLD.reload({"%s": "%s"})' % (param, icon.name))
-    rows = [
-        HTML.tr(*map(td, icons)) for c, icons in
-        groupby(sorted(iconlist, key=lambda i: i.name[1:]), lambda i: i.name[1:])]
-    return HTML.div(
-        HTML.table(
-            HTML.tbody(*rows),
-            class_="table table-condensed"
-        ),
-        button('Close', **{'data-dismiss': 'clickover'}))
-
-
 def glottolog_url(glottocode):
     return models.Identifier(name=glottocode, type='glottolog').url()
 
@@ -652,23 +628,23 @@ def charis_font_spec_css():
     return """
     @font-face {{
         font-family: 'charissil';
-        src: url('{0}/CharisSIL-R.ttf');
+        src: url('{0}/CharisSIL-Regular.ttf');
     }}
     @font-face {{
         font-family: 'charissil';
         font-style: italic;
-        src: url('{0}/CharisSIL-I.ttf');
+        src: url('{0}/CharisSIL-Italic.ttf');
     }}
     @font-face {{
         font-family: 'charissil';
         font-weight: bold;
-        src: url('{0}/CharisSIL-B.ttf');
+        src: url('{0}/CharisSIL-Bold.ttf');
     }}
     @font-face {{
         font-family: 'charissil';
         font-weight: bold;
         font-style: italic;
-        src: url('{0}/CharisSIL-BI.ttf');
+        src: url('{0}/CharisSIL-BoldItalic.ttf');
     }}
 """.format(static_path('fonts'))
 

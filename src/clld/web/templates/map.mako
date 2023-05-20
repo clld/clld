@@ -15,7 +15,7 @@
         % if not obj.options.get('no_showlabels'):
         <li>
             <label class="checkbox inline" style="margin-left: 5px; margin-right: 5px;">
-                <input id="map-label-visiblity" type="checkbox" ${'checked="checked"' if obj.options.get('show_labels') else ''|n}class="inline" onclick='${h.JS_CLLD.mapToggleLabels(obj.eid, h.JS("this"))|n}'>
+                <input id="map-label-visiblity" type="checkbox" ${'checked="checked" ' if obj.options.get('show_labels') else ''|n}class="inline" onclick='${h.JS_CLLD.mapToggleLabels(obj.eid, h.JS("this"))|n}'>
                 ${_('Show/hide Labels')}
             </label>
         </li>

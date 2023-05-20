@@ -2,6 +2,12 @@
 Changes
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- Refactored support for map marker customisation
+
+
 10.0.0
 ~~~~~~
 

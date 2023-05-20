@@ -1,6 +1,7 @@
 <%! from json import dumps %>
 <%! from clldutils.misc import slug %>
 <%! from clld.web.util import doi %>
+<%! from clld.web.icon import Icon %>
 ##
 ##
 ##
@@ -381,23 +382,44 @@ $(document).ready(function() {
 </%def>
 
 ###
-### icon-select element
+### head content necessary to use coloris color picker functionality.
 ###
-<%def name="iconselect(id, param, tag='td', placement='left')">
-    <${tag} title="click to select a different map marker"
-            style="cursor: pointer;"
-            id="${id}"
-            data-toggle="popover"
-            data-placement="${placement}">
-             ${caller.body()}
-        <script>
-$(document).ready(function() {
-    $('#${id}').clickover({'html': true, 'content': '${h.icons(request, param)}'});
-});
-        </script>
-    </${tag}>
+<%def name="head_coloris()">
+<link rel="stylesheet" href="${req.static_url('clld:web/static/css/coloris.min.css')}"/>
+<script src="${req.static_url('clld:web/static/js/coloris.min.js')}"></script>
+<style>
+    input.coloris {width: 20px; height: 20px;}
+    .clr-field button {
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+    }
+    #clr-picker {
+        z-index: 10000;
+    }
+    select.shape {
+        margin-right: 5px;
+        margin-top: 0 !important;
+        margin-bottom: 2px;
+    }
+</style>
 </%def>
 
+
+<%def name="coloris_icon_picker(icon)">
+    <input class="coloris" id="${icon.select_id}-c" type="text" data-coloris value="${icon.color}">
+    <select class="shape" id="${icon.select_id}-s" style="width: 45px; margin-top: 10px">
+    % for shape, glyph in [('s', '\u25a0'), ('d', '\u25c6'), ('c', '\u25cf'), ('t', '\u25b2'), ('f', '\u25bc')]:
+        <option value="${shape}" style="font-size: 30px;"${' selected' if shape == icon.shape else ''}>${glyph}</option>
+    % endfor
+    </select>
+</%def>
+
+
+<%def name="parameter_map_reloader(icons)">
+    <% quoted = lambda s: '"{}"'.format(s) %>
+    <a class="btn" onclick='CLLD.reload_map([${", ".join(quoted(icon.select_id) for icon in icons)|n}])'>reload</a>
+</%def>
 
 <%def name="combination_valuetable(ctx, iconselect=False)">
     <%self:table items="${enumerate(ctx.domain)}" args="item" eid="refs" class_="table-condensed table-striped table-nonfluid" options="${dict(aaSorting=[[2, 'desc']])}">\
@@ -417,11 +439,9 @@ $(document).ready(function() {
         </td>
         <td>
             % if item[1].languages:
-
                 % if iconselect:
-                <%self:iconselect id="iconselect${str(item[0])}" param="v${str(item[0])}" placement="right" tag="span">
-                    <img height="20" width="20" src="${item[1].icon.url(request)}"/>
-                </%self:iconselect>
+                ${coloris_icon_picker(Icon.from_req(item[1], req))|n}
+                ${parameter_map_reloader([Icon.from_req(de, req) for de in ctx.domain])|n}
                 % else:
                 <img height="20" width="20" src="${item[1].icon.url(request)}"/>
                 % endif

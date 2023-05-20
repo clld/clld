@@ -68,12 +68,6 @@ def test_icon(env):
     assert 'white' in icon('download', inverted=True)
 
 
-def test_icons(env):
-    from clld.web.util.helpers import icons
-
-    assert icons(env['request'], 'param')
-
-
 def test_link(env, utility_factory, mocker):
     from clld.web.util.helpers import link
 

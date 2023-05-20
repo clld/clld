@@ -2,9 +2,10 @@
 import itertools
 
 from clldutils import svg
+from clldutils.color import rgb_as_hex
 from zope.interface import implementer
-from clld.interfaces import IIcon, IMapMarker
 
+from clld.interfaces import IIcon, IMapMarker, IValue, IValueSet, IDomainElement
 
 SHAPES = [
     "c",  # circle
@@ -71,11 +72,70 @@ class Icon(object):
 
     """Default implementation of IIcon: Icons are static image files."""
 
-    def __init__(self, name):
+    def __init__(self, name, opacity=None, select_id=None):
         self.name = name
+        self.opacity = opacity
+        self.select_id = select_id
+
+    @classmethod
+    def from_req(cls,
+                 ctx,
+                 req,
+                 icon_spec_factory=None,
+                 icon_map=None):
+        from clld.db.models.common import CombinationDomainElement  # Avoid circular imports.
+
+        de, icon, opacity, select_id = None, None, '1.0', None
+        icon_map = icon_map or {}
+
+        if IValue.providedBy(ctx):
+            de = ctx.domainelement
+        elif IValueSet.providedBy(ctx):
+            de = ctx.values[0].domainelement
+        elif IDomainElement.providedBy(ctx):
+            de = ctx
+        elif isinstance(ctx, CombinationDomainElement):
+            select_id = 'v' + ctx.id
+            icon = req.params.get(select_id, ctx.icon.name)
+
+        if de:
+            select_id = 'v{}'.format(de.number)
+            icon = req.params.get(select_id, de.jsondata['icon'])
+
+        if not icon and icon_spec_factory:
+            icon = icon_spec_factory(ctx, req)
+            if isinstance(icon, tuple):
+                icon, select_id = icon
+
+        if icon:
+            opacity = None
+            if "'" in icon:
+                icon = icon.split("'")[0]
+            if len(icon) > 4:
+                if len(icon) == 9:
+                    opacity = int('0x' + icon[7:], base=16) / 255
+                    icon = icon[:7]
+                elif len(icon) == 7:
+                    pass
+                else:
+                    icon = icon[:4]
+            if len(icon) == 4:
+                icon = icon[0] + 2 * icon[1] + 2 * icon[2] + 2 * icon[3]
+            return cls(icon_map.get(icon, icon), opacity=opacity, select_id=select_id)
+
+    @property
+    def shape(self):
+        return self.name[0]
+
+    @property
+    def color(self):
+        res = rgb_as_hex(self.name[1:7])
+        if self.opacity:
+            res += hex(round(float(self.opacity) * 255))[2:]
+        return res
 
     def url(self, req):
-        return svg.data_url(svg.icon(self.name))
+        return svg.data_url(svg.icon(self.name, opacity=str(self.opacity)))
 
 
 #: a list of all available icons:

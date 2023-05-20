@@ -38,13 +38,28 @@ CLLD.url = function(path, query) {
 /**
  * Reload the current page with updated query parameters.
  */
-CLLD.reload = function (query, url) {
+CLLD.reload = function (query, url, fragment) {
     var current = document.location;
     url = url === undefined ? current.pathname : url;
     if (current.search) {
         query = $.extend({}, JSON.parse('{"' + decodeURI(current.search.replace('?', '').replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}'), query)
     }
-    document.location.href = url + '?' + $.param(query);
+    if (fragment === undefined) {
+        document.location.href = url + '?' + $.param(query);
+    } else {
+        document.location.href = url + '?' + $.param(query) + '#' + fragment;
+    }
+};
+
+CLLD.reload_map = function (domain) {
+    var query = {
+        'iconsize': $('input[name=iconsize]:checked').val(),
+        'labels': $('input[id=map-label-visiblity]').is(':checked') ? '1' : '0'
+    };
+    for (const sid of domain) {
+        query[sid] = $("#" + sid + "-c").val().replace("#", $("#" + sid + "-s").val());
+    }
+    CLLD.reload(query, undefined, 'map-container');
 };
 
 /**
@@ -575,7 +590,9 @@ CLLD.Map = function(eid, layers, options) {
     }
 
     if (this.options.hash) {/* istanbul ignore next */
-        hash = new L.Hash(this.map);
+        if (!window.location.hash) {
+            hash = new L.Hash(this.map);
+        }
     }
 
     /* istanbul ignore if */

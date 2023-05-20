@@ -12,6 +12,7 @@ from sqlalchemy.orm import joinedload
 from clldutils.misc import nfilter
 
 from clld.web.adapters.base import Renderable
+from clld.web.icon import Icon
 from clld import interfaces
 from clld.db.meta import DBSession
 from clld.db.models.common import ValueSet, Value, Language
@@ -215,8 +216,9 @@ class GeoJsonCombinationDomainElement(GeoJson):
     """GeoJSON adapter for a domain element of a combination of parameters."""
 
     def feature_properties(self, ctx, req, language):
+        icon = Icon.from_req(ctx, req) or ctx.icon
         return {
-            'icon': ctx.icon.url(req) if ctx.icon else '',
+            'icon': icon.url(req) if icon else '',
             'zindex': 1000 - len(ctx.languages)}
 
 
