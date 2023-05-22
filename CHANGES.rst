@@ -2,10 +2,14 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+11.0.0
+~~~~~~
 
 - Refactored support for map marker customisation
+
+Backwards incompatibility:
+
+- Dropped old support for icon-select panels.
 
 
 10.0.0
