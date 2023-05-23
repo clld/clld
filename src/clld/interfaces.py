@@ -167,11 +167,6 @@ class IIcon(Interface):
         """return URL for the marker."""
 
 
-class IIconList(Interface):
-
-    """utility listing all available icons ordered by preference."""
-
-
 class IFrequencyMarker(Interface):
 
     """utility."""

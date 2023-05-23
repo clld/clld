@@ -393,6 +393,7 @@ $(document).ready(function() {
         width: 100%;
         height: 100%;
         border-radius: 5px;
+        cursor: pointer !important;
     }
     #clr-picker {
         z-index: 10000;
@@ -407,8 +408,8 @@ $(document).ready(function() {
 
 
 <%def name="coloris_icon_picker(icon)">
-    <input class="coloris" id="${icon.select_id}-c" type="text" data-coloris value="${icon.color}">
-    <select class="shape" id="${icon.select_id}-s" style="width: 45px; margin-top: 10px">
+    <input title="Click to choose marker color" class="coloris" id="${icon.select_id}-c" type="text" data-coloris value="${icon.color}" style="cursor: pointer;">
+    <select title="Select marker shape" class="shape" id="${icon.select_id}-s" style="width: 45px; margin-top: 10px">
     % for shape, glyph in [('s', '\u25a0'), ('d', '\u25c6'), ('c', '\u25cf'), ('t', '\u25b2'), ('f', '\u25bc')]:
         <option value="${shape}" style="font-size: 30px;"${' selected' if shape == icon.shape else ''}>${glyph}</option>
     % endfor

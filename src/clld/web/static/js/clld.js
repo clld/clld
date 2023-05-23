@@ -57,7 +57,11 @@ CLLD.reload_map = function (domain) {
         'labels': $('input[id=map-label-visiblity]').is(':checked') ? '1' : '0'
     };
     for (const sid of domain) {
-        query[sid] = $("#" + sid + "-c").val().replace("#", $("#" + sid + "-s").val());
+        try {
+            query[sid] = $("#" + sid + "-c").val().replace("#", $("#" + sid + "-s").val());
+        } catch(e) {
+            console.log(e);
+        }
     }
     CLLD.reload(query, undefined, 'map-container');
 };

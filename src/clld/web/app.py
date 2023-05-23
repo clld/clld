@@ -42,7 +42,7 @@ from clld.web.subscribers import add_renderer_globals, add_localizer, init_map
 from clld.web.datatables.base import DataTable
 from clld.web import datatables
 from clld.web.maps import Map, ParameterMap, LanguageMap, CombinationMap
-from clld.web.icon import ICONS, ORDERED_ICONS, MapMarker
+from clld.web.icon import ICONS, MapMarker
 from clld.web import assets
 
 assert clld
@@ -600,7 +600,6 @@ def includeme(config):
 
     for icon in ICONS:
         config.registry.registerUtility(icon, interfaces.IIcon, name=icon.name)
-    config.registry.registerUtility(ORDERED_ICONS, interfaces.IIconList)
     config.registry.registerUtility(MapMarker(), interfaces.IMapMarker)
 
     #

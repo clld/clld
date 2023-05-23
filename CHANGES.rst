@@ -2,6 +2,13 @@
 Changes
 -------
 
+11.0.1
+~~~~~~
+
+Bugfix: Make sure color picker can be detected by appropriate cursor and
+help text.
+
+
 11.0.0
 ~~~~~~
 
