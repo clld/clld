@@ -109,6 +109,20 @@ def test_UnitValue(db, persist):
     DBSession.flush()
 
 
+def test_unitvalue_to_string():
+    de_name = common.UnitDomainElement(id='de_name', name='Code with name')
+    de_noname = common.UnitDomainElement(id='de_noname')
+    val_de_name = common.UnitValue(id='val_de_name', unitdomainelement=de_name)
+    val_de_noname = common.UnitValue(id='val_de_noname', unitdomainelement=de_noname)
+    val_name = common.UnitValue(id='val_name', name='Value with name')
+    val_noname = common.UnitValue(id='val_noname')
+
+    assert str(val_de_name) == 'Code with name'
+    assert str(val_de_noname) == 'val_de_noname'
+    assert str(val_name) == 'Value with name'
+    assert str(val_noname) == 'val_noname'
+
+
 def test_Identifier():
     i = common.Identifier(id='a', name='a', type=common.IdentifierType.iso.value)
     assert i.url()
@@ -123,6 +137,20 @@ def test_Contribution(data):
 
 def test_Value(data):
     assert 'valueset' in common.Value.first().__json__(None)
+
+
+def test_value_to_string():
+    de_name = common.DomainElement(id='de_name', name='Code with name')
+    de_noname = common.DomainElement(id='de_noname')
+    val_de_name = common.Value(id='val_de_name', domainelement=de_name)
+    val_de_noname = common.Value(id='val_de_noname', domainelement=de_noname)
+    val_name = common.Value(id='val_name', name='Value with name')
+    val_noname = common.Value(id='val_noname')
+
+    assert str(val_de_name) == 'Code with name'
+    assert str(val_de_noname) == 'val_de_noname'
+    assert str(val_name) == 'Value with name'
+    assert str(val_noname) == 'val_noname'
 
 
 def test_Combination(data):

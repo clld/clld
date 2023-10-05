@@ -76,7 +76,10 @@ class Value(Base,
         return res
 
     def __str__(self):
-        return self.domainelement.name if self.domainelement else self.name or self.id
+        if self.domainelement and self.domainelement.name:
+            return self.domainelement.name
+        else:
+            return self.name or self.id
 
 
 class ValueSentence(Base, PolymorphicBaseMixin):
