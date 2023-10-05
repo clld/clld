@@ -67,8 +67,10 @@ class UnitValue(Base,
         return unitparameter_pk
 
     def __str__(self):
-        return self.unitdomainelement.name \
-            if self.unitdomainelement else self.name or self.id
+        if self.unitdomainelement and self.unitdomainelement.name:
+            return self.unitdomainelement.name
+        else:
+            return self.name or self.id
 
 
 #
