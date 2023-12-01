@@ -2,6 +2,13 @@
 Changes
 -------
 
+Unreleased
+~~~~~~~~~~
+
+Dropped support for Python 3.7.
+Added support for Python 3.12
+
+
 11.0.1
 ~~~~~~
 
