@@ -2,11 +2,12 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+11.1.0
+~~~~~~
 
-Dropped support for Python 3.7.
-Added support for Python 3.12
+- Dropped support for Python 3.7.
+- Added support for Python 3.12.
+- Updated leaflet providers.
 
 
 11.0.1
