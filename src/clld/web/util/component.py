@@ -1,7 +1,8 @@
 """Implementation of a component concept."""
+import functools
+
 from markupsafe import Markup
 from pyramid.renderers import render
-from clldutils.misc import lazyproperty
 
 
 class Component(object):
@@ -15,7 +16,7 @@ class Component(object):
 
     __template__ = None
 
-    @lazyproperty
+    @functools.cached_property
     def options(self):
         """Typically options to configure a corresponding JavaScript object.
 

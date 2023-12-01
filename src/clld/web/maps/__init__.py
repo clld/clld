@@ -1,5 +1,5 @@
 """Functionality to configure leaflet maps from python."""
-from clldutils.misc import lazyproperty
+import functools
 
 from clld.interfaces import IDataTable, IMapMarker, IIcon
 from clld.web.util import helpers
@@ -207,7 +207,7 @@ class Map(Component):
     def get_default_options(self):
         return {'resize_direction': 's'}
 
-    @lazyproperty
+    @functools.cached_property
     def layers(self):
         """The list of layers of the map.
 
@@ -233,7 +233,7 @@ class Map(Component):
             '%s' % self.ctx,
             self.req.route_url(route_name, **route_params))
 
-    @lazyproperty
+    @functools.cached_property
     def legends(self):
         return list(self.get_legends())
 

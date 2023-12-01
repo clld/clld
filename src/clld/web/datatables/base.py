@@ -7,12 +7,13 @@ object. Server side they know how to provide the data to the client-side table.
 """
 import re
 import typing
+import functools
 
 from markupsafe import Markup
 from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
-from clldutils.misc import lazyproperty, nfilter
+from clldutils.misc import nfilter
 from pyramid.request import Request
 
 from clld.db.meta import DBSession, Base
@@ -466,7 +467,7 @@ class DataTable(Component):
         """
         return [LinkCol(self, 'name')]
 
-    @lazyproperty
+    @functools.cached_property
     def cols(self):
         return self.col_defs()
 
