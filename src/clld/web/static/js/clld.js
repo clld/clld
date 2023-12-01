@@ -420,9 +420,6 @@ CLLD.Map = function(eid, layers, options) {
         baseLayers = [
             "OpenStreetMap.Mapnik",
             "OpenTopoMap",
-            "Stamen.Watercolor",
-            "Stamen.Terrain",
-            "Stamen.TerrainBackground",
             "USGS.USTopo",
             "USGS.USImagery",
             "USGS.USImageryTopo",
