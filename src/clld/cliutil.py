@@ -115,11 +115,28 @@ def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
             language=lang, identifier=identifier('glottolog', glottocode)))
 
 
-def bibtex2source(rec, cls=common.Source, lowercase_id=False):
-    year, fields, jsondata = bibtex.unescape(rec.get('year', 'nd')), {}, {}
+def bibtex2source(rec: bibtex.Record,
+                  cls=common.Source,
+                  lowercase_id: bool = False,
+                  sluggify_id: bool = True,
+                  latex_unescape: bool = True) -> common.Source:
+    """
+    Convert a BibTeX record to a `common.Source` instance, suitable for adding to the database.
+
+    The record's BibTeX citekex will be used as `id` property of the source instance.
+
+    :param rec: The BibTeX record.
+    :param cls: The `common.Source` subclass to instantiate.
+    :param lowercase_id: Flag signaling whether to convert the BibTeX citekey to lowercase.
+    :param sluggify_id: Flag signaling whether to sluggify the BibTeX citekey.
+    :param latex_unescape: Flag signaling whether to convert LaTeX encoding in the record's fields \
+    to plain unicode text.
+    """
+    convert = bibtex.unescape if latex_unescape else lambda x: x
+    year, fields, jsondata = convert(rec.get('year', 'nd')), {}, {}
     for field in bibtex.FIELDS:
         if field in rec:
-            value = bibtex.unescape(rec[field])
+            value = convert(rec[field])
             container = fields if hasattr(cls, field) else jsondata
             container[field] = value
 
@@ -130,7 +147,7 @@ def bibtex2source(rec, cls=common.Source, lowercase_id=False):
         if authors:
             eds = ' (eds.)'
     if authors:
-        authors = bibtex.unescape(authors).split(' and ')
+        authors = convert(authors).split(' and ')
         if len(authors) > 2:
             authors = authors[:1]
             etal = ' et al.'
@@ -139,9 +156,9 @@ def bibtex2source(rec, cls=common.Source, lowercase_id=False):
         authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(
-        id=slug(rec.id, lowercase=lowercase_id),
+        id=slug(rec.id, lowercase=lowercase_id) if sluggify_id else rec.id,
         name=('%s %s' % (authors, year)).strip(),
-        description=bibtex.unescape(rec.get('title', rec.get('booktitle', ''))),
+        description=convert(rec.get('title', rec.get('booktitle', ''))),
         jsondata=jsondata,
         bibtex_type=rec.genre,
         **fields)

@@ -2,6 +2,13 @@
 Changes
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- More flexible ``cliutil.bibtex2source``, accomodating non-LaTeX content in
+  BibTeX files and punctuation in citekeys.
+
+
 11.1.0
 ~~~~~~
 
