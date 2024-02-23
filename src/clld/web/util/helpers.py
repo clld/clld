@@ -4,7 +4,7 @@
 """
 import os
 import re
-from itertools import groupby  # we just import this to have it available in templates!
+from itertools import zip_longest, groupby  # we just import this to have it available in templates!
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
 from urllib.parse import quote, urlencode, urlparse, urlsplit, urlunsplit, SplitResult
@@ -434,7 +434,9 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
     if sentence.analyzed and sentence.gloss:
         analyzed = sentence.analyzed
         glossed = sentence.gloss
-        for morpheme, gloss in zip(analyzed.split('\t'), glossed.split('\t')):
+        for morpheme, gloss in zip_longest(
+            analyzed.split('\t'), glossed.split('\t'), fillvalue=''
+        ):
             units.append(HTML.div(
                 HTML.div(morpheme, class_='morpheme'),
                 HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
