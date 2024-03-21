@@ -38,6 +38,8 @@ apps.
 - **Integrating audio recordings of lexical data**: There's
   [a plugin](https://github.com/clld/clld-audio-plugin) for that
   and here's the list of apps on GitHub using it: https://github.com/clld/clld-audio-plugin/network/dependents
+- **Rendering CLDF Markdown in the context of the app**: There's
+  [a plugin](https://github.com/clld/clld-markdown-plugin) for that.
 - **Aggregating data from multiple CLDF datasets**: The app serving the
   [Intercontinental Dictionary Series](https://ids.clld.org) does this.
   Very simple per-dataset metadata of the form
