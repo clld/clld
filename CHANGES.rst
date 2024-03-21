@@ -2,6 +2,12 @@
 Changes
 -------
 
+11.2.1
+~~~~~~
+
+- Addressed one issue regarding rendering of IGT examples.
+
+
 11.2.0
 ~~~~~~
 
