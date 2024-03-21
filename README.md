@@ -10,6 +10,12 @@ The source for this documentation is in the `docs` directory.
 [![PyPI](https://img.shields.io/pypi/v/clld.svg)](https://pypi.python.org/pypi/clld)
 [![Documentation Status](http://readthedocs.org/projects/clld/badge/?version=latest)](http://clld.readthedocs.io/en/latest/?badge=latest)
 
+## How to cite
+
+To cite the `clld` software, please cite the presentation introducing it
+
+> Forkel, R., & Bank, S. (2014, October 7). The clld toolkit. Language Comparison with Linguistic Databases: RefLex and Typological Databases, Nijmegen. Zenodo. https://doi.org/10.5281/zenodo.10846846
+
 
 ## Usage
 
