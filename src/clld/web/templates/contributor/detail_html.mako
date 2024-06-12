@@ -6,9 +6,8 @@
 <h2>${ctx.name}
 % if ctx.jsondatadict.get("orcid", None):
 <a href="https://orcid.org/${ctx.jsondatadict["orcid"]}"><img style="height:.8em" src="${request.static_url('clld:web/static/images/orcid.svg')}" /></a>
-
-
-% endif</h2>
+% endif
+</h2>
 
 % if ctx.description:
 <p>${ctx.description}</p>
