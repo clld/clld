@@ -2,6 +2,12 @@
 Changes
 -------
 
+11.2.2
+~~~~~~
+
+- Addressed issue with incorrectly formatted template (https://github.com/clld/clld/pull/264)
+
+
 11.2.1
 ~~~~~~
 
