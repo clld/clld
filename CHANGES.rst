@@ -2,6 +2,11 @@
 Changes
 -------
 
+unreleased
+~~~~~~~~~~
+
+- Addressed rendering issue with IGT examples.
+
 11.2.2
 ~~~~~~
 
