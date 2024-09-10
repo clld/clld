@@ -437,9 +437,16 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
         for morpheme, gloss in zip_longest(
             analyzed.split('\t'), glossed.split('\t'), fillvalue=''
         ):
+            if gloss:
+                html_gloss = gloss_with_tooltip(gloss)
+            else:
+                # When there are less glosses than morphemes, the trailing
+                # morphemes 'fall down' into the gloss line.  To prevent that we
+                # pad the gloss line with some white space.
+                html_gloss = [literal('&#160;')]
             units.append(HTML.div(
                 HTML.div(morpheme, class_='morpheme'),
-                HTML.div(*gloss_with_tooltip(gloss), **{'class': 'gloss'}),
+                HTML.div(*html_gloss, **{'class': 'gloss'}),
                 class_='gloss-unit'))
 
     return HTML.div(
