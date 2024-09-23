@@ -6,6 +6,7 @@ unreleased
 ~~~~~~~~~~
 
 - Addressed rendering issue with IGT examples.
+- Addressed exception in maps when some values of a parameter are missing their domain element.
 
 11.2.2
 ~~~~~~
