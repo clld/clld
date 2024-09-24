@@ -183,7 +183,9 @@ class GeoJsonParameter(GeoJson):
         de = req.params.get('domainelement')
         if de:
             return [vs for vs in ctx.valuesets
-                    if vs.values and vs.values[0].domainelement.id == de]
+                    if vs.values
+                    and vs.values[0].domainelement
+                    and vs.values[0].domainelement.id == de]
         return self.get_query(ctx, req)
 
     def get_language(self, ctx, req, valueset):
