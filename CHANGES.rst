@@ -2,8 +2,8 @@
 Changes
 -------
 
-unreleased
-~~~~~~~~~~
+11.2.3
+~~~~~~
 
 - Addressed rendering issue with IGT examples.
 - Addressed exception in maps when some values of a parameter are missing their domain element.
