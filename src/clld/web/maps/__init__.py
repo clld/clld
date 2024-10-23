@@ -308,13 +308,12 @@ class ParameterMap(Map):
     def get_layers(self):
         if self.ctx.domain:
             for de in self.ctx.domain:
+                q = {k: v for k, v in self.req.query_params.items()}
+                q['domainelement'] = str(de.id)
                 yield Layer(
                     de.id,
                     de.name,
-                    self.req.resource_url(
-                        self.ctx, ext='geojson',
-                        _query=dict(domainelement=str(de.id), **self.req.query_params)
-                    ),
+                    self.req.resource_url(self.ctx, ext='geojson', _query=q),
                     marker=helpers.map_marker_img(self.req, de, marker=self.map_marker))
         else:
             yield Layer(

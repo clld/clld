@@ -2,6 +2,14 @@
 Changes
 -------
 
+
+unreleased
+~~~~~~~~~~
+
+- Support python 3.13.
+- Drop support for python 3.8.
+
+
 11.2.3
 ~~~~~~
 

@@ -14,6 +14,7 @@ from sqlalchemy.orm import joinedload, undefer
 
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
 from clld.interfaces import IOlacConfig
+from clld._compat import utcnow
 
 
 #
@@ -57,11 +58,11 @@ Institution = collections.namedtuple('Institution', 'name url location')
 
 
 def timestamp(dt=None):
-    return str(dt or datetime.datetime.utcnow()).split('.')[0].replace(' ', 'T') + 'Z'
+    return str(dt or utcnow()).split('.')[0].replace(' ', 'T') + 'Z'
 
 
 def date(dt=None):
-    return str(dt or datetime.datetime.utcnow()).split(' ')[0]
+    return str(dt or utcnow()).split(' ')[0]
 
 
 class ResumptionToken(object):

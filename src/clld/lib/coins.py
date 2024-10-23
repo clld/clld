@@ -1,4 +1,3 @@
-# coding: utf8
 """Functionality to create Coins, i.e. context objects in spans.
 
 .. seealso:: https://en.wikipedia.org/wiki/COinS
@@ -225,7 +224,7 @@ class ContextObject(list):
 
         for i, author in enumerate(rec.getall('author')):
             if i == 0:
-                parts = re.split(r'\s*,\s*', author, 1)
+                parts = re.split(r'\s*,\s*', author, maxsplit=1)
                 if len(parts) == 1:
                     parts = re.split(r'\s+', author)
                     last = parts[-1]

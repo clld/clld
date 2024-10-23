@@ -396,7 +396,7 @@ class Database(_Convertable):
         content = bibFile.read_text(encoding=encoding) if bibFile.exists() else ''
 
         return cls((Record.from_string('@' + m, lowercase=lowercase)
-                    for m in re.split(r'^\s*@', content, 0, re.MULTILINE)))
+                    for m in re.split(r'^\s*@', content, maxsplit=0, flags=re.MULTILINE)))
 
     def __len__(self):
         return len(self.records)

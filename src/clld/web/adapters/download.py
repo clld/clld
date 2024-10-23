@@ -8,7 +8,7 @@ import contextlib
 
 from zope.interface import implementer
 from pyramid.path import AssetResolver
-from sqlalchemy.orm import joinedload, class_mapper
+from sqlalchemy.orm import class_mapper
 from clldutils.misc import format_size, to_binary
 
 from clld.util import safe_overwrite
@@ -18,7 +18,7 @@ from clld.web.adapters.md import TxtCitation
 from clld.web.util.helpers import rdf_namespace_attrs
 from clld.interfaces import IRepresentation, IDownload
 from clld.db.meta import DBSession
-from clld.db.models.common import Language, Source, LanguageIdentifier, Dataset
+from clld.db.models.common import Dataset
 from clld.db.util import page_query
 
 __all__ = ['download_dir', 'Download', 'N3Dump', 'CsvDump', 'RdfXmlDump']
@@ -138,18 +138,7 @@ class Download(object):
         return fp.read()
 
     def query(self, req):
-        q = DBSession.query(self.model).filter(self.model.active == True)
-        if self.model == Language:  # pragma: no cover
-            q = q.options(
-                joinedload(
-                    Language.languageidentifier
-                ).joinedload(
-                    LanguageIdentifier.identifier
-                )
-            )
-        if self.model == Source:
-            q = q.options(joinedload(Source.languages))
-        return q.order_by(self.model.pk)
+        return DBSession.query(self.model).filter(self.model.active == True).order_by(self.model.pk)
 
     def before(self, req, fp):
         pass

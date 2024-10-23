@@ -29,7 +29,7 @@ extras_require={
         'test': [
             'mock',
             'pytest>=5.4',
-            'pytest-clld',
+            'pytest-clld>=1.3',
             'pytest-mock',
             'pytest-cov',
             'coverage>=4.2',

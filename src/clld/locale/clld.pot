@@ -1,85 +1,85 @@
 # Translations template for clld.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the clld project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: clld 9.2.3.dev0\n"
+"Project-Id-Version: clld 11.2.4.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-17 15:20+0100\n"
+"POT-Creation-Date: 2024-10-23 11:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.16.0\n"
 
 #: src/clld/project_template/{{cookiecutter.directory_name}}/{{cookiecutter.directory_name}}/templates/parameter/detail_html.mako:4
 #: src/clld/project_template/{{cookiecutter.directory_name}}/{{cookiecutter.directory_name}}/templates/parameter/detail_html.mako:23
 #: src/clld/web/datatables/value.py:119
-#: src/clld/web/templates/combination/detail_html.mako:20
+#: src/clld/web/templates/combination/detail_html.mako:21
 #: src/clld/web/templates/parameter/detail_html.mako:4
 #: src/clld/web/templates/parameter/detail_html.mako:6
 #: src/clld/web/templates/valueset/detail_html.mako:46
 msgid "Parameter"
 msgstr ""
 
-#: src/clld/web/app.py:668
+#: src/clld/web/app.py:667
 msgid "Home"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:500
+#: src/clld/web/datatables/base.py:501
 msgid "Next"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:501
+#: src/clld/web/datatables/base.py:502
 msgid "Previous"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:502
+#: src/clld/web/datatables/base.py:503
 msgid "First"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:503
+#: src/clld/web/datatables/base.py:504
 msgid "Last"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:505
+#: src/clld/web/datatables/base.py:506
 msgid "No data available in table"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:506
+#: src/clld/web/datatables/base.py:507
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:507
+#: src/clld/web/datatables/base.py:508
 msgid "Showing 0 to 0 of 0 entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:508
+#: src/clld/web/datatables/base.py:509
 msgid "(filtered from _MAX_ total entries)"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:509
+#: src/clld/web/datatables/base.py:510
 msgid "Show _MENU_ entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:510
+#: src/clld/web/datatables/base.py:511
 msgid "Loading..."
 msgstr ""
 
-#: src/clld/web/datatables/base.py:511
+#: src/clld/web/datatables/base.py:512
 msgid "Processing..."
 msgstr ""
 
-#: src/clld/web/datatables/base.py:512
+#: src/clld/web/datatables/base.py:513
 msgid "Search:"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:513
+#: src/clld/web/datatables/base.py:514
 msgid "No matching records found"
 msgstr ""
 
@@ -92,7 +92,7 @@ msgstr ""
 msgid "Translation"
 msgstr ""
 
-#: src/clld/web/maps/__init__.py:288
+#: src/clld/web/maps/__init__.py:293
 msgid "Icon size"
 msgstr ""
 
@@ -117,16 +117,16 @@ msgid "Show/hide Labels"
 msgstr ""
 
 #: src/clld/web/templates/sentence/detail_html.mako:19
-#: src/clld/web/templates/util.mako:206
+#: src/clld/web/templates/util.mako:207
 msgid "Sentence"
 msgstr ""
 
-#: src/clld/web/templates/util.mako:250
+#: src/clld/web/templates/util.mako:251
 msgid "Alternative names"
 msgstr ""
 
 #: src/clld/web/templates/unit/detail_html.mako:21
-#: src/clld/web/templates/util.mako:316
+#: src/clld/web/templates/util.mako:317
 #: src/clld/web/templates/value/index_html.mako:6
 #: src/clld/web/templates/valueset/detail_html.mako:12
 #: src/clld/web/templates/valueset/snippet_html.mako:8
@@ -134,22 +134,22 @@ msgid "Values"
 msgstr ""
 
 #: src/clld/web/templates/source/detail_html.mako:57
-#: src/clld/web/templates/util.mako:317
+#: src/clld/web/templates/util.mako:318
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
 msgid "Sentences"
 msgstr ""
 
-#: src/clld/web/templates/util.mako:480
+#: src/clld/web/templates/util.mako:501
 msgid "released version"
 msgstr ""
 
 #: src/clld/web/templates/combination/detail_html.mako:5
-#: src/clld/web/templates/combination/detail_html.mako:12
+#: src/clld/web/templates/combination/detail_html.mako:13
 msgid "Combination"
 msgstr ""
 
-#: src/clld/web/templates/combination/detail_html.mako:19
+#: src/clld/web/templates/combination/detail_html.mako:20
 #: src/clld/web/templates/parameter/index_html.mako:4
 msgid "Parameters"
 msgstr ""
@@ -161,20 +161,20 @@ msgstr ""
 
 #: src/clld/web/templates/contribution/index_html.mako:4
 #: src/clld/web/templates/contribution/index_html.mako:6
-#: src/clld/web/templates/contributor/detail_html.mako:37
+#: src/clld/web/templates/contributor/detail_html.mako:36
 #: src/clld/web/templates/source/detail_html.mako:45
 msgid "Contributions"
 msgstr ""
 
-#: src/clld/web/templates/contributor/detail_html.mako:19
+#: src/clld/web/templates/contributor/detail_html.mako:18
 msgid "Address"
 msgstr ""
 
-#: src/clld/web/templates/contributor/detail_html.mako:27
+#: src/clld/web/templates/contributor/detail_html.mako:26
 msgid "Web:"
 msgstr ""
 
-#: src/clld/web/templates/contributor/detail_html.mako:31
+#: src/clld/web/templates/contributor/detail_html.mako:30
 msgid "Mail:"
 msgstr ""
 

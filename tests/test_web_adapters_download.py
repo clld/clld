@@ -54,4 +54,4 @@ def test_Download2(env, tmp_path):
     dl.create(env['request'], verbose=False, outfile=out)
 
     with closing(gzip.open(out.as_posix(), 'rb')) as fp:
-        assert et.fromstring(fp.read())
+        assert et.fromstring(fp.read()) is not None
