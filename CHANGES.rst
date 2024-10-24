@@ -3,6 +3,12 @@ Changes
 -------
 
 
+11.3.1
+~~~~~~
+
+Re-instate support for python 3.8 since it's still supported on Ubuntu 20.04 lts.
+
+
 11.3.0
 ~~~~~~
 
