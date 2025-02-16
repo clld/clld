@@ -70,7 +70,7 @@
 <%def name="accordion_group(eid, parent, title=None, open=False)">
     <div class="accordion-group">
         <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#${parent}" href="#${eid}" title="${'click to hide or show {0}'.format(title or '')}">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#${parent}" href="#${eid}" title="${'{} {}'.format(_('click to hide or show'), title or '')}">
                 ${title or caller.title()}
             </a>
         </div>
@@ -171,7 +171,7 @@
 ## format citation information as well.
 ##
 <%def name="cite(obj=None, title='Cite')">
-    <%self:well title="${title}">
+    <%self:well title="${_(title)}">
         ${h.newline2br(h.text_citation(request, obj or ctx))|n}
         ${h.cite_button(request, obj or ctx)}
     </%self:well>
@@ -232,13 +232,13 @@ $(document).ready(function() {
     <% lang = lang or ctx %>
     <div class="accordion" id="sidebar-accordion">
         % if getattr(request, 'map', False):
-        <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="Map" open="${True}">
+        <%self:accordion_group eid="acc-map" parent="sidebar-accordion" title="${_('Map')}" open="${True}">
             ${request.map.render()}
             ${h.format_coordinates(lang)}
         </%self:accordion_group>
         % endif
         % if lang.sources:
-        <%self:accordion_group eid="sources" parent="sidebar-accordion" title="Sources">
+        <%self:accordion_group eid="sources" parent="sidebar-accordion" title="${_('Sources')}">
             <ul>
                 % for source in lang.sources:
                 <li>${h.link(request, source, label=source.description)}<br />
@@ -374,8 +374,8 @@ $(document).ready(function() {
             % elif hasattr(caller, 'title'):
             ${caller.title()}
             % endif
-            <a href="#top" title="go to top of the page" style="vertical-align: bottom">&#x21eb;</a>
-            <a class="headerlink" href="#${id}" title="Permalink to this headline">¶</a>
+            <a href="#top" title="${_('go to top of the page')}" style="vertical-align: bottom">&#x21eb;</a>
+            <a class="headerlink" href="#${id}" title="${_('Permalink to this headline')}">¶</a>
         </h${level}>
         ${caller.body()}
     </div>
@@ -408,8 +408,8 @@ $(document).ready(function() {
 
 
 <%def name="coloris_icon_picker(icon)">
-    <input title="Click to choose marker color" class="coloris" id="${icon.select_id}-c" type="text" data-coloris value="${icon.color}" style="cursor: pointer;">
-    <select title="Select marker shape" class="shape" id="${icon.select_id}-s" style="width: 45px; margin-top: 10px">
+    <input title="${_('Click to choose marker color')}" class="coloris" id="${icon.select_id}-c" type="text" data-coloris value="${icon.color}" style="cursor: pointer;">
+    <select title="${_('Select marker shape')}" class="shape" id="${icon.select_id}-s" style="width: 45px; margin-top: 10px">
     % for shape, glyph in [('s', '\u25a0'), ('d', '\u25c6'), ('c', '\u25cf'), ('t', '\u25b2'), ('f', '\u25bc')]:
         <option value="${shape}" style="font-size: 30px;"${' selected' if shape == icon.shape else ''}>${glyph}</option>
     % endfor
@@ -432,7 +432,7 @@ $(document).ready(function() {
         </%def>
         <td>
             % if item[1].languages:
-            <button title="click to toggle display of languages for value ${item[1].name}"
+            <button title="${_('click to toggle display of languages for value')} ${item[1].name}"
                     type="button" class="btn btn-mini expand-collapse" data-toggle="collapse" data-target="#de-${item[0]}">
                 <i class="icon icon-plus"> </i>
             </button>

@@ -3,6 +3,14 @@ Changes
 -------
 
 
+unreleased
+~~~~~~~~~~
+
+Make more title attributes of HTML elements created from templates in util.mako available
+for translation.
+
+
+
 11.3.1
 ~~~~~~
 

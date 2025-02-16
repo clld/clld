@@ -1,14 +1,14 @@
 # Translations template for clld.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the clld project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: clld 11.2.4.dev0\n"
+"Project-Id-Version: clld 11.3.2.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-23 11:35+0200\n"
+"POT-Creation-Date: 2025-02-16 14:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,9 +116,23 @@ msgstr ""
 msgid "Show/hide Labels"
 msgstr ""
 
+#: src/clld/web/templates/util.mako:73
+msgid "click to hide or show"
+msgstr ""
+
 #: src/clld/web/templates/sentence/detail_html.mako:19
 #: src/clld/web/templates/util.mako:207
 msgid "Sentence"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:235
+msgid "Map"
+msgstr ""
+
+#: src/clld/web/templates/source/index_html.mako:4
+#: src/clld/web/templates/source/index_html.mako:6
+#: src/clld/web/templates/util.mako:241
+msgid "Sources"
 msgstr ""
 
 #: src/clld/web/templates/util.mako:251
@@ -138,6 +152,26 @@ msgstr ""
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
 msgid "Sentences"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:377
+msgid "go to top of the page"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:378
+msgid "Permalink to this headline"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:411
+msgid "Click to choose marker color"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:412
+msgid "Select marker shape"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:435
+msgid "click to toggle display of languages for value"
 msgstr ""
 
 #: src/clld/web/templates/util.mako:501
@@ -223,11 +257,6 @@ msgstr ""
 
 #: src/clld/web/templates/source/detail_html.mako:51
 msgid "ValueSets"
-msgstr ""
-
-#: src/clld/web/templates/source/index_html.mako:4
-#: src/clld/web/templates/source/index_html.mako:6
-msgid "Sources"
 msgstr ""
 
 #: src/clld/web/templates/unit/detail_html.mako:6

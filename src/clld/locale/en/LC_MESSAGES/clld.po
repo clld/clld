@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: clld 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-23 11:35+0200\n"
+"POT-Creation-Date: 2025-02-16 14:29+0100\n"
 "PO-Revision-Date: 2013-01-15 13:57+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -117,9 +117,23 @@ msgstr ""
 msgid "Show/hide Labels"
 msgstr ""
 
+#: src/clld/web/templates/util.mako:73
+msgid "click to hide or show"
+msgstr ""
+
 #: src/clld/web/templates/sentence/detail_html.mako:19
 #: src/clld/web/templates/util.mako:207
 msgid "Sentence"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:235
+msgid "Map"
+msgstr ""
+
+#: src/clld/web/templates/source/index_html.mako:4
+#: src/clld/web/templates/source/index_html.mako:6
+#: src/clld/web/templates/util.mako:241
+msgid "Sources"
 msgstr ""
 
 #: src/clld/web/templates/util.mako:251
@@ -139,6 +153,26 @@ msgstr ""
 #: src/clld/web/templates/value/detail_html.mako:24
 #: src/clld/web/templates/valueset/snippet_html.mako:20
 msgid "Sentences"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:377
+msgid "go to top of the page"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:378
+msgid "Permalink to this headline"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:411
+msgid "Click to choose marker color"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:412
+msgid "Select marker shape"
+msgstr ""
+
+#: src/clld/web/templates/util.mako:435
+msgid "click to toggle display of languages for value"
 msgstr ""
 
 #: src/clld/web/templates/util.mako:501
@@ -224,11 +258,6 @@ msgstr ""
 
 #: src/clld/web/templates/source/detail_html.mako:51
 msgid "ValueSets"
-msgstr ""
-
-#: src/clld/web/templates/source/index_html.mako:4
-#: src/clld/web/templates/source/index_html.mako:6
-msgid "Sources"
 msgstr ""
 
 #: src/clld/web/templates/unit/detail_html.mako:6
