@@ -346,6 +346,8 @@ class Record(Source, _Convertable):
         value = collections.OrderedDict.__getitem__(self, key)
         if not isinstance(value, (tuple, list)):
             value = [value]
+        elif value and not isinstance(value[0], str):
+            return None
         return Record.sep(key).join(filter(None, value))
 
     def __str__(self):

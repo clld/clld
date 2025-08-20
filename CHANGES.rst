@@ -6,9 +6,9 @@ Changes
 unreleased
 ~~~~~~~~~~
 
-Make more title attributes of HTML elements created from templates in util.mako available
-for translation.
-
+- Make more title attributes of HTML elements created from templates in util.mako available
+  for translation.
+- Fix issue whereby `Source` objects could not have arbitrary `jsondata` properties.
 
 
 11.3.1
