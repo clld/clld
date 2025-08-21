@@ -625,7 +625,7 @@ CLLD.Map = function(eid, layers, options) {
 
         for (id in this.marker_map) {
             if (this.marker_map.hasOwnProperty(id)) {
-                func(this.marker_map[id]);
+                func(this.marker_map[id], id);
             }
         }
     };
@@ -648,7 +648,11 @@ CLLD.Map = function(eid, layers, options) {
                     map.layer_map[data.properties.layer].addData(data);
                     _zoomToExtent();
                     if (map.options.show_labels && !map.options.exclude_from_zoom.includes(data.properties.layer)) {
-                        map.eachMarker(function(marker){marker.openTooltip()})
+                        map.eachMarker(function(marker, lid){
+                            if (!('lids' in window) || lids.includes(lid)) {
+                                marker.openTooltip()
+                            }
+                        })
                     }
                 });
             } else {

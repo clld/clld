@@ -2,6 +2,11 @@
 Changes
 -------
 
+unreleased
+~~~~~~~~~~
+
+Allow selective initial opening of tooltips on maps.
+
 
 11.4.0
 ~~~~~~

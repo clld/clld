@@ -166,7 +166,9 @@ class Map(Component):
     - tile_layer: dict(url_pattern=, options=), specifying an alternative base layer [None]
     - add_layers_to_control: Flag indicating whether map layers should be added to the \
       layers control as overlays [False]
-    - show_labels: Flag indicating whether labels/tooltips should be initially open [False]
+    - show_labels: Flag indicating whether labels/tooltips should be initially open [False]. \
+      If a variable `lids` is defined, listing language IDs, only corresponding tooltips will \
+      be opened.
     - on_init: function to run at the end of map initialization [None]
     - resize_direction: 'e', 's' or 'se', make map resizeable.
       see https://github.com/jjimenezshaw/Leaflet.Control.Resizer#api
