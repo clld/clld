@@ -2,8 +2,8 @@
 Changes
 -------
 
-unreleased
-~~~~~~~~~~
+11.5.0
+~~~~~~
 
 Allow selective initial opening of tooltips on maps.
 
