@@ -3,7 +3,7 @@ import collections
 from clld.db.models import common
 from clld import interfaces
 
-__version__ = "11.5.0"
+__version__ = "11.5.1.dev0"
 
 
 class Resource(collections.namedtuple('Resource', 'name model interface with_index with_rdfdump')):
