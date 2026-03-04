@@ -148,7 +148,7 @@ def bibtex2source(rec: bibtex.Record,
             eds = ' (eds.)'
     if authors:
         if authors.startswith('{') and authors.endswith('}'):
-            authors = authors[1:-1].strip()
+            authors = authors.replace('{', '').replace('}', '').strip()
         else:
             authors = convert(authors).split(' and ')
             if len(authors) > 2:
