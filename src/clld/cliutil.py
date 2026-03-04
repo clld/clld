@@ -147,13 +147,16 @@ def bibtex2source(rec: bibtex.Record,
         if authors:
             eds = ' (eds.)'
     if authors:
-        authors = convert(authors).split(' and ')
-        if len(authors) > 2:
-            authors = authors[:1]
-            etal = ' et al.'
+        if authors.startswith('{') and authors.endswith('}'):
+            authors = authors.replace('{', '').replace('}', '').strip()
+        else:
+            authors = convert(authors).split(' and ')
+            if len(authors) > 2:
+                authors = authors[:1]
+                etal = ' et al.'
 
-        authors = [n.last or n.first for n in [HumanName(a) for a in authors]]
-        authors = '%s%s%s' % (' and '.join(authors), etal, eds)
+            authors = [n.last or n.first for n in [HumanName(a) for a in authors]]
+            authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(
         id=slug(rec.id, lowercase=lowercase_id) if sluggify_id else rec.id,
