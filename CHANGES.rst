@@ -2,6 +2,14 @@
 Changes
 -------
 
+
+11.5.2
+~~~~~~
+
+Fix issue where source labels were forced to be "<last-name> <year>" even when the BibTeX
+convention of wrapping content in curly braces was used to prevent splitting.
+
+
 11.5.1
 ~~~~~~
 
