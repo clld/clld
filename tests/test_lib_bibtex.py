@@ -10,6 +10,7 @@ from clld.lib.bibtex import *
         ("\\ss ", 'ß'),
         ('\u2013', '\u2013'),
         ('?[\\u65533]', '\ufffd'),
+        ('\\~{}a', '~a'),
     ])
 def test_unescape(arg, res):
     assert unescape(arg) == res

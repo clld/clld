@@ -3,6 +3,12 @@ Changes
 -------
 
 
+unreleased
+~~~~~~~~~~
+
+Fixed latex unescaping of escaped tilde.
+
+
 11.5.2
 ~~~~~~
 

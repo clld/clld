@@ -43,6 +43,7 @@ def u_unescape(s):
 
 
 SYMBOLS = {
+    '\\~': '~',
     '\\plusminus{}': '\xb1',
     '\\middot{}': '\xb7',
     '\\textopeno{}': "\u0254",
