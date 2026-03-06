@@ -3,8 +3,8 @@ Changes
 -------
 
 
-unreleased
-~~~~~~~~~~
+11.5.3
+~~~~~~
 
 Fixed latex unescaping of escaped tilde.
 
