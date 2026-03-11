@@ -32,7 +32,7 @@ apps.
 - **Integrating language metadata from Glottolog**: There's 
   [a plugin](https://github.com/clld/clld-glottologfamily-plugin) for that
   and here's the list of apps on GitHub using it: https://github.com/clld/clld-glottologfamily-plugin/network/dependents
-- **Displaying (data on) phylogenetic laguage trees**: There's
+- **Displaying (data on) phylogenetic language trees**: There's
   [a plugin](https://github.com/clld/clld-phylogeny-plugin) for that
   and here's the list of apps on GitHub using it: https://github.com/clld/clld-phylogeny-plugin/network/dependents
 - **Displaying cognacy relations between words**: There's
