@@ -1,5 +1,6 @@
 """Generic utility functions."""
 import re
+import shutil
 import random
 import string
 import pathlib
@@ -7,7 +8,6 @@ import contextlib
 
 from sqlalchemy.sql.sqltypes import SchemaType
 from sqlalchemy.types import TypeDecorator, Enum
-from clldutils.path import move
 from clldutils.declenum import DeclEnum as BaseEnum
 from clldutils.lgr import ABBRS as LGR_ABBRS
 assert LGR_ABBRS
@@ -31,7 +31,7 @@ def safe_overwrite(fname):
     yield tmp
     if fname.exists():
         fname.unlink()
-    move(tmp, fname)
+    shutil.move(tmp, fname)
 
 
 def summary(text, max_length=70):
