@@ -3,6 +3,12 @@ Changes
 -------
 
 
+11.5.4
+~~~~~~
+
+Compatibility with clldutils 4.x.
+
+
 11.5.3
 ~~~~~~
 
