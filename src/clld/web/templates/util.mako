@@ -412,7 +412,7 @@ $(document).ready(function() {
     <%
     if len(icon.color) == 7:
         opacity = icon.opacity if icon.opacity is not None else 1.0
-        color = f'{icon.color}{int(opacity * 255.0)):02x}'
+        color = f'{icon.color}{int(opacity * 255.0):02x}'
     else:
         color = icon.color
     %>
