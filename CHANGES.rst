@@ -2,6 +2,12 @@
 Changes
 -------
 
+unreleased
+~~~~~~~~~~
+
+Fix where the colour preview in the colour picker was wrong, when opacity was
+set to 0.
+
 
 11.5.4
 ~~~~~~
