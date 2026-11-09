@@ -2,8 +2,8 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+11.6.0
+~~~~~~
 
 - Drop py3.8, py3.9 and py3.10 compatibility
 - Run tests on py3.15
