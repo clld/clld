@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Unicode, UniqueConstraint
 
 from zope.interface import implementer
-from nameparser import HumanName
+import nameparser
 
 from clld.db.meta import Base, PolymorphicBaseMixin
 from clld import interfaces
@@ -39,4 +39,4 @@ class Contributor(Base,
     def last_first(self):
         if not self.name:
             return ''
-        return '{0.last}, {0.first} {0.middle}'.format(HumanName(self.name)).strip()
+        return '{0.family}, {0.given} {0.middle}'.format(nameparser.parse(self.name)).strip()

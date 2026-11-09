@@ -18,7 +18,6 @@ Notation = collections.namedtuple('Notation', 'name extension mimetype uri')
 
 FORMATS = dict((n.name, n) for n in [
     Notation('xml', 'rdf', 'application/rdf+xml', 'http://www.w3.org/ns/formats/RDF_XML'),
-    Notation('n3', 'n3', 'text/n3', 'http://www.w3.org/ns/formats/N3'),
     Notation('nt', 'nt', 'text/nt', 'http://www.w3.org/ns/formats/N-Triples'),
     Notation('turtle', 'ttl', 'text/turtle', 'http://www.w3.org/ns/formats/Turtle')])
 
@@ -117,6 +116,9 @@ def convert(string, from_, to_):
     if to_ is None:
         return g
     out = io.BytesIO()
-    g.serialize(out, format=to_)
+    kw = dict(format=to_)
+    if to_ == 'nt':
+        kw['encoding'] = 'utf-8'
+    g.serialize(out, **kw)
     out.seek(0)
     return out.read()

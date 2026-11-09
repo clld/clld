@@ -1,6 +1,8 @@
 """
 Create downloads registered for a clld app.
 """
+import pathlib
+
 from clld.interfaces import IDownload
 from clld.cliutil import BootstrappedAppConfig
 
@@ -13,6 +15,7 @@ def register(parser):
         help="domain name under which the app is served. Necessary to create correct URLs "
              "in RDF downloads.",
     )
+    parser.add_argument('--out', type=pathlib.Path, default=None)
     parser.add_argument(
         '-l', '--list', default=False, action='store_true', help='only list registered downloads')
 
@@ -26,4 +29,7 @@ def run(args):
     for name, download in args.env['registry'].getUtilitiesFor(IDownload):  # pragma: no cover
         args.log.info('creating download %s' % name)
         if not args.list:
-            download.create(args.env['request'])
+            download.create(
+                args.env['request'],
+                outfile=args.out.joinpath(download.fname(args.env['request'])) if args.out else None
+            )

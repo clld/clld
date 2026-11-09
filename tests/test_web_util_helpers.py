@@ -1,6 +1,5 @@
 from clld.db.models import common
 from clld.interfaces import ILinkAttrs, IFrequencyMarker, IDownload
-from clld.web.adapters.download import N3Dump
 
 
 def test_get_url_template(env):
@@ -204,14 +203,6 @@ def test_format_coordinates(env, mocker):
     format_coordinates(mocker.Mock(latitude=5.333, longitude=-9.99), no_seconds=False)
     assert format_coordinates(common.Language.get('l2')) == ''
     assert format_coordinates(common.Language.get('language')) != ''
-
-
-def test_get_downloads(env, utility_factory):
-    from clld.web.util.helpers import get_rdf_dumps, get_downloads
-
-    with utility_factory(N3Dump(common.Language, 'clld'), IDownload):
-        assert list(get_rdf_dumps(env['request'], common.Language))
-        assert list(get_downloads(env['request']))
 
 
 def test_rendered_sentence(env, mocker):

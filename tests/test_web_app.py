@@ -8,7 +8,7 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from clld.db.models.common import Contribution, ValueSet, Language, Language_files
 from clld.interfaces import IMapMarker, IDataTable
-from clld.web.adapters.download import N3Dump
+from clld.web.adapters.download import Download
 
 
 @pytest.fixture
@@ -78,12 +78,15 @@ def test_config(config):
     class IF(Interface):
         pass
 
+    class NTDump(Download):
+        ext = 'nt'
+
     # should have no effect, because a resource with this name is registered by
     # default:
     config.register_menu('languages', ('sources', dict(label='References')))
     config.register_resource('language', None, None)
     config.register_resource('testresource', Language, IF, with_index=True, test=True)
-    config.register_download(N3Dump(Language, 'clld'))
+    config.register_download(NTDump(Language, 'clld'))
     config.add_301('/301pattern', 'http://example.org')
     config.add_410('/410pattern')
 

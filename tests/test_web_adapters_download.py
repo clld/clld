@@ -42,13 +42,17 @@ def test_Download_url(mocker, env):
 
 
 def test_Download2(env, tmp_path):
+    class NTDump(Download):
+        ext = 'nt'
+
     out = tmp_path / 'dl'
     dl = CsvDump(Language, 'clld')
+    assert '-' not in dl.fname(env['request'])
     dl.create(env['request'], verbose=False, outfile=out)
     assert out.exists()
     dl.create(env['request'], filename=out, verbose=False, outfile=out)
-    dl = N3Dump(Language, 'clld')
-    assert dl.abspath(env['request']).name == 'dataset-language.n3.gz'
+    dl = NTDump(Language, 'clld')
+    assert dl.abspath(env['request']).name == 'dataset-language.nt.gz'
     dl.create(env['request'], verbose=False, outfile=out)
     dl = RdfXmlDump(Language, 'clld')
     dl.create(env['request'], verbose=False, outfile=out)

@@ -8,7 +8,7 @@ import collections
 
 from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings, bootstrap
-from nameparser import HumanName
+import nameparser
 from clldutils.misc import slug
 from clldutils import clilib
 
@@ -155,7 +155,7 @@ def bibtex2source(rec: bibtex.Record,
                 authors = authors[:1]
                 etal = ' et al.'
 
-            authors = [n.last or n.first for n in [HumanName(a) for a in authors]]
+            authors = [n.family or n.given for n in [nameparser.parse(a) for a in authors]]
             authors = '%s%s%s' % (' and '.join(authors), etal, eds)
 
     return cls(

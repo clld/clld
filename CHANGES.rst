@@ -2,6 +2,18 @@
 Changes
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- Drop py3.8, py3.9 and py3.10 compatibility
+- Run tests on py3.15
+- Remove support for n3 RDF format
+
+Backwards incompatibility: n3 is no longer supported and neither is `N3Dump`. If triple downloads
+are needed, nt should be prefered, since it's simpler to write and read for machines.
+
+
+
 11.5.5
 ~~~~~~
 

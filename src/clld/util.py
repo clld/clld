@@ -58,8 +58,8 @@ class DeclEnumType(SchemaType, TypeDecorator):
             name="ck%s" % re.sub(
                 '([A-Z])', lambda m: "_" + m.group(1).lower(), enum.__name__))
 
-    def _set_table(self, table, column):
-        self.impl._set_table(table, column)  # pragma: no cover
+    def _set_table(self, column, table):
+        self.impl._set_table(column, table)  # pragma: no cover
 
     def copy(self):
         return DeclEnumType(self.enum)  # pragma: no cover

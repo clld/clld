@@ -21,7 +21,7 @@ from clld.db.meta import DBSession
 from clld.db.models.common import Dataset
 from clld.db.util import page_query
 
-__all__ = ['download_dir', 'Download', 'N3Dump', 'CsvDump', 'RdfXmlDump']
+__all__ = ['download_dir', 'Download', 'CsvDump', 'RdfXmlDump']
 
 README = """
 {0} data download
@@ -61,7 +61,7 @@ def download_dir(pkg):
 
 
 @implementer(IDownload)
-class Download(object):
+class Download:
 
     """Represents a download format of a clld app's data."""
 
@@ -84,6 +84,10 @@ class Download(object):
         dataset = req.db.query(Dataset).first()
         return download_asset_spec(self.pkg, '%s-%s.%s' % (
             dataset.id, self.name, 'gz' if self.rdf else 'zip'))
+
+    def fname(self, req):
+        dataset = req.db.query(Dataset).first()
+        return f"{dataset.id}_{self.name}.{'gz' if self.rdf else 'zip'}"
 
     def url(self, req):
         return req.static_url(self.asset_spec(req))
@@ -194,20 +198,6 @@ class CsvDump(Download):
 
     def dump(self, req, fp, item, index):
         self.writer.writerow(self.row(req, fp, item, index))
-
-
-class N3Dump(Download):
-
-    """Download of a resource type as n-triples."""
-
-    ext = 'n3'
-
-    def dump_rendered(self, req, fp, item, index, rendered):
-        header, body = rendered.split(to_binary('\n\n'), 1)
-        if index == 0:
-            fp.write(header)
-            fp.write(to_binary('\n\n'))
-        fp.write(body)
 
 
 class RdfXmlDump(Download):
