@@ -31,7 +31,7 @@ def test_initdb(tmp_path):
 use = call:testutils:main
 sqlalchemy.url = sqlite:///{}
     """.format(tmp_path / 'db.sqlite'), encoding='utf8')
-    main(['initdb', str(cfg)])
+    main(['initdb', str(cfg), '-y'])
 
     with pytest.raises(ValueError):
         main(['initdb', str(tmp_path / 'xyz.ini')])

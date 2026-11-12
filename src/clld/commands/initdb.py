@@ -8,6 +8,7 @@ import transaction
 from clldutils import db
 from clldutils.clilib import PathType
 from clld.cliutil import SessionContext, BootstrappedAppConfig
+
 try:
     from pycldf import Dataset
 except ImportError:  # pragma: no cover
@@ -26,6 +27,8 @@ def register(parser):
         help="ini file providing app config",
     )
     parser.add_argument(
+        '-y', '--assume-yes', help='non-interactive mode', action='store_true', default=False)
+    parser.add_argument(
         '--prime-cache-only',
         action='store_true',
         default=False,
@@ -39,11 +42,11 @@ def register(parser):
         parser.add_argument(
             '--' + name,
             metavar=name.upper(),
-            help='Path to repository clone of {0} data'.format(name.capitalize()),
+            help=f'Path to repository clone of {name.capitalize()} data',
             default=None)
         parser.add_argument(
-            '--{0}-version'.format(name),
-            help='Version of {0} data to checkout'.format(name.capitalize()),
+            f'--{name}-version',
+            help=f'Version of {name.capitalize()} data to checkout',
             default=None)
 
 
@@ -68,8 +71,7 @@ def run(args):
                 if getattr(args, name + '_version'):
                     stack.enter_context(
                         Catalog(getattr(args, name), tag=getattr(args, name + '_version')))
-                else:
-                    setattr(args, name, pathlib.Path(getattr(args, name)))
+                setattr(args, name, pathlib.Path(getattr(args, name)))
 
         if not args.prime_cache_only:
             with transaction.manager:
