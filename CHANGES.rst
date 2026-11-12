@@ -2,8 +2,8 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+11.7.0
+~~~~~~
 
 Added a flag `-y`, `--assume-yes` to `clld initdb` to allow invocation in non-interactive scenarios.
 
