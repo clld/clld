@@ -129,7 +129,7 @@ def _tokenize(tex):  # pragma: no cover
                     pos += 1
 
 
-class _unlatex(object):  # pragma: no cover
+class _unlatex:  # pragma: no cover
 
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
 

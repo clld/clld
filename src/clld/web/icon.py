@@ -68,7 +68,7 @@ SECONDARY_COLORS = [c for c in COLORS if c not in PREFERED_COLORS]
 
 
 @implementer(IIcon)
-class Icon(object):
+class Icon:
 
     """Default implementation of IIcon: Icons are static image files."""
 
@@ -151,7 +151,7 @@ ORDERED_ICONS = [ICON_MAP[s + c] for s, c in itertools.chain(
 
 
 @implementer(IMapMarker)
-class MapMarker(object):
+class MapMarker:
 
     """The default map marker is an orange circle."""
 

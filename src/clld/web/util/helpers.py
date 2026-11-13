@@ -118,11 +118,11 @@ def get_url_template(req, route, relative=True, variable_map=None):
             route.pattern)
 
 
-def rdf_namespace_attrs():
+def rdf_namespace_attrs() -> str:
     return '\n'.join('xmlns:%s="%s"' % item for item in rdf.NAMESPACES.items())
 
 
-def urlescape(string):
+def urlescape(string: str) -> str:
     return quote(string, safe='')
 
 
@@ -136,7 +136,7 @@ def data_uri(filename, mimetype):
     return 'data:%s;base64,%s' % (mimetype, b64encode(content).decode())
 
 
-class JS(object):
+class JS:
 
     """Markup JavaScript object names for proper serialization to pseudo-JSON.
 
@@ -173,7 +173,7 @@ JSModal = JS('CLLD.Modal')
 JSDataTable = JS('CLLD.DataTable')
 
 
-class JSNamespace(object):
+class JSNamespace:
 
     """Shortcut to create JS objects within a common namespace."""
 

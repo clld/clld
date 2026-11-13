@@ -8,7 +8,7 @@ from clld.web.util.component import Component
 from clld.web.adapters.geojson import GeoJson, GeoJsonCombinationDomainElement, get_lonlat
 
 
-class Layer(object):
+class Layer:
 
     """Represents a layer in a leaflet map.
 
@@ -37,7 +37,7 @@ class Layer(object):
             setattr(self, k, v)
 
 
-class Legend(object):
+class Legend:
 
     """Represents a navpill with a dropdown above a map."""
 

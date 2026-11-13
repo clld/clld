@@ -211,7 +211,7 @@ def menu_item(route_name, ctx, req, label=None):
 
 
 @implementer(interfaces.ICtxFactoryQuery)
-class CtxFactoryQuery(object):
+class CtxFactoryQuery:
 
     """Implements reasonable default queries to be used in context factories.
 

@@ -108,7 +108,7 @@ class Source(Base,
 #
 # Several objects can be linked to sources, i.e. they can have references.
 #
-class HasSourceMixin(object):
+class HasSourceMixin:
     key = Column(Unicode)  # the citation key, specific (and unique) within a contribution
     description = Column(Unicode)  # e.g. page numbers.
 

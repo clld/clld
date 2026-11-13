@@ -263,7 +263,7 @@ FIELDS = [
 FIELDS_SET = set(FIELDS)
 
 
-class _Convertable(object):
+class _Convertable:
 
     """Mixin adding a shortcut to clld.lib.bibutils.convert as method."""
 

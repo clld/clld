@@ -5,7 +5,7 @@ from markupsafe import Markup
 from pyramid.renderers import render
 
 
-class Component(object):
+class Component:
 
     """Virtual base class for page components.
 

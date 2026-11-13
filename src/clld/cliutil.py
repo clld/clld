@@ -30,7 +30,7 @@ confirm = functools.partial(clilib.confirm, default=False)
 
 
 # Moved here from distutils.util, due to this package being deprecated.
-def strtobool(val):  # pragma: no cover
+def strtobool(val: str) -> int:  # pragma: no cover
     """Convert a string representation of truth to true (1) or false (0).
 
     True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
@@ -96,7 +96,53 @@ class SessionContext:
         DBSession.remove()
 
 
-def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
+class Data(collections.defaultdict):
+
+    """Dictionary, serving to store references to new db objects during data imports.
+
+    The values are dictionaries, keyed by the name of the model class used to create the
+    new objects.
+
+    >>> data = Data()
+    >>> l = data.add(common.Language, 'l', id='abc', name='Abc Language')
+    >>> assert l == data['Language']['l']
+    """
+
+    def __init__(self, **kw):
+        super(Data, self).__init__(dict)
+        self.defaults = kw
+
+    def add(self, model_, key_, **kw):
+        """
+        Create an instance of a model class to be persisted in the database.
+
+        :param model_: The model class we want to create an instance of.
+        :param key_: A key which can be used to retrieve the instance later.
+        :param kw: Keyword parameters passed to model class for initialisation.
+        :return: The newly created instance of model class.
+        """
+        if '.' in kw.get('id', ''):
+            raise ValueError('Object id contains illegal character "."')
+        if list(kw.keys()) == ['_obj']:
+            # if a single keyword parameter _obj is passed, we take it to be the object
+            # which should be added to the session.
+            new = kw['_obj']
+        else:
+            for k, v in self.defaults.items():
+                kw.setdefault(k, v)
+            new = model_(**kw)
+        self[model_.__name__][key_] = new
+        DBSession.add(new)
+        return new
+
+
+def add_language_codes(
+        data: Data,
+        lang: common.Language,
+        isocode: str | None,
+        glottocodes: list[str] | None = None,
+        glottocode: str | None = None,
+):
     def identifier(type_, id_):
         return data.add(
             common.Identifier, '%s:%s' % (type_, id_),
@@ -114,11 +160,13 @@ def add_language_codes(data, lang, isocode, glottocodes=None, glottocode=None):
             language=lang, identifier=identifier('glottolog', glottocode)))
 
 
-def bibtex2source(rec: bibtex.Record,
-                  cls=common.Source,
-                  lowercase_id: bool = False,
-                  sluggify_id: bool = True,
-                  latex_unescape: bool = True) -> common.Source:
+def bibtex2source(
+        rec: bibtex.Record,
+        cls: type = common.Source,
+        lowercase_id: bool = False,
+        sluggify_id: bool = True,
+        latex_unescape: bool = True,
+) -> common.Source:
     """
     Convert a BibTeX record to a `common.Source` instance, suitable for adding to the database.
 
@@ -169,43 +217,3 @@ def bibtex2source(rec: bibtex.Record,
 def data_file(module, *comps):
     """Return Path object of file in the data directory of an app."""
     return pathlib.Path(module.__file__).parent.joinpath('..', 'data', *comps)
-
-
-class Data(collections.defaultdict):
-
-    """Dictionary, serving to store references to new db objects during data imports.
-
-    The values are dictionaries, keyed by the name of the model class used to create the
-    new objects.
-
-    >>> data = Data()
-    >>> l = data.add(common.Language, 'l', id='abc', name='Abc Language')
-    >>> assert l == data['Language']['l']
-    """
-
-    def __init__(self, **kw):
-        super(Data, self).__init__(dict)
-        self.defaults = kw
-
-    def add(self, model_, key_, **kw):
-        """
-        Create an instance of a model class to be persisted in the database.
-
-        :param model_: The model class we want to create an instance of.
-        :param key_: A key which can be used to retrieve the instance later.
-        :param kw: Keyword parameters passed to model class for initialisation.
-        :return: The newly created instance of model class.
-        """
-        if '.' in kw.get('id', ''):
-            raise ValueError('Object id contains illegal character "."')
-        if list(kw.keys()) == ['_obj']:
-            # if a single keyword parameter _obj is passed, we take it to be the object
-            # which should be added to the session.
-            new = kw['_obj']
-        else:
-            for k, v in self.defaults.items():
-                kw.setdefault(k, v)
-            new = model_(**kw)
-        self[model_.__name__][key_] = new
-        DBSession.add(new)
-        return new

@@ -5,6 +5,7 @@ import random
 import string
 import pathlib
 import contextlib
+from collections.abc import Generator
 
 from sqlalchemy.sql.sqltypes import SchemaType
 from sqlalchemy.types import TypeDecorator, Enum
@@ -15,12 +16,12 @@ assert LGR_ABBRS
 __all__ = ['random_string', 'safe_overwrite', 'summary', 'DeclEnum', 'DeclEnumType']
 
 
-def random_string(length):
+def random_string(length: int) -> str:
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
 @contextlib.contextmanager
-def safe_overwrite(fname):
+def safe_overwrite(fname: str | pathlib.Path) -> Generator[pathlib.Path, None, None]:
     fname = pathlib.Path(fname)
     if not fname.parent.exists():
         fname.parent.mkdir()
@@ -34,7 +35,7 @@ def safe_overwrite(fname):
     shutil.move(str(tmp), str(fname))
 
 
-def summary(text, max_length=70):
+def summary(text: str, max_length: int = 70) -> str:
     from textwrap import shorten
     if max_length < 4:
         return '...'

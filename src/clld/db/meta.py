@@ -35,7 +35,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
         cursor.execute("SELECT 1")
         if not isinstance(dbapi_connection, sqlite3.Connection):  # pragma: no cover
             cursor.execute("SET default_text_search_config TO 'english'")
-    except:  # noqa: E722; # pragma: no cover
+    except:  # noqa: E722 ; # pragma: no cover
         # dispose the whole pool instead of invalidating one at a time
         connection_proxy._pool.dispose()
 
@@ -190,7 +190,7 @@ class Base(declarative_base()):
             self.__class__.__name__, getattr(self, 'id', self.pk))
 
 
-class PolymorphicBaseMixin(object):
+class PolymorphicBaseMixin:
 
     """Mixin providing the wiring for joined table inheritance.
 
@@ -223,7 +223,7 @@ def is_base(cls):
     return PolymorphicBaseMixin in cls.__bases__
 
 
-class CustomModelMixin(object):
+class CustomModelMixin:
 
     """Mixin for customized classes in our joined table inheritance scheme.
 

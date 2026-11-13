@@ -80,7 +80,7 @@ def filter_number(col, qs, type_=None, qs_weight=1):
         return
 
 
-class Col(object):
+class Col:
 
     """DataTables are basically a list of column specifications.
 

@@ -11,7 +11,7 @@ __all__ = (
 )
 
 
-class IdNameDescriptionMixin(object):
+class IdNameDescriptionMixin:
 
     """Mixin for 'visible' objects, i.e. anything that has to be displayed.
 
@@ -85,7 +85,7 @@ class FilesMixin(IdNameDescriptionMixin):
         return str(p)
 
 
-class HasFilesMixin(object):
+class HasFilesMixin:
 
     """Mixin for model classes which may have associated files."""
 
@@ -99,7 +99,7 @@ class HasFilesMixin(object):
         return relationship(cls.__name__ + '_files', backref='object')
 
 
-class DataMixin(object):
+class DataMixin:
 
     """Provide a simple way to attach key-value pairs to a model class given by name."""
 
@@ -116,7 +116,7 @@ class DataMixin(object):
         return Column(Integer, ForeignKey('%s.pk' % cls.owner_class().lower()))
 
 
-class HasDataMixin(object):
+class HasDataMixin:
 
     """Adds a convenience method to retrieve the key-value pairs from data as dict.
 

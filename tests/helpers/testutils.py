@@ -7,8 +7,10 @@ from unittest.mock import Mock
 def main(global_config, **settings):
     """called when bootstrapping a pyramid app using clld/tests/test.ini."""
     from clld import interfaces
+    from clld.db.models.common import Source
     from clld.web.app import MapMarker
     from clld.web.adapters.base import Representation
+    from clld.web.adapters.download import Download
 
     settings['mako.directories'] = ['clld:web/templates']
     config = Configurator(settings=settings)
@@ -17,6 +19,7 @@ def main(global_config, **settings):
     config.register_staticresource('css', 'clld:web/static/notexisting.css')
     config.register_staticresource('js', 'clld:web/static/notexisting.js')
     config.register_adapter(Representation, Mock, name='test')
+    config.register_download(Download(Source, 'name', ext='bib', description="References"))
     config.register_menu(('home', lambda ctx, req: (req.resource_url(req.dataset), 'tt')))
     return config.make_wsgi_app()
 

@@ -77,7 +77,7 @@ class Parameter(Base,
         'DomainElement', backref='parameter', order_by=DomainElement.number)
 
 
-class CombinationDomainElement(object):
+class CombinationDomainElement:
     def __init__(self, combination, domainelements, icon=None):
         self.number = tuple(de.number for de in domainelements)
         self.id = '-'.join(str(n) for n in self.number)
@@ -88,7 +88,7 @@ class CombinationDomainElement(object):
 
 
 @implementer(interfaces.ICombination)
-class Combination(object):
+class Combination:
 
     """A combination of parameters."""
 

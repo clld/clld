@@ -2,6 +2,12 @@ from clld.db.models import common
 from clld.interfaces import ILinkAttrs, IFrequencyMarker, IDownload
 
 
+def test_get_downloads(env):
+    from clld.web.util.helpers import get_downloads
+
+    assert list(get_downloads(env['request']))
+
+
 def test_get_url_template(env):
     from clld.web.util.helpers import get_url_template
 
