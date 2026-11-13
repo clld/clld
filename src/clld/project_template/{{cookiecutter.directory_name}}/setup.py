@@ -1,5 +1,4 @@
-from setuptools import setup, find_packages
-
+from setuptools import setup, find_packages, find_namespace_packages
 
 setup(
     name='{{cookiecutter.directory_name}}',
@@ -15,8 +14,15 @@ setup(
     author_email='',
     url='',
     keywords='web pyramid pylons',
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     include_package_data=True,
+    #package_data={
+    #    "{{cookiecutter.directory_name}}": [
+    #        "static/**/*",
+    #        "templates/**/*",
+    #        "locale/**/*",
+    #    ],
+    #},
     zip_safe=False,
     install_requires=[
         'clld',
@@ -25,9 +31,8 @@ setup(
 {% endif %}
 ],
 extras_require={
-        'dev': ['flake8', 'waitress'],
+        'dev': ['flake8', 'waitress', 'Babel'],
         'test': [
-            'mock',
             'pytest>=5.4',
             'pytest-clld>=1.3',
             'pytest-mock',
@@ -37,7 +42,6 @@ extras_require={
             'zope.component>=3.11.0',
         ],
     },
-    test_suite="{{cookiecutter.directory_name}}",
     entry_points="""\
     [paste.app_factory]
     main = {{cookiecutter.directory_name}}:main

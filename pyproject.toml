@@ -1,3 +1,177 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "clld"
+version = "11.7.1.dev0"
+description = "Python library supporting the development of cross-linguistic databases."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE.txt"]
+authors = [
+    {name = "Robert Forkel", email = "dlce.rdm@eva.mpg.de"}
+]
+keywords = ["web", "pyramid", "clld"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+]
+dependencies = [
+    "clldutils>=3.18",
+    # WebOb requires cgi
+    "legacy-cgi>=2.6",
+    "pyramid>=1.10",
+    "pyramid_mako>=1.0",
+    "pyramid_tm",
+    "SQLAlchemy>=1.4, <2.0",
+    "zope.sqlalchemy",
+    "webassets>=0.12.1",
+    "markupsafe",
+    "rdflib>=4.1.1",
+    "nameparser>=2.0",
+    # pyramid requires `pkg_resources`
+    # TODO: remove this when pyramid updates
+    "setuptools<82",
+]
+
+[project.urls]
+Homepage = "https://github.com/clld/clld"
+
+[project.optional-dependencies]
+bootstrap = [
+    "cookiecutter",
+    "pycldf",
+]
+dev = [
+    "Babel",
+    "cookiecutter",
+    "pycldf",
+    "cldfcatalog",
+    "waitress",
+    "pyramid_debugtoolbar",
+    "ruff",
+    "wheel",
+    "build",
+    "twine",
+]
+test = [
+    "cookiecutter",
+    "pytest>=5",
+    "pytest-clld>=1.0.3",
+    "pytest-mock",
+    "pytest-cov",
+    "pytest-clld",
+    "coverage>=4.2",
+    "zope.component>=3.11.0",
+]
+docs = [
+    "Sphinx<7",
+    "docutils",
+    "repoze.sphinx.autointerface",
+]
+
+[project.scripts]
+clld = "clld.__main__:main"
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+clld = [
+    "locale/**",
+    "project_template/**",
+    "web/**",
+]
+
+[tool.babel]
+
+[[tool.babel.mappings]]
+method = "ignore"
+pattern = ["web/static/**"]
+
+[[tool.babel.mappings]]
+method = "python"
+pattern = "**.py"
+
+[[tool.babel.mappings]]
+method = "mako"
+pattern = "**.mako"
+encoding = "utf8"
+
+[tool.ruff]
+line-length = 100
+exclude = [".tox", "src/clld/project_template"]
+
+[tool.ruff.lint]
+# E/F match default Flake8; D enables pydocstyle checks (since you ignored specific D rules)
+select = ["E", "F", "D"]
+ignore = [
+    "E711", # Comparison to `None` should be `cond is None` (needed for SQLAlchemy filters)
+    "E712", # Comparison to `True` should be `cond is True` (needed for SQLAlchemy filters)
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104",
+    "D105",
+    "D107",
+    "D301", # Use `r"""` if any backslashes in a docstring
+    "D203",
+    "D205",
+    "D211",
+    "D212",
+    "D213",
+    "D400",
+    "D401",
+    "D403",
+    "D404",
+    "D415",
+    "D419",
+    "E722",
+]
+
+[tool.pytest.ini_options]
+minversion = "5.0"
+testpaths = ["tests"]
+addopts = [
+    "--cov",
+    "--appini=tests/test.ini",
+]
+filterwarnings = [
+    "ignore::sqlalchemy.exc.SAWarning",
+    "ignore::sqlalchemy.exc.RemovedIn20Warning",
+]
+
+[tool.coverage.run]
+source = [
+    "clld",
+    "tests",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.tox]
+requires = ["tox>=4.19"]
+env_list = ["py311", "py312", "py313", "py314", "py315"]
+skip_missing_interpreters = true
+
+[tool.tox.env_run_base]
+extras = ["test"]
+commands = [["pytest", { replace = "posargs", default = [], extend = true }]]
+set_env = "SQLALCHEMY_SILENCE_UBER_WARNING=1"

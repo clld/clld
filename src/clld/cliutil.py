@@ -76,9 +76,8 @@ class BootstrappedAppConfig(AppConfig):
 
 
 class SessionContext:
-    """
-    To support accessing configured sessions in cli commands.
-    """
+    """To support accessing configured sessions in cli commands."""
+
     def __init__(self, settings):
         self.settings = {'sqlalchemy.url': settings} if isinstance(settings, str) else settings
         self.engine = None

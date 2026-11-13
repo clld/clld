@@ -48,3 +48,4 @@ cd testapp_clld || exit 1
 cd $VENVS || exit 1
 rm -rf testapp
 echo "testing cldf template done"
+

@@ -1,6 +1,4 @@
-"""
-Create downloads registered for a clld app.
-"""
+"""Create downloads registered for a clld app."""
 import pathlib
 
 from clld.interfaces import IDownload
@@ -21,9 +19,7 @@ def register(parser):
 
 
 def run(args):
-    """
-    Create all registered downloads (locally).
-    """
+    """Create all registered downloads (locally)."""
     if args.domain:
         args.env['request'].environ['HTTP_HOST'] = args.domain
     for name, download in args.env['registry'].getUtilitiesFor(IDownload):  # pragma: no cover

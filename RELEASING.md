@@ -1,11 +1,10 @@
-Releasing clld
-==============
+# Releasing clld
 
 - Update translations
   ```shell
-  python setup.py extract_messages
-  python setup.py update_catalog
-  python setup.py compile_catalog
+  pybabel extract -F pyproject.toml --keywords translate --input-dirs src/clld --output-file src/clld/locale/clld.pot
+  pybabel update --domain clld --input-file src/clld/locale/clld.pot --output-dir src/clld/locale
+  pybabel compile --domain clld --directory src/clld/locale
   ```
 
 - Make sure all changes are committed and pushed with a `*.devN` version number.
@@ -34,7 +33,7 @@ Releasing clld
 
 - Make sure flake8 passes
   ```shell
-  flake8 src/
+  ruff check src/
   ```
 
 - Make sure docs render OK
