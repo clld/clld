@@ -44,7 +44,7 @@
   ```
 
 - Update the version number, by removing the trailing `.dev0` in:
-  - `setup.cfg`
+  - `pyproject.toml`
   - `src/clld/__init__.py`
   - `docs/conf.py`
 
@@ -79,7 +79,7 @@
 
 - Increment version number and append `.dev0` to the version number for the new development cycle:
   - `src/clld/__init__.py`
-  - `setup.cfg`
+  - `pyproject.toml`
   - `docs/conf.py`
 
 - Commit/push the version change:

@@ -2,8 +2,8 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+12.0.0
+~~~~~~
 
 Migrate to a pyproject.toml based setup.
 
