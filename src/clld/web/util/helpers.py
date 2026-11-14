@@ -201,13 +201,6 @@ def get_downloads(req):
         yield k, sorted([i[1] for i in items if i[1].size], key=lambda d: d.ext)
 
 
-def get_rdf_dumps(req, model):
-    rdf_exts = [n.extension for n in rdf.FORMATS.values()]
-    for name, dl in req.registry.getUtilitiesFor(interfaces.IDownload):
-        if dl.model == model and dl.ext in rdf_exts:
-            yield dl
-
-
 def coins(req, obj, label=''):
     if not isinstance(obj, bibtex.Record):
         adapter = get_adapter(interfaces.IMetadata, obj, req, ext='md.bib')
@@ -369,7 +362,44 @@ ALT_TRANSLATION_LANGUAGE_PATTERN = re.compile(r'((?P<language>[a-zA-Z\s]+):)')
 #
 # TODO: enumerate exceptions: 1SG, 2SG, 3SG, ?PL, ?DU
 #
-def rendered_sentence(sentence, abbrs=None, fmt='long'):
+def _handle_match(gloss: str, match: re.Match[str], res: list, abbrs: dict[str, str], person_map):
+    abbr = match.group('abbr')
+    if abbr in abbrs:
+        explanation = abbrs[abbr]
+        if match.group('personprefix'):
+            explanation = f"{person_map[match.group('personprefix')]} {explanation}"
+
+        if match.group('personsuffix'):
+            explanation = f"{explanation} {person_map[match.group('personsuffix')]}"
+
+        res.append(HTML.span(
+            HTML.span(gloss[match.start():match.end()].lower(), class_='sc'),
+            **{'data-hint': explanation, 'class': 'hint--bottom'}))
+    else:
+        res.append(
+            (match.group('personprefix') or '') +  # noqa: W504
+            abbr +  # noqa: W504
+            (match.group('personsuffix') or ''))
+
+
+def _gloss_with_tooltip(gloss: str, abbrs: dict[str, str]) -> list:
+    person_map = {
+        '1': 'first person',
+        '2': 'second person',
+        '3': 'third person',
+    }
+    res, end = [], 0
+    for match in GLOSS_ABBR_PATTERN.finditer(gloss):
+        if match.start() > end:
+            res.append(gloss[end:match.start()])
+        _handle_match(gloss, match, res, abbrs, person_map)
+        end = match.end()
+
+    res.append(gloss[end:])
+    return filter(None, res)
+
+
+def rendered_sentence(sentence: models.Sentence, abbrs=None, fmt='long'):
     """Format a sentence as HTML."""
     if sentence.xhtml:
         return HTML.div(
@@ -381,43 +411,6 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
                 models.GlossAbbreviation.language_pk == None)
         )
         abbrs = dict((g.id, g.name) for g in q)
-
-    def gloss_with_tooltip(gloss):
-        person_map = {
-            '1': 'first person',
-            '2': 'second person',
-            '3': 'third person',
-        }
-
-        res, end = [], 0
-        for match in GLOSS_ABBR_PATTERN.finditer(gloss):
-            if match.start() > end:
-                res.append(gloss[end:match.start()])
-
-            abbr = match.group('abbr')
-            if abbr in abbrs:
-                explanation = abbrs[abbr]
-                if match.group('personprefix'):
-                    explanation = '%s %s' % (
-                        person_map[match.group('personprefix')], explanation)
-
-                if match.group('personsuffix'):
-                    explanation = '%s %s' % (
-                        explanation, person_map[match.group('personsuffix')])
-
-                res.append(HTML.span(
-                    HTML.span(gloss[match.start():match.end()].lower(), class_='sc'),
-                    **{'data-hint': explanation, 'class': 'hint--bottom'}))
-            else:
-                res.append(
-                    (match.group('personprefix') or '') +  # noqa: W504
-                    abbr +  # noqa: W504
-                    (match.group('personsuffix') or ''))
-
-            end = match.end()
-
-        res.append(gloss[end:])
-        return filter(None, res)
 
     def alt_translation(sentence):
         res = ''
@@ -438,7 +431,7 @@ def rendered_sentence(sentence, abbrs=None, fmt='long'):
             analyzed.split('\t'), glossed.split('\t'), fillvalue=''
         ):
             if gloss:
-                html_gloss = gloss_with_tooltip(gloss)
+                html_gloss = _gloss_with_tooltip(gloss, abbrs)
             else:
                 # When there are less glosses than morphemes, the trailing
                 # morphemes 'fall down' into the gloss line.  To prevent that we

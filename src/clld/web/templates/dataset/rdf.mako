@@ -35,23 +35,6 @@ ${TxtCitation.render(request.dataset, request)}
         </dcterms:bibliographicCitation>
         <dcterms:subject rdf:resource="http://dbpedia.org/resource/Linguistics"/>
     </void:Dataset>
-% for rsc in rscs:
-    <% dls = list(h.get_rdf_dumps(request, rsc.model)) %>
-    % if dls or (rsc.name in sitemaps):
-    <void:Dataset rdf:about="${request.route_url(rsc.name + 's')}">
-        <skos:prefLabel xml:lang="en">${_(rsc.name.capitalize())}s</skos:prefLabel>
-        <skos:hiddenLabel xml:lang="x-clld">${rsc.name}</skos:hiddenLabel>
-        <skos:example>${request.route_url(rsc.name, id='---').replace('---', '{id}')}</skos:example>
-        % if dls:
-            % for dl in dls:
-            <void:dataDump rdf:resource="${dl.url(request)}"/>
-            % endfor
-        % else:  ## rsc.name in sitemaps
-        <void:rootResource rdf:resource="${request.route_url(rsc.name + 's')}"/>
-        % endif
-    </void:Dataset>
-    % endif
-% endfor
     <foaf:Organization rdf:about="${request.dataset.publisher_url}">
         <skos:prefLabel xml:lang="en">${request.dataset.publisher_name}</skos:prefLabel>
         <foaf:homepage>${request.dataset.publisher_url}</foaf:homepage>

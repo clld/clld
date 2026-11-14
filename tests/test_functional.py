@@ -36,7 +36,6 @@ def test_dataset(app):
     assert app.parsed_body.find(
         './/{http://rdfs.org/ns/void#}Dataset').get(
         '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about')
-    assert 'skos:example' in app.get_xml('/void.rdf')
     # Test __locale__ param is propagated:
     res = app.get_html('/?__locale__=en')
     assert '?__locale__=en' in res
