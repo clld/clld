@@ -21,6 +21,16 @@ def test_Map(request_factory, route, params, map_cls, ctx_cls, ctx_id):
         m.render()
 
 
+def test_Map_get_options_from_req(mocker, request_factory):
+    with request_factory(params={'iconsize': '5'}) as req:
+        m = Map(mocker.Mock(), req, 'mid')
+        assert m.get_options_from_req()['icon_size'] == 5
+
+    with request_factory(params={'labels': '1'}) as req:
+        m = Map(mocker.Mock(), req, 'mid')
+        assert m.get_options_from_req()['show_labels'] is True
+
+
 def test_SelectedLanguagesMap(env):
     m = SelectedLanguagesMap(None, env['request'], [common.Language.first()])
     m.render()

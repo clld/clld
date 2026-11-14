@@ -21,6 +21,8 @@ def test_SessionContext(testsdir):
     'genre,id_,md,kw,assertion',
     [
         ('book', 'id', dict(author='M, R and G, H and Z, U'), None, None),
+        ('book', 'Id', dict(editor='M, R and G, H'), None, lambda src: 'eds' in src.name),
+        ('book', 'Id', dict(author='{M, R and G, H}'), None, lambda src: '{' not in src.name),
         ('book', 'id', dict(author='M, R and G, H'), None, None),
         ('book', 'id', dict(title='tb', customfield='cf', year="1920}"), None, None),
         ('misc', 'Id', dict(title='title'), None, lambda src: src.id == 'Id'),

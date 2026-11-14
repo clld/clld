@@ -70,7 +70,6 @@ test = [
     "pytest-clld>=1.0.3",
     "pytest-mock",
     "pytest-cov",
-    "pytest-clld",
     "coverage>=4.2",
     "zope.component>=3.11.0",
 ]

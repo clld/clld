@@ -1,5 +1,6 @@
 """Functionality to manage icons for map markers."""
 import itertools
+from typing import Self
 
 from clldutils import svg
 from clldutils.color import rgb_as_hex
@@ -70,19 +71,36 @@ SECONDARY_COLORS = [c for c in COLORS if c not in PREFERED_COLORS]
 @implementer(IIcon)
 class Icon:
 
-    """Default implementation of IIcon: Icons are static image files."""
+    """Default implementation of IIcon: Icons are svg images."""
 
     def __init__(self, name, opacity=None, select_id=None):
         self.name = name
         self.opacity = opacity
         self.select_id = select_id
 
+    @staticmethod
+    def parse_icon_spec(icon: str) -> tuple[str, None | float]:
+        opacity = None
+        if "'" in icon:
+            icon = icon.split("'")[0]
+        if len(icon) > 4:
+            if len(icon) == 9:  # Spec includes opacity.
+                opacity = int('0x' + icon[7:], base=16) / 255
+                icon = icon[:7]
+            elif len(icon) == 7:
+                pass
+            else:  # Just assume the legacy icon spec format and ignore the rest.
+                icon = icon[:4]
+        if len(icon) == 4:  # Expand to full 6 hex-digits of RGB spec.
+            icon = icon[0] + 2 * icon[1] + 2 * icon[2] + 2 * icon[3]
+        return icon, opacity
+
     @classmethod
     def from_req(cls,
                  ctx,
                  req,
                  icon_spec_factory=None,
-                 icon_map=None):
+                 icon_map=None) -> Self | None:
         from clld.db.models.common import CombinationDomainElement  # Avoid circular imports.
 
         de, icon, opacity, select_id = None, None, '1.0', None
@@ -108,19 +126,7 @@ class Icon:
                 icon, select_id = icon
 
         if icon:
-            opacity = None
-            if "'" in icon:
-                icon = icon.split("'")[0]
-            if len(icon) > 4:
-                if len(icon) == 9:
-                    opacity = int('0x' + icon[7:], base=16) / 255
-                    icon = icon[:7]
-                elif len(icon) == 7:
-                    pass
-                else:
-                    icon = icon[:4]
-            if len(icon) == 4:
-                icon = icon[0] + 2 * icon[1] + 2 * icon[2] + 2 * icon[3]
+            icon, opacity = cls.parse_icon_spec(icon)
             return cls(icon_map.get(icon, icon), opacity=opacity, select_id=select_id)
 
     @property

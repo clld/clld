@@ -6,6 +6,7 @@ Functionality to handle bibligraphical data in the BibTeX format.
 import re
 import pathlib
 import collections
+from typing import Self
 
 from zope.interface import Interface, implementer
 from clldutils.misc import to_binary
@@ -339,7 +340,7 @@ class Record(Source, _Convertable):
         except KeyError:
             return default
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Self | None:
         """Get concatenated string of all values for key.
 
         :return: string representing the concatenation of the values for field 'key'.
@@ -348,7 +349,7 @@ class Record(Source, _Convertable):
         if not isinstance(value, (tuple, list)):
             value = [value]
         elif value and not isinstance(value[0], str):
-            return None
+            return None  # pragma: no cover
         return Record.sep(key).join(filter(None, value))
 
     def __str__(self):
