@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clld"
-version = "12.0.0"
+version = "12.0.1.dev0"
 description = "Python library supporting the development of cross-linguistic databases."
 readme = "README.md"
 requires-python = ">=3.11"
