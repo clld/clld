@@ -17,22 +17,24 @@ __all__ = ['random_string', 'safe_overwrite', 'summary', 'DeclEnum', 'DeclEnumTy
 
 
 def random_string(length: int) -> str:
+    """A random string of a certain length."""
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
 @contextlib.contextmanager
 def safe_overwrite(fname: str | pathlib.Path) -> Generator[pathlib.Path, None, None]:
+    """A context manager to safely overwrite a file when content creation takes a while."""
     fname = pathlib.Path(fname)
     if not fname.parent.exists():
         fname.parent.mkdir()
     assert fname.parent.exists()
     tmp = fname.parent
     while tmp.exists():
-        tmp = fname.parent.joinpath('%s.%s' % (fname.name, random_string(6)))
+        tmp = fname.parent / f'{fname.name}.{random_string(6)}'
     yield tmp
     if fname.exists():
         fname.unlink()
-    shutil.move(str(tmp), str(fname))
+    shutil.move(tmp, fname)
 
 
 def summary(text: str, max_length: int = 70) -> str:
