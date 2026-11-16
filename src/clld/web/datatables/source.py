@@ -12,7 +12,7 @@ class TypeCol(Col):
     def __init__(self, dt, name, *args, **kw):
         kw['sTitle'] = 'BibTeX type'
         kw['choices'] = [(t.value, t.description) for t in EntryType]
-        super(TypeCol, self).__init__(dt, name, *args, **kw)
+        super().__init__(dt, name, *args, **kw)
 
     def format(self, item):
         return getattr(item.bibtex_type, 'description', '')

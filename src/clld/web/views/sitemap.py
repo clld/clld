@@ -29,9 +29,9 @@ def robots(req):
     spec = ''
     deny = (req.registry.settings.get('clld.robots_deny') or '').strip().split()
     for robot in deny:
-        spec = spec + 'User-agent: {}\nDisallow: /\n'.format(robot)
-    return Response(
-        "Sitemap: {}\n{}".format(req.route_url('sitemapindex'), spec), content_type="text/plain")
+        spec = spec + f'User-agent: {robot}\nDisallow: /\n'
+    return Response(f"Sitemap: {req.route_url('sitemapindex')}\n{spec}", content_type="text/plain")
+
 
 
 def _query(req, rsc):

@@ -128,7 +128,8 @@ def get_adapters(interface, ctx, req):
     return req.registry.getAdapters([resource], interface)
 
 
-def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
+def get_adapter(  # noqa: PLR0913,PLR0917
+        interface, ctx, req, ext=None, name=None, getall=False):
     """Retrieve matching adapter.
 
     :param interface: Interface class to lookup adapter for.
@@ -149,16 +150,15 @@ def get_adapter(interface, ctx, req, ext=None, name=None, getall=False):
     elif name:
         # or by mime type
         adapter = adapters.get(name)
+    # or by content negotiation
+    elif not hasattr(req.accept, 'acceptable_offers'):  # pragma: no cover
+        # pre WebOb 1.8 (should be dropped once pyramid requires WebOb>=1.8):
+        adapter = adapters.get(req.accept.best_match(adapters.keys()))
     else:
-        # or by content negotiation
-        if not hasattr(req.accept, 'acceptable_offers'):  # pragma: no cover
-            # pre WebOb 1.8 (should be dropped once pyramid requires WebOb>=1.8):
-            adapter = adapters.get(req.accept.best_match(adapters.keys()))
-        else:
-            try:
-                adapter = adapters.get(req.accept.acceptable_offers(list(adapters.keys()))[0][0])
-            except IndexError:
-                adapter = None
+        try:
+            adapter = adapters.get(req.accept.acceptable_offers(list(adapters.keys()))[0][0])
+        except IndexError:
+            adapter = None
 
     res = None
     if isinstance(adapter, list):

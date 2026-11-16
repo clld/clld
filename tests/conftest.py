@@ -78,29 +78,29 @@ def populate_test_db(engine):
         jsondata={'__replacement_id__': 'source'})
 
     data.add_default(common.Contribution)
-    common.ContributionReference(
-        contribution=data[common.Contribution], source=data[common.Source])
+    DBSession.add(common.ContributionReference(
+        contribution=data[common.Contribution], source=data[common.Source]))
 
     for primary, c in [(True, 'contributor'), (False, 'b'), (True, 'c'), (False, 'd')]:
-        common.ContributionContributor(
+        DBSession.add(common.ContributionContributor(
             contribution=data[common.Contribution],
             primary=primary,
-            contributor=data['Contributor'][c])
+            contributor=data['Contributor'][c]))
 
     data.add_default(common.Language, latitude=10.5, longitude=0.3)
     data[common.Language].sources.append(data[common.Source])
 
     for i, type_ in enumerate(common.IdentifierType):
-        common.LanguageIdentifier(
+        DBSession.add(common.LanguageIdentifier(
             language=data[common.Language],
             identifier=common.Identifier(
                 type=type_.value,
                 id=type_.value + str(i),
-                name='abc' if type_.name == 'iso' else 'glot1234'))
+                name='abc' if type_.name == 'iso' else 'glot1234')))
 
-    common.LanguageIdentifier(
+    DBSession.add(common.LanguageIdentifier(
         language=data[common.Language],
-        identifier=common.Identifier(type='name', id='name', name='a'))
+        identifier=common.Identifier(type='name', id='name', name='a')))
 
     for i in range(2, 102):
         _l = common.Language(id='l%s' % i, name='Language %s' % i)
@@ -117,8 +117,8 @@ def populate_test_db(engine):
         language=data[common.Language],
         parameter=param,
         contribution=data[common.Contribution])
-    common.ValueSetReference(
-        valueset=valueset, source=data[common.Source], description='10-20')
+    DBSession.add(common.ValueSetReference(
+        valueset=valueset, source=data[common.Source], description='10-20'))
 
     data.add_default(
         common.Value,
@@ -145,14 +145,14 @@ def populate_test_db(engine):
         parameter=paramnd,
         contribution=data[common.Contribution])
 
-    common.ValueSetReference(
-        valueset=valueset, source=data[common.Source], description='10-20')
-    common.Value(id='v2', valueset=valueset, frequency=50, confidence='high')
+    DBSession.add(common.ValueSetReference(
+        valueset=valueset, source=data[common.Source], description='10-20'))
+    DBSession.add(common.Value(id='v2', valueset=valueset, frequency=50, confidence='high'))
 
     unit = data.add_default(common.Unit, language=data[common.Language])
     up = data.add_default(common.UnitParameter)
-    common.UnitValue(
-        id='unitvalue', name='UnitValue', unit=unit, unitparameter=up)
+    DBSession.add(common.UnitValue(
+        id='unitvalue', name='UnitValue', unit=unit, unitparameter=up))
 
     up2 = common.UnitParameter(id='up2', name='UnitParameter with domain')
     de = common.UnitDomainElement(id='de', name='de', parameter=up2)
@@ -175,7 +175,7 @@ def populate_test_db(engine):
         original_script='a morpheme',
         language=data[common.Language],
         jsondata={'alt_translation': 'Spanish: ...'})
-    common.SentenceReference(sentence=sentence, source=data[common.Source])
+    DBSession.add(common.SentenceReference(sentence=sentence, source=data[common.Source]))
     DBSession.add(common.Config(key='key', value='value'))
 
     common.Config.add_replacement('replaced', 'language', model=common.Language)

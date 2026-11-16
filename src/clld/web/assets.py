@@ -47,6 +47,6 @@ bundles = {
     ],
 }
 
-for name in bundles:
+for name, bundle in bundles.items():
     environment.register(
-        name, *bundles[name], **dict(output='{0}/packed.%(version)s.{0}'.format(name)))
+        name, *bundle, **dict(output='{0}/packed.%(version)s.{0}'.format(name)))

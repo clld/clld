@@ -41,10 +41,10 @@ class Renderable:
 
     def render_to_response(self, ctx, req):
         res = Response(self.render(ctx, req))
-        res.vary = str('Accept')
+        res.vary = 'Accept'
         res.content_type = str(self.send_mimetype or self.mimetype)
         if self.charset:
-            res.content_type += str('; charset=') + str(self.charset)
+            res.content_type += '; charset=' + str(self.charset)
         return res
 
     def template_context(self, ctx, req):

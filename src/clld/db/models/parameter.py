@@ -168,8 +168,7 @@ class Combination:
 
         # determine relevant languages, i.e. languages having a value for all parameters:
         languages = _filter(
-            DBSession.query(Language.pk).join(ValueSet).join(Parameter),
-            'intersect').subquery()
+            DBSession.query(Language.pk).join(ValueSet).join(Parameter), 'intersect')
 
         # value query:
         return _filter(

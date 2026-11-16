@@ -172,7 +172,7 @@ class CsvDump(Download):
         fields can be a list of column names or a dictionary mapping model attribute
         names to csv column names.
         """
-        super(CsvDump, self).__init__(model, pkg, **kw)
+        super().__init__(model, pkg, **kw)
         self.fields = fields
         self.writer = None
 

@@ -14,7 +14,7 @@ def url(id=None, obj_type='ConceptSet'):
         'ConceptList': 'contributions',
         'Concept': 'values',
     }
-    return '{0}/{1}/{2}'.format(BASE_URL, path_map[obj_type], id)
+    return f'{BASE_URL}/{path_map[obj_type]}/{id}'
 
 
 def logo(req, width='20'):
@@ -23,7 +23,7 @@ def logo(req, width='20'):
 
 def link(req, id=None, obj_type='ConceptSet', label=None):
     akw = dict(
-        title='Concepticon' if id is None else 'View {0} at Concepticon'.format(obj_type),
+        title='Concepticon' if id is None else f'View {obj_type} at Concepticon',
         href=url(id=id, obj_type=obj_type))
     if label:
         return external_link(None, label=label, **akw)

@@ -10,7 +10,7 @@ import collections
 
 from pyramid.renderers import render
 from pyramid.response import Response
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload
 
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
 from clld.interfaces import IOlacConfig
@@ -74,8 +74,8 @@ class ResumptionToken:
     .. seealso: http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
     """
 
-    PATTERN = re.compile('(?P<offset>[0-9]+)(?P<from>f%s)?(?P<until>u%s)?$'
-                         % (TIMESTAMP_REGEX, TIMESTAMP_REGEX))
+    PATTERN = re.compile(
+        f'(?P<offset>[0-9]+)(?P<from>f{TIMESTAMP_REGEX})?(?P<until>u{TIMESTAMP_REGEX})?$')
     limit = 100
 
     def __init__(self, url_arg=None, offset=None, from_=None, until=None):
@@ -97,11 +97,11 @@ class ResumptionToken:
                 self.until = datetime_from_iso(m.group('until')[1:]) + datetime.timedelta(1)
 
     def __str__(self):
-        res = "%s" % self.offset
+        res = f"{self.offset}"
         if self.from_:
-            res += "f%s" % date(self.from_)
+            res += f"f{date(self.from_)}"
         if self.until:
-            res += "u%s" % date(self.until)
+            res += f"u{date(self.until)}"
         assert self.PATTERN.match(res)
         return res
 
@@ -119,8 +119,7 @@ class OlacConfig:
             .join(LanguageIdentifier)\
             .filter_by(language_pk=Language.pk)
         return req.db.query(Language).filter(subquery.exists())\
-            .options(undefer('updated'),
-                     joinedload(Language.languageidentifier).
+            .options(joinedload(Language.languageidentifier).
                      joinedload(LanguageIdentifier.identifier))
 
     def get_earliest_record(self, req):
@@ -171,7 +170,7 @@ class OlacConfig:
                 ed.contributor.name,
                 ed.contributor.email or req.contact_email_address))
         return {
-            'archiveURL': 'http://%s/' % req.dataset.domain,
+            'archiveURL': f'https://{req.dataset.domain}/',
             'participants': participants,
             'institution': Institution(
                 req.dataset.publisher_name,
@@ -187,7 +186,7 @@ def olac(req):
     return olac_with_cfg(req, req.registry.getUtility(IOlacConfig))
 
 
-def olac_with_cfg(req, cfg):
+def olac_with_cfg(req, cfg):  # noqa: PLR0912,PLR0911,C901
     """Factory function for olac views with different configurations.
 
     If applications want to disseminate metadata for other resources than languages

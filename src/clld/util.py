@@ -4,6 +4,7 @@ import shutil
 import random
 import string
 import pathlib
+import textwrap
 import contextlib
 from collections.abc import Generator
 
@@ -38,10 +39,9 @@ def safe_overwrite(fname: str | pathlib.Path) -> Generator[pathlib.Path, None, N
 
 
 def summary(text: str, max_length: int = 70) -> str:
-    from textwrap import shorten
     if max_length < 4:
         return '...'
-    return shorten(text, width=max_length, placeholder=' ...')
+    return textwrap.shorten(text, width=max_length, placeholder=' ...')
 
 
 # From "The Enum Recipe": http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/

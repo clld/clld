@@ -15,10 +15,10 @@ class Bibtex(Representation):
     mimetype = 'text/x-bibtex'
 
     def filename(self, ctx, req):
-        return '%s-refs.%s' % (req.dataset.id, self.extension)
+        return f'{req.dataset.id}-refs.{self.extension}'
 
     def render_to_response(self, ctx, req):
-        res = super(Bibtex, self).render_to_response(ctx, req)
+        res = super().render_to_response(ctx, req)
         res.content_disposition = 'attachment; filename="%s"' % self.filename(ctx, req)
         return res
 

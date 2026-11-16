@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
     "clldutils>=3.18",
@@ -32,7 +33,7 @@ dependencies = [
     "pyramid>=1.10",
     "pyramid_mako>=1.0",
     "pyramid_tm",
-    "SQLAlchemy>=1.4, <2.0",
+    "SQLAlchemy>=2.1",
     "zope.sqlalchemy",
     "webassets>=0.12.1",
     "markupsafe",
@@ -119,6 +120,10 @@ exclude = [".tox", "src/clld/project_template"]
 # E/F match default Flake8; D enables pydocstyle checks (since you ignored specific D rules)
 select = ["UP", "N", "C90", "PL", "E", "F"]
 ignore = [
+    "UP031",
+    "UP032",
+    "PLW2901",
+    "PLR2004",
     "E711", # Comparison to `None` should be `cond is None` (needed for SQLAlchemy filters)
     "E712", # Comparison to `True` should be `cond is True` (needed for SQLAlchemy filters)
 ]
@@ -130,10 +135,6 @@ addopts = [
     "--cov",
     "--appini=tests/test.ini",
 ]
-#filterwarnings = [
-#    "ignore::sqlalchemy.exc.SAWarning",
-#    "ignore::sqlalchemy.exc.RemovedIn20Warning",
-#]
 
 [tool.coverage.run]
 source = [
@@ -147,11 +148,10 @@ skip_covered = true
 
 [tool.tox]
 requires = ["tox>=4.19"]
-env_list = ["py311", "py312", "py313", "py314"]
+env_list = ["py311", "py312", "py313", "py314", "py315"]
 skip_missing_interpreters = true
 
 [tool.tox.env_run_base]
 extras = ["test"]
 commands = [["pytest", { replace = "posargs", default = [], extend = true }]]
-set_env = "SQLALCHEMY_SILENCE_UBER_WARNING=1"
 package = "wheel"

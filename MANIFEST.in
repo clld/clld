@@ -1,3 +1,0 @@
-include README.md
-graft src
-global-exclude *.py[co]

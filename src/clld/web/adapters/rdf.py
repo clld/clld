@@ -13,8 +13,7 @@ class Rdf(Representation):
     rdflibname = None
 
     def render(self, ctx, req):
-        return convert(
-            xmlchars(super(Rdf, self).render(ctx, req)), 'xml', self.rdflibname)
+        return convert(xmlchars(super().render(ctx, req)), 'xml', self.rdflibname)
 
 
 class RdfIndex(Index):
@@ -39,8 +38,8 @@ class RdfIndex(Index):
             # triggered without any filter parameters
             items = ctx.rdf_index_query(req.db.query(ctx.db_model()).order_by(ctx.db_model().pk))
         if isinstance(ctx.model.name, property):
-            items = [(item.id, None) for item in items.options(load_only('id'))]
+            items = [(item.id, None) for item in items.options(load_only(ctx.model.id))]
         else:
             items = [(item.id, item.name)
-                     for item in items.options(load_only('id', 'name'))]
-        return convert(super(RdfIndex, self).render(items, req), 'xml', self.rdflibname)
+                     for item in items.options(load_only(ctx.model.id, ctx.model.name))]
+        return convert(super().render(items, req), 'xml', self.rdflibname)

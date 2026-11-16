@@ -52,7 +52,7 @@ def cc_link(req, license_url, button='regular'):
         return
 
     comps = license_url.path.split('/')
-    if len(comps) < 3:
+    if len(comps) < 3:  # noqa: PLR2004
         return  # pragma: no cover
 
     known = {
@@ -157,14 +157,14 @@ class JS:
             arg.name if isinstance(arg, JS) else dumps(arg) for arg in args))
 
     def __getattr__(self, attr):
-        return JS('%s.%s' % (self.name, attr))
+        return JS(f'{self.name}.{attr}')
 
     def __json__(self, request=None):
-        return '{0}{1}{0}'.format(self.delimiter, self.name)
+        return f'{self.delimiter}{self.name}{self.delimiter}'
 
     @classmethod
-    def sub(self, string):
-        return self.pattern.sub(lambda m: m.group('name'), string)
+    def sub(cls, string):
+        return cls.pattern.sub(lambda m: m.group('name'), string)
 
 
 JSFeed = JS('CLLD.Feed')
@@ -250,7 +250,7 @@ def format_license_icon_url(req):
 
 
 def format_frequency(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
-    if not obj.frequency or obj.frequency == 100:
+    if not obj.frequency or obj.frequency == 100:  # noqa: PLR2004
         return ''
     res = 'Frequency: %s%%' % round(obj.frequency, 1)
     marker = marker or req.registry.queryUtility(interfaces.IFrequencyMarker)
@@ -470,11 +470,10 @@ def contactmail(req, ctx=None, title='contact maintainer'):
     params = {}
     for name in ['subject', 'body']:
         params[name] = pyramid_render(
-            'contactmail_{0}.mako'.format(name), {'req': req, 'ctx': ctx}, request=req)\
-            .strip()\
+            f'contactmail_{name}.mako', {'req': req, 'ctx': ctx}, request=req).strip()\
             .encode('utf8')
         query = urlencode(params).replace('+', '%20')
-    href = 'mailto:{0}?{1}'.format(req.contact_email_address, query)
+    href = f'mailto:{req.contact_email_address}?{query}'
     return button(icon('bell'), title=title, href=href, class_='btn-warning btn-mini')
 
 

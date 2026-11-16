@@ -22,7 +22,7 @@ _PACIFIC_CENTERED = False
 
 
 def pacific_centered():
-    global _PACIFIC_CENTERED
+    global _PACIFIC_CENTERED  # noqa: PLW0603
     _PACIFIC_CENTERED = True
 
 
@@ -64,13 +64,13 @@ def get_lonlat(obj):
     """
     if hasattr(obj, 'latitude') and hasattr(obj, 'longitude'):
         longitude, latitude = obj.longitude, obj.latitude
-    elif isinstance(obj, (tuple, list)) and len(obj) == 2:
+    elif isinstance(obj, (tuple, list)) and len(obj) == 2:  # noqa: PLR2004
         longitude, latitude = obj
     else:
         return
     if longitude is None or latitude is None:
         return
-    if _PACIFIC_CENTERED and longitude <= -26:
+    if _PACIFIC_CENTERED and longitude <= -26:  # noqa: PLR2004
         longitude += 360
     return longitude, latitude
 

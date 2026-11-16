@@ -4,9 +4,7 @@ import sqlite3
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
 from sqlalchemy.pool import Pool
-from sqlalchemy.orm import (
-    declarative_base, declared_attr, scoped_session, sessionmaker, deferred, undefer,
-)
+from sqlalchemy.orm import declarative_base, declared_attr, scoped_session, sessionmaker
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, DisconnectionError
 from sqlalchemy.inspection import inspect
 from sqlalchemy.types import TypeDecorator, VARCHAR
@@ -88,20 +86,14 @@ class Base(declarative_base()):
     pk = Column(Integer, primary_key=True, doc='primary key')
 
     #: To allow for timestamp-based versioning we store a timestamp for creation or an object.
-    @declared_attr
-    def created(cls):
-        return deferred(Column(DateTime(timezone=True), default=func.now()))
+    created = Column(DateTime(timezone=True), default=func.now())
 
     #: Timestamp for latest update of an object.
-    @declared_attr
-    def updated(cls):
-        return deferred(Column(DateTime(timezone=True), default=func.now(), onupdate=func.now()))
+    updated = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
     #: The active flag is meant as an easy way to mark records as obsolete or inactive,
     #: without actually deleting them.
-    @declared_attr
-    def active(cls):
-        return deferred(Column(Boolean, default=True))
+    active = Column(Boolean, default=True)
 
     #: To allow storage of arbitrary key,value pairs with typed values, each model
     #: provides a column to store JSON encoded dicts.
@@ -109,7 +101,7 @@ class Base(declarative_base()):
 
     def __init__(self, jsondata=None, **kwargs):
         kwargs['jsondata'] = jsondata or {}
-        super(Base, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def update_jsondata(self, **kw):
         """Convenience function.
@@ -151,8 +143,7 @@ class Base(declarative_base()):
         if key is None:
             key = 'pk' if isinstance(value, int) else 'id'
         try:
-            return session.query(cls)\
-                .options(undefer('updated')).filter_by(**{key: value}).one()
+            return session.query(cls).filter_by(**{key: value}).one()
         except (NoResultFound, MultipleResultsFound):
             if default is NO_DEFAULT:
                 raise

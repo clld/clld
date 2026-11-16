@@ -19,7 +19,7 @@ class TypeCol(Col):
     def __init__(self, dt, name, **kw):
         kw.setdefault('sTitle', dt.req.translate('Type'))
         kw.setdefault('choices', get_distinct_values(Sentence.type))
-        super(TypeCol, self).__init__(dt, name, **kw)
+        super().__init__(dt, name, **kw)
 
     def search(self, qs):
         return Sentence.type == qs
@@ -33,7 +33,7 @@ class TypeCol(Col):
 
 class TsvCol(Col):
     def search(self, qs):
-        return super(TsvCol, self).search('\t'.join(qs.split()))
+        return super().search('\t'.join(qs.split()))
 
 
 class AudioCol(Col):
@@ -76,7 +76,7 @@ class Sentences(DataTable):
             query = query.join(Language).options(joinedload(Sentence.language))
 
         if self.parameter:
-            query = query.join(ValueSentence, Value, ValueSet)\
+            query = query.join(ValueSentence).join(Value).join(ValueSet)\
                 .filter(ValueSet.parameter_pk == self.parameter.pk)
 
         return query

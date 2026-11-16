@@ -9,13 +9,14 @@ import collections
 import urllib.parse
 
 from sqlalchemy import engine_from_config
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import NoResultFound
 
 from webob.request import Request as WebobRequest
 from zope.interface import implementer, implementedBy
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPGone
 from pyramid import events
+from pyramid.config import Configurator
 from pyramid.request import Request, reify
 from pyramid.interfaces import IRoutesMapper
 from pyramid.asset import abspath_from_asset_spec
@@ -79,7 +80,7 @@ class ClldRequest(Request):
         application serves are used in various places, so we want to have a reference to
         it.
         """
-        return self.db.query(common.Dataset).options(undefer('updated')).first()
+        return self.db.query(common.Dataset).first()
 
     @property
     def contact_email_address(self):
@@ -202,7 +203,7 @@ class ClldRequest(Request):
             return self.static_url(self.file_ospath(file_))
 
 
-def menu_item(route_name, ctx, req, label=None):
+def menu_item(route_name: str, ctx, req: Request, label: str | None = None):
     """Factory function for a menu item specified by route name.
 
     :return: A pair (URL, label) to create a menu item.
@@ -221,7 +222,7 @@ class CtxFactoryQuery:
     CtxFactoryQuery.
     """
 
-    def refined_query(self, query, model, req):
+    def refined_query(self, query, model, req: Request):
         """To be overridden.
 
         Derived classes may override this method to add model-specific query
@@ -229,7 +230,7 @@ class CtxFactoryQuery:
         """
         return query
 
-    def __call__(self, model, req):
+    def __call__(self, model, req: Request):
         query = req.db.query(model).filter(model.id == req.matchdict['id'])
         custom_query = self.refined_query(query, model, req)
 
@@ -238,30 +239,19 @@ class CtxFactoryQuery:
             f = getattr(model, 'refine_factory_query', None)
             if f:
                 query = f(query)
-            else:
-                if model == common.Contribution:
-                    query = query.options(
-                        joinedload(
-                            common.Contribution.valuesets
-                        ).joinedload(
-                            common.ValueSet.parameter
-                        ),
-                        joinedload(
-                            common.Contribution.valuesets
-                        ).joinedload(
-                            common.ValueSet.values
-                        ).joinedload(
-                            common.Value.domainelement
-                        ),
-                        joinedload(
-                            common.Contribution.references
-                        ).joinedload(
-                            common.ContributionReference.source
-                        ),
-                        joinedload(
-                            common.Contribution.data
-                        )
-                    )
+            elif model == common.Contribution:
+                query = query.options(
+                    joinedload(common.Contribution.valuesets
+                    ).joinedload(common.ValueSet.parameter
+                    ),
+                    joinedload(common.Contribution.valuesets
+                    ).joinedload(common.ValueSet.values
+                    ).joinedload(common.Value.domainelement
+                    ),
+                    joinedload(common.Contribution.references
+                    ).joinedload(common.ContributionReference.source),
+                    joinedload(common.Contribution.data)
+                )
         else:
             query = custom_query  # pragma: no cover
 
@@ -320,25 +310,25 @@ def maybe_import(name, pkg_dir=None):
         return importlib.import_module(name)
     except ImportError:
         if pkg_dir and exists:
-            print('failed to import existing module {0}'.format(name))
+            print(f'failed to import existing module {name}')
             raise
 
 
 #
 # configurator directives:
 #
-def register_utility(config, cls, interface, name='', overwrite=True):
+def register_utility(config: Configurator, cls, interface, name='', overwrite=True):
     if overwrite or not config.registry.queryUtility(interface, name=name):
         config.registry.registerUtility(cls, provided=interface, name=name)
 
 
-def register_cls(interface, config, route, cls, overwrite=True):
+def register_cls(interface, config: Configurator, route: str, cls, overwrite=True):
     register_utility(config, cls, interface, name=route, overwrite=overwrite)
     if not route.endswith('_alt'):
         register_utility(config, cls, interface, name=route + '_alt', overwrite=overwrite)
 
 
-def register_adapter(config, cls, from_, to_=None, name=None):
+def register_adapter(config: Configurator, cls, from_, to_=None, name=None):
     if isinstance(cls, dict):
         cls = adapter_factory(**cls)
     to_ = to_ or list(implementedBy(cls))[0]
@@ -346,13 +336,13 @@ def register_adapter(config, cls, from_, to_=None, name=None):
     config.registry.registerAdapter(cls, (from_,), to_, name=name)
 
 
-def register_adapters(config, specs):
+def register_adapters(config: Configurator, specs):
     for interface, base, mimetype, extension, template, extra in specs:
         extra.update(base=base, mimetype=mimetype, extension=extension, template=template)
         config.register_adapter(extra, interface, name=mimetype)
 
 
-def register_menu(config, *items):
+def register_menu(config: Configurator, *items):
     """Register an item for the main menu.
 
     :param items: An item may be a (name, factory) pair, where factory is a callable that\
@@ -371,7 +361,7 @@ def register_menu(config, *items):
     config.registry.registerUtility(menuitems, interfaces.IMenuItems)
 
 
-def add_route_and_view(config, route_name, route_pattern, view, **kw):
+def add_route_and_view(config: Configurator, route_name, route_pattern, view, **kw):
     """Add a route and a corresponding view and appropriate default routes and views.
 
     .. note:: To allow custom route patterns we look them up in a dict in settings.
@@ -390,7 +380,7 @@ def add_route_and_view(config, route_name, route_pattern, view, **kw):
     config.add_view(view, route_name=route_name + '_alt', **kw)
 
 
-def register_resource_routes_and_views(config, rsc):
+def register_resource_routes_and_views(config: Configurator, rsc):
     kw = dict(factory=functools.partial(ctx_factory, rsc.model, 'rsc'))
     if rsc.model == common.Dataset:
         pattern = '/'
@@ -407,7 +397,7 @@ def register_resource_routes_and_views(config, rsc):
             factory=functools.partial(ctx_factory, rsc.model, 'index'))
 
 
-def register_resource(config, name, model, interface, with_index=False, **kw):
+def register_resource(config: Configurator, name, model, interface, with_index=False, **kw):
     """Directive to register custom resources.
 
     .. note::
@@ -428,14 +418,14 @@ def register_resource(config, name, model, interface, with_index=False, **kw):
     register_resource_adapters(config, rsc)
 
 
-def register_download(config, download):
+def register_download(config: Configurator, download):
     config.registry.registerUtility(download, interfaces.IDownload, name=download.name)
 
 
 StaticResource = collections.namedtuple('StaticResource', 'type asset_spec')
 
 
-def register_staticresource(config, type, asset_spec):
+def register_staticresource(config: Configurator, type, asset_spec):
     config.registry.registerUtility(
         StaticResource(type, asset_spec), interfaces.IStaticResource, name=asset_spec)
 
@@ -448,23 +438,24 @@ def add_settings_from_file(config, file_):
         config.add_settings(cfg)
 
 
-def _route_and_view(config, pattern, view, name=None):
+def _route_and_view(config: Configurator, pattern, view, name=None):
     name = name or str(uuid.uuid4())
     config.add_route(name, pattern)
     config.add_view(view, route_name=name)
 
 
-def add_301(config, pattern, location, name=None):
+def add_301(config: Configurator, pattern, location, name=None):
     _route_and_view(
         config, pattern, xpartial(redirect, HTTPMovedPermanently, location), name=name)
 
 
-def add_410(config, pattern, name=None):
+def add_410(config: Configurator, pattern, name=None):
     _route_and_view(config, pattern, gone, name=name)
 
 
-def add_page(config, name, pattern=None, view=None, template=None, views=None):
-    views = views or maybe_import('%s.views' % config.root_package.__name__)
+def add_page(  # noqa: PLR0917,PLR0913
+        config: Configurator, name: str, pattern=None, view=None, template=None, views=None):
+    views = views or maybe_import(f'{config.root_package.__name__}.views')
     config.add_route_and_view(
         name,
         pattern or '/' + name,
@@ -472,7 +463,7 @@ def add_page(config, name, pattern=None, view=None, template=None, views=None):
         renderer=template or name + '.mako')
 
 
-def includeme(config):
+def includeme(config: Configurator):  # noqa: PLR0915,PLR0912,C901
     """Upgrading:
 
     - register utilities "by hand", after config.include('clld.web.app')
@@ -505,9 +496,10 @@ def includeme(config):
     config.registry.registerUtility(OlacConfig(), interfaces.IOlacConfig)
 
     # initialize the db connection
-    engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
+    if not DBSession.registry.has():
+        engine = engine_from_config(config.registry.settings, 'sqlalchemy.')
+        DBSession.configure(bind=engine)
+        Base.metadata.bind = engine
 
     try:
         git_tag = git_describe(pathlib.Path(pkg_dir).parent)

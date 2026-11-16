@@ -14,7 +14,7 @@ def get_doi(obj):
 def url(obj):
     doi = get_doi(obj)
     if doi:
-        return '{0}/{1}'.format(BASE_URL, doi)
+        return f'{BASE_URL}/{doi}'
 
 
 def logo(req, width='20'):

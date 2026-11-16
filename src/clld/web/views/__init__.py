@@ -69,8 +69,7 @@ def _add_link_header(response, url, adapter=None, rel="canonical", mimetype="tex
         rel = adapter.rel
         mimetype = adapter.send_mimetype or adapter.mimetype
     if mimetype and rel:
-        response.headerlist.append(
-            ('Link', '<%s>; rel="%s"; type="%s"' % tuple(map(str, [url, rel, mimetype]))))
+        response.headerlist.append(('Link', f'<{url}>; rel="{rel}"; type="{mimetype}"'))
 
 
 def index_view(ctx, req):
@@ -109,7 +108,7 @@ def datatable_xhr_view(ctx, req):
     if hasattr(ctx, 'row_class'):
         data = []
         for item in items:
-            _d = {'DT_RowId': 'row_%s' % item.pk}
+            _d = {'DT_RowId': f'row_{item.pk}'}
             row_class = ctx.row_class(item)
             if row_class:
                 _d['DT_RowClass'] = row_class
@@ -140,12 +139,12 @@ def js(req):
     param_pattern = re.compile(r'\{(?P<name>[a-z]+)(\:[^\}]+)?\}')
 
     res = [
-        "CLLD.base_url = %s;" % json.dumps(req.application_url),
-        "CLLD.query_params = %s;" % json.dumps(req.query_params),
+        f"CLLD.base_url = {json.dumps(req.application_url)};",
+        f"CLLD.query_params = {json.dumps(req.query_params)};",
     ]
     for route in req.registry.getUtility(IRoutesMapper).get_routes():
-        pattern = param_pattern.sub(lambda m: '{%s}' % m.group('name'), route.pattern)
-        res.append('CLLD.routes[%s] = %s;' % tuple(map(json.dumps, [route.name, pattern])))
+        pattern = param_pattern.sub(lambda m: f"{{{m.group('name')}}}", route.pattern)
+        res.append(f'CLLD.routes[{json.dumps(route.name)}] = {json.dumps(pattern)};')
     return Response('\n'.join(res), content_type="text/javascript")
 
 
@@ -214,14 +213,14 @@ class ParameterMultiSelect(MultiSelect):  # pragma: no cover
 
     """Experimental."""
 
-    def __init__(self, req, name, eid, collection=None, url=None, selected=None):
+    def __init__(  # noqa: PLR0917,PLR0913
+            self, req, name, eid, collection=None, url=None, selected=None):
         MultiSelect.__init__(self, req, name, eid, url='x')
         self.data = []
         for app, rm in req.registry.settings.get('clld.parameters', {}).items():
             for param in rm['resources']:
                 self.data.append({
-                    'id': '%s-%s' % (app, param['id']),
-                    'text': '%s %s: %s' % (app, param['id'], param['name'])})
+                    'id': f"{app}-{param['id']}", 'text': f"{app} {param['id']}: {param['name']}"})
         self._datadict = dict((d['id'], d) for d in self.data)
 
     def format_result(self, obj):

@@ -91,4 +91,4 @@ class TxtCitation(Metadata):
             self.template = 'contribution/md_txt.mako'
         else:  # if interfaces.IDataset.providedBy(ctx):
             self.template = 'dataset/md_txt.mako'
-        return super(TxtCitation, self).render(ctx, req)
+        return super().render(ctx, req)

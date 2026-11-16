@@ -9,7 +9,7 @@ def url(id=None, obj_type='languoid'):
     if id is None:
         return BASE_URL
     assert obj_type in ('languoid', 'reference')
-    return '{0}/resource/{1}/id/{2}'.format(BASE_URL, obj_type, id)
+    return f'{BASE_URL}/resource/{obj_type}/id/{id}'
 
 
 def logo(req, width='20'):
@@ -21,6 +21,6 @@ def logo(req, width='20'):
 
 def link(req, id=None, obj_type='languoid', label=None):
     akw = dict(
-        title='Glottolog' if id is None else 'View {0} at Glottolog'.format(obj_type),
+        title='Glottolog' if id is None else f'View {obj_type} at Glottolog',
         href=url(id=id, obj_type=obj_type))
     return HTML.a(logo(req), label or '', **akw)

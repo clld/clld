@@ -82,16 +82,16 @@ class Icon:
     def parse_icon_spec(icon: str) -> tuple[str, None | float]:
         opacity = None
         if "'" in icon:
-            icon = icon.split("'")[0]
-        if len(icon) > 4:
-            if len(icon) == 9:  # Spec includes opacity.
+            icon = icon.split("'", maxsplit=1)[0]
+        if len(icon) > 4:  # noqa: PLR2004
+            if len(icon) == 9:  # Spec includes opacity.  # noqa: PLR2004
                 opacity = int('0x' + icon[7:], base=16) / 255
                 icon = icon[:7]
-            elif len(icon) == 7:
+            elif len(icon) == 7:  # noqa: PLR2004
                 pass
             else:  # Just assume the legacy icon spec format and ignore the rest.
                 icon = icon[:4]
-        if len(icon) == 4:  # Expand to full 6 hex-digits of RGB spec.
+        if len(icon) == 4:  # Expand to full 6 hex-digits of RGB spec.  # noqa: PLR2004
             icon = icon[0] + 2 * icon[1] + 2 * icon[2] + 2 * icon[3]
         return icon, opacity
 
@@ -101,7 +101,7 @@ class Icon:
                  req,
                  icon_spec_factory=None,
                  icon_map=None) -> Self | None:
-        from clld.db.models.common import CombinationDomainElement  # Avoid circular imports.
+        from clld.db.models.common import CombinationDomainElement  # noqa: PLC0415
 
         de, icon, opacity, select_id = None, None, '1.0', None
         icon_map = icon_map or {}

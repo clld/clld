@@ -41,7 +41,7 @@ class Legend:
 
     """Represents a navpill with a dropdown above a map."""
 
-    def __init__(self,
+    def __init__(self,  # noqa: PLR0913,PLR0917
                  map_,
                  name,
                  items,
@@ -416,7 +416,10 @@ class SelectedLanguagesMap(Map):
         Map.__init__(self, ctx, req, **kw)
 
     def get_options(self):
-        return {'icon_size': 20, 'hash': True, 'show_labels': len(self.languages) < 100}
+        return {
+            'icon_size': 20,
+            'hash': True,
+            'show_labels': len(self.languages) < 100}  # noqa: PLR2004
 
     def get_layers(self):
         yield Layer(

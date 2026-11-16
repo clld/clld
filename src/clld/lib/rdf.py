@@ -69,9 +69,28 @@ class ClldGraph(Graph):
     """
 
     def __init__(self, *args, **kw):
-        super(ClldGraph, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         for prefix, ns in NAMESPACES.items():
             self.bind(prefix, ns)
+
+
+def _is_http_url(s):
+    return s.startswith('http://') or s.startswith('https://')
+
+
+def _extract_description(xml):
+    res = []
+    in_desc = False
+    if not isinstance(xml, str):
+        xml = xml.decode('utf8')  # pragma: no cover
+    for line in xml.split('\n'):
+        if line.strip().startswith('</rdf:Description'):
+            break
+        if in_desc:
+            res.append(line)
+        if line.strip().startswith('<rdf:Description'):
+            in_desc = True
+    return '\n'.join(res)
 
 
 def properties_as_xml_snippet(subject, props):
@@ -84,27 +103,12 @@ def properties_as_xml_snippet(subject, props):
             p = expand_prefix(p)
             if p:
                 if isinstance(o, str):
-                    if o.startswith('http://') or o.startswith('https://'):
-                        o = URIRef(o)
-                    else:
-                        o = Literal(o)
+                    o = URIRef(o) if _is_http_url(o) else Literal(o)
                 try:
                     g.add((subject, p, o))
                 except AssertionError:
                     pass
-    res = []
-    in_desc = False
-    xml = g.serialize(format='xml')
-    if not isinstance(xml, str):
-        xml = xml.decode('utf8')  # pragma: no cover
-    for line in xml.split('\n'):
-        if line.strip().startswith('</rdf:Description'):
-            break
-        if in_desc:
-            res.append(line)
-        if line.strip().startswith('<rdf:Description'):
-            in_desc = True
-    return '\n'.join(res)
+    return _extract_description(g.serialize(format='xml'))
 
 
 def convert(string, from_, to_):

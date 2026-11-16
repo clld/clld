@@ -6,11 +6,10 @@ nature: On the client they provide the information to instantiate a jquery DataT
 object. Server side they know how to provide the data to the client-side table.
 """
 import re
-import typing
 import functools
+from collections.abc import Generator, Callable
 
 from markupsafe import Markup
-from sqlalchemy.orm import undefer
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
 from clldutils.misc import nfilter
@@ -94,7 +93,14 @@ class Col:
     # convenient way to provide defaults for some kw arguments of __init__:
     __kw__ = {}
 
-    def __init__(self, dt, name, get_object=None, model_col=None, format=None, **kw):
+    def __init__(  # noqa: C901
+            self,
+            dt: 'DataTable',
+            name: str,
+            get_object: Callable[[Base], Base] | None = None,
+            model_col=None,
+            format=None,
+            **kw):
         """
         :param kw: Camel-cased keywords with type prefix are made available to JS. Recognized \
         keywords are \
@@ -420,8 +426,7 @@ class DataTable(Component):
     __constraints__ = []
     __toolbar_kw__ = {}
 
-    def __init__(
-            self, req: Request, model: typing.Type[Base], eid: typing.Optional[str] = None, **kw):
+    def __init__(self, req: Request, model: Base, eid: str | None = None, **kw):
         """
         :param req: request object.
         :param model: mapper class, instances of this class will be the rows in the table.
@@ -455,10 +460,10 @@ class DataTable(Component):
         return model.__name__.lower()
 
     def __str__(self):
-        return '%ss' % self.model.__name__
+        return f'{self.model.__name__}s'
 
     def __repr__(self):
-        return '%ss' % self.model.__name__
+        return f'{self.model.__name__}s'
 
     def col_defs(self):
         """Must be implemented by derived classes.
@@ -544,12 +549,7 @@ class DataTable(Component):
     def default_order(self):
         return self.db_model().pk
 
-    def get_query(self, limit=DISPLAY_LIMIT, offset=0, undefer_cols=()):
-        query = self.base_query(
-            DBSession.query(self.db_model()).filter(self.db_model().active == True))
-        self.count_all = query.count()
-
-        _filters = []
+    def _iter_filters(self, query) -> Generator[tuple[int, str, str], None, None]:
         for name, val in self.req.params.items():
             if val and name.startswith('sSearch_'):
                 try:
@@ -564,17 +564,14 @@ class DataTable(Component):
                     for clause in clauses:
                         if clause is not None:
                             query = query.filter(clause)
-                            _filters.append((colindex, col.js_args['sTitle'], val))
-        for colindex, coltitle, qs in sorted(set(_filters)):
-            self.filters.append((coltitle, qs))
+                            yield (colindex, col.js_args['sTitle'], val)
 
-        self.count_filtered = query.count()
-
-        iSortingCols = type_coerce(int, self.req.params.get('iSortingCols', 0), 0)
+    def _sort(self, query):
+        iSortingCols = type_coerce(int, self.req.params.get('iSortingCols', 0), 0)  # noqa: N806
 
         for index in range(min(iSortingCols, 10)):
             try:
-                col = self.cols[int(self.req.params.get('iSortCol_%s' % index))]
+                col = self.cols[int(self.req.params.get(f'iSortCol_{index}'))]
             except (TypeError, ValueError, IndexError):  # pragma: no cover
                 continue
             if col.js_args.get('bSortable', True):
@@ -583,9 +580,20 @@ class DataTable(Component):
                     if not isinstance(orders, (tuple, list)):
                         orders = [orders]
                     for order in orders:
-                        if self.req.params.get('sSortDir_%s' % index) == 'desc':
-                            order = order.desc()
+                        if self.req.params.get(f'sSortDir_{index}') == 'desc':
+                            order = order.desc()  # noqa: PLW2901
                         query = query.order_by(order)
+
+    def get_query(self, limit: int = DISPLAY_LIMIT, offset: int = 0):
+        query = self.base_query(
+            DBSession.query(self.db_model()).filter(self.db_model().active == True))
+        self.count_all = query.count()
+
+        for colindex, coltitle, qs in sorted(set(self._iter_filters(query))):
+            self.filters.append((coltitle, qs))
+
+        self.count_filtered = query.count()
+        self._sort(query)
 
         clauses = self.default_order()
         if not isinstance(clauses, (list, tuple)):
@@ -599,9 +607,6 @@ class DataTable(Component):
         query = query\
             .limit(DISPLAY_LIMIT if limit == -1 else limit)\
             .offset(type_coerce(int, self.req.params.get('iDisplayStart', offset), offset))
-
-        if undefer_cols:
-            query = query.options(*(undefer(c) for c in undefer_cols))
 
         return query
 

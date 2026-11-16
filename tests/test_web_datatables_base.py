@@ -37,7 +37,7 @@ def test_DataTable(env, request_factory):
     assert 'exclude' in dt._toolbar.options
     assert str(dt) == 'Contributors'
     assert repr(dt) == 'Contributors'
-    dt.get_query(undefer_cols=['updated']).all()
+    dt.get_query().all()
     html = dt.render()
     assert 'xytt' in html
     assert ' multiple ' in html

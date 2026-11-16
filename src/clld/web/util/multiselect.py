@@ -17,7 +17,7 @@ class MultiSelect(Component):
 
     __template__ = 'clld:web/templates/multiselect.mako'
 
-    def __init__(self,
+    def __init__(self,  # noqa: PLR0913,PLR0917
                  req,
                  name,
                  eid,
@@ -42,10 +42,7 @@ class MultiSelect(Component):
         self.multiple = multiple
 
     def get_default_options(self):
-        res = {
-            'placeholder': "Search %s" % self.name,
-            'width': 'element',
-        }
+        res = {'placeholder': f"Search {self.name}", 'width': 'element'}
         if self.url:
             res.update(
                 minimumInputLength=2,
@@ -64,9 +61,7 @@ class MultiSelect(Component):
 
         :return: dict which can be serialized as JSON for use by the select2 component.
         """
-        return {
-            'id': getattr(obj, 'id', obj.pk),
-            'text': '%s' % getattr(obj, 'label', obj)}
+        return {'id': getattr(obj, 'id', obj.pk), 'text': f"{getattr(obj, 'label', obj)}"}
 
     def render(self, selected=None):
         """allow the list of selected items to be specified upon rendering, too."""
@@ -93,7 +88,7 @@ class CombinationMultiSelect(MultiSelect):
         return DBSession.query(Parameter)
 
     def format_result(self, obj):
-        return {'id': obj.id, 'text': '%s: %s' % (obj.id, obj.name)}
+        return {'id': obj.id, 'text': f'{obj.id}: {obj.name}'}
 
     def get_options(self):
         return {
