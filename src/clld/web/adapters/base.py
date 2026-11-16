@@ -7,6 +7,7 @@ from pyramid.renderers import render as pyramid_render
 from clldutils.misc import slug
 
 from clld import interfaces
+from clld.web.request import ClldRequest
 
 
 class Renderable:
@@ -39,7 +40,7 @@ class Renderable:
             or 'kml' in self.mimetype \
             else None
 
-    def render_to_response(self, ctx, req):
+    def render_to_response(self, ctx, req: ClldRequest):
         res = Response(self.render(ctx, req))
         res.vary = 'Accept'
         res.content_type = str(self.send_mimetype or self.mimetype)
@@ -47,10 +48,10 @@ class Renderable:
             res.content_type += '; charset=' + str(self.charset)
         return res
 
-    def template_context(self, ctx, req):
+    def template_context(self, ctx, req: ClldRequest) -> dict:
         return {}
 
-    def render(self, ctx, req):
+    def render(self, ctx, req: ClldRequest):
         context = self.template_context(ctx, req)
         context.setdefault('ctx', ctx)
         return pyramid_render(self.template, context, request=req)
@@ -71,7 +72,7 @@ class Json(Renderable):
     mimetype = 'application/json'
     extension = 'json'
 
-    def render(self, ctx, req):
+    def render(self, ctx, req: ClldRequest):
         return pyramid_render('json', ctx, request=req)
 
 

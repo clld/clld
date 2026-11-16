@@ -31,7 +31,7 @@
   npm test
   ```
 
-- Make sure flake8 passes
+- Make sure ruff passes
   ```shell
   ruff check src/
   ```

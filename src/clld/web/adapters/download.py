@@ -13,6 +13,7 @@ from clldutils.misc import format_size, to_binary
 
 from clld.util import safe_overwrite
 from clld.lib.rdf import FORMATS
+from clld.web.request import ClldRequest
 from clld.web.adapters import get_adapter
 from clld.web.adapters.md import TxtCitation
 from clld.web.util.helpers import rdf_namespace_attrs
@@ -36,7 +37,7 @@ It should be cited as
 """
 
 
-def format_readme(req, dataset):
+def format_readme(req: ClldRequest, dataset: Dataset):
     return README.format(
         dataset.name,
         '=' * (len(dataset.name) + len(' data download')),
@@ -44,7 +45,7 @@ def format_readme(req, dataset):
         TxtCitation(None).render(dataset, req))
 
 
-def pkg_name(pkg):
+def pkg_name(pkg) -> str:
     return pkg if isinstance(pkg, str) else pkg.__name__
 
 
@@ -78,40 +79,37 @@ class Download:
 
     @property
     def name(self):
-        return '%s.%s' % (class_mapper(self.model).class_.__name__.lower(), self.ext)
+        return f'{class_mapper(self.model).class_.__name__.lower()}.{self.ext}'
 
-    def asset_spec(self, req):
+    def asset_spec(self, req: ClldRequest):
         dataset = req.db.query(Dataset).first()
-        return download_asset_spec(self.pkg, '%s-%s.%s' % (
-            dataset.id, self.name, 'gz' if self.rdf else 'zip'))
+        return download_asset_spec(
+            self.pkg, f"{dataset.id}-{self.name}.{'gz' if self.rdf else 'zip'}")
 
-    def fname(self, req):
+    def fname(self, req: ClldRequest):
         dataset = req.db.query(Dataset).first()
         return f"{dataset.id}_{self.name}.{'gz' if self.rdf else 'zip'}"
 
-    def url(self, req):
+    def url(self, req: ClldRequest):
         return req.static_url(self.asset_spec(req))
 
-    def abspath(self, req):
+    def abspath(self, req: ClldRequest):
         return abspath(self.asset_spec(req))
 
-    def size(self, req):
+    def size(self, req: ClldRequest):
         _path = self.abspath(req)
         if _path.exists():
             return format_size(_path.stat().st_size)
 
-    def label(self, req):
-        return "%s [%s]" % (getattr(self, 'description', self.name), self.size(req))
+    def label(self, req: ClldRequest):
+        return f"{getattr(self, 'description', self.name)} [{self.size(req)}]"
 
-    def create(self, req, filename=None, verbose=True, outfile=None):
+    def create(self, req: ClldRequest, filename=None, verbose=True, outfile=None):
         with safe_overwrite(outfile or self.abspath(req)) as tmp:
             if self.rdf:
                 # we do not create archives with a readme for rdf downloads, because each
                 # RDF entity points to the dataset and the void description of the dataset
                 # covers all relevant metadata.
-                #
-                # TODO: write test for the file name things!?
-                #
                 with contextlib.closing(gzip.GzipFile(
                     filename=pathlib.Path(tmp.stem).stem, fileobj=tmp.open('wb'), mode='w',
                 )) as fp:
@@ -141,22 +139,22 @@ class Download:
         fp.seek(0)
         return fp.read()
 
-    def query(self, req):
+    def query(self, req: ClldRequest):
         return DBSession.query(self.model).filter(self.model.active == True).order_by(self.model.pk)
 
-    def before(self, req, fp):
+    def before(self, req: ClldRequest, fp):
         pass
 
-    def dump(self, req, fp, item, index):
+    def dump(self, req: ClldRequest, fp, item, index):
         adapter = get_adapter(IRepresentation, item, req, ext=self.ext)
         self.dump_rendered(req, fp, item, index, adapter.render(item, req))
 
-    def dump_rendered(self, req, fp, item, index, rendered):
+    def dump_rendered(self, req: ClldRequest, fp, item, index, rendered):
         if isinstance(rendered, str):
             rendered = rendered.encode('utf8')
         fp.write(rendered)
 
-    def after(self, req, fp):
+    def after(self, req: ClldRequest, fp):
         pass
 
 
@@ -207,8 +205,7 @@ class RdfXmlDump(Download):
     ext = 'rdf'
 
     def before(self, req, fp):
-        fp.write(
-            to_binary('<rdf:RDF ') + to_binary(rdf_namespace_attrs()) + to_binary('>\n'))
+        fp.write(to_binary('<rdf:RDF ') + to_binary(rdf_namespace_attrs()) + to_binary('>\n'))
 
     def after(self, req, fp):
         fp.write(to_binary('</rdf:RDF>'))

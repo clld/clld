@@ -6,6 +6,7 @@ Functionality to handle bibligraphical data in the BibTeX format.
 import re
 import pathlib
 import collections
+from collections.abc import Iterable
 from typing import Self
 
 from zope.interface import Interface, implementer
@@ -24,7 +25,7 @@ latex.register()
 UU_PATTERN = re.compile(r'\?\[\\u(?P<number>[0-9]{3,5})]')
 
 
-def u_unescape(s):
+def u_unescape(s: str) -> str:
     """Unencode Unicode escape sequences.
 
     Match all 3-5-digit sequences with unicode character
@@ -108,14 +109,14 @@ RE_XML_ILLEGAL = re.compile(
     ))
 
 
-def stripctrlchars(string):
+def stripctrlchars(string: str) -> str:
     try:
         return RE_XML_ILLEGAL.sub("", string)
     except TypeError:
         return string
 
 
-def unescape(string):
+def unescape(string: str) -> str:
     r"""Transform latex escape sequences of type \`\ae  into unicode.
 
     :param string: str or binary
@@ -261,7 +262,7 @@ FIELDS = [
     'year',
 ]
 
-FIELDS_SET = set(FIELDS)
+FIELDS_SET: set[str] = set(FIELDS)
 
 
 class _Convertable:
@@ -299,7 +300,7 @@ class Record(Source, _Convertable):
     .. note:: Unknown genres are converted to "misc".
     """
 
-    def __init__(self, genre, id_, *args, **kw):
+    def __init__(self, genre: str, id_: str, *args, **kw):
         super().__init__(genre, 'a', args, **kw)
         self.id = id_
         if isinstance(self.genre, str):
@@ -321,10 +322,10 @@ class Record(Source, _Convertable):
         return cls.from_bibtex(bibtex_string, lowercase=lowercase)
 
     @staticmethod
-    def sep(key):
+    def sep(key: str) -> str:
         return ' and ' if key in ('author', 'editor') else '; '
 
-    def getall(self, key):
+    def getall(self, key: str) -> list[str]:
         """Get list of all values for key.
 
         :return: list of strings representing the values of the record for field 'key'.
@@ -334,7 +335,7 @@ class Record(Source, _Convertable):
             res = res.split(Record.sep(key))
         return [_f for _f in res if _f]
 
-    def get(self, key, default=None):
+    def get(self, key: str, default=None):
         try:
             return self[key]
         except KeyError:
@@ -376,15 +377,15 @@ class Database(_Convertable):
 
     """Represents a bibtex databases, i.e. a container class for Record instances."""
 
-    def __init__(self, records):
-        self.records = [r for r in records if r and r.genre and r.id]
-        self._keymap = None
+    def __init__(self, records: Iterable[Record]):
+        self.records: list[Record] = [r for r in records if r and r.genre and r.id]
+        self._keymap: dict[str, int] | None = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '\n'.join(str(r) for r in self.records)
 
     @property
-    def keymap(self):
+    def keymap(self) -> dict[str, int]:
         """Map bibtex record ids to list index."""
         if self._keymap is None:
             self._keymap = dict((r.id, i) for i, r in enumerate(self.records))
@@ -403,10 +404,10 @@ class Database(_Convertable):
                    for m in re.split(r'^\s*@', content, maxsplit=0, flags=re.MULTILINE)
                    if m.strip())
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.records)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str | int):
         """Access bib records by index or citation key."""
         return self.records[key if isinstance(key, int) else self.keymap[key]]
 

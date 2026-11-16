@@ -2,6 +2,7 @@
 import os
 
 from pyramid.path import AssetResolver
+from pyramid.config import Configurator
 
 from clld import interfaces
 from clld.web.adapters.base import Index, Representation, Json
@@ -23,7 +24,7 @@ def template_exists(config, relpath):
     return False
 
 
-def register_resource_adapters(config, rsc):
+def register_resource_adapters(config: Configurator, rsc):
     name, interface = rsc.name, rsc.interface
 
     cls = type('Json%s' % rsc.model.__name__, (Json,), {})

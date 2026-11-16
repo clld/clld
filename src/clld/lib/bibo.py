@@ -1,7 +1,7 @@
 """
 Functionality for the creation of bibliographical data using the Bibliographic Ontology.
 
-.. seealso:: http://bibliontology.com/
+# .. seealso:: https://www.dublincore.org/specifications/bibo/bibo/
 """
 #: Map BibTeX entry types to the corresponding bibo types.
 TYPE_MAP = {

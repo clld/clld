@@ -4,10 +4,13 @@
 """
 import os
 import re
+import pathlib
 from itertools import zip_longest, groupby  # we just import this to have it available in templates!
 import datetime  # we just import this to have it available in templates!
 from base64 import b64encode
 from urllib.parse import quote, urlencode, urlparse, urlsplit, urlunsplit, SplitResult
+from collections.abc import Callable
+from typing import Literal
 
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -24,12 +27,13 @@ from clld import interfaces
 from clld import RESOURCES
 from clld.web.util.htmllib import HTML, literal
 from clld.web.util.downloadwidget import DownloadWidget
-from clld.db.meta import DBSession
+from clld.db.meta import DBSession, Base
 from clld.db.models import common as models
 from clld.web.adapters import get_adapter, get_adapters
 from clld.lib.coins import ContextObject
 from clld.lib import bibtex
 from clld.lib import rdf
+from clld.web.request import ClldRequest
 
 # appease pyflakes
 assert get_adapter
@@ -43,7 +47,9 @@ assert groupby
 MARKER_IMG_DIM = '20'
 
 
-def cc_link(req, license_url, button='regular'):
+def cc_link(
+        req: ClldRequest, license_url: str, button: Literal['small', 'regular'] = 'regular'
+) -> HTML:
     license_url = license_url.decode('utf8') if isinstance(license_url, bytes) else license_url
     if license_url == 'https://en.wikipedia.org/wiki/Public_domain':
         license_url = 'https://creativecommons.org/publicdomain/zero/1.0/'  # pragma: no cover
@@ -75,7 +81,7 @@ def cc_link(req, license_url, button='regular'):
     return HTML.a(HTML.img(**img_attrs), href=license_url.geturl(), rel='license')
 
 
-def maybe_license_link(req, license, **kw):
+def maybe_license_link(req: ClldRequest, license: str, **kw):
     cc_link_ = cc_link(req, license, button=kw.pop('button', 'regular'))
     if cc_link_:
         return cc_link_
@@ -85,18 +91,18 @@ def maybe_license_link(req, license, **kw):
     return license
 
 
-def get_valueset(req, ctx):
+def get_valueset(req: ClldRequest, ctx: models.Language) -> models.ValueSet | None:
+    """Get a valueset for a given language matching the parameter requested in req."""
     param = req.params.get('parameter')
     if param is None:  # pragma: no cover
-        return
+        return None
 
     try:
         param = int(param)
     except ValueError:  # pragma: no cover
         pass
 
-    query = DBSession.query(models.ValueSet)\
-        .filter(models.ValueSet.language_pk == ctx.pk)
+    query = DBSession.query(models.ValueSet).filter(models.ValueSet.language_pk == ctx.pk)
 
     if isinstance(param, int):
         query = query.filter(models.ValueSet.parameter_pk == param)
@@ -106,7 +112,7 @@ def get_valueset(req, ctx):
     return query.first()
 
 
-def get_url_template(req, route, relative=True, variable_map=None):
+def get_url_template(req: ClldRequest, route, relative=True, variable_map=None):
     variable_map = variable_map or {}
     if isinstance(route, str):
         route = req.registry.getUtility(IRoutesMapper).get_route(route)
@@ -130,10 +136,8 @@ def dumps(obj):
     return JS.sub(pyramid_render('json', obj))
 
 
-def data_uri(filename, mimetype):
-    with open(filename, mode='rb') as fp:
-        content = fp.read()
-    return 'data:%s;base64,%s' % (mimetype, b64encode(content).decode())
+def data_uri(filename: str | pathlib.Path, mimetype) -> str:
+    return 'data:%s;base64,%s' % (mimetype, b64encode(pathlib.Path(filename).read_bytes()).decode())
 
 
 class JS:
@@ -187,12 +191,12 @@ class JSNamespace:
 JS_CLLD = JSNamespace('CLLD')
 
 
-def text_citation(req, ctx):
+def text_citation(req: ClldRequest, ctx):
     citation = get_adapter(interfaces.IRepresentation, ctx, req, ext='md.txt')
     return citation.render(ctx, req)
 
 
-def get_downloads(req):
+def get_downloads(req: ClldRequest):
     for k, items in groupby(
         sorted(
             list(req.registry.getUtilitiesFor(interfaces.IDownload)), key=lambda t: t[0]),
@@ -249,7 +253,12 @@ def format_license_icon_url(req):
         return url
 
 
-def format_frequency(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
+def format_frequency(
+        req: ClldRequest,
+        obj: Base,
+        marker: Callable[[Base, ClldRequest], str] | None = None,
+        height: str | int = MARKER_IMG_DIM,
+        width: str | int = MARKER_IMG_DIM):
     if not obj.frequency or obj.frequency == 100:  # noqa: PLR2004
         return ''
     res = 'Frequency: %s%%' % round(obj.frequency, 1)
@@ -261,17 +270,21 @@ def format_frequency(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_
     return res
 
 
-def map_marker_url(req, obj, marker=None):
+def map_marker_url(
+        req: ClldRequest,
+        obj: Base,
+        marker: Callable[[Base, ClldRequest], str] | None = None,
+) -> str:
     marker = marker or req.registry.getUtility(interfaces.IMapMarker)
     return marker(obj, req)
 
 
-def map_marker_img(req, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
+def map_marker_img(req: ClldRequest, obj, marker=None, height=MARKER_IMG_DIM, width=MARKER_IMG_DIM):
     url = map_marker_url(req, obj, marker=marker)
     return marker_img(url, height=height, width=width) if url else ''
 
 
-def link(req, obj, **kw):
+def link(req: ClldRequest, obj, **kw) -> HTML:
     get_link_attrs = req.registry.queryUtility(interfaces.ILinkAttrs)
     if get_link_attrs:
         kw = get_link_attrs(req, obj, **kw)
@@ -295,7 +308,7 @@ def link(req, obj, **kw):
     return HTML.a(label, href=href, **kw)
 
 
-def external_link(url, label=None, inverted=False, **kw):
+def external_link(url: str, label: str | None = None, inverted: bool = False, **kw) -> HTML:
     kw.setdefault('title', label or url)
     kw.setdefault('href', url)
     return HTML.a(icon('share', inverted=inverted), ' ', label or url, **kw)
@@ -308,7 +321,7 @@ def maybe_external_link(text, **kw):
     return text
 
 
-def link_to_map(language):
+def link_to_map(language: models.Language) -> HTML:
     return HTML.a(
         icon('icon-globe'),
         title='show %s on map' % language.name,

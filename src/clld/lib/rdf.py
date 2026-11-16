@@ -55,7 +55,7 @@ def expand_prefix(p):
     return p
 
 
-def url_for_qname(qname):
+def url_for_qname(qname) -> str:
     """Expand qname to full URL respecting our default prefixes."""
     return str(expand_prefix(qname))
 
@@ -74,11 +74,11 @@ class ClldGraph(Graph):
             self.bind(prefix, ns)
 
 
-def _is_http_url(s):
+def _is_http_url(s: str) -> bool:
     return s.startswith('http://') or s.startswith('https://')
 
 
-def _extract_description(xml):
+def _extract_description(xml: str | bytes) -> str:
     res = []
     in_desc = False
     if not isinstance(xml, str):
@@ -111,7 +111,7 @@ def properties_as_xml_snippet(subject, props):
     return _extract_description(g.serialize(format='xml'))
 
 
-def convert(string, from_, to_):
+def convert(string, from_: str, to_: str) -> str:
     if from_ == to_:
         return encoded(string)
     assert from_ in FORMATS and (to_ is None or to_ in FORMATS)
