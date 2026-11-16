@@ -62,7 +62,6 @@
 
 - Release to PyPI:
   ```shell
-  rm -rf build
   rm dist/*
   python -m build -n
   twine upload dist/*

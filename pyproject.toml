@@ -24,7 +24,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
     "clldutils>=3.18",
@@ -84,16 +83,17 @@ clld = "clld.__main__:main"
 
 [tool.setuptools]
 zip-safe = false
-include-package-data = true
+include-package-data = false
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 clld = [
-    "locale/**",
-    "project_template/**",
-    "web/**",
+    "locale/**/*",
+    "project_template/**/*",
+    "web/static/**/*",
+    "web/templates/**/*",
 ]
 
 [tool.babel]
@@ -117,30 +117,10 @@ exclude = [".tox", "src/clld/project_template"]
 
 [tool.ruff.lint]
 # E/F match default Flake8; D enables pydocstyle checks (since you ignored specific D rules)
-select = ["E", "F", "D"]
+select = ["UP", "N", "C90", "PL", "E", "F"]
 ignore = [
     "E711", # Comparison to `None` should be `cond is None` (needed for SQLAlchemy filters)
     "E712", # Comparison to `True` should be `cond is True` (needed for SQLAlchemy filters)
-    "D100", # Missing docstring in public module
-    "D101", # Missing docstring in public class
-    "D102", # Missing docstring in public method
-    "D103", # Missing docstring in public function
-    "D104",
-    "D105",
-    "D107",
-    "D301", # Use `r"""` if any backslashes in a docstring
-    "D203",
-    "D205",
-    "D211",
-    "D212",
-    "D213",
-    "D400",
-    "D401",
-    "D403",
-    "D404",
-    "D415",
-    "D419",
-    "E722",
 ]
 
 [tool.pytest.ini_options]
@@ -150,10 +130,10 @@ addopts = [
     "--cov",
     "--appini=tests/test.ini",
 ]
-filterwarnings = [
-    "ignore::sqlalchemy.exc.SAWarning",
-    "ignore::sqlalchemy.exc.RemovedIn20Warning",
-]
+#filterwarnings = [
+#    "ignore::sqlalchemy.exc.SAWarning",
+#    "ignore::sqlalchemy.exc.RemovedIn20Warning",
+#]
 
 [tool.coverage.run]
 source = [
@@ -167,10 +147,11 @@ skip_covered = true
 
 [tool.tox]
 requires = ["tox>=4.19"]
-env_list = ["py311", "py312", "py313", "py314", "py315"]
+env_list = ["py311", "py312", "py313", "py314"]
 skip_missing_interpreters = true
 
 [tool.tox.env_run_base]
 extras = ["test"]
 commands = [["pytest", { replace = "posargs", default = [], extend = true }]]
 set_env = "SQLALCHEMY_SILENCE_UBER_WARNING=1"
+package = "wheel"
