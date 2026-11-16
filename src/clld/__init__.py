@@ -9,7 +9,7 @@ __version__ = "12.0.1.dev0"
 class Resource(collections.namedtuple('Resource', 'name model interface with_index with_rdfdump')):
 
     def __new__(cls, name, model, interface, with_index=True, with_rdfdump=True):
-        return super(Resource, cls).__new__(cls, name, model, interface, with_index, with_rdfdump)
+        return super().__new__(cls, name, model, interface, with_index, with_rdfdump)
 
     @property
     def plural(self):

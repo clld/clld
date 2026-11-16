@@ -1,6 +1,7 @@
 """
 
 """
+import argparse
 import pathlib
 import contextlib
 
@@ -50,7 +51,7 @@ def register(parser):
             default=None)
 
 
-def run(args):
+def run(args: argparse.Namespace):  # noqa: C901
     if (args.glottolog or args.concepticon) and Catalog is None:  # pragma: no cover
         print('To use reference catalogs you must install the cldfcatalog package!')
         return 10

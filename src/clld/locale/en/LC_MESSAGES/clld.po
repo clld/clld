@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: clld 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-11-14 12:50+0100\n"
+"POT-Creation-Date: 2026-11-16 19:19+0100\n"
 "PO-Revision-Date: 2013-01-15 13:57+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -28,59 +28,59 @@ msgstr ""
 msgid "Parameter"
 msgstr ""
 
-#: src/clld/web/app.py:667
+#: src/clld/web/app.py:659
 msgid "Home"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:501
+#: src/clld/web/datatables/base.py:507
 msgid "Next"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:502
+#: src/clld/web/datatables/base.py:508
 msgid "Previous"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:503
+#: src/clld/web/datatables/base.py:509
 msgid "First"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:504
+#: src/clld/web/datatables/base.py:510
 msgid "Last"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:506
+#: src/clld/web/datatables/base.py:512
 msgid "No data available in table"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:507
+#: src/clld/web/datatables/base.py:513
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:508
+#: src/clld/web/datatables/base.py:514
 msgid "Showing 0 to 0 of 0 entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:509
+#: src/clld/web/datatables/base.py:515
 msgid "(filtered from _MAX_ total entries)"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:510
+#: src/clld/web/datatables/base.py:516
 msgid "Show _MENU_ entries"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:511
+#: src/clld/web/datatables/base.py:517
 msgid "Loading..."
 msgstr ""
 
-#: src/clld/web/datatables/base.py:512
+#: src/clld/web/datatables/base.py:518
 msgid "Processing..."
 msgstr ""
 
-#: src/clld/web/datatables/base.py:513
+#: src/clld/web/datatables/base.py:519
 msgid "Search:"
 msgstr ""
 
-#: src/clld/web/datatables/base.py:514
+#: src/clld/web/datatables/base.py:520
 msgid "No matching records found"
 msgstr ""
 

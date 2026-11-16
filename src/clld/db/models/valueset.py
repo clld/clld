@@ -17,11 +17,11 @@ assert _parameter
 __all__ = ('ValueSet', 'ValueSetReference')
 
 
-class ValueSet_data(Base, DataMixin):
+class ValueSet_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class ValueSet_files(Base, FilesMixin):
+class ValueSet_files(Base, FilesMixin):  # noqa: N801
     pass
 
 
@@ -54,14 +54,14 @@ class ValueSet(Base,
         )
 
     @declared_attr
-    def contribution(cls):
+    def contribution(self):
         return relationship(
-            'Contribution', backref=backref('valuesets', order_by=cls.parameter_pk))
+            'Contribution', backref=backref('valuesets', order_by=self.parameter_pk))
 
     @declared_attr
-    def language(cls):
+    def language(self):
         return relationship(
-            'Language', innerjoin=True, backref=backref('valuesets', order_by=cls.language_pk))
+            'Language', innerjoin=True, backref=backref('valuesets', order_by=self.language_pk))
 
     @property
     def name(self):

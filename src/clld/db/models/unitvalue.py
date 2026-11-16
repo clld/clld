@@ -16,11 +16,11 @@ assert _unitparameter
 __all__ = ('UnitValue',)
 
 
-class UnitValue_data(Base, DataMixin):
+class UnitValue_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class UnitValue_files(Base, FilesMixin):
+class UnitValue_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

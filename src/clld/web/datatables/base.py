@@ -7,9 +7,10 @@ object. Server side they know how to provide the data to the client-side table.
 """
 import re
 import functools
-from collections.abc import Generator, Callable
+from collections.abc import Callable
 
 from markupsafe import Markup
+from sqlalchemy.orm import Query
 from sqlalchemy.types import String, Unicode, Float, Integer, Boolean
 from zope.interface import implementer, implementedBy
 from clldutils.misc import nfilter
@@ -549,7 +550,8 @@ class DataTable(Component):
     def default_order(self):
         return self.db_model().pk
 
-    def _iter_filters(self, query) -> Generator[tuple[int, str, str], None, None]:
+    def _filters_and_query(self, query) -> tuple[list[tuple[int, str, str]], Query]:
+        filters = []
         for name, val in self.req.params.items():
             if val and name.startswith('sSearch_'):
                 try:
@@ -564,7 +566,8 @@ class DataTable(Component):
                     for clause in clauses:
                         if clause is not None:
                             query = query.filter(clause)
-                            yield (colindex, col.js_args['sTitle'], val)
+                            filters.append((colindex, col.js_args['sTitle'], val))
+        return filters, query
 
     def _sort(self, query):
         iSortingCols = type_coerce(int, self.req.params.get('iSortingCols', 0), 0)  # noqa: N806
@@ -583,17 +586,19 @@ class DataTable(Component):
                         if self.req.params.get(f'sSortDir_{index}') == 'desc':
                             order = order.desc()  # noqa: PLW2901
                         query = query.order_by(order)
+        return query
 
     def get_query(self, limit: int = DISPLAY_LIMIT, offset: int = 0):
         query = self.base_query(
             DBSession.query(self.db_model()).filter(self.db_model().active == True))
         self.count_all = query.count()
 
-        for colindex, coltitle, qs in sorted(set(self._iter_filters(query))):
+        _filters, query = self._filters_and_query(query)
+        for _, coltitle, qs in sorted(set(_filters)):
             self.filters.append((coltitle, qs))
 
         self.count_filtered = query.count()
-        self._sort(query)
+        query = self._sort(query)
 
         clauses = self.default_order()
         if not isinstance(clauses, (list, tuple)):

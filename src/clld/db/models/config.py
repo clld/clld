@@ -33,7 +33,7 @@ class Config(Base):
             name = model.__name__
         else:
             name = model.__class__.__name__
-        return '__%s_%s__' % (name, id_)
+        return f'__{name}_{id_}__'
 
     @classmethod
     def get_replacement_id(cls, model, id_):
@@ -41,8 +41,7 @@ class Config(Base):
 
         :return: id of a resource registered as replacement for the specified resource.
         """
-        res = DBSession.query(cls.value)\
-            .filter(cls.key == cls.replacement_key(model, id_)).first()
+        res = DBSession.query(cls.value).filter(cls.key == cls.replacement_key(model, id_)).first()
         if res:
             return res[0]
 

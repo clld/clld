@@ -18,11 +18,11 @@ from . import (
 __all__ = ('Source', 'HasSourceMixin', 'HasSourceNotNullMixin')
 
 
-class Source_data(Base, DataMixin):
+class Source_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Source_files(Base, FilesMixin):
+class Source_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

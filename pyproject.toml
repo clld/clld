@@ -124,6 +124,7 @@ ignore = [
     "UP032",
     "PLW2901",
     "PLR2004",
+    "N805", # SQLA's declared_attr convention.
     "E711", # Comparison to `None` should be `cond is None` (needed for SQLAlchemy filters)
     "E712", # Comparison to `True` should be `cond is True` (needed for SQLAlchemy filters)
 ]
@@ -134,6 +135,10 @@ testpaths = ["tests"]
 addopts = [
     "--cov",
     "--appini=tests/test.ini",
+]
+filterwarnings = [
+    "default::sqlalchemy.exc.LegacyAPIWarning",
+    "default::sqlalchemy.exc.SAWarning",
 ]
 
 [tool.coverage.run]

@@ -2,7 +2,7 @@ from sqlalchemy import func, Index
 
 
 def tsvector(obj):  # pragma: no cover
-    return func.to_tsvector('english', '{0}'.format(obj))
+    return func.to_tsvector('english', f'{obj}')
 
 
 def index(name, col, bind):  # pragma: no cover

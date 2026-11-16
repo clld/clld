@@ -34,7 +34,7 @@ def getregentry():
     return _registry('latex')  # pragma: no cover
 
 
-def _registry(encoding):
+def _registry(encoding):  # noqa: C901
     if encoding == 'latex':
         encoding = None  # pragma: no cover
     elif encoding.startswith('latex+'):
@@ -83,7 +83,7 @@ def _registry(encoding):
     return (Codec().encode, Codec().decode, StreamReader, StreamWriter)
 
 
-def _tokenize(tex):  # pragma: no cover
+def _tokenize(tex):  # pragma: no cover  # noqa: PLR0912,C901
     """Convert latex source into sequence of single-token substrings."""
     start = 0
     try:
@@ -129,7 +129,7 @@ def _tokenize(tex):  # pragma: no cover
                     pos += 1
 
 
-class _unlatex:  # pragma: no cover
+class _unlatex:  # pragma: no cover  # noqa: N801
 
     """Convert tokenized tex into sequence of unicode strings.  Helper for decode()."""
 
@@ -502,10 +502,10 @@ _l2u = {
     r'\ ': ord(' ')  # unexpanding space makes no sense in non-TeX contexts
 }
 
-for _tex in latex_equivalents:
-    if _tex <= 0x0020 or (_tex <= 0x007f and len(latex_equivalents[_tex]) <= 1):
+for _tex, equiv in latex_equivalents.items():
+    if _tex <= 0x0020 or (_tex <= 0x007f and len(equiv) <= 1):
         continue    # boring entry
-    _toks = tuple(_tokenize(latex_equivalents[_tex]))
+    _toks = tuple(_tokenize(equiv))
     if _toks[0] == '{' and _toks[-1] == '}':
         _toks = _toks[1:-1]
     if _toks[0].isalpha():

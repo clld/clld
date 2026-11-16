@@ -98,11 +98,11 @@ class IRepresentation(Interface):
     charset = Attribute('')
     extension = Attribute('')
 
-    def render(request):
-        """ """
+    def render(self):
+        ...
 
-    def render_to_response(request):
-        """ """
+    def render_to_response(self):
+        ...
 
 
 class IIndex(Interface):
@@ -110,11 +110,11 @@ class IIndex(Interface):
     charset = Attribute('')
     extension = Attribute('')
 
-    def render(request, query, count):
-        """ """
+    def render(self, query, count):
+        ...
 
-    def render_to_response(request, query, count):
-        """ """
+    def render_to_response(self, query, count):
+        ...
 
 
 class IMetadata(Interface):
@@ -125,17 +125,17 @@ class IMetadata(Interface):
 class IDownload(Interface):
     name = Attribute('name the download will be registered for')
 
-    def url(request):
+    def url(self):
         """called from the template for the download page."""
 
-    def create(request):
+    def create(self):
         """called from the script creating all downloads."""
 
 
 class IDataTable(Interface):
     model = Attribute('model class of the objects listed in the table')
 
-    def get_query(request, model, **kw):
+    def get_query(self, model, **kw):
         """called to retrieve a filtered and sorted sqla query."""
 
 

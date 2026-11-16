@@ -27,12 +27,12 @@ __all__ = (
 )
 
 
-class Language_data(Base, DataMixin):
+class Language_data(Base, DataMixin):  # noqa: N801
 
     """Associated data mapper."""
 
 
-class Language_files(Base, FilesMixin):
+class Language_files(Base, FilesMixin):  # noqa: N801
 
     """Associated files mapper."""
 

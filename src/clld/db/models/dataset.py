@@ -21,12 +21,12 @@ from . import (
 __all__ = ('Dataset', 'Editor')
 
 
-class Dataset_data(Base, DataMixin):
+class Dataset_data(Base, DataMixin):  # noqa: N801
 
     """Associated data mapper."""
 
 
-class Dataset_files(Base, FilesMixin):
+class Dataset_files(Base, FilesMixin):  # noqa: N801
 
     """Associated files mapper."""
 

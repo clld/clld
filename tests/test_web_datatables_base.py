@@ -44,26 +44,27 @@ def test_DataTable(env, request_factory):
     assert 'MyName' in html
 
 
-@pytest.mark.parametrize('params', [
-    {},
-    {
+@pytest.mark.parametrize('params,cnt', [
+    ({}, 4),
+    ({
         'sSearch_0': '1..1000000',
         'sSearch_4': 'True',
         'sSearch_6': 'e',
         'iSortingCols': '1',
         'iSortCol_0': '0',
         'sSortDir_0': 'desc',
-    },
-    {'iSortingCols': 'x'},
-    {'iSortingCols': '1', 'iSortCol_0': '7'},
-    {'sSearch_7': '1'},
-    {'sSearch_8': 'id'},
-    {'iDisplayLength': 'nonnumber'},
-    {'iDisplayStart': 'nonnumber'},
+    }, 0),
+    ({'iSortingCols': 'x'}, 4),
+    ({'iSortingCols': '1', 'iSortCol_0': '7'}, 4),
+    ({'sSearch_7': '1'}, 0),
+    ({'sSearch_8': 'id'}, 0),
+    ({'iDisplayLength': 'nonnumber'}, 4),
+    ({'iDisplayStart': 'nonnumber'}, 4),
 ])
-def test_DataTable_cols(request_factory, params):
+def test_DataTable_cols(request_factory, params, cnt):
     with request_factory(params=params) as req:
-        handle_dt(req, Table, common.Contributor)
+        dt = handle_dt(req, Table, common.Contributor)
+        assert dt.count_filtered == cnt
 
 
 def test_DataTable2(request_factory):

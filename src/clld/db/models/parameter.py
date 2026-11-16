@@ -20,11 +20,11 @@ from . import (
 __all__ = ('DomainElement', 'Parameter', 'Combination')
 
 
-class DomainElement_data(Base, DataMixin):
+class DomainElement_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class DomainElement_files(Base, FilesMixin):
+class DomainElement_files(Base, FilesMixin):  # noqa: N801
     pass
 
 
@@ -54,11 +54,11 @@ class DomainElement(Base,
         return request.resource_url(self.parameter, _anchor='DE-' + self.id)
 
 
-class Parameter_data(Base, DataMixin):
+class Parameter_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Parameter_files(Base, FilesMixin):
+class Parameter_files(Base, FilesMixin):  # noqa: N801
     pass
 
 
@@ -84,7 +84,7 @@ class CombinationDomainElement:
         self.name = ' / '.join(de.name for de in domainelements)
         self.icon = icon
         self.languages = []
-        super(CombinationDomainElement, self).__init__()
+        super().__init__()
 
 
 @implementer(interfaces.ICombination)
@@ -106,7 +106,7 @@ class Combination:
         self.parameters = parameters
         # we keep track of languages with multiple values.
         self.multiple = []
-        super(Combination, self).__init__()
+        super().__init__()
 
     def __json__(self, *args, **kw):
         return {k: getattr(self, k) for k in ['id', 'name']}
@@ -159,7 +159,7 @@ class Combination:
 
     @functools.cached_property
     def values(self):
-        from . import ValueSet, Value
+        from . import ValueSet, Value  # noqa: PLC0415
 
         def _filter(query, operation):
             q = query.filter(Parameter.pk == self.parameters[0].pk)

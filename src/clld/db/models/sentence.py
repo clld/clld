@@ -14,11 +14,11 @@ from . import (
 __all__ = ('Sentence', 'SentenceReference')
 
 
-class Sentence_data(Base, DataMixin):
+class Sentence_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Sentence_files(Base, FilesMixin):
+class Sentence_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

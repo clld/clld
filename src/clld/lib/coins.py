@@ -152,6 +152,14 @@ def _encoded(value):
     return encoded(value)
 
 
+def _last_first(author: str) -> tuple[str, str]:
+    parts = re.split(r'\s*,\s*', author, maxsplit=1)
+    if len(parts) == 1:
+        parts = re.split(r'\s+', author)
+        return parts[-1], ' '.join(parts[:-1])
+    return parts
+
+
 class ContextObject(list):
 
     """A Context Object which knows how to render it's metadata as HTML span tags."""
@@ -166,7 +174,7 @@ class ContextObject(list):
             self.append((key, validator(val)))
 
     @classmethod
-    def from_bibtex(cls, sid, rec):
+    def from_bibtex(cls, sid, rec):  # noqa: PLR0912,C901
         mtx, genre = {
             'article': ('journal', 'article'),
             'book': ('book', 'book'),
@@ -182,29 +190,27 @@ class ContextObject(list):
             'misc': ('book', 'unknown'),
         }.get(getattr(rec.genre, 'value', rec.genre),  # allow EnumSymbol as genre.
               ('book', 'document' if rec.get('author') else 'unknown'))
-        if genre:
-            data = [('genre', genre)]
-        else:
-            data = []
+        data = [('genre', genre)] if genre else []
 
-        if mtx == 'journal':
-            if 'title' in rec:
-                data.append(('atitle', rec['title']))
-            if 'journal' in rec:
-                data.append(('jtitle', rec['journal']))
-        elif mtx == 'book':
-            if 'title' in rec:
-                data.append(('btitle' if genre == 'book' else 'atitle', rec['title']))
-            if 'booktitle' in rec:
-                if genre != 'book':
-                    data.append(('btitle', rec['booktitle']))
-        elif mtx == 'dissertation':
-            if 'title' in rec:
-                data.append(('title', rec['title']))
-            data.append(
-                ('degree', 'phd' if
-                 getattr(rec.genre, 'value', rec.genre) == 'phdthesis' else 'masters'))
-            data.append(('inst', rec.get('school', rec.get('institution', ''))))
+        match mtx:
+            case 'journal':
+                if 'title' in rec:
+                    data.append(('atitle', rec['title']))
+                if 'journal' in rec:
+                    data.append(('jtitle', rec['journal']))
+            case 'book':
+                if 'title' in rec:
+                    data.append(('btitle' if genre == 'book' else 'atitle', rec['title']))
+                if 'booktitle' in rec:
+                    if genre != 'book':
+                        data.append(('btitle', rec['booktitle']))
+            case 'dissertation':
+                if 'title' in rec:
+                    data.append(('title', rec['title']))
+                data.append(
+                    ('degree', 'phd' if
+                     getattr(rec.genre, 'value', rec.genre) == 'phdthesis' else 'masters'))
+                data.append(('inst', rec.get('school', rec.get('institution', ''))))
 
         if 'url' in rec:
             data.append(('rft_id', rec['url']))
@@ -224,13 +230,7 @@ class ContextObject(list):
 
         for i, author in enumerate(rec.getall('author')):
             if i == 0:
-                parts = re.split(r'\s*,\s*', author, maxsplit=1)
-                if len(parts) == 1:
-                    parts = re.split(r'\s+', author)
-                    last = parts[-1]
-                    first = ' '.join(parts[:-1])
-                else:
-                    last, first = parts
+                last, first = _last_first(author)
                 data.append(('aulast', last))
                 data.append(('aufirst', first))
             else:

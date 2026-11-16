@@ -109,7 +109,7 @@ class Data(collections.defaultdict):
     """
 
     def __init__(self, **kw):
-        super(Data, self).__init__(dict)
+        super().__init__(dict)
         self.defaults = kw
 
     def add(self, model_, key_, **kw):

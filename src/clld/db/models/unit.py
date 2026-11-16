@@ -12,11 +12,11 @@ from . import (
 __all__ = ('Unit',)
 
 
-class Unit_data(Base, DataMixin):
+class Unit_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Unit_files(Base, FilesMixin):
+class Unit_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

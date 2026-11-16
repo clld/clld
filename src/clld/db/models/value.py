@@ -24,11 +24,11 @@ assert _parameter
 __all__ = ('Value', 'ValueSentence')
 
 
-class Value_data(Base, DataMixin):
+class Value_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Value_files(Base, FilesMixin):
+class Value_files(Base, FilesMixin):  # noqa: N801
     pass
 
 
@@ -62,11 +62,11 @@ class Value(Base,
     domainelement = relationship('DomainElement', backref='values')
 
     @declared_attr
-    def valueset(cls):
+    def valueset(self):
         return relationship(
             ValueSet, innerjoin=True,
             backref=backref(
-                'values', order_by=[cls.frequency.desc(), cls.confidence, cls.pk]))
+                'values', order_by=[self.frequency.desc(), self.confidence, self.pk]))
 
     def __json__(self, req):
         res = Base.__json__(self, req)

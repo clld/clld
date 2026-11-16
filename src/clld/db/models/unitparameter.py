@@ -11,11 +11,11 @@ from . import IdNameDescriptionMixin, DataMixin, HasDataMixin, FilesMixin, HasFi
 __all__ = ('UnitDomainElement', 'UnitParameter')
 
 
-class UnitDomainElement_data(Base, DataMixin):
+class UnitDomainElement_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class UnitDomainElement_files(Base, FilesMixin):
+class UnitDomainElement_files(Base, FilesMixin):  # noqa: N801
     pass
 
 
@@ -40,11 +40,11 @@ class UnitDomainElement(Base,
         return request.resource_url(self.parameter, _anchor='DE-%s' % self.id)
 
 
-class UnitParameter_data(Base, DataMixin):
+class UnitParameter_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class UnitParameter_files(Base, FilesMixin):
+class UnitParameter_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

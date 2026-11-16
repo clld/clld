@@ -14,11 +14,11 @@ from . import (
 __all__ = ('Contribution', 'ContributionReference', 'ContributionContributor')
 
 
-class Contribution_data(Base, DataMixin):
+class Contribution_data(Base, DataMixin):  # noqa: N801
     pass
 
 
-class Contribution_files(Base, FilesMixin):
+class Contribution_files(Base, FilesMixin):  # noqa: N801
     pass
 
 

@@ -173,12 +173,11 @@ class Base(declarative_base()):
         if not r:
             r = getattr(self, 'id', None)
         if not r:
-            r = '%s%s' % (self.__class__.__name__, self.pk)
+            r = f'{self.__class__.__name__}{self.pk}'
         return r
 
     def __repr__(self):
-        return '<%s %r>' % (
-            self.__class__.__name__, getattr(self, 'id', self.pk))
+        return f"<{self.__class__.__name__} '{getattr(self, 'id', self.pk)}'>"
 
 
 class PolymorphicBaseMixin:

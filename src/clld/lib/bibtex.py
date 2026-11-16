@@ -130,7 +130,7 @@ def unescape(string):
         return str(result)
 
     res = u_unescape(stripctrlchars(_delatex(string.strip())))
-    for symbol in sorted(SYMBOLS.keys(), key=lambda s: len(s)):
+    for symbol in sorted(SYMBOLS.keys(), key=len):
         res = res.replace(symbol, SYMBOLS[symbol])
     if '\\' not in res:
         res = res.replace('{', '').replace('}', '')
@@ -300,7 +300,7 @@ class Record(Source, _Convertable):
     """
 
     def __init__(self, genre, id_, *args, **kw):
-        super(Record, self).__init__(genre, 'a', args, **kw)
+        super().__init__(genre, 'a', args, **kw)
         self.id = id_
         if isinstance(self.genre, str):
             try:
@@ -309,7 +309,7 @@ class Record(Source, _Convertable):
                 self.genre = EntryType.misc
 
     @classmethod
-    def from_object(cls, obj, **kw):
+    def from_object(cls, obj, **kw) -> Self:
         data = {field: getattr(obj, field, None) for field in FIELDS if getattr(obj, field, None)}
         data.update(kw)
         data.setdefault('title', obj.description)
@@ -317,8 +317,8 @@ class Record(Source, _Convertable):
         return cls(obj.bibtex_type, obj.id, *data)
 
     @classmethod
-    def from_string(cls, bibtexString, lowercase=False):
-        return cls.from_bibtex(bibtexString, lowercase=lowercase)
+    def from_string(cls, bibtex_string, lowercase=False) -> Self:
+        return cls.from_bibtex(bibtex_string, lowercase=lowercase)
 
     @staticmethod
     def sep(key):
@@ -391,17 +391,17 @@ class Database(_Convertable):
         return self._keymap
 
     @classmethod
-    def from_file(cls, bibFile, encoding='utf8', lowercase=False):
+    def from_file(cls, bibfile: str | pathlib.Path, encoding='utf8', lowercase=False):
         """Create bibtex database from a bib-file.
 
         @param bibFile: path of the bibtex-database-file to be read.
         """
-        bibFile = pathlib.Path(bibFile)
-        content = bibFile.read_text(encoding=encoding) if bibFile.exists() else ''
+        bibfile = pathlib.Path(bibfile)
+        content = bibfile.read_text(encoding=encoding) if bibfile.exists() else ''
 
-        return cls((Record.from_string('@' + m, lowercase=lowercase)
-                    for m in re.split(r'^\s*@', content, maxsplit=0, flags=re.MULTILINE)
-                    if m.strip()))
+        return cls(Record.from_string('@' + m, lowercase=lowercase)
+                   for m in re.split(r'^\s*@', content, maxsplit=0, flags=re.MULTILINE)
+                   if m.strip())
 
     def __len__(self):
         return len(self.records)
