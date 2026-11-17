@@ -312,9 +312,6 @@ def includeme(config: Configurator):  # noqa: PLR0915,PLR0912,C901
 
     - register utilities "by hand", after config.include('clld.web.app')
     - add routes by hand (and remove these from the **kw passed to Configurator)
-
-    :param config:
-    :return:
     """
     #
     # now we exploit the default package layout as created via the CLLD scaffold:

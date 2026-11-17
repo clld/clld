@@ -2,12 +2,14 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+13.0.0
+~~~~~~
 
 - Migrated to SQLAlchemy >= 2.1
 - `DataTable.get_query` has no kw `undefer_cols` anymore - since there are no defered columns anymore.
 
+While the changes in this release are fairly minimal, we make this a major release to leave 12.0.0
+as possible branch point should bugfixes be necessary for environments requiring SQLAlchemy < 2.
 
 
 12.0.0
