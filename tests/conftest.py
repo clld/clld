@@ -53,12 +53,12 @@ class TestData(Data):
 
 def populate_test_db(engine):
     data = TestData()
-    data.add_default(
+    ds = data.add_default(
         common.Dataset,
         domain='clld',
         jsondata={'license_icon': 'cc-by', 'license_url': 'http://example.org'})
 
-    data.add_default(common.Contributor, name='A Name', email='a@example.org')
+    dc = data.add_default(common.Contributor, name='A Name', email='a@example.org')
     for id_, name in {
         'b': 'b Name',
         'c': 'c Name',
@@ -66,8 +66,7 @@ def populate_test_db(engine):
     }.items():
         data.add(common.Contributor, id_, id=id_, name=name, url='http://example.org')
 
-    DBSession.add(
-        common.Editor(dataset=data[common.Dataset], contributor=data[common.Contributor]))
+    DBSession.add(common.Editor(dataset=ds, contributor=dc))
 
     data.add_default(common.Source)
     data.add(
@@ -77,9 +76,9 @@ def populate_test_db(engine):
         active=False,
         jsondata={'__replacement_id__': 'source'})
 
-    data.add_default(common.Contribution)
+    dcontrib = data.add_default(common.Contribution)
     DBSession.add(common.ContributionReference(
-        contribution=data[common.Contribution], source=data[common.Source]))
+        contribution=dcontrib, source=data[common.Source]))
 
     for primary, c in [(True, 'contributor'), (False, 'b'), (True, 'c'), (False, 'd')]:
         DBSession.add(common.ContributionContributor(

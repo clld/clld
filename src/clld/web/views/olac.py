@@ -10,8 +10,10 @@ import collections
 
 from pyramid.renderers import render
 from pyramid.response import Response
+from sqlalchemy import TIMESTAMP, cast
 from sqlalchemy.orm import joinedload
 
+from clld.db.meta import DBSession
 from clld.db.models.common import Language, LanguageIdentifier, Identifier, IdentifierType
 from clld.interfaces import IOlacConfig
 
@@ -133,9 +135,15 @@ class OlacConfig:
     def query_records(self, req, from_=None, until=None):
         q = self._query(req).order_by(Language.pk)
         if from_:
-            q = q.filter(Language.updated >= from_)
+            if DBSession.bind.dialect.name == 'sqlite':
+                q = q.filter(Language.updated >= from_)
+            else:  # pragma: no cover
+                q = q.filter(Language.updated >= cast(from_, TIMESTAMP(timezone=True)))
         if until:
-            q = q.filter(Language.updated < until)
+            if DBSession.bind.dialect.name == 'sqlite':
+                q = q.filter(Language.updated < until)
+            else:  # pragma: no cover
+                q = q.filter(Language.updated < cast(until, TIMESTAMP(timezone=True)))
         return q
 
     def format_identifier(self, req, item):

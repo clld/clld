@@ -40,6 +40,10 @@ def test_ResumptionToken():
             lambda res: len(res.findall('header')),
             100),
         (
+            dict(verb='ListIdentifiers', metadataPrefix='olac', until='1990-01-01'),
+            lambda res: len(res.findall('header')),
+            0),
+        (
             dict(verb='Identify'),
             lambda res: res.findone(
                 '{http://www.openarchives.org/OAI/2.0/oai-identifier}sampleIdentifier'
