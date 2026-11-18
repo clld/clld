@@ -2,8 +2,8 @@
 Changes
 -------
 
-Unreleased
-~~~~~~~~~~
+13.1.0
+~~~~~~
 
 - Fixed OLAC OAI PMH.
 - Added `clts` to catalogs to be used in `clld initdb`.

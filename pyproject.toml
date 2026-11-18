@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clld"
-version = "13.0.1.dev0"
+version = "13.1.0"
 description = "Python library supporting the development of cross-linguistic databases."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -161,6 +161,6 @@ env_list = ["py311", "py312", "py313", "py314", "py315"]
 skip_missing_interpreters = true
 
 [tool.tox.env_run_base]
-extras = ["test"]
+extras = ["test", "initdb"]
 commands = [["pytest", { replace = "posargs", default = [], extend = true }]]
 package = "wheel"
