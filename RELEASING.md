@@ -73,9 +73,6 @@
   git push --tags origin
   ```
 
-- Re-release using the same tag on GitHub, to trigger the ZENODO hook.
-  update the DOI badge.
-
 - Increment version number and append `.dev0` to the version number for the new development cycle:
   - `src/clld/__init__.py`
   - `pyproject.toml`
