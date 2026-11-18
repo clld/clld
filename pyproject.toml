@@ -48,6 +48,10 @@ dependencies = [
 Homepage = "https://github.com/clld/clld"
 
 [project.optional-dependencies]
+initdb = [
+    "pycldf",
+    "cldfcatalog",
+]
 bootstrap = [
     "cookiecutter",
     "pycldf",

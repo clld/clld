@@ -38,7 +38,7 @@ class RdfIndex(Index):
             # triggered without any filter parameters
             items = ctx.rdf_index_query(req.db.query(ctx.db_model()).order_by(ctx.db_model().pk))
         if isinstance(ctx.model.name, property):
-            items = [(item.id, None) for item in items.options(load_only(ctx.model.id))]
+            items = [(item.id, None) for item in items.options(load_only(ctx.db_model().id))]
         else:
             items = [(item.id, item.name)
                      for item in items.options(load_only(ctx.model.id, ctx.model.name))]

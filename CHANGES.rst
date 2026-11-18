@@ -5,7 +5,9 @@ Changes
 Unreleased
 ~~~~~~~~~~
 
-Fixed OLAC OAI PMH.
+- Fixed OLAC OAI PMH.
+- Added `clts` to catalogs to be used in `clld initdb`.
+- Fixed bug in RDF index for custom resources.
 
 
 13.0.0

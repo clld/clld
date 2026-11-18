@@ -1,5 +1,8 @@
 """
+Create the database for a clld app, running its custom `initializedb` code.
 
+This requires installing the clld package with the [initdb] extra, i.e. running
+`pip install clld[initdb]` or equivalent.
 """
 import argparse
 import pathlib
@@ -39,7 +42,7 @@ def register(parser):
         type=PathType(type='file'),
         default=None,
     )
-    for name in ['concepticon', 'glottolog']:
+    for name in ['concepticon', 'glottolog', 'clts']:
         parser.add_argument(
             '--' + name,
             metavar=name.upper(),
@@ -52,14 +55,10 @@ def register(parser):
 
 
 def run(args: argparse.Namespace):  # noqa: C901
-    if (args.glottolog or args.concepticon) and Catalog is None:  # pragma: no cover
-        print('To use reference catalogs you must install the cldfcatalog package!')
-        return 10
+    if (not Dataset) or (not Catalog):  # pragma: no cover
+        raise ImportError('To run initdb you need to install clld with [initdb] extra.')
 
     if args.cldf:  # pragma: no cover
-        if not Dataset:
-            print('To import CLDF data you must install the pycldf package!')
-            return 10
         args.cldf = Dataset.from_metadata(args.cldf)
 
     with contextlib.ExitStack() as stack:
@@ -67,7 +66,7 @@ def run(args: argparse.Namespace):  # noqa: C901
             stack.enter_context(db.FreshDB.from_settings(args.settings, log=args.log))
         stack.enter_context(SessionContext(args.settings))
 
-        for name in ['concepticon', 'glottolog']:
+        for name in ['concepticon', 'glottolog', 'clts']:
             if getattr(args, name):  # pragma: no cover
                 if getattr(args, name + '_version'):
                     stack.enter_context(
